@@ -45,8 +45,8 @@ body{font-family:var(--sans);color:var(--ink);font-size:15px;line-height:1.5;-we
 .tile h1{font-size:17px;font-weight:800;letter-spacing:-.01em;color:var(--navy);margin:10px 0 4px}
 .tile .sub{color:var(--muted);font-size:13.5px;margin:0 0 26px}
 
-.enterBtn{appearance:none;border:0;cursor:pointer;font-family:var(--sans);font-weight:700;font-size:14px;
-  color:#fff;background:linear-gradient(120deg,var(--navy2),var(--navy3));padding:13px 34px;border-radius:999px;
+.enterBtn{appearance:none;border:0;cursor:pointer;font-family:var(--sans);font-weight:600;font-size:11.5px;
+  color:#fff;background:linear-gradient(120deg,var(--navy2),var(--navy3));padding:8px 20px;border-radius:999px;
   letter-spacing:.04em;transition:transform .15s ease, box-shadow .15s ease}
 .enterBtn:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(10,31,68,.35)}
 .enterBtn:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}
@@ -56,6 +56,19 @@ body{font-family:var(--sans);color:var(--ink);font-size:15px;line-height:1.5;-we
   transition:background .15s ease,color .15s ease}
 .studentBtn:hover{background:var(--soft);color:var(--magenta)}
 .studentBtn:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
+
+.entryTiles{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:8px 0 22px;text-align:left}
+.entryTile{display:block;text-decoration:none;background:var(--soft);border:1px solid var(--line);
+  border-top:3px solid var(--magenta);border-radius:12px;padding:15px 15px 13px;
+  transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease}
+.entryTile:nth-child(even){border-top-color:var(--cyan)}
+.entryTile:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(10,31,68,.14)}
+.entryTile:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
+.entryTile .etk{font-size:9px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:var(--muted);margin-bottom:6px}
+.entryTile .ett{font-size:13.5px;font-weight:800;color:var(--navy);line-height:1.2}
+.entryTile .etg{margin-top:9px;font-size:11px;font-weight:700;color:var(--magenta)}
+.entryTile:nth-child(even) .etg{color:var(--cyan)}
+@media (max-width:420px){.entryTiles{grid-template-columns:1fr}}
 
 /* password reveal */
 .pwArea{max-height:0;overflow:hidden;transition:max-height .4s ease}
@@ -131,6 +144,18 @@ a.card:nth-child(even) .cardgo{color:var(--cyan)}
     <img class="logo" id="ascendLogo" alt="ASCEND Curriculum" src="">
     <h1>Dashboard Hub</h1>
     <p class="sub">Your guide to the ASCEND curriculum.</p>
+    <div class="entryTiles">
+      <a class="entryTile" href="https://sinaiascend.github.io/Landing-Page---Students/">
+        <div class="etk">For Students</div>
+        <div class="ett">Student Dashboard</div>
+        <div class="etg">Open &rarr;</div>
+      </a>
+      <a class="entryTile" href="https://sinaiascend.github.io/Landing-Page---Faculty/">
+        <div class="etk">For Faculty</div>
+        <div class="ett">Faculty Dashboard</div>
+        <div class="etg">Open &rarr;</div>
+      </a>
+    </div>
     <button class="enterBtn" id="enterBtn">Enter access code</button>
     <div class="pwArea" id="pwArea">
       <div class="pwRow">
@@ -139,7 +164,6 @@ a.card:nth-child(even) .cardgo{color:var(--cyan)}
       </div>
       <div class="pwErr" id="pwErr">That code isn’t recognized. Check with the Office of Curricular Affairs.</div>
     </div>
-    <a class="studentBtn" id="studentBtn" href="REPLACE_STUDENT_LANDING_URL">To Student Dashboard →</a>
   </div>
   <div class="gatefoot">Icahn School of Medicine at Mount Sinai · ASCEND Curriculum · Internal program-evaluation use</div>
 </div>
