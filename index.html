@@ -43,7 +43,13 @@ body{font-family:var(--sans);color:var(--ink);font-size:15px;line-height:1.5;-we
 .tile .eyebrow::after{background:var(--cyan)}
 .logo{width:min(300px,78%);height:auto;display:block;margin:0 auto 8px;user-select:none;-webkit-user-drag:none}
 .tile h1{font-size:17px;font-weight:800;letter-spacing:-.01em;color:var(--navy);margin:10px 0 4px}
-.tile .sub{color:var(--muted);font-size:13.5px;margin:0 0 26px}
+.tile .sub{color:var(--muted);font-size:13.5px;margin:0 0 14px}
+.tile .inst{font-size:11.5px;font-weight:700;color:var(--navy);letter-spacing:.01em;line-height:1.3;margin:0 0 12px}
+.tile .tagline{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:7px;background:transparent;margin:2px 0 22px}
+.tile .tagline span{font-size:11px;font-weight:800;letter-spacing:-.01em;line-height:1}
+.tile .tl-a{color:var(--cyan)}
+.tile .tl-b{color:var(--navy)}
+.tile .tl-c{color:var(--magenta)}
 
 .enterBtn{appearance:none;border:0;cursor:pointer;font-family:var(--sans);font-weight:600;font-size:11.5px;
   color:#fff;background:linear-gradient(120deg,var(--navy2),var(--navy3));padding:8px 20px;border-radius:999px;
@@ -85,7 +91,7 @@ body{font-family:var(--sans);color:var(--ink);font-size:15px;line-height:1.5;-we
 .pwErr.show{visibility:visible}
 .tile.shake{animation:shake .4s ease}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-9px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(4px)}}
-.gatefoot{position:absolute;bottom:18px;left:0;right:0;text-align:center;color:rgba(207,224,245,.55);font-size:11.5px;letter-spacing:.05em}
+
 
 /* ================= HUB (tier page) ================= */
 .hub{display:none;min-height:100vh}
@@ -118,7 +124,7 @@ a.card:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
 .cardblurb{font-size:13.5px;color:var(--muted)}
 .cardgo{margin-top:14px;font-weight:700;font-size:13px;color:var(--magenta)}
 a.card:nth-child(even) .cardgo{color:var(--cyan)}
-.foot{color:var(--muted);font-size:12px;padding:22px 0 30px;border-top:1px solid var(--line);margin-top:10px}
+
 
 @media (max-width:680px){
   .cards{grid-template-columns:1fr}
@@ -140,10 +146,16 @@ a.card:nth-child(even) .cardgo{color:var(--cyan)}
     <div class="peak"></div><div class="peak"></div><div class="peak"></div><div class="peak"></div><div class="peak"></div>
   </div>
   <div class="tile" id="tile">
+    <div class="inst">Icahn School of Medicine at Mount Sinai</div>
     <div class="eyebrow">Office of Curricular Affairs</div>
     <img class="logo" id="ascendLogo" alt="ASCEND Curriculum" src="">
     <h1>Dashboard Hub</h1>
     <p class="sub">Your guide to the ASCEND curriculum.</p>
+    <div class="tagline">
+      <span class="tl-a">Climb higher.</span>
+      <span class="tl-b">Reach further.</span>
+      <span class="tl-c">Care deeper.</span>
+    </div>
     <div class="entryTiles">
       <a class="entryTile" href="https://sinaiascend.github.io/Landing-Page---Students/">
         <div class="etk">For Students</div>
@@ -165,7 +177,6 @@ a.card:nth-child(even) .cardgo{color:var(--cyan)}
       <div class="pwErr" id="pwErr">That code isn’t recognized. Check with the Office of Curricular Affairs.</div>
     </div>
   </div>
-  <div class="gatefoot">Icahn School of Medicine at Mount Sinai · ASCEND Curriculum · Internal program-evaluation use</div>
 </div>
 
 <!-- ============ STAGE 2 · HUB ============ -->
@@ -188,7 +199,6 @@ a.card:nth-child(even) .cardgo{color:var(--cyan)}
   <main>
     <div class="wrap">
       <div class="cards" id="cardGrid"></div>
-      <div class="foot">Icahn School of Medicine at Mount Sinai · ASCEND Curriculum · Internal program-evaluation use.</div>
     </div>
   </main>
 </div>
