@@ -204,32 +204,32 @@ const DASHBOARDS = {
   clerkships: {
     url: "https://sinaiascend.github.io/Dashboard---Clerkships/",
     kicker: "Program Monitoring",
-    title: "Clerkship Dashboard",
+    title: "ASCEND Clerkship Dashboard",
     blurb: "LCME element monitoring (9.7, 9.4, 9.3, 3.5) across all eight clerkships against adjustable benchmarks."
   },
   DO: {
     url: "https://sinaiascend.github.io/Dashboard---Direct-Observations/",
     kicker: "Assessment Monitoring",
-    title: "Clerkship Direct Observation Dashboard",
+    title: "ASCEND Clerkship DO Dashboard",
     blurb: "Item-level SP direct-observation performance, mapped to the NBME Physician Tasks & Competencies framework."
   },
   directors: {
     url: "https://sinaiascend.github.io/Dashboard---Directors/",
     kicker: "Curriculum Mapping",
-    title: "Curriculum Navigator — Directors",
-    blurb: "Session maps, SLO alignment, curricular threads, and AOC coverage for clerkship and program directors."
+    title: "ASCEND Curriculum Navigator — Directors",
+    blurb: "Session maps, learning objectives alignment, curricular threads, and AOC coverage for module and clerkship directors."
   },
   students: {
     url: "https://sinaiascend.github.io/Dashboard---Students/",
     kicker: "Curriculum Search",
-    title: "Curriculum Navigator — Students",
-    blurb: "Student-facing view of the ASCEND curriculum: sessions, objectives, and the academic calendar."
+    title: "ASCEND Curriculum Navigator",
+    blurb: "Search the ASCEND curriculum: sessions, objectives, and the academic calendar."
   },
   job: {
     url: "https://sinaiascend.github.io/Dashboard---JobPostings/",
     kicker: "Medical Education Roles",
     title: "Faculty Opportunities",
-    blurb: "Open roles, leadership, and how to get involved with the Office of Curricular Affairs."
+    blurb: "Open roles, leadership, and how to get involved with Medical Education."
   },
   governance: {
     url: "https://sinaiascend.github.io/Dashboard---Governance/",
@@ -241,7 +241,7 @@ const DASHBOARDS = {
     url: "https://sinaiascend.github.io/Dashboard---LCME/",
     kicker: "Accreditation",
     title: "LCME Curriculum Task Force",
-    blurb: "DCI and ISA tracking, element glossary, and kickoff materials for the LCME accreditation task force."
+    blurb: "DCI and ISA tracking, element glossary, and materials for the LCME accreditation task force."
   }
 };
 
@@ -249,7 +249,7 @@ const DASHBOARDS = {
    To change a code: uppercase it, hash it (any SHA-256 tool), replace the key. */
 const TIERS = {
   "5942bd952f12e02478b5a6aba902340a58c9c769a961f128dbb57f0b79358537": {  // Tier 1 — code: ASCEND
-    name: "Senior Curriculum Leadership",
+    name: "Office of Curricular Affairs",
     sub: "Full access — all monitoring, mapping, governance, and accreditation views.",
     dashboards: ["clerkships","DO","directors","students","governance","LCME","job"]
   },
@@ -269,7 +269,7 @@ const TIERS = {
     dashboards: ["governance","directors","job"]
   },
   "fb31bd7dfdce77f9f73e07eea6ad612b599af0ce76c513789adb0e2a169c448f": {  // Tier 5 — code: LCME
-    name: "LCME Task Force",
+    name: "LCME Curriculum Task Force Members",
     sub: "Accreditation tracking, curriculum maps, and office resources.",
     dashboards: ["LCME","directors","job"]
   }
