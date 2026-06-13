@@ -213,6 +213,12 @@ const DASHBOARDS = {
     title: "ASCEND Clerkship DO Dashboard",
     blurb: "Item-level SP direct-observation performance, mapped to the NBME Physician Tasks & Competencies framework."
   },
+  nbme: {
+    url: "https://sinaiascend.github.io/Dashboard---NBME-CAS-Performance/",
+    kicker: "Assessment Monitoring",
+    title: "USMLE/NBME Content-Area Performance Dashboard",
+    blurb: "Content-area strengths and gaps across NBME assessments — Module CAS, CBSE, Step 1, clerkship shelf exams, Step 2, and the CAS→CBSE correlation — for curricular review."
+  },
   directors: {
     url: "https://sinaiascend.github.io/Dashboard---Directors/",
     kicker: "Curriculum Mapping",
@@ -251,17 +257,17 @@ const TIERS = {
   "5942bd952f12e02478b5a6aba902340a58c9c769a961f128dbb57f0b79358537": {  // Tier 1 — code: ASCEND
     name: "Office of Curricular Affairs",
     sub: "Full access — all monitoring, mapping, governance, and accreditation views.",
-    dashboards: ["clerkships","DO","directors","students","governance","LCME","job"]
+    dashboards: ["clerkships","DO","nbme","directors","students","governance","LCME","job"]
   },
   "31016cceeab858e9880093fcb959e82b5ac270f082b80c9ef9a63a731c9c7d86": {  // Tier 2 — code: PCCS
     name: "Pre-Clerkship Curriculum Directors",
     sub: "Curriculum mapping and office resources.",
-    dashboards: ["directors","job"]
+    dashboards: ["nbme","directors","job"]
   },
   "5156cc64ad912a74bb8bd6a96ec955fa6d4fc4c4f97815d53e6eef9439d398a0": {  // Tier 3 — code: CCS
     name: "Clinical Curriculum Directors",
     sub: "Clerkship monitoring, direct-observation assessment, and curriculum maps.",
-    dashboards: ["DO","clerkships","directors","job"]
+    dashboards: ["DO","clerkships","nbme","directors","job"]
   },
   "255af8d0734e8438d7fcef7cb457da08d130e24f574065175f2ab73ed2ffb360": {  // Tier 4 — code: EEC
     name: "Governance Committee Members",
