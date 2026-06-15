@@ -18,8 +18,12 @@ html,body{margin:0;min-height:100%}
 body{font-family:var(--sans);color:var(--ink);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;background:var(--bg)}
 
 /* ================= GATE (solo tile) ================= */
-.gate{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;
-  background:linear-gradient(120deg,var(--navy) 0%,var(--navy2) 55%,var(--navy3) 100%);overflow:hidden;z-index:50;
+.gate{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  padding:24px;
+  padding-top:calc(24px + env(safe-area-inset-top));
+  padding-bottom:calc(24px + env(safe-area-inset-bottom));
+  background:linear-gradient(120deg,var(--navy) 0%,var(--navy2) 55%,var(--navy3) 100%);
+  overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;z-index:50;
   transition:opacity .45s ease, visibility .45s ease}
 .gate.hidden{opacity:0;visibility:hidden;pointer-events:none}
 
@@ -34,7 +38,7 @@ body{font-family:var(--sans);color:var(--ink);font-size:15px;line-height:1.5;-we
 .peak:nth-child(4){left:64%;height:85vh;opacity:.6}
 .peak:nth-child(5){left:82%;height:110vh;opacity:.8}
 
-.tile{position:relative;width:min(480px,100%);background:#fff;border-radius:18px;
+.tile{position:relative;width:min(480px,100%);margin:auto;background:#fff;border-radius:18px;
   box-shadow:0 24px 70px rgba(2,10,30,.45);padding:46px 42px 38px;text-align:center;
   border-top:5px solid var(--magenta)}
 .tile .eyebrow{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--muted);font-weight:700;
