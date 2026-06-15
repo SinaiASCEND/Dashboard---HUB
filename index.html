@@ -63,6 +63,13 @@ body{font-family:var(--sans);color:var(--ink);font-size:15px;line-height:1.5;-we
 .studentBtn:hover{background:var(--soft);color:var(--magenta)}
 .studentBtn:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
 
+.oacBtn{display:block;width:100%;margin-top:14px;font-family:var(--sans);font-weight:700;font-size:12.5px;
+  letter-spacing:.04em;text-align:center;text-decoration:none;color:var(--navy2);background:var(--soft);
+  border:1px solid var(--line);border-top:3px solid var(--cyan);padding:12px 16px;border-radius:12px;
+  transition:transform .15s ease,box-shadow .15s ease,color .15s ease}
+.oacBtn:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(10,31,68,.14);color:var(--magenta)}
+.oacBtn:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
+
 .entryTiles{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:8px 0 22px;text-align:left}
 .entryTile{display:block;text-decoration:none;background:var(--soft);border:1px solid var(--line);
   border-top:3px solid var(--magenta);border-radius:12px;padding:15px 15px 13px;
@@ -176,6 +183,7 @@ a.card:nth-child(even) .cardgo{color:var(--cyan)}
       </div>
       <div class="pwErr" id="pwErr">That code isn’t recognized. Check with the Office of Curricular Affairs.</div>
     </div>
+    <a class="oacBtn" href="https://sinaiascend.github.io/Curricular-Affairs/">Meet the Office of Curricular Affairs &rarr;</a>
   </div>
 </div>
 
