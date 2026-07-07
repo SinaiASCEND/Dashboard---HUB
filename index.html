@@ -399,7 +399,8 @@ document.getElementById('enterBtn').addEventListener('click', () => {
 function tryUnlock(){
   const code = pwInput.value.trim().toUpperCase();
   if(!code) return;
-  const tier = TIERS[sha256(code)];
+  const h = sha256(code);
+  const tier = TIERS[h];
   if(!tier){
     pwErr.classList.add('show');
     tile.classList.remove('shake'); void tile.offsetWidth; tile.classList.add('shake');
@@ -407,6 +408,7 @@ function tryUnlock(){
     return;
   }
   pwErr.classList.remove('show');
+  try { sessionStorage.setItem('ascendTier', h); } catch(e){}
   renderTier(tier);
   gate.classList.add('hidden');
   hub.classList.add('active');
@@ -484,10 +486,29 @@ function renderTier(tier){
 }
 
 document.getElementById('lockBtn').addEventListener('click', () => {
+  try { sessionStorage.removeItem('ascendTier'); } catch(e){}
   hub.classList.remove('active');
   gate.classList.remove('hidden');
   pwArea.classList.remove('open');
 });
+
+/* Restore the unlocked tier when returning to the hub (e.g., browser Back
+   from a dashboard). The tier hash lives in sessionStorage, so it survives
+   navigation within the tab but is cleared when the tab closes or the user
+   clicks Lock. */
+function restoreTier(){
+  let h = null;
+  try { h = sessionStorage.getItem('ascendTier'); } catch(e){}
+  const tier = h && TIERS[h];
+  if(tier){
+    renderTier(tier);
+    gate.classList.add('hidden');
+    hub.classList.add('active');
+    pwArea.classList.remove('open');
+  }
+}
+restoreTier();
+window.addEventListener('pageshow', e => { if(e.persisted) restoreTier(); });
 </script>
 </body>
 </html>
