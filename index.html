@@ -151,6 +151,20 @@ a.card{position:relative}
 .favstar:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){.favstar{transition:none}}
 
+/* ---- sub-tier: locked tiles + unlock modal ---- */
+a.card.locked{cursor:pointer}
+a.card.locked .cardkicker,a.card.locked .cardtitle,a.card.locked .cardblurb{opacity:.55}
+a.card.locked .cardgo{color:var(--muted)}
+.lockbadge{position:absolute;top:10px;right:44px;font-size:11.5px;font-weight:700;color:var(--muted);
+  background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:3px 10px;letter-spacing:.02em}
+.subgate-overlay{position:fixed;inset:0;background:rgba(10,31,68,.45);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
+.subgate-overlay.open{display:flex}
+.subgate{background:#fff;border-radius:var(--radius);padding:26px 26px 20px;width:min(430px,94vw);
+  border-top:4px solid var(--magenta);box-shadow:0 18px 50px rgba(10,31,68,.35)}
+.subgate h3{margin:0 0 6px;font-size:17px;color:var(--navy)}
+.subgate p{margin:0 0 16px;font-size:13.5px;color:var(--muted)}
+.subgate .pwRow{margin-top:0}
+
 
 @media (max-width:680px){
   .cards{grid-template-columns:1fr}
@@ -228,6 +242,19 @@ a.card{position:relative}
       <div class="cards" id="cardGrid"></div>
     </div>
   </main>
+
+<!-- Sub-tier unlock (faculty-only tiles) -->
+<div class="subgate-overlay" id="subGate" role="dialog" aria-modal="true" aria-labelledby="subGateTitle">
+  <div class="subgate">
+    <h3 id="subGateTitle">Faculty access required</h3>
+    <p>This dashboard is restricted to faculty. Enter the faculty access code to unlock it.</p>
+    <div class="pwRow">
+      <input type="password" id="subPwInput" placeholder="Faculty code" autocomplete="off" aria-label="Faculty access code">
+      <button id="subPwGo">Unlock</button>
+    </div>
+    <div class="pwErr" id="subPwErr">That code isn&rsquo;t recognized. Check with the Office of Curricular Affairs.</div>
+  </div>
+</div>
 </div>
 
 <script>
@@ -327,13 +354,19 @@ const DASHBOARDS = {
     url: "https://sinaiascend.github.io/PMB-MLOs/",
     kicker: "Curriculum Mapping",
     title: "ASCEND Phase 1 Curriculum Map Portal",
-    blurb: "Phase 1 module learning objectives and curriculum mapping \u2014 explore how content aligns across the pre-clerkship curriculum."
+    blurb: "Phase 1 module learning objectives mapped across the pre-clerkship curriculum \u2014 browse MLOs by module, session, and alignment."
   },
   policyreview: {
     url: "https://sinaiascend.github.io/PMB-Policies/",
-    kicker: "Governance",
+    kicker: "Policy Review",
     title: "ASCEND Policy Review Portal",
-    blurb: "Institutional and program policies under review \u2014 supporting governance oversight and policy stewardship."
+    blurb: "Review and track curricular policies under consideration \u2014 drafts, revisions, and materials to support governance deliberation."
+  },
+  policylibrary: {
+    url: "https://sinaiascend.github.io/Dashboard---Policy-Library/",
+    kicker: "Policies",
+    title: "ASCEND Policy Library",
+    blurb: "The central library of approved curricular and student policies \u2014 searchable, versioned, and organized for quick reference."
   }
 };
 
@@ -343,7 +376,7 @@ const TIERS = {
   "5942bd952f12e02478b5a6aba902340a58c9c769a961f128dbb57f0b79358537": {  // Tier 1 — code: ASCEND
     name: "Office of Curricular Affairs",
     sub: "Full access — all monitoring, mapping, governance, and accreditation views.",
-    dashboards: ["clerkships","DO","nbme","mepo","electives","asqisa","directors","students","governance","LCME","job","babybates","clinicalcompetency","curricularaffairs"]
+    dashboards: ["clerkships","DO","nbme","mepo","electives","asqisa","phase1map","policyreview","policylibrary","directors","students","governance","LCME","job","babybates","clinicalcompetency","curricularaffairs"]
   },
   "31016cceeab858e9880093fcb959e82b5ac270f082b80c9ef9a63a731c9c7d86": {  // Tier 2 — code: PCCS
     name: "Pre-Clerkship Curriculum Directors",
@@ -353,12 +386,20 @@ const TIERS = {
   "5156cc64ad912a74bb8bd6a96ec955fa6d4fc4c4f97815d53e6eef9439d398a0": {  // Tier 3 — code: CCS
     name: "Clinical Curriculum Directors",
     sub: "Clerkship monitoring, direct-observation assessment, and curriculum maps.",
-    dashboards: ["DO","clerkships","nbme","directors","job"]
+    dashboards: ["DO","clerkships","nbme","directors","job"],
+    /* Sub-tier: tiles listed here appear locked until the code is re-entered.
+       To change the code: uppercase it, hash it (any SHA-256 tool), replace the hash.
+       Current code: CCS (same as the tier code — acts as a confirmation gate) */
+    locked: {
+      hash: "5156cc64ad912a74bb8bd6a96ec955fa6d4fc4c4f97815d53e6eef9439d398a0",
+      label: "Faculty only",
+      dashboards: ["DO"]
+    }
   },
   "255af8d0734e8438d7fcef7cb457da08d130e24f574065175f2ab73ed2ffb360": {  // Tier 4 — code: EEC
     name: "Governance Committee Members",
     sub: "Governance, curriculum maps, and office resources.",
-    dashboards: ["governance","phase1map","policyreview","directors","job"]
+    dashboards: ["governance","directors","job"]
   },
   "fb31bd7dfdce77f9f73e07eea6ad612b599af0ce76c513789adb0e2a169c448f": {  // Tier 5 — code: LCME
     name: "LCME Curriculum Task Force Members",
@@ -457,14 +498,25 @@ function renderTier(tier){
   ordered.forEach(key => {
     const d = DASHBOARDS[key];
     if(!d) return;
+    const isLocked = tier.locked && tier.locked.dashboards.includes(key) && !subUnlocked(tier);
     const a=document.createElement('a');
-    a.className='card'; a.href=d.url;
+    a.className='card';
+    if(isLocked){
+      a.classList.add('locked');
+      a.setAttribute('role','button');
+      a.setAttribute('tabindex','0');
+      a.setAttribute('aria-label', d.title+' — locked, faculty access required');
+      a.addEventListener('click', e=>{ e.preventDefault(); openSubGate(key); });
+      a.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openSubGate(key); } });
+    } else {
+      a.href=d.url;
+    }
     const isFav = favs.has(key);
     const body =
       '<div class="cardkicker">'+d.kicker+'</div>'+
       '<div class="cardtitle">'+d.title+'</div>'+
       '<div class="cardblurb">'+d.blurb+'</div>'+
-      '<div class="cardgo">Open dashboard →</div>';
+      '<div class="cardgo">'+(isLocked ? 'Enter faculty code →' : 'Open dashboard →')+'</div>';
     if(d.img){
       a.classList.add('hascover');
       a.innerHTML =
@@ -493,12 +545,59 @@ function renderTier(tier){
     star.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' ') toggleFav(e); });
     a.appendChild(star);
 
+    if(isLocked){
+      const badge=document.createElement('span');
+      badge.className='lockbadge';
+      badge.textContent='\uD83D\uDD12 '+((tier.locked && tier.locked.label) || 'Locked');
+      a.appendChild(badge);
+    }
+
     grid.appendChild(a);
   });
 }
 
+/* ---- sub-tier (faculty-locked tiles) ---- */
+const subGate=document.getElementById('subGate'), subPwInput=document.getElementById('subPwInput'),
+      subPwErr=document.getElementById('subPwErr');
+let pendingLockedKey=null;
+
+function subUnlocked(tier){
+  if(!tier || !tier.locked) return true;
+  try { return sessionStorage.getItem('ascendSub') === tier.locked.hash; } catch(e){ return false; }
+}
+function openSubGate(key){
+  pendingLockedKey=key;
+  subPwErr.classList.remove('show');
+  subPwInput.value='';
+  subGate.classList.add('open');
+  setTimeout(()=>subPwInput.focus(), 50);
+}
+function closeSubGate(){
+  subGate.classList.remove('open');
+  pendingLockedKey=null;
+}
+function trySubUnlock(){
+  const code = subPwInput.value.trim().toUpperCase();
+  if(!code) return;
+  if(currentTier && currentTier.locked && sha256(code)===currentTier.locked.hash){
+    try { sessionStorage.setItem('ascendSub', currentTier.locked.hash); } catch(e){}
+    const key=pendingLockedKey;
+    closeSubGate();
+    renderTier(currentTier);
+    if(key && DASHBOARDS[key]) window.location.href = DASHBOARDS[key].url;
+  } else {
+    subPwErr.classList.add('show');
+    subPwInput.select();
+  }
+}
+document.getElementById('subPwGo').addEventListener('click', trySubUnlock);
+subPwInput.addEventListener('keydown', e => { if(e.key==='Enter') trySubUnlock(); if(e.key==='Escape') closeSubGate(); });
+subPwInput.addEventListener('input', () => subPwErr.classList.remove('show'));
+subGate.addEventListener('click', e => { if(e.target===subGate) closeSubGate(); });
+
 document.getElementById('lockBtn').addEventListener('click', () => {
   try { sessionStorage.removeItem('ascendTier'); } catch(e){}
+  try { sessionStorage.removeItem('ascendSub'); } catch(e){}
   hub.classList.remove('active');
   gate.classList.remove('hidden');
   pwArea.classList.remove('open');
