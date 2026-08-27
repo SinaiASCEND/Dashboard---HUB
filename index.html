@@ -380,6 +380,12 @@ const DASHBOARDS = {
     title: "AAMC Graduation Questionnaire Dashboard",
     blurb: "Class of 2026 GQ results \u2014 satisfaction, learning environment, and curricular items benchmarked against 155 LCME-accredited MD programs with national percentiles."
   },
+  sitecomparability: {
+    url: "https://sinaiascend.github.io/Dashboard-Site-Comparability/",
+    kicker: "Site Comparability",
+    title: "Clerkship Site Reports",
+    blurb: "Site-level clerkship experience across teaching sites \u2014 supervision (LCME 9.3) and learning environment (3.5), with each site benchmarked against anonymized peers. Opens a secure hub that requires a per-site access code."
+  },
   clerkshipassessments: {
     url: "https://sinaiascend.github.io/Dashboard---Clerkship-Assessments/",
     kicker: "Assessment Quality",
@@ -400,7 +406,7 @@ const TIERS = {
   "5942bd952f12e02478b5a6aba902340a58c9c769a961f128dbb57f0b79358537": {  // Tier 1 — code: ASCEND
     name: "Office of Curricular Affairs",
     sub: "Full access — all monitoring, mapping, governance, and accreditation views.",
-    dashboards: ["clerkships","DO","nbme","clerkshipassessments","mepo","electives","asqisa","aamcgq","aamcscope","phase1map","milestonesmap","policyreview","policylibrary","directors","students","governance","LCME","job","babybates","clinicalcompetency","curricularaffairs"]
+    dashboards: ["clerkships","sitecomparability","DO","nbme","clerkshipassessments","mepo","electives","asqisa","aamcgq","aamcscope","phase1map","milestonesmap","policyreview","policylibrary","directors","students","governance","LCME","job","babybates","clinicalcompetency","curricularaffairs"]
   },
   "31016cceeab858e9880093fcb959e82b5ac270f082b80c9ef9a63a731c9c7d86": {  // Tier 2 — code: PCCS
     name: "Pre-Clerkship Curriculum Directors",
@@ -410,7 +416,7 @@ const TIERS = {
   "5156cc64ad912a74bb8bd6a96ec955fa6d4fc4c4f97815d53e6eef9439d398a0": {  // Tier 3 — code: CCS
     name: "Clinical Curriculum Directors",
     sub: "Clerkship monitoring, direct-observation assessment, and curriculum maps.",
-    dashboards: ["DO","clerkships","nbme","directors","job"],
+    dashboards: ["DO","clerkships","sitecomparability","nbme","directors","job"],
     /* Sub-tier: tiles listed here appear locked until the code is re-entered.
        To change the code: uppercase it, hash it (any SHA-256 tool), replace the hash.
        Current code: CCS (same as the tier code — acts as a confirmation gate) */
@@ -434,6 +440,11 @@ const TIERS = {
     name: "Clinical Competency Mentors",
     sub: "Clinical competency, physical examination, and office resources.",
     dashboards: ["curricularaffairs","babybates","clinicalcompetency","job","directors"]
+  },
+  "03392dae7966b87086b1cc4e771ba78070c8f21819ba84311526d7c203da9b6e": {  // Tier 7 — code: SITES
+    name: "Clerkship Site Directors",
+    sub: "Site-level clerkship comparability reports.",
+    dashboards: ["sitecomparability"]
   }
 };
 /* ============================================================ */
