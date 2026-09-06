@@ -73,6 +73,8 @@ body{font-family:var(--sans);color:var(--ink);font-size:15px;line-height:1.5;-we
   transition:transform .15s ease,box-shadow .15s ease,color .15s ease}
 .oacBtn:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(10,31,68,.14);color:var(--magenta)}
 .oacBtn:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
+.oacBtn--alt{margin-top:10px;border-top-color:var(--magenta)}
+.oacBtn--alt:hover{color:var(--cyan)}
 
 .entryTiles{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:8px 0 22px;text-align:left}
 .entryTile{display:block;text-decoration:none;background:var(--soft);border:1px solid var(--line);
@@ -217,6 +219,7 @@ a.card.locked .cardgo{color:var(--muted)}
       <div class="pwErr" id="pwErr">That code isn’t recognized. Check with the Office of Curricular Affairs.</div>
     </div>
     <a class="oacBtn" href="https://sinaiascend.github.io/Curricular-Affairs/">Meet the Office of Curricular Affairs &rarr;</a>
+    <a class="oacBtn oacBtn--alt" href="https://sinaiascend.github.io/Dashboard---Curricular-Students/">Meet the Curricular Student Leadership &rarr;</a>
   </div>
 </div>
 
