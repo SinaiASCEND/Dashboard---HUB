@@ -430,45 +430,45 @@ const DASHBOARDS = {
 /* Tiers, keyed by SHA-256 of the UPPERCASED access code.
    To change a code: uppercase it, hash it (any SHA-256 tool), replace the key. */
 const TIERS = {
-  "5942bd952f12e02478b5a6aba902340a58c9c769a961f128dbb57f0b79358537": {  // Tier 1 — code: ASCEND
+  "5942bd952f12e02478b5a6aba902340a58c9c769a961f128dbb57f0b79358537": {  // Tier 1
     name: "Office of Curricular Affairs",
     sub: "Full access — all monitoring, mapping, governance, and accreditation views.",
     dashboards: ["phase1assessment","phase2assessment","phase3assessment","clerkships","sitecomparability","sitecomp2526","DO","nbme","clerkshipassessments","mepo","electives","asqisa","aamcgq","aamcscope","phase1map","milestonesmap","policyreview","policylibrary","directors","students","governance","LCME","job","babybates","clinicalcompetency","curricularaffairs"]
   },
-  "31016cceeab858e9880093fcb959e82b5ac270f082b80c9ef9a63a731c9c7d86": {  // Tier 2 — code: PCCS
+  "31016cceeab858e9880093fcb959e82b5ac270f082b80c9ef9a63a731c9c7d86": {  // Tier 2
     name: "Pre-Clerkship Curriculum Directors",
     sub: "Curriculum mapping, governance, and office resources.",
     dashboards: ["phase1assessment","nbme","governance","directors","job"]
   },
-  "5156cc64ad912a74bb8bd6a96ec955fa6d4fc4c4f97815d53e6eef9439d398a0": {  // Tier 3 — code: CCS
+  "5156cc64ad912a74bb8bd6a96ec955fa6d4fc4c4f97815d53e6eef9439d398a0": {  // Tier 3
     name: "Clinical Curriculum Directors",
     sub: "Clerkship monitoring, direct-observation assessment, curriculum maps, and governance.",
     dashboards: ["phase2assessment","phase3assessment","DO","clerkships","sitecomparability","sitecomp2526","nbme","asqisa","governance","directors","job"],
     /* Sub-tier: tiles listed here appear locked until the code is re-entered.
        To change the code: uppercase it, hash it (any SHA-256 tool), replace the hash.
-       Current code: CCS (same as the tier code — acts as a confirmation gate) */
+       Code is stored as a hash below (same as the tier code — acts as a confirmation gate) */
     locked: {
       hash: "5156cc64ad912a74bb8bd6a96ec955fa6d4fc4c4f97815d53e6eef9439d398a0",
       label: "Faculty only",
       dashboards: ["DO"]
     }
   },
-  "255af8d0734e8438d7fcef7cb457da08d130e24f574065175f2ab73ed2ffb360": {  // Tier 4 — code: EEC
+  "255af8d0734e8438d7fcef7cb457da08d130e24f574065175f2ab73ed2ffb360": {  // Tier 4
     name: "Governance Committee Members",
     sub: "Governance, curriculum maps, and office resources.",
     dashboards: ["phase1assessment","phase2assessment","phase3assessment","governance","directors","job"]
   },
-  "fb31bd7dfdce77f9f73e07eea6ad612b599af0ce76c513789adb0e2a169c448f": {  // Tier 5 — code: LCME
+  "fb31bd7dfdce77f9f73e07eea6ad612b599af0ce76c513789adb0e2a169c448f": {  // Tier 5
     name: "LCME Curriculum Task Force Members",
     sub: "Accreditation tracking, curriculum maps, and office resources.",
     dashboards: ["LCME","directors","job"]
   },
-  "9f8b17ea00b6b3fd1efa6d10aa21cfedc91ba71a26b03557e09576370c157a81": {  // Tier 6 — code: CCM
+  "9f8b17ea00b6b3fd1efa6d10aa21cfedc91ba71a26b03557e09576370c157a81": {  // Tier 6
     name: "Clinical Competency Mentors",
     sub: "Clinical competency, physical examination, and office resources.",
     dashboards: ["curricularaffairs","babybates","clinicalcompetency","job","directors"]
   },
-  "4ed5cb948f5f7c10d66e38ed679d0e5f0be24469df2de636c2da893d5b06ecb3": {  // Tier 7 — code: CIS
+  "4ed5cb948f5f7c10d66e38ed679d0e5f0be24469df2de636c2da893d5b06ecb3": {  // Tier 7
     name: "Curricular Integration Subcommittee",
     sub: "Programmatic assessment across all three phases, curriculum maps, governance, and electives.",
     dashboards: ["phase1assessment","phase2assessment","phase3assessment","directors","governance","electives"]
