@@ -171,6 +171,7 @@ a.card.locked .cardgo{color:var(--muted)}
 .subgate h3{margin:0 0 6px;font-size:17px;color:var(--navy)}
 .subgate p{margin:0 0 16px;font-size:13.5px;color:var(--muted)}
 .subgate .pwRow{margin-top:0}
+#emailInput{font-family:var(--sans);letter-spacing:0;text-transform:none}
 
 
 @media (max-width:680px){
@@ -263,6 +264,22 @@ a.card.locked .cardgo{color:var(--muted)}
     <div class="pwErr" id="subPwErr">That code isn&rsquo;t recognized. Check with the Office of Curricular Affairs.</div>
   </div>
 </div>
+</div>
+
+
+<!-- ============ EMAIL CHECK · PUBLIC LINKS ============ -->
+<div class="subgate-overlay" id="emailGate" role="dialog" aria-modal="true" aria-labelledby="emailGateTitle">
+  <div class="subgate">
+    <h3 id="emailGateTitle">Confirm your email</h3>
+    <p>Enter your Mount Sinai email address to continue.</p>
+    <div class="pwRow">
+      <input type="email" id="emailInput" placeholder="Email address"
+             inputmode="email" autocomplete="email" autocapitalize="off"
+             autocorrect="off" spellcheck="false" aria-label="Email address">
+      <button id="emailGo">Continue</button>
+    </div>
+    <div class="pwErr" id="emailErr">That address isn&rsquo;t recognized. Check with the Office of Curricular Affairs.</div>
+  </div>
 </div>
 
 <script>
@@ -687,6 +704,61 @@ function restoreTier(){
 }
 restoreTier();
 window.addEventListener('pageshow', e => { if(e.persisted) restoreTier(); });
+
+/* ---- institutional email check on the public links ----
+   Format is first.last@ one of three Mount Sinai domains. Hyphens and
+   apostrophes are allowed inside each name part (Smith-Jones, O'Brien) and a
+   trailing digit run is allowed for duplicate accounts. Input is trimmed and
+   lower-cased first, so capitalisation never matters.
+
+   This runs in the browser, so it is a front door, not a lock: the four link
+   targets are in this page's source either way. It keeps the landing pages
+   from being wandered into, nothing more. */
+const EMAIL_RE = /^[a-z][a-z'’-]*\.[a-z][a-z'’-]*\d*@(?:mssm\.edu|mountsinai\.org|icahn\.mssm\.edu)$/;
+const emailGate=document.getElementById('emailGate'),
+      emailInput=document.getElementById('emailInput'),
+      emailErr=document.getElementById('emailErr');
+let pendingUrl=null;
+
+function emailCleared(){
+  try { return sessionStorage.getItem('ascendEmailOk')==='1'; } catch(e){ return false; }
+}
+function openEmailGate(url){
+  pendingUrl=url;
+  emailErr.classList.remove('show');
+  emailInput.value='';
+  emailGate.classList.add('open');
+  setTimeout(()=>emailInput.focus(), 50);
+}
+function closeEmailGate(){
+  emailGate.classList.remove('open');
+  pendingUrl=null;
+}
+function tryEmail(){
+  const v = emailInput.value.trim().toLowerCase();
+  if(!EMAIL_RE.test(v)){
+    emailErr.classList.add('show');
+    emailInput.select();
+    return;
+  }
+  try { sessionStorage.setItem('ascendEmailOk','1'); } catch(e){}
+  const url = pendingUrl;
+  closeEmailGate();
+  if(url) window.location.href = url;
+}
+document.getElementById('emailGo').addEventListener('click', tryEmail);
+emailInput.addEventListener('keydown', e => { if(e.key==='Enter') tryEmail(); if(e.key==='Escape') closeEmailGate(); });
+emailInput.addEventListener('input', () => emailErr.classList.remove('show'));
+emailGate.addEventListener('click', e => { if(e.target===emailGate) closeEmailGate(); });
+
+/* The four public links on the gate tile. Tier tiles keep their access codes. */
+document.querySelectorAll('#gate .entryTile, #gate .oacBtn').forEach(a => {
+  a.addEventListener('click', e => {
+    if(emailCleared()) return;
+    e.preventDefault();
+    openEmailGate(a.href);
+  });
+});
 </script>
 </body>
 </html>
