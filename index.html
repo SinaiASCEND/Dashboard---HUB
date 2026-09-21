@@ -443,7 +443,7 @@ const DASHBOARDS = {
   },
   studentperf: {
     url: "./Student_Performance.html",
-    kicker: "Student Progress",
+    kicker: "De-identified Student Data",
     title: "ASCEND Student Performance Dashboard",
     blurb: "De-identified student-level performance across all three phases \u2014 module quizzes, NBME customized assessments, OSCE and clinical-skills evaluations, and shelf exams \u2014 with a class roster, a rotation schedule and full record per student code, and review flags. Coded education records; the code key is held separately."
   },
@@ -461,14 +461,7 @@ const TIERS = {
   "5942bd952f12e02478b5a6aba902340a58c9c769a961f128dbb57f0b79358537": {  // Tier 1
     name: "Office of Curricular Affairs",
     sub: "Full access — all monitoring, mapping, governance, and accreditation views.",
-    dashboards: ["studentperf","phase1assessment","phase2assessment","phase3assessment","clerkships","sitecomparability","sitecomp2526","DO","nbme","clerkshipassessments","mepo","electives","asqisa","aamcgq","aamcscope","phase1map","milestonesmap","policyreview","policylibrary","directors","students","governance","LCME","job","babybates","clinicalcompetency","curricularaffairs"],
-    /* Individually identifiable student records sit behind the confirmation
-       gate: the tile stays locked until the tier code is re-entered. */
-    locked: {
-      hash: "5942bd952f12e02478b5a6aba902340a58c9c769a961f128dbb57f0b79358537",
-      label: "Student records",
-      dashboards: ["studentperf"]
-    }
+    dashboards: ["phase1assessment","phase2assessment","phase3assessment","clerkships","sitecomparability","sitecomp2526","DO","nbme","clerkshipassessments","mepo","electives","asqisa","aamcgq","aamcscope","phase1map","milestonesmap","policyreview","policylibrary","directors","students","governance","LCME","job","babybates","clinicalcompetency","curricularaffairs"]
   },
   "31016cceeab858e9880093fcb959e82b5ac270f082b80c9ef9a63a731c9c7d86": {  // Tier 2
     name: "Pre-Clerkship Curriculum Directors",
@@ -501,12 +494,14 @@ const TIERS = {
   "9f8b17ea00b6b3fd1efa6d10aa21cfedc91ba71a26b03557e09576370c157a81": {  // Tier 6
     name: "Clinical Competency Mentors",
     sub: "Clinical competency, physical examination, and office resources.",
-    dashboards: ["studentperf","curricularaffairs","babybates","clinicalcompetency","job","directors"],
-    locked: {
-      hash: "9f8b17ea00b6b3fd1efa6d10aa21cfedc91ba71a26b03557e09576370c157a81",
-      label: "Student records",
-      dashboards: ["studentperf"]
-    }
+    dashboards: ["curricularaffairs","babybates","clinicalcompetency","job","directors"]
+  },
+  "b9b2b6f01aa767c022763ca563e0882c08635da21f2519dc7b02564aaf0aa9ba": {  // Tier 8
+    /* Student-level records sit behind their own access code and are reachable
+       from no other tier. Holding a code for another tier grants nothing here. */
+    name: "De-identified Student Data",
+    sub: "Student-level performance across all three phases, by student code. Names are held in a separate key.",
+    dashboards: ["studentperf"]
   },
   "4ed5cb948f5f7c10d66e38ed679d0e5f0be24469df2de636c2da893d5b06ecb3": {  // Tier 7
     name: "Curricular Integration Subcommittee",
