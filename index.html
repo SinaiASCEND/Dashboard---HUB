@@ -751,8 +751,13 @@ emailInput.addEventListener('keydown', e => { if(e.key==='Enter') tryEmail(); if
 emailInput.addEventListener('input', () => emailErr.classList.remove('show'));
 emailGate.addEventListener('click', e => { if(e.target===emailGate) closeEmailGate(); });
 
-/* The four public links on the gate tile. Tier tiles keep their access codes. */
-document.querySelectorAll('#gate .entryTile, #gate .oacBtn').forEach(a => {
+/* The two dashboard tiles only. The "Meet the ..." links below them are the
+   office and the student leadership introducing themselves — a directory of
+   who does what, which is the thing you send someone before they have an
+   address here at all. Asking for a Mount Sinai address to read it turns an
+   introduction into a closed door, so those two stay open. Tier tiles keep
+   their access codes. */
+document.querySelectorAll('#gate .entryTile').forEach(a => {
   a.addEventListener('click', e => {
     if(emailCleared()) return;
     e.preventDefault();
