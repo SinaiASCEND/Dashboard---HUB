@@ -64,6 +64,10 @@
   --seq-100:#dfeaf8; --seq-200:#bed4ef; --seq-300:#9cbde6;
   --seq-400:#7aa6dc; --seq-500:#558cd0; --seq-600:#3179C6;
   --seq-700:#245c99;
+  /* schedule states are an ordinal ramp: the palest step must still clear
+     2:1 against the surface, so it is set here rather than taken from the
+     ramp's light end (light 2.18:1, dark 2.66:1). */
+  --sched:#8ab3e4;
 
   /* --- diverging: warm/cool poles, neutral midpoint --- */
   --dv-neg-3:#A8321F; --dv-neg-2:#CC5C3F; --dv-neg-1:#E8A188;
@@ -104,6 +108,7 @@
     --seq-100:#16233c; --seq-200:#1d3253; --seq-300:#27446f;
     --seq-400:#32578c; --seq-500:#3e6bab; --seq-600:#4A8ACF;
     --seq-700:#7fb0e4;
+    --sched:#3a5f96;
 
     --dv-neg-3:#F09A7E; --dv-neg-2:#D2674A; --dv-neg-1:#8E4130;
     --dv-mid:#2a3346;
@@ -137,6 +142,7 @@
   --seq-100:#16233c; --seq-200:#1d3253; --seq-300:#27446f;
   --seq-400:#32578c; --seq-500:#3e6bab; --seq-600:#4A8ACF;
   --seq-700:#7fb0e4;
+  --sched:#3a5f96;
 
   --dv-neg-3:#F09A7E; --dv-neg-2:#D2674A; --dv-neg-1:#8E4130;
   --dv-mid:#2a3346;
@@ -235,6 +241,40 @@ main{padding-bottom:44px}
 .kpi .dl{display:flex;align-items:center;gap:6px;margin-top:6px;font-size:12px;color:var(--ink-2)}
 .kpi .dl .ic{font-size:11px}
 .kpi .spark{margin-top:8px;display:block}
+
+/* ================= student identity card ================= */
+/* De-identified: a photo, the student code, and where they are in the
+   curriculum. No name appears anywhere on this page - the code-to-student
+   key is held separately. */
+.idcard{display:flex;gap:22px;align-items:flex-start;flex-wrap:wrap}
+.photo{width:124px;height:156px;border-radius:12px;flex:none;overflow:hidden;
+  background:var(--surface-2);border:1px solid var(--line-2);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+.photo.empty{border-style:dashed}
+.photo img{width:100%;height:100%;object-fit:cover;display:block}
+.photo .ph{font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  font-weight:800;color:var(--muted)}
+.idmeta{flex:1;min-width:230px}
+.idtop{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.idtop .kicker{margin-bottom:0}
+.idcode{font-size:30px;font-weight:700;letter-spacing:-.01em;color:var(--ink);
+  font-variant-numeric:tabular-nums;margin:2px 0 8px}
+.idfacts{display:flex;flex-wrap:wrap;gap:8px 26px;margin-bottom:12px}
+.idfact{min-width:118px}
+.idfact dt{font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  font-weight:800;color:var(--muted);margin:0}
+.idfact dd{margin:3px 0 0;font-size:13.5px;font-weight:600;color:var(--ink)}
+@media (max-width:520px){
+  .photo{width:96px;height:120px}
+  .idcode{font-size:24px}
+}
+
+/* ================= rotation schedule ================= */
+.schedrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.schedrow .wk{font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.now{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px;
+  font-size:11.5px;font-weight:800;background:var(--s1-wash);color:var(--ink);
+  border:1px solid var(--s1);white-space:nowrap;flex:none}
 
 /* the single number the student view leads with */
 .hero{display:flex;flex-direction:column;gap:6px;margin-top:2px}
@@ -401,7 +441,8 @@ tr.rosterrow:focus-visible{outline:3px solid var(--s1);outline-offset:-3px}
         <h1>Student Performance Dashboard</h1>
         <p class="mastsub">How each student is doing across the ASCEND curriculum &mdash; module quizzes,
           NBME customized assessments, OSCE and clinical-skills evaluations, and NBME subject (shelf)
-          examinations &mdash; for faculty advising, coaching, and promotions review.</p>
+          examinations &mdash; for faculty advising, coaching, and promotions review.
+          Students appear by code; names are held in a separate key.</p>
       </div>
       <div class="mastside">
         <img class="mastlogo" id="mastLogo" alt="ASCEND Curriculum" src="">
@@ -419,17 +460,19 @@ tr.rosterrow:focus-visible{outline:3px solid var(--s1);outline-offset:-3px}
   <div class="notices">
     <div class="notice sample" id="sampleNotice">
       <span class="ic" aria-hidden="true">&#9888;</span>
-      <span><strong>Sample data.</strong> These are computer-generated students, not real records.
+      <span><strong>Sample data.</strong> These are computer-generated, coded students, not real records.
         Use <em>Load data file</em> to replace them with a registrar or assessment export
         (JSON or CSV &mdash; the expected shape is in the comment block at the top of this
         file&rsquo;s script).</span>
     </div>
     <div class="notice ferpa">
       <span class="ic" aria-hidden="true">&#128274;</span>
-      <span><strong>Confidential &mdash; education records.</strong> Individually identifiable student
-        performance is protected under FERPA. View only students you have a legitimate educational
-        interest in, and do not redistribute, screenshot into shared channels, or leave this page
-        open on an unattended screen.</span>
+      <span><strong>Coded education records.</strong> Students appear by code only &mdash; no names are
+        held in or shown by this dashboard. The code-to-student key is kept separately by the Office
+        of Curricular Affairs. Because that key exists these records are still re-identifiable and
+        remain protected under FERPA: open only the students you have a legitimate educational
+        interest in, never pair this page with the key in a shared channel, and do not leave it open
+        on an unattended screen.</span>
     </div>
   </div>
 
@@ -466,8 +509,8 @@ tr.rosterrow:focus-visible{outline:3px solid var(--s1);outline-offset:-3px}
       </select>
     </div>
     <div class="field search">
-      <label for="fSearch">Find a student</label>
-      <input id="fSearch" type="search" placeholder="Name or student ID" autocomplete="off">
+      <label for="fSearch">Find a student code</label>
+      <input id="fSearch" type="search" placeholder="e.g. ASC-2028-014" autocomplete="off">
     </div>
     <button class="clear" id="fClear" type="button">Reset</button>
   </div>
@@ -560,14 +603,23 @@ tr.rosterrow:focus-visible{outline:3px solid var(--s1);outline-offset:-3px}
    The whole page renders from one object, DATA:
 
    {
-     "meta":     { "source": "Registrar extract 2026-09-01", "generated": "2026-09-01" },
+     "meta":     { "source": "Registrar extract 2026-09-01",
+                   "generated": "2026-09-01",
+                   "asOf": "2026-09-21" },   // the date "today" is measured from
      "students": [ Student, ... ]
    }
 
+   THE DATA IS DE-IDENTIFIED. A student carries a code and nothing else that
+   names them; the code-to-student key is held separately and never loaded
+   here. Do not add a name field - the page will not render one.
+
    Student = {
-     id, name, cohort,            // cohort = graduating class year, e.g. 2028
-     phase,                       // 1 | 2 | 3  (current phase)
-     college, advisor,            // advisory college + faculty advisor
+     id,                          // the de-identified student code, e.g. "ASC-2028-014"
+     cohort,                      // graduating class year, e.g. 2028
+     phase,                       // optional: 1 | 2 | 3. Omit it and the page
+                                  //   derives it from the block in progress.
+     college, advisingGroup,      // advisory college + advising group code
+     photo,                       // optional image URL; a placeholder shows without one
      records: [ Record, ... ]     // one per module / clerkship / transition course
    }
 
@@ -576,7 +628,11 @@ tr.rosterrow:focus-visible{outline:3px solid var(--s1);outline-offset:-3px}
      phase, kind,                 // kind: "module" | "clerkship" | "transition"
      code, name, term,
      site,                        // clerkship training site (optional)
-     result,                      // "Pass" | "Pass with remediation" | "Fail" | "In progress"
+     start, end,                  // ISO dates - these drive the rotation schedule
+     status,                      // "completed" | "in progress" | "scheduled"
+                                  //   omit it and it is derived from the dates
+     result,                      // "Pass" | "Pass with remediation" | "Fail"
+                                  //   | "In progress" | "Scheduled"
 
      quizzes: [ {name, pct, cohortMean} ],          // module quizzes, % correct
      cas:     {label, scaled, percentile,           // NBME CAS / shelf / CBSE
@@ -589,8 +645,10 @@ tr.rosterrow:focus-visible{outline:3px solid var(--s1);outline-offset:-3px}
 
    Any of quizzes / cas / osce / eval may be null - a Phase 1 module usually has
    quizzes + CAS, a clerkship usually has a shelf + a clinical evaluation, and
-   OSCEs appear at fixed checkpoints. Percentiles are cohort percentiles (0-100)
-   unless the field name says otherwise.
+   OSCEs appear at fixed checkpoints. A block that has not been sat yet carries
+   none of them, and still belongs in records so it shows on the schedule.
+   Percentiles are cohort percentiles (0-100) unless the field name says
+   otherwise.
 
    Everything below "SAMPLE DATA" is synthetic and exists only so the page is
    viewable before a real extract is loaded. Deleting it does no harm: the
@@ -599,18 +657,18 @@ tr.rosterrow:focus-visible{outline:3px solid var(--s1);outline-offset:-3px}
 
 /* ---------- curriculum catalogue ---------- */
 const PHASE1_MODULES = [
-  {code:'FND', name:'Foundations',                          term:'Fall Y1'},
-  {code:'MCG', name:'Molecular, Cellular & Genetic Basis',  term:'Fall Y1'},
-  {code:'HDI', name:'Host Defense & Infectious Disease',    term:'Fall Y1'},
-  {code:'CVS', name:'Cardiovascular',                       term:'Winter Y1'},
-  {code:'PUL', name:'Pulmonary',                            term:'Winter Y1'},
-  {code:'REN', name:'Renal & Urinary',                      term:'Winter Y1'},
-  {code:'GIN', name:'Gastrointestinal & Nutrition',         term:'Spring Y1'},
-  {code:'END', name:'Endocrine & Metabolism',               term:'Spring Y1'},
-  {code:'SRH', name:'Sexual & Reproductive Health',         term:'Spring Y1'},
-  {code:'MSK', name:'Musculoskeletal & Dermatology',        term:'Fall Y2'},
-  {code:'BNB', name:'Brain & Behavior',                     term:'Fall Y2'},
-  {code:'HEM', name:'Hematology & Oncology',                term:'Winter Y2'}
+  {code:'FND', name:'Foundations'},
+  {code:'MCG', name:'Molecular, Cellular & Genetic Basis'},
+  {code:'HDI', name:'Host Defense & Infectious Disease'},
+  {code:'CVS', name:'Cardiovascular'},
+  {code:'PUL', name:'Pulmonary'},
+  {code:'REN', name:'Renal & Urinary'},
+  {code:'GIN', name:'Gastrointestinal & Nutrition'},
+  {code:'END', name:'Endocrine & Metabolism'},
+  {code:'SRH', name:'Sexual & Reproductive Health'},
+  {code:'MSK', name:'Musculoskeletal & Dermatology'},
+  {code:'BNB', name:'Brain & Behavior'},
+  {code:'HEM', name:'Hematology & Oncology'}
 ];
 
 const CLERKSHIPS = [
@@ -625,10 +683,10 @@ const CLERKSHIPS = [
 ];
 
 const PHASE3 = [
-  {code:'CCC', name:'Chronic Care Clerkship',      term:'Fall Y4'},
-  {code:'AI',  name:'Acting Internship',           term:'Fall Y4'},
-  {code:'ICU', name:'Critical Care Selective',     term:'Winter Y4'},
-  {code:'T2R', name:'Transition to Residency',     term:'Spring Y4'}
+  {code:'CCC', name:'Chronic Care Clerkship'},
+  {code:'AI',  name:'Acting Internship'},
+  {code:'ICU', name:'Critical Care Selective'},
+  {code:'T2R', name:'Transition to Residency'}
 ];
 
 const SITES = ['Mount Sinai Hospital','Mount Sinai Morningside','Mount Sinai West',
@@ -671,119 +729,154 @@ function pctile(z){return clamp(Math.round(normCdf(z)*100),1,99)}
 function clamp(v,lo,hi){return Math.min(hi,Math.max(lo,v))}
 function r1(v){return Math.round(v*10)/10}
 
-const FIRST=['Amara','Daniel','Priya','Elena','Marcus','Sofia','Jonah','Leila','Tomas','Nadia',
- 'Owen','Ines','Rafael','Hana','Caleb','Yara','Simon','Maya','Dev','Clara','Ezra','Noor','Felix',
- 'Imani','Aaron','Rosa','Kwame','Lena','Theo','Anika','Malik','Greta','Idris','Juno','Peter',
- 'Sana','Victor','Wren','Xiomara','Zane','Beatriz','Colin','Farid','Gita','Hugo','Iris','Jamal',
- 'Keiko','Lucas','Mira','Nash','Oona','Pablo','Quinn','Ravi','Selma','Tariq','Uma','Vera','Wesley'];
-const LAST=['Okonkwo','Fischer','Raman','Vasquez','Bell','Moretti','Adler','Haddad','Silva','Petrov',
- 'Gallagher','Duarte','Nkemelu','Sato','Brennan','Osei','Lindqvist','Chowdhury','Patel','Novak',
- 'Weiss','Abadi','Mensah','Kaplan','Roux','Iyer','Bauer','Solano','Trinh','Ferreira','Marchetti',
- 'Aguilar','Bhatt','Castellanos','Dumont','Eriksen','Farrow','Gutierrez','Halvorsen','Ibarra'];
-const COLLEGES=['Ascent','Summit','Meridian','Keystone'];
-const ADVISORS=['Dr. R. Feldman','Dr. A. Okoye','Dr. L. Marchetti','Dr. S. Nagarajan',
- 'Dr. J. Brightman','Dr. C. Ferreira','Dr. M. Halloran','Dr. T. Oyelaran'];
+const COLLEGES = ['Ascent','Summit','Meridian','Keystone'];
 
-/* Build one record's worth of numbers from an ability and a bit of noise. */
+/* One assessment's worth of ability plus drift plus noise. */
 function scoreAt(ability, drift, noise, r){ return ability + drift + rnorm(r)*noise }
 
-function makeStudent(rng, idx, cohort, phase){
+/* ---------- the academic calendar the sample cohorts run on ----------
+   Everything is dated, and a block's status is decided by comparing its
+   dates with AS_OF rather than being drawn at random, so a student's
+   completed work, their current rotation, and what is still ahead of them
+   always agree with each other.                                        */
+const AS_OF = '2026-09-21';
+const PHASE1_WEEKS = 6;     /* each pre-clerkship module          */
+const PHASE2_WEEKS = 6;     /* each core clerkship                */
+const PHASE3_WEEKS = 6;     /* each transition course             */
+const PHASE3_EVERY = 11;    /* with electives in between          */
+
+function addWeeks(date, w){ const d = new Date(date.getTime()); d.setDate(d.getDate() + w*7); return d }
+function iso(d){ return d.toISOString().slice(0,10) }
+function seasonOf(d){ const m = d.getMonth();
+  return (m >= 7 && m <= 10) ? 'Fall' : (m === 11 || m <= 2) ? 'Winter' : 'Spring' }
+function statusOn(startIso, endIso, asOf){
+  if(endIso < asOf) return 'completed';
+  if(startIso > asOf) return 'scheduled';
+  return 'in progress';
+}
+const RESULT_BY_STATUS = {'in progress':'In progress', 'scheduled':'Scheduled'};
+
+/* The planned run of blocks for one student, dated end to end. */
+function planBlocks(cohort, r){
+  const matric = cohort - 4;
+  const p1 = new Date(Date.UTC(matric, 7, 11));        /* mid-August, year 1 */
+  const blocks = [];
+
+  PHASE1_MODULES.forEach((m, i) => {
+    const s = addWeeks(p1, i*PHASE1_WEEKS), e = addWeeks(s, PHASE1_WEEKS);
+    blocks.push({phase:1, kind:'module', code:m.code, name:m.name,
+      term: seasonOf(s) + ' Y' + (Math.floor(i*PHASE1_WEEKS/52) + 1),
+      start: iso(s), end: iso(e), checkpoint: i === 2 ? 'I' : i === 6 ? 'II' : i === 10 ? 'III' : null});
+  });
+
+  const p2 = addWeeks(p1, PHASE1_MODULES.length*PHASE1_WEEKS + 2);
+  CLERKSHIPS.slice().sort(() => r() - 0.5).forEach((c, i) => {
+    const s = addWeeks(p2, i*PHASE2_WEEKS), e = addWeeks(s, PHASE2_WEEKS);
+    blocks.push({phase:2, kind:'clerkship', code:c.code, name:c.name,
+      term:'Block ' + (i+1), site: SITES[Math.floor(r()*SITES.length)],
+      start: iso(s), end: iso(e), checkpoint: i === 3 ? 'mid' : i === 7 ? 'summative' : null});
+  });
+
+  const p3 = addWeeks(p2, CLERKSHIPS.length*PHASE2_WEEKS + 3);
+  PHASE3.forEach((t, i) => {
+    const s = addWeeks(p3, i*PHASE3_EVERY), e = addWeeks(s, PHASE3_WEEKS);
+    blocks.push({phase:3, kind:'transition', code:t.code, name:t.name,
+      term: seasonOf(s) + ' Y4', site: t.code === 'T2R' ? '' : SITES[Math.floor(r()*SITES.length)],
+      start: iso(s), end: iso(e)});
+  });
+
+  blocks.forEach((b, i) => { b.seq = i + 1; b.status = statusOn(b.start, b.end, AS_OF) });
+  return blocks;
+}
+
+function makeStudent(rng, idx, cohort){
   const r = rng;
-  const name = FIRST[Math.floor(r()*FIRST.length)] + ' ' + LAST[Math.floor(r()*LAST.length)];
-  const id = 'M' + cohort + String(1000 + idx).slice(1);
+  /* The de-identified student code is the only identifier the dashboard
+     holds. The code-to-student key lives outside this file. */
+  const code = 'ASC-' + cohort + '-' + String(1000 + idx).slice(1);
 
   /* latent abilities: clinical skills correlate ~0.45 with medical knowledge */
   const kAbility = rnorm(r);
-  const sAbility = 0.45*kAbility + Math.sqrt(1-0.45*0.45)*rnorm(r);
-  const growth = (r()*0.5) - 0.12;          // most students improve a little
-  const areaBias = {}; CONTENT_AREAS.forEach(a=>areaBias[a]=rnorm(r)*0.62);
-  const domBias  = {}; SKILL_DOMAINS.forEach(d=>domBias[d]=rnorm(r)*0.55);
+  const sAbility = 0.45*kAbility + Math.sqrt(1 - 0.45*0.45)*rnorm(r);
+  const growth = (r()*0.5) - 0.12;          /* most students improve a little */
+  const areaBias = {}; CONTENT_AREAS.forEach(a => areaBias[a] = rnorm(r)*0.62);
+  const domBias  = {}; SKILL_DOMAINS.forEach(d => domBias[d] = rnorm(r)*0.55);
 
-  const records = [];
-  let seq = 0;
+  const records = planBlocks(cohort, r).map(b => {
+    const rec = {seq:b.seq, phase:b.phase, kind:b.kind, code:b.code, name:b.name,
+      term:b.term, site:b.site || '', start:b.start, end:b.end, status:b.status,
+      result: RESULT_BY_STATUS[b.status] || 'Pass',
+      quizzes:null, cas:null, osce:null, eval:null};
+    if(b.status === 'scheduled') return rec;          /* nothing sat yet */
 
-  /* ---------- Phase 1 ---------- */
-  const p1count = phase === 1 ? Math.max(3, Math.round(3 + r()*(PHASE1_MODULES.length-4)))
-                              : PHASE1_MODULES.length;
-  PHASE1_MODULES.slice(0, p1count).forEach((m, i) => {
-    seq++;
-    const drift = growth * (seq/22);
-    const z = scoreAt(kAbility, drift, 0.70, r);
-    const quizzes = [];
-    const nq = 3 + Math.floor(r()*2);
-    for(let q=1;q<=nq;q++){
-      const qz = scoreAt(kAbility, drift, 0.85, r);
-      quizzes.push({name:'Quiz '+q, pct: clamp(Math.round(84 + qz*7), 40, 100), cohortMean: 84});
+    const done = b.status === 'completed';
+    const drift = growth * (b.seq/24);
+
+    if(b.phase === 1){
+      /* quizzes run through the module, so a block in progress already has some */
+      const nq = 3 + Math.floor(r()*2);
+      const sat = done ? nq : Math.max(1, Math.round(nq/2));
+      rec.quizzes = [];
+      for(let q = 1; q <= sat; q++){
+        const qz = scoreAt(kAbility, drift, 0.85, r);
+        rec.quizzes.push({name:'Quiz ' + q, pct: clamp(Math.round(84 + qz*7), 40, 100), cohortMean:84});
+      }
+      if(done){
+        const z = scoreAt(kAbility, drift, 0.70, r);
+        rec.cas = {label:'NBME Module CAS', scaled: clamp(Math.round(72 + z*8), 45, 98),
+          percentile: pctile(z), natlMean:72, cohortMean:74};
+      }
+    } else {
+      /* the shelf and the clinical evaluation both land at the end of a block */
+      if(done){
+        const kz = scoreAt(kAbility, drift, b.phase === 2 ? 0.68 : 0.62, r);
+        const sz = scoreAt(sAbility, drift, b.phase === 2 ? 0.66 : 0.60, r);
+        if(b.phase === 2)
+          rec.cas = {label:'NBME Subject Exam (shelf)', scaled: clamp(Math.round(75 + kz*8), 48, 99),
+            percentile: pctile(kz), natlMean:75, cohortMean:78};
+        else if(b.code === 'T2R')
+          rec.cas = {label:'NBME Comprehensive Clinical Science (CCSE)',
+            scaled: clamp(Math.round(70 + kz*8), 45, 95), percentile: pctile(kz),
+            natlMean:70, cohortMean:73};
+        else if(b.code === 'CCC')
+          rec.cas = {label:'NBME Subject Exam (shelf)', scaled: clamp(Math.round(76 + kz*8), 48, 99),
+            percentile: pctile(kz), natlMean:75, cohortMean:79};
+        rec.eval = buildEval(sz, domBias, r, b.name);
+      }
     }
-    /* Every Phase 1 module runs an NBME customized assessment (CAS). */
-    const cas = {label:'NBME Module CAS', scaled: clamp(Math.round(72 + z*8), 45, 98),
-      percentile: pctile(z), natlMean: 72, cohortMean: 74};
-    /* OSCEs sit at three clinical-skills checkpoints, not in every module. */
-    let osce = null;
-    if(i===2 || i===6 || i===10){
-      const sz = scoreAt(sAbility, drift, 0.65, r);
-      osce = buildOsce(sz, domBias, r, 'Clinical Skills OSCE ' + (i===2?'I':i===6?'II':'III'));
+
+    /* OSCEs sit at fixed clinical-skills checkpoints, not in every block */
+    if(done && b.checkpoint){
+      const sz = scoreAt(sAbility, drift, b.phase === 1 ? 0.65 : 0.66, r);
+      rec.osce = buildOsce(sz, domBias, r,
+        b.phase === 1 ? 'Clinical Skills OSCE ' + b.checkpoint
+        : b.checkpoint === 'mid' ? 'Phase 2 Mid-point CPX' : 'Phase 2 Summative CPX');
     }
-    const weakest = Math.min(...quizzes.map(q=>q.pct));
-    records.push({seq, phase:1, kind:'module', code:m.code, name:m.name, term:m.term,
-      quizzes, cas, osce, eval:null,
-      result: cas.percentile <= 1 || weakest < 55 ? (r()<0.3?'Fail':'Pass with remediation') : 'Pass'});
-  });
-
-  /* ---------- Phase 2 ---------- */
-  if(phase >= 2){
-    const order = CLERKSHIPS.slice().sort(()=>r()-0.5);
-    const n2 = phase === 2 ? Math.max(2, Math.round(2 + r()*6)) : CLERKSHIPS.length;
-    order.slice(0, n2).forEach((c, i) => {
-      seq++;
-      const drift = growth * (seq/22);
-      const kz = scoreAt(kAbility, drift, 0.68, r);
-      const sz = scoreAt(sAbility, drift, 0.66, r);
-      const shelf = {label:'NBME Subject Exam (shelf)', scaled: clamp(Math.round(75 + kz*8), 48, 99),
-        percentile: pctile(kz), natlMean: 75, cohortMean: 78};
-      const ev = buildEval(sz, domBias, r, c.name);
-      /* Summative CPX-style OSCEs at the mid- and end-points of Phase 2. */
-      const osce = (i===3 || i===7) ? buildOsce(sz, domBias, r, i===3?'Phase 2 Mid-point CPX':'Phase 2 Summative CPX') : null;
-      records.push({seq, phase:2, kind:'clerkship', code:c.code, name:c.name,
-        term:'Block '+(i+1), site: SITES[Math.floor(r()*SITES.length)],
-        quizzes:null, cas:shelf, osce, eval:ev,
-        result: shelf.percentile <= 1 ? (r()<0.3?'Fail':'Pass with remediation')
-              : ev.overall < 3.0 ? 'Pass with remediation' : 'Pass'});
-    });
-  }
-
-  /* ---------- Phase 3 ---------- */
-  if(phase >= 3){
-    const n3 = Math.max(1, Math.round(1 + r()*3));
-    PHASE3.slice(0, n3).forEach((p) => {
-      seq++;
-      const drift = growth * (seq/22);
-      const kz = scoreAt(kAbility, drift, 0.62, r);
+    if(done && b.code === 'T2R'){
       const sz = scoreAt(sAbility, drift, 0.60, r);
-      const cas = p.code === 'T2R'
-        ? {label:'NBME Comprehensive Clinical Science (CCSE)', scaled: clamp(Math.round(70+kz*8),45,95),
-           percentile: pctile(kz), natlMean: 70, cohortMean: 73}
-        : p.code === 'CCC'
-        ? {label:'NBME Subject Exam (shelf)', scaled: clamp(Math.round(76+kz*8),48,99),
-           percentile: pctile(kz), natlMean: 75, cohortMean: 79}
-        : null;
-      const ev = buildEval(sz, domBias, r, p.name);
-      const osce = p.code === 'T2R' ? buildOsce(sz, domBias, r, 'Graduation Competency OSCE') : null;
-      records.push({seq, phase:3, kind:'transition', code:p.code, name:p.name, term:p.term,
-        quizzes:null, cas, osce, eval:ev,
-        result: (cas && cas.percentile <= 1) || ev.overall < 3.0 ? 'Pass with remediation' : 'Pass'});
-    });
-  }
+      rec.osce = buildOsce(sz, domBias, r, 'Graduation Competency OSCE');
+    }
 
-  /* NBME content-area profile, aggregated across this student's NBME exams. */
-  const contentAreas = {};
-  CONTENT_AREAS.forEach(a=>{
-    const z = kAbility + areaBias[a] + rnorm(r)*0.25;
-    contentAreas[a] = {percentile: pctile(z), natlMean: 50};
+    if(done){
+      const weakest = rec.quizzes && rec.quizzes.length ? Math.min(...rec.quizzes.map(q => q.pct)) : 100;
+      const lowExam = rec.cas && rec.cas.percentile <= 1;
+      const lowEval = rec.eval && rec.eval.overall < 3.0;
+      rec.result = (lowExam || weakest < 55) ? (r() < 0.3 ? 'Fail' : 'Pass with remediation')
+                 : lowEval ? 'Pass with remediation' : 'Pass';
+    }
+    return rec;
   });
 
-  return {id, name, cohort, phase, college: COLLEGES[Math.floor(r()*COLLEGES.length)],
-    advisor: ADVISORS[Math.floor(r()*ADVISORS.length)], records, contentAreas};
+  /* NBME content-area profile, aggregated across this student's NBME exams */
+  const contentAreas = {};
+  CONTENT_AREAS.forEach(a => {
+    const z = kAbility + areaBias[a] + rnorm(r)*0.25;
+    contentAreas[a] = {percentile: pctile(z), natlMean:50};
+  });
+
+  return {id: code, cohort, college: COLLEGES[Math.floor(r()*COLLEGES.length)],
+    advisingGroup: 'AG-' + String(1 + Math.floor(r()*12)).padStart(2,'0'),
+    records, contentAreas};
 }
 
 function buildOsce(z, domBias, r, label){
@@ -826,15 +919,18 @@ function buildEval(z, domBias, r, label){
 }
 
 function buildSampleData(){
-  const cohorts = [{year:2027, phase:3, n:42},{year:2028, phase:2, n:44},{year:2029, phase:1, n:46}];
+  /* Three cohorts, each one academic year apart, so the sample shows a class
+     part-way through Phase 1, one part-way through the clerkships, and one in
+     Phase 3. Which phase each is in falls out of the calendar, not a setting. */
+  const cohorts = [{year:2027, n:42}, {year:2028, n:44}, {year:2029, n:46}];
   const students = [];
-  cohorts.forEach(c=>{
-    for(let i=1;i<=c.n;i++){
-      const rng = mulberry32(seedOf('ascend-'+c.year+'-'+i));
-      students.push(makeStudent(rng, i, c.year, c.phase));
+  cohorts.forEach(c => {
+    for(let i = 1; i <= c.n; i++){
+      students.push(makeStudent(mulberry32(seedOf('ascend-' + c.year + '-' + i)), i, c.year));
     }
   });
-  return {meta:{source:'Sample data (synthetic)', generated:'2026-09-21', sample:true}, students};
+  return {meta:{source:'Sample data (synthetic, de-identified)', generated:'2026-09-21',
+    asOf:'2026-09-21', sample:true}, students};
 }
 
 /* ============================================================================
@@ -878,6 +974,14 @@ function hydrate(data){
   /* --- per-student standings, domain profile, flags --- */
   students.forEach(s => {
     const recs = s.records || [];
+    /* Where the student is right now comes from the schedule, not a stored
+       field, so the phase shown can never drift from the blocks on record. */
+    s.current   = recs.find(r => r.status === 'in progress') || null;
+    s.completed = recs.filter(r => r.status === 'completed').length;
+    s.upcoming  = recs.filter(r => r.status === 'scheduled').length;
+    if(s.phase == null)
+      s.phase = s.current ? s.current.phase
+              : (recs.filter(r => r.status === 'completed').slice(-1)[0] || {phase:1}).phase;
     const know = [], skill = [];
     recs.forEach(rec => {
       if(rec.cas && rec.cas.percentile != null) know.push(rec.cas.percentile);
@@ -1198,7 +1302,7 @@ function filtered(){
     if(state.cohort !== 'all' && String(s.cohort) !== state.cohort) return false;
     if(state.phase !== 'all' && String(s.phase) !== state.phase) return false;
     if(state.standing !== 'all' && s.status !== state.standing) return false;
-    if(q && !(s.name.toLowerCase().includes(q) || String(s.id).toLowerCase().includes(q))) return false;
+    if(q && !String(s.id).toLowerCase().includes(q)) return false;
     return true;
   });
 }
@@ -1316,7 +1420,7 @@ function renderSkillsScatter(){
     if(marker) marker.remove();
     marker = add(g,'circle',{cx:best.x,cy:best.y,r:10,fill:'none',
       stroke:colorOf(best.s.status),'stroke-width':2});
-    tipShow(ev, best.s.name, [
+    tipShow(ev, best.s.id, [
       {value: ord(best.s.knowledgePct), label:'medical knowledge', color:cssv('--s1')},
       {value: ord(best.s.skillsPct),    label:'clinical skills',   color:cssv('--s4')},
       {value: STANDING[best.s.status].label, label:'standing',     color: colorOf(best.s.status)}
@@ -1332,10 +1436,10 @@ function renderSkillsScatter(){
   });
 
   buildTable($('skillsTable'),
-    [{label:'Student'},{label:'ID'},{label:'Cohort',num:true},
+    [{label:'Student code'},{label:'Cohort',num:true},{label:'Phase',num:true},
      {label:'Medical knowledge (pct)',num:true},{label:'Clinical skills (pct)',num:true},{label:'Standing'}],
     list.slice().sort((a,b)=>a.knowledgePct-b.knowledgePct)
-        .map(s=>[s.name, s.id, s.cohort, s.knowledgePct, s.skillsPct, STANDING[s.status].label]),
+        .map(s=>[s.id, s.cohort, s.phase, s.knowledgePct, s.skillsPct, STANDING[s.status].label]),
     'Medical knowledge and clinical skills percentile for every student in view');
 }
 
@@ -1405,10 +1509,10 @@ function renderTypeChart(){
 
 /* ---------------- roster ---------------- */
 const ROSTER_COLS = [
-  {key:'name',      label:'Student'},
+  {key:'name',      label:'Student code'},
   {key:'cohort',    label:'Cohort',  num:true},
   {key:'phase',     label:'Phase',   num:true},
-  {key:'done',      label:'Blocks completed', num:true},
+  {key:'done',      label:'Blocks done', num:true},
   {key:'knowledge', label:'Medical knowledge'},
   {key:'skills',    label:'Clinical skills'},
   {key:'overall',   label:'Overall'},
@@ -1416,10 +1520,10 @@ const ROSTER_COLS = [
   {key:'open',      label:''}
 ];
 const SORT_VAL = {
-  name: s => s.name.toLowerCase(),
+  name: s => String(s.id).toLowerCase(),
   cohort: s => s.cohort,
   phase: s => s.phase,
-  done: s => (s.records||[]).length,
+  done: s => s.completed,
   knowledge: s => s.knowledgePct == null ? -1 : s.knowledgePct,
   skills: s => s.skillsPct == null ? -1 : s.skillsPct,
   overall: s => s.overallPct == null ? -1 : s.overallPct,
@@ -1446,6 +1550,26 @@ function chipFor(status){
   c.appendChild(dot); c.appendChild(t);
   return c;
 }
+/* A block's outcome, including the ones not sat yet. "In progress" and
+   "Scheduled" are states, not judgements, so they get the muted chip rather
+   than a status colour. */
+const RESULT_CHIP = {
+  'Fail':'concern', 'Pass with remediation':'watch', 'Pass':'ok',
+  'In progress':'neutral', 'Scheduled':'neutral'
+};
+function resultChip(result){
+  const cls = RESULT_CHIP[result] || 'neutral';
+  if(cls === 'neutral'){
+    const c = elc('span','chip neutral');
+    const dot = elc('span','dot'); dot.setAttribute('aria-hidden','true');
+    c.appendChild(dot); c.appendChild(elc('span', null, result || '\u2014'));
+    return c;
+  }
+  const c = chipFor(cls);
+  c.querySelector('span:last-child').textContent = result;
+  return c;
+}
+
 function renderRoster(){
   const list = filtered().slice();
   const get = SORT_VAL[state.sort.key] || SORT_VAL.overall;
@@ -1482,18 +1606,19 @@ function renderRoster(){
   list.forEach(s => {
     const tr = document.createElement('tr');
     tr.className = 'rosterrow'; tr.tabIndex = 0;
-    tr.setAttribute('aria-label', 'Open the record for ' + s.name);
+    tr.setAttribute('aria-label', 'Open the record for student ' + s.id);
     const cells = [];
 
     const c1 = document.createElement('td');
     const nm = document.createElement('div'); nm.className = 'namecell';
-    const a = document.createElement('span'); a.className = 'nm'; a.textContent = s.name;
-    const b = document.createElement('span'); b.className = 'sid'; b.textContent = s.id + ' · ' + s.college;
+    const a = document.createElement('span'); a.className = 'nm'; a.textContent = s.id;
+    const b = document.createElement('span'); b.className = 'sid';
+    b.textContent = s.college + ' College' + (s.current ? ' · in ' + s.current.code : '');
     nm.appendChild(a); nm.appendChild(b); c1.appendChild(nm); cells.push(c1);
 
     const c2 = document.createElement('td'); c2.className = 'num'; c2.textContent = s.cohort; cells.push(c2);
     const c3 = document.createElement('td'); c3.className = 'num'; c3.textContent = s.phase; cells.push(c3);
-    const c4 = document.createElement('td'); c4.className = 'num'; c4.textContent = (s.records||[]).length; cells.push(c4);
+    const c4 = document.createElement('td'); c4.className = 'num'; c4.textContent = s.completed; cells.push(c4);
     const c5 = document.createElement('td'); c5.appendChild(meterCell(s.knowledgePct)); cells.push(c5);
     const c6 = document.createElement('td'); c6.appendChild(meterCell(s.skillsPct)); cells.push(c6);
     const c7 = document.createElement('td'); c7.appendChild(meterCell(s.overallPct)); cells.push(c7);
@@ -1589,8 +1714,8 @@ function studentTiles(host, s){
     {lab:'Clinical skills', val: s.skillsPct, unit:'th pct', delta:sD,
      series:sSeries, accent:cssv('--s4'),
      note:'OSCE and clinical evaluations'},
-    {lab:'Blocks completed', val:(s.records||[]).length,
-     note:'Modules, clerkships, and transition courses on record'},
+    {lab:'Blocks completed', val: s.completed,
+     note: s.upcoming ? s.upcoming + ' still scheduled' : 'Nothing left on the schedule'},
     {lab:'Items needing attention', val: openFlags,
      note: openFlags ? 'Listed in full below' : 'Nothing outstanding',
      status: openFlags === 0 ? 'ok' : s.status === 'concern' ? 'crit' : 'warn'}
@@ -1627,31 +1752,179 @@ function studentTiles(host, s){
   host.appendChild(grid);
 }
 
+/* ---------------- identity card ---------------- */
+/* Photo, student code, where they are in the curriculum. Nothing that
+   identifies the person - re-identification runs through the separate key. */
+const PHASE_LABEL = {1:'Phase 1 · Pre-clerkship', 2:'Phase 2 · Clerkships',
+                     3:'Phase 3 · Integration & Transitions'};
+
+function photoBox(s){
+  const box = elc('div','photo');
+  if(s.photo){
+    const img = document.createElement('img');
+    img.src = s.photo;
+    img.alt = 'Photograph of student ' + s.id;
+    box.appendChild(img);
+    return box;
+  }
+  /* placeholder until a photo source is wired up */
+  box.classList.add('empty');
+  const svg = sv('svg', {width:'44', height:'44', viewBox:'0 0 24 24', 'aria-hidden':'true'});
+  add(svg, 'circle', {cx:12, cy:8.5, r:3.8, fill:'none', stroke:cssv('--line-2'), 'stroke-width':1.6});
+  add(svg, 'path', {d:'M4.6 20c0-4.1 3.3-6.4 7.4-6.4s7.4 2.3 7.4 6.4',
+    fill:'none', stroke:cssv('--line-2'), 'stroke-width':1.6, 'stroke-linecap':'round'});
+  box.appendChild(svg);
+  box.appendChild(elc('span','ph','Photo'));
+  return box;
+}
+
+function fact(dl, label, value){
+  const d = elc('div','idfact');
+  d.appendChild(elc('dt', null, label));
+  d.appendChild(elc('dd', null, value));
+  dl.appendChild(d);
+}
+
 function studentHeader(host, s){
   const back = elc('button','backlink','← All students');
   back.type = 'button';
   back.addEventListener('click', closeStudent);
   host.appendChild(back);
 
-  const body = makeCard(host, null, s.name, null, null);
+  const body = makeCard(host, null, 'Student record', null, null);
   const card = body.parentElement;
-  const hd = card.querySelector('.cardhd > div');
-  hd.textContent = '';
-  hd.appendChild(elc('div','kicker','Class of ' + s.cohort + ' · ' + s.id));
-  const h = elc('h2', null, s.name); hd.appendChild(h);
-  hd.appendChild(elc('p','why',
-    'Phase ' + s.phase + ' · ' + s.college + ' College · Advisor ' + s.advisor +
-    ' · ' + (s.records||[]).length + ' blocks on record'));
-  card.querySelector('.cardhd').appendChild(chipFor(s.status));
+  card.querySelector('.cardhd').remove();
 
-  const hero = elc('div','hero');
-  const fig = elc('div','fig', s.overallPct == null ? '—' : s.overallPct);
-  if(s.overallPct != null) fig.appendChild(elc('span','u','th percentile'));
-  hero.appendChild(fig);
-  hero.appendChild(elc('div','cap',
-    'Overall standing in the Class of ' + s.cohort + ', weighting medical knowledge 60% and ' +
-    'clinical skills 40% across every assessment on record.'));
-  body.appendChild(hero);
+  const row = elc('div','idcard');
+  row.appendChild(photoBox(s));
+
+  const meta = elc('div','idmeta');
+  const top = elc('div','idtop');
+  top.appendChild(elc('div','kicker','Student code'));
+  top.appendChild(chipFor(s.status));
+  meta.appendChild(top);
+  meta.appendChild(elc('div','idcode', s.id));
+
+  const dl = document.createElement('dl');
+  dl.className = 'idfacts';
+  fact(dl, 'Class of', String(s.cohort));
+  fact(dl, 'Current phase', PHASE_LABEL[s.phase] || ('Phase ' + s.phase));
+  fact(dl, 'Advisory college', s.college + (/College$/.test(s.college) ? '' : ' College'));
+  if(s.advisingGroup) fact(dl, 'Advising group', s.advisingGroup);
+  fact(dl, 'Blocks completed', s.completed + (s.upcoming ? ' of ' + (s.completed + s.upcoming) : ''));
+  meta.appendChild(dl);
+
+  const now = elc('div','schedrow');
+  if(s.current){
+    const chip = elc('span','now');
+    chip.appendChild(elc('span', null, 'In block now'));
+    now.appendChild(chip);
+    now.appendChild(elc('span', null, s.current.code + ' — ' + s.current.name +
+      (s.current.site ? ' · ' + s.current.site : '')));
+    now.appendChild(elc('span','wk', fmtRange(s.current.start, s.current.end)));
+  } else {
+    now.appendChild(elc('span','wk','Not in a scheduled block on ' + fmtDate(asOfDate())));
+  }
+  meta.appendChild(now);
+  row.appendChild(meta);
+  body.appendChild(row);
+}
+
+/* ---------------- rotation schedule ---------------- */
+function asOfDate(){ return (DATA.meta && DATA.meta.asOf) || new Date().toISOString().slice(0,10) }
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function fmtDate(isoStr){
+  if(!isoStr) return '—';
+  const p = String(isoStr).slice(0,10).split('-');
+  if(p.length !== 3) return String(isoStr);
+  return Number(p[2]) + ' ' + MONTHS[Number(p[1]) - 1] + ' ' + p[0];
+}
+function fmtRange(a, b){
+  if(!a && !b) return '—';
+  if(!b) return fmtDate(a);
+  return fmtDate(a) + ' – ' + fmtDate(b);
+}
+function weeksBetween(a, b){
+  if(!a || !b) return null;
+  return Math.round((new Date(b) - new Date(a)) / (7*864e5));
+}
+const SCHED_STYLE = {
+  'completed':   {label:'Completed',   varName:'--context'},
+  'in progress': {label:'In progress', varName:'--s1'},
+  'scheduled':   {label:'Scheduled',   varName:'--sched'}
+};
+
+/* A dated plan of blocks is a Gantt, not a statistical chart: one bar per
+   rotation on a shared calendar axis, the current block in the accent and
+   everything else as context. */
+function renderSchedule(host, s){
+  host.textContent = '';
+  const recs = (s.records||[]).filter(r => r.start && r.end).sort((a,b) => a.start < b.start ? -1 : 1);
+  if(!recs.length){
+    host.appendChild(elc('div','empty','No dated rotations on record. Add start and end dates to show the schedule.'));
+    buildTable($('schedTable'), [{label:'Block'}], [], 'Empty');
+    return;
+  }
+
+  legend(host, Object.keys(SCHED_STYLE).map(k =>
+    ({label: SCHED_STYLE[k].label, color: cssv(SCHED_STYLE[k].varName), shape:'box'})));
+
+  const W = widthOf(host);
+  const labelW = Math.min(Math.round(W * 0.34), W < 520 ? 116 : 216);
+  const rowH = 26, m = {t:26, r:16, b:30, l:labelW};
+  const H = m.t + recs.length*rowH + m.b;
+  const pw = W - m.l - m.r;
+  const t0 = new Date(recs[0].start).getTime();
+  const t1 = new Date(recs[recs.length-1].end).getTime();
+  const X = t => m.l + ((t - t0)/Math.max(1, t1 - t0))*pw;
+
+  const svg = add(host,'svg',{class:'chart',width:W,height:H,role:'img',
+    'aria-label':'Rotation schedule: each block on a calendar axis, marked completed, in progress, or scheduled.'});
+
+  /* a gridline per academic year start, labelled */
+  const y0 = new Date(recs[0].start).getUTCFullYear(), y1 = new Date(recs[recs.length-1].end).getUTCFullYear();
+  for(let y = y0; y <= y1 + 1; y++){
+    const t = Date.UTC(y, 0, 1);
+    if(t < t0 || t > t1) continue;
+    add(svg,'line',{x1:X(t),x2:X(t),y1:m.t-8,y2:m.t+recs.length*rowH,class:'gridline'});
+    add(svg,'text',{x:X(t),y:H-14,'text-anchor':'middle',class:'ax'}, String(y));
+  }
+
+  /* today */
+  const nowT = new Date(asOfDate()).getTime();
+  if(nowT >= t0 && nowT <= t1){
+    add(svg,'line',{x1:X(nowT),x2:X(nowT),y1:m.t-14,y2:m.t+recs.length*rowH,
+      stroke:cssv('--magenta'),'stroke-width':1});
+    add(svg,'text',{x:X(nowT),y:m.t-19,'text-anchor':'middle',class:'dlab'}, 'Today');
+  }
+
+  recs.forEach((rec, i) => {
+    const y = m.t + i*rowH, bh = 14, by = y + (rowH - bh)/2;
+    const st = SCHED_STYLE[rec.status] || SCHED_STYLE['scheduled'];
+    const color = cssv(st.varName);
+    add(svg,'text',{x:m.l-10,y:by+11,'text-anchor':'end',class:'dlab'},
+      fitLabel(rec.code + ' — ' + rec.name, labelW - 14));
+    const x0 = X(new Date(rec.start).getTime());
+    /* the 2px surface gap keeps back-to-back blocks reading as two bars */
+    const w = Math.max(4, X(new Date(rec.end).getTime()) - x0 - 2);
+    add(svg,'path',{d: barPath(x0, by, w, bh, 4, 'right'), fill: color});
+    const hit = add(svg,'rect',{x:0,y:y,width:W,height:rowH,class:'hit',tabindex:'0',
+      role:'button','aria-label': rec.code + ' ' + rec.name + ', ' + st.label.toLowerCase() +
+        ', ' + fmtRange(rec.start, rec.end) + (rec.site ? ', at ' + rec.site : '') + '.'});
+    hoverable(hit, rec.code + ' — ' + rec.name, [
+      {value: fmtRange(rec.start, rec.end), label:'', color},
+      {value: st.label, label: rec.site || rec.term || ''}
+    ]);
+  });
+  add(svg,'line',{x1:m.l,x2:m.l,y1:m.t-8,y2:m.t+recs.length*rowH,class:'baseline'});
+
+  buildTable($('schedTable'),
+    [{label:'#',num:true},{label:'Phase'},{label:'Rotation'},{label:'Term'},{label:'Site'},
+     {label:'Dates'},{label:'Weeks',num:true},{label:'Status'}],
+    recs.map(r => [r.seq, 'Phase ' + r.phase, r.code + ' — ' + r.name, r.term || '—',
+      r.site || '—', fmtRange(r.start, r.end), weeksBetween(r.start, r.end) ?? '—',
+      (SCHED_STYLE[r.status] || {label:r.status || '—'}).label]),
+    'Rotation schedule with dates, sites, and status');
 }
 
 /* ---------------- trajectory: small multiples ---------------- */
@@ -1867,7 +2140,9 @@ function renderMatrix(host, s){
       const td = elc('td','cell');
       const d = cellData(rec, c.key);
       if(!d){ td.classList.add('na'); td.textContent = '—';
-        td.setAttribute('aria-label','not assessed'); tr.appendChild(td); return }
+        td.setAttribute('aria-label', rec.status === 'scheduled' ? 'not sat yet'
+          : rec.status === 'in progress' ? 'block still in progress' : 'not assessed');
+        tr.appendChild(td); return }
       const bg = divergingColor(d.pct - 50);
       td.style.background = bg;
       td.style.color = inkOn(bg);
@@ -1884,10 +2159,7 @@ function renderMatrix(host, s){
 
     const rt = elc('td','cell');
     rt.style.background = 'transparent';
-    const st = rec.result === 'Fail' ? 'concern' : rec.result === 'Pass with remediation' ? 'watch' : 'ok';
-    const chip = chipFor(st);
-    chip.querySelector('span:last-child').textContent = rec.result;
-    rt.appendChild(chip);
+    rt.appendChild(resultChip(rec.result));
     tr.appendChild(rt);
     tb.appendChild(tr);
   });
@@ -1966,7 +2238,9 @@ function divergingBars(chartId, tableId, items, opts){
     const hit = add(svg,'rect',{x:0,y:y,width:W,height:rowH,class:'hit',tabindex:'0',
       role:'button','aria-label': it.label + ': ' + it.detail});
     hoverable(hit, it.label, [
-      {value: (it.delta > 0 ? '+' : '') + it.delta + ' ' + opts.unit, label:'vs. ' + opts.refName, color},
+      {value: (it.delta > 0 ? '+' : '') + it.delta + ' ' +
+              (Math.abs(it.delta) === 1 ? opts.unit.replace(/s$/, '') : opts.unit),
+       label:'vs. ' + opts.refName, color},
       {value: it.studentText, label:'this student'},
       {value: it.refText, label: opts.refName}
     ]);
@@ -2079,11 +2353,33 @@ function renderLog(host, s){
 /* ---------------- assemble the student view ---------------- */
 function renderStudent(s){
   const host = $('studentView'); host.textContent = '';
+
+  /* The order the page reads in: who (by code), where they are, how they are
+     doing, and finally what needs a conversation. */
   studentHeader(host, s);
+
+  const schedBody = makeCard(host, 'Rotation schedule',
+    'Where this student has been and where they are going',
+    'Every module, clerkship, and transition course on a single calendar. ' +
+    'The accent bar is the block in progress today; the pale bars are still ahead.', 'schedTable');
+  chartAndTable(schedBody, 'schedChart', 'schedTable');
+  renderSchedule($('schedChart'), s);
+
+  const perfBody = makeCard(host, 'Performance', 'Overall standing', null, null);
+  const hero = elc('div','hero');
+  const fig = elc('div','fig', s.overallPct == null ? '\u2014' : s.overallPct);
+  if(s.overallPct != null) fig.appendChild(elc('span','u','th percentile'));
+  hero.appendChild(fig);
+  hero.appendChild(elc('div','cap',
+    'Standing in the Class of ' + s.cohort + ', weighting medical knowledge 60% and ' +
+    'clinical skills 40% across every assessment on record. Relative to the class, ' +
+    'not an absolute standard.'));
+  perfBody.appendChild(hero);
+
   studentTiles(host, s);
 
   const trajBody = makeCard(host, 'Trajectory',
-    'How ' + s.name.split(' ')[0] + ' has tracked over time',
+    'How this student has tracked over time',
     'One panel per kind of assessment, in academic order. The class median is the grey line, ' +
     'so a gap that widens or closes is visible without doing arithmetic.', 'trajTable');
   chartAndTable(trajBody, 'trajChart', 'trajTable');
@@ -2174,16 +2470,22 @@ function renderAll(){
    2. CSV - one row per assessment, which is what most registrar and assessment
       exports look like. Recognised columns (header row required):
 
-        student_id, student_name, cohort, phase, college, advisor,
+        student_code, cohort, phase, college, advising_group, photo,
         seq, block_code, block_name, term, site, result,
+        start_date, end_date, status,
         assessment_type   quiz | cas | osce | eval
         assessment_label, score, percentile, national_mean, cohort_mean,
         comment
         domain:<name>     any number of columns, e.g. domain:Clinical reasoning
 
-      Rows for the same student_id and block_code are folded into one block.
+      Rows for the same student_code and block_code are folded into one block.
+      start_date / end_date are ISO dates and drive the rotation schedule; the
+      status is derived from them when the column is absent. A block that has
+      not been sat yet still gets a row - leave assessment_type blank.
       Percentiles that are missing are derived where the page can derive them.
+      A student_name column, if present, is ignored: this page shows codes.
    ============================================================================ */
+const CSV_AS_OF = new Date().toISOString().slice(0,10);
 function parseCsv(text){
   const rows = []; let row = [], field = '', q = false;
   for(let i = 0; i < text.length; i++){
@@ -2204,25 +2506,33 @@ function csvToData(text){
   if(rows.length < 2) throw new Error('The CSV has no data rows.');
   const head = rows[0].map(h => h.trim());
   const idx = n => head.indexOf(n);
-  if(idx('student_id') < 0) throw new Error('The CSV needs a student_id column.');
+  const idCol = idx('student_code') >= 0 ? 'student_code' : 'student_id';
+  if(idx(idCol) < 0) throw new Error('The CSV needs a student_code column.');
   const domCols = head.map((h,i) => ({h,i})).filter(o => o.h.toLowerCase().startsWith('domain:'));
   const num = v => { const n = parseFloat(v); return isNaN(n) ? null : n };
   const students = {};
 
   rows.slice(1).forEach(r => {
     const get = n => { const i = idx(n); return i < 0 ? '' : (r[i]||'').trim() };
-    const sid = get('student_id'); if(!sid) return;
+    const sid = get(idCol); if(!sid) return;
+    /* No name is read, even if the export carries one. */
     const s = students[sid] || (students[sid] = {
-      id: sid, name: get('student_name') || sid, cohort: num(get('cohort')) || '—',
-      phase: num(get('phase')) || 1, college: get('college') || '—',
-      advisor: get('advisor') || '—', records: [], contentAreas: {}
+      id: sid, cohort: num(get('cohort')) || '—',
+      phase: num(get('phase')) || null, college: get('college') || '—',
+      advisingGroup: get('advising_group') || '', photo: get('photo') || '',
+      records: [], contentAreas: {}
     });
     const code = get('block_code') || get('block_name') || 'BLOCK';
     let rec = s.records.find(x => x.code === code);
     if(!rec){
-      rec = {seq: num(get('seq')) || s.records.length + 1, phase: num(get('phase')) || s.phase,
+      const start = get('start_date'), end = get('end_date');
+      const status = get('status') ||
+        (start && end ? statusOn(start, end, CSV_AS_OF) : 'completed');
+      rec = {seq: num(get('seq')) || s.records.length + 1,
+        phase: num(get('phase')) || s.phase || 1,
         kind: 'module', code, name: get('block_name') || code, term: get('term') || '',
-        site: get('site') || '', result: get('result') || 'Pass',
+        site: get('site') || '', start, end, status,
+        result: get('result') || RESULT_BY_STATUS[status] || 'Pass',
         quizzes: null, cas: null, osce: null, eval: null};
       s.records.push(rec);
     }
@@ -2250,7 +2560,7 @@ function csvToData(text){
 
   const list = Object.values(students);
   list.forEach(s => s.records.sort((a,b) => a.seq - b.seq));
-  return {meta:{source:'Imported CSV', generated: new Date().toISOString().slice(0,10)}, students:list};
+  return {meta:{source:'Imported CSV', generated: CSV_AS_OF, asOf: CSV_AS_OF}, students:list};
 }
 
 function adoptData(obj, sourceName){
