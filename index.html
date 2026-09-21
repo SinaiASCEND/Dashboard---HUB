@@ -441,6 +441,12 @@ const DASHBOARDS = {
     title: "ASCEND Programmatic Assessment \u2014 Phase 3",
     blurb: "Module and Clerkship Director dashboards for the Integration and Transitions phase \u2014 Chronic Care Clerkship, acting internships, and the transition modules \u2014 reporting cohort outcomes, assessment quality, and evaluations by academic year."
   },
+  studentperf: {
+    url: "./Student_Performance.html",
+    kicker: "Student Progress",
+    title: "ASCEND Student Performance Dashboard",
+    blurb: "Individual student performance across all three phases \u2014 module quizzes, NBME customized assessments, OSCE and clinical-skills evaluations, and shelf exams \u2014 with a class roster, per-student records, and review flags. Confidential education records."
+  },
   sitecomp2526: {
     url: "./Site_Comparability_2025-26.html",
     kicker: "Site Comparability \u00b7 AY 2025\u201326",
@@ -455,7 +461,14 @@ const TIERS = {
   "5942bd952f12e02478b5a6aba902340a58c9c769a961f128dbb57f0b79358537": {  // Tier 1
     name: "Office of Curricular Affairs",
     sub: "Full access — all monitoring, mapping, governance, and accreditation views.",
-    dashboards: ["phase1assessment","phase2assessment","phase3assessment","clerkships","sitecomparability","sitecomp2526","DO","nbme","clerkshipassessments","mepo","electives","asqisa","aamcgq","aamcscope","phase1map","milestonesmap","policyreview","policylibrary","directors","students","governance","LCME","job","babybates","clinicalcompetency","curricularaffairs"]
+    dashboards: ["studentperf","phase1assessment","phase2assessment","phase3assessment","clerkships","sitecomparability","sitecomp2526","DO","nbme","clerkshipassessments","mepo","electives","asqisa","aamcgq","aamcscope","phase1map","milestonesmap","policyreview","policylibrary","directors","students","governance","LCME","job","babybates","clinicalcompetency","curricularaffairs"],
+    /* Individually identifiable student records sit behind the confirmation
+       gate: the tile stays locked until the tier code is re-entered. */
+    locked: {
+      hash: "5942bd952f12e02478b5a6aba902340a58c9c769a961f128dbb57f0b79358537",
+      label: "Student records",
+      dashboards: ["studentperf"]
+    }
   },
   "31016cceeab858e9880093fcb959e82b5ac270f082b80c9ef9a63a731c9c7d86": {  // Tier 2
     name: "Pre-Clerkship Curriculum Directors",
@@ -488,7 +501,12 @@ const TIERS = {
   "9f8b17ea00b6b3fd1efa6d10aa21cfedc91ba71a26b03557e09576370c157a81": {  // Tier 6
     name: "Clinical Competency Mentors",
     sub: "Clinical competency, physical examination, and office resources.",
-    dashboards: ["curricularaffairs","babybates","clinicalcompetency","job","directors"]
+    dashboards: ["studentperf","curricularaffairs","babybates","clinicalcompetency","job","directors"],
+    locked: {
+      hash: "9f8b17ea00b6b3fd1efa6d10aa21cfedc91ba71a26b03557e09576370c157a81",
+      label: "Student records",
+      dashboards: ["studentperf"]
+    }
   },
   "4ed5cb948f5f7c10d66e38ed679d0e5f0be24469df2de636c2da893d5b06ecb3": {  // Tier 7
     name: "Curricular Integration Subcommittee",

@@ -1,0 +1,7 @@
+student_id,student_name,cohort,phase,college,advisor,seq,block_code,block_name,term,site,result,assessment_type,assessment_label,score,percentile,national_mean,cohort_mean,comment,domain:History taking,domain:Physical examination,domain:Communication,domain:Clinical reasoning,domain:Documentation & presentation,domain:Professionalism,domain:Patient education & counseling
+M2028001,Example Student,2028,2,Ascent,Dr. A. Example,1,CVS,Cardiovascular,Winter Y1,,Pass,quiz,Quiz 1,88,,,84,,,,,,,,
+M2028001,Example Student,2028,2,Ascent,Dr. A. Example,1,CVS,Cardiovascular,Winter Y1,,Pass,quiz,Quiz 2,81,,,84,,,,,,,,
+M2028001,Example Student,2028,2,Ascent,Dr. A. Example,1,CVS,Cardiovascular,Winter Y1,,Pass,cas,NBME Module CAS,76,68,72,74,,,,,,,,
+M2028001,Example Student,2028,2,Ascent,Dr. A. Example,2,IM,Internal Medicine,Block 1,Mount Sinai Hospital,Pass,cas,NBME Subject Exam (shelf),79,63,75,78,,,,,,,,
+M2028001,Example Student,2028,2,Ascent,Dr. A. Example,2,IM,Internal Medicine,Block 1,Mount Sinai Hospital,Pass,eval,Internal Medicine,4.2,71,,4.15,"Solid, reliable performance. Presentations improved steadily over the block.",4.3,4.0,4.4,4.1,4.2,4.5,4.1
+M2028001,Example Student,2028,2,Ascent,Dr. A. Example,3,SUR,Surgery,Block 2,Mount Sinai West,Pass,osce,Phase 2 Mid-point CPX,84,58,,82,,86,79,88,82,80,90,83
