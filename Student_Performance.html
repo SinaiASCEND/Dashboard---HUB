@@ -246,15 +246,17 @@ main{padding-bottom:44px}
 /* De-identified: a photo, the student code, and where they are in the
    curriculum. No name appears anywhere on this page - the code-to-student
    key is held separately. */
-.idcard{display:flex;gap:22px;align-items:flex-start;flex-wrap:wrap}
-.photo{width:124px;height:156px;border-radius:12px;flex:none;overflow:hidden;
-  background:var(--surface-2);border:1px solid var(--line-2);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
-.photo.empty{border-style:dashed}
-.photo img{width:100%;height:100%;object-fit:cover;display:block}
-.photo .ph{font-size:10px;letter-spacing:.14em;text-transform:uppercase;
-  font-weight:800;color:var(--muted)}
-.idmeta{flex:1;min-width:230px}
+.idcard{display:block}
+.idmeta{min-width:230px}
+/* A class-level link, never a portrait: a group photograph of a cohort cannot
+   say which code belongs to which face, so it carries no re-identification
+   that the separate key does not already hold. */
+.classlink{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px;
+  font-size:13px}
+.classlink a{color:var(--magenta);font-weight:700;text-decoration:none}
+.classlink a:hover{text-decoration:underline}
+.classlink .off{color:var(--muted)}
+.classlink .ic{color:var(--muted);flex:none;display:block}
 .idtop{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
 .idtop .kicker{margin-bottom:0}
 .idcode{font-size:30px;font-weight:700;letter-spacing:-.01em;color:var(--ink);
@@ -265,7 +267,6 @@ main{padding-bottom:44px}
   font-weight:800;color:var(--muted);margin:0}
 .idfact dd{margin:3px 0 0;font-size:13.5px;font-weight:600;color:var(--ink)}
 @media (max-width:520px){
-  .photo{width:96px;height:120px}
   .idcode{font-size:24px}
 }
 
@@ -467,8 +468,8 @@ tr.rosterrow:focus-visible{outline:3px solid var(--s1);outline-offset:-3px}
     </div>
     <div class="notice ferpa">
       <span class="ic" aria-hidden="true">&#128274;</span>
-      <span><strong>Coded education records.</strong> Students appear by code only &mdash; no names are
-        held in or shown by this dashboard. The code-to-student key is kept separately by the Office
+      <span><strong>Coded education records.</strong> Students appear by code only &mdash; no names and
+        no portraits are held in or shown by this dashboard. The code-to-student key is kept separately by the Office
         of Curricular Affairs. Because that key exists these records are still re-identifiable and
         remain protected under FERPA: open only the students you have a legitimate educational
         interest in, never pair this page with the key in a shared channel, and do not leave it open
@@ -605,13 +606,20 @@ tr.rosterrow:focus-visible{outline:3px solid var(--s1);outline-offset:-3px}
    {
      "meta":     { "source": "Registrar extract 2026-09-01",
                    "generated": "2026-09-01",
-                   "asOf": "2026-09-21" },   // the date "today" is measured from
+                   "asOf": "2026-09-21",     // the date "today" is measured from
+                   "classPhotos": {          // cohort class picture, by class year
+                     "2028": "https://example.edu/class-of-2028"
+                   } },
      "students": [ Student, ... ]
    }
 
    THE DATA IS DE-IDENTIFIED. A student carries a code and nothing else that
    names them; the code-to-student key is held separately and never loaded
-   here. Do not add a name field - the page will not render one.
+   here. Do not add a name field, and do not add a portrait - the page will
+   render neither. A face identifies a person outright, which is the one
+   thing the coding exists to prevent. The card links to the cohort's class
+   picture instead: a class-level resource that identifies nobody in
+   particular.
 
    Student = {
      id,                          // the de-identified student code, e.g. "ASC-2028-014"
@@ -619,7 +627,8 @@ tr.rosterrow:focus-visible{outline:3px solid var(--s1);outline-offset:-3px}
      phase,                       // optional: 1 | 2 | 3. Omit it and the page
                                   //   derives it from the block in progress.
      college, advisingGroup,      // advisory college + advising group code
-     photo,                       // optional image URL; a placeholder shows without one
+     classPhotoUrl,               // optional per-student override for the cohort
+                                  //   class picture link; http(s) only
      records: [ Record, ... ]     // one per module / clerkship / transition course
    }
 
@@ -1758,24 +1767,42 @@ function studentTiles(host, s){
 const PHASE_LABEL = {1:'Phase 1 · Pre-clerkship', 2:'Phase 2 · Clerkships',
                      3:'Phase 3 · Integration & Transitions'};
 
-function photoBox(s){
-  const box = elc('div','photo');
-  if(s.photo){
-    const img = document.createElement('img');
-    img.src = s.photo;
-    img.alt = 'Photograph of student ' + s.id;
-    box.appendChild(img);
-    return box;
+/* No portrait sits on this record. A face identifies a person outright, which
+   is the one thing the coding is there to prevent, so the card links to the
+   cohort's class picture instead - a class-level resource that identifies
+   nobody in particular. */
+function classPictureLink(s){
+  const map = (DATA.meta && DATA.meta.classPhotos) || {};
+  const raw = s.classPhotoUrl || map[s.cohort] || map[String(s.cohort)] || '';
+  const url = /^https?:\/\//i.test(String(raw)) ? String(raw) : '';   /* http(s) only */
+  const row = elc('div','classlink');
+  /* drawn rather than an emoji - the picture-frame glyph is tofu wherever no
+     emoji font is installed */
+  const ic = sv('svg',{width:'15',height:'15',viewBox:'0 0 16 16','aria-hidden':'true'});
+  ic.setAttribute('class','ic');
+  add(ic,'rect',{x:1.5,y:2.5,width:13,height:11,rx:1.8,fill:'none',
+    stroke:'currentColor','stroke-width':1.3});
+  add(ic,'circle',{cx:5.6,cy:6.4,r:1.2,fill:'currentColor'});
+  add(ic,'path',{d:'M2.6 12 6.4 8.4l2.3 2.2 2.4-2.6 2.3 4',fill:'none',
+    stroke:'currentColor','stroke-width':1.3,'stroke-linejoin':'round'});
+  row.appendChild(ic);
+  if(url){
+    const a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.textContent = 'Class of ' + s.cohort + ' class picture';
+    a.title = 'Opens the cohort class picture in a new tab. It is a class-level ' +
+              'resource and does not say which student this code belongs to.';
+    row.appendChild(a);
+    row.appendChild(elc('span','off','\u2197'));
+  } else {
+    const off = elc('span','off', 'Class of ' + s.cohort + ' class picture \u2014 no link set');
+    off.title = 'Set meta.classPhotos["' + s.cohort + '"] in the loaded data to the ' +
+                'cohort class picture URL.';
+    row.appendChild(off);
   }
-  /* placeholder until a photo source is wired up */
-  box.classList.add('empty');
-  const svg = sv('svg', {width:'44', height:'44', viewBox:'0 0 24 24', 'aria-hidden':'true'});
-  add(svg, 'circle', {cx:12, cy:8.5, r:3.8, fill:'none', stroke:cssv('--line-2'), 'stroke-width':1.6});
-  add(svg, 'path', {d:'M4.6 20c0-4.1 3.3-6.4 7.4-6.4s7.4 2.3 7.4 6.4',
-    fill:'none', stroke:cssv('--line-2'), 'stroke-width':1.6, 'stroke-linecap':'round'});
-  box.appendChild(svg);
-  box.appendChild(elc('span','ph','Photo'));
-  return box;
+  return row;
 }
 
 function fact(dl, label, value){
@@ -1796,8 +1823,6 @@ function studentHeader(host, s){
   card.querySelector('.cardhd').remove();
 
   const row = elc('div','idcard');
-  row.appendChild(photoBox(s));
-
   const meta = elc('div','idmeta');
   const top = elc('div','idtop');
   top.appendChild(elc('div','kicker','Student code'));
@@ -1826,6 +1851,7 @@ function studentHeader(host, s){
     now.appendChild(elc('span','wk','Not in a scheduled block on ' + fmtDate(asOfDate())));
   }
   meta.appendChild(now);
+  meta.appendChild(classPictureLink(s));
   row.appendChild(meta);
   body.appendChild(row);
 }
@@ -2470,7 +2496,7 @@ function renderAll(){
    2. CSV - one row per assessment, which is what most registrar and assessment
       exports look like. Recognised columns (header row required):
 
-        student_code, cohort, phase, college, advising_group, photo,
+        student_code, cohort, phase, college, advising_group, class_photo_url,
         seq, block_code, block_name, term, site, result,
         start_date, end_date, status,
         assessment_type   quiz | cas | osce | eval
@@ -2519,7 +2545,8 @@ function csvToData(text){
     const s = students[sid] || (students[sid] = {
       id: sid, cohort: num(get('cohort')) || '—',
       phase: num(get('phase')) || null, college: get('college') || '—',
-      advisingGroup: get('advising_group') || '', photo: get('photo') || '',
+      advisingGroup: get('advising_group') || '',
+      classPhotoUrl: get('class_photo_url') || '',
       records: [], contentAreas: {}
     });
     const code = get('block_code') || get('block_name') || 'BLOCK';
