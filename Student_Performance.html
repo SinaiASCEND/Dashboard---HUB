@@ -729,7 +729,12 @@ body.gated{overflow:hidden}
      cohort,                      // graduating class year, e.g. 2028
      phase,                       // optional: 1 | 2 | 3. Omit it and the page
                                   //   derives it from the block in progress.
-     college, advisingGroup,      // advisory college + advising group code
+     careerAdvisor, ccm,          // the two people to call about this student:
+                                  //   career advisor, clinical competency mentor.
+                                  //   FACULTY names - the student stays coded.
+                                  //   Optional; omitted when the extract has not
+                                  //   been joined to the advising roster.
+     advisingGroup,               // advising group code
      classPhotoUrl,               // optional per-student override for the cohort
                                   //   class picture link; http(s) only
      records: [ Record, ... ]     // one per module / clerkship / transition course
@@ -851,7 +856,12 @@ function pctile(z){return clamp(Math.round(normCdf(z)*100),1,99)}
 function clamp(v,lo,hi){return Math.min(hi,Math.max(lo,v))}
 function r1(v){return Math.round(v*10)/10}
 
-const COLLEGES = ['Ascent','Summit','Meridian','Keystone'];
+/* Invented faculty, for the sample data only. Real names arrive with the
+   advising roster; none of these people exist. */
+const SAMPLE_ADVISORS = ['A. Whitfield, MD','R. Okonkwo, MD','L. Bergstrom, MD',
+  'M. Castellanos, MD','J. Ferraro, MD','P. Nandakumar, MD'];
+const SAMPLE_CCMS = ['S. Devereux, MD','T. Haruki, MD','C. Abrahams, MD',
+  'D. Mwangi, MD','K. Lindqvist, MD','B. Oyelaran, MD'];
 
 /* One assessment's worth of ability plus drift plus noise. */
 function scoreAt(ability, drift, noise, r){ return ability + drift + rnorm(r)*noise }
@@ -996,7 +1006,9 @@ function makeStudent(rng, idx, cohort){
     contentAreas[a] = {percentile: pctile(z), natlMean:50};
   });
 
-  return {id: code, cohort, college: COLLEGES[Math.floor(r()*COLLEGES.length)],
+  return {id: code, cohort,
+    careerAdvisor: SAMPLE_ADVISORS[Math.floor(r()*SAMPLE_ADVISORS.length)],
+    ccm: SAMPLE_CCMS[Math.floor(r()*SAMPLE_CCMS.length)],
     advisingGroup: 'AG-' + String(1 + Math.floor(r()*12)).padStart(2,'0'),
     records, contentAreas};
 }
@@ -1804,7 +1816,9 @@ function renderRoster(){
     const nm = document.createElement('div'); nm.className = 'namecell';
     const a = document.createElement('span'); a.className = 'nm'; a.textContent = s.id;
     const b = document.createElement('span'); b.className = 'sid';
-    b.textContent = s.college + ' College' + (s.current ? ' · in ' + s.current.code : '');
+    /* The roster line is for scanning, so it carries the advising group and
+       the block in progress. The people to call are on the record itself. */
+    b.textContent = (s.advisingGroup || '—') + (s.current ? ' · in ' + s.current.code : '');
     nm.appendChild(a); nm.appendChild(b); c1.appendChild(nm); cells.push(c1);
 
     const c2 = document.createElement('td'); c2.className = 'num'; c2.textContent = s.cohort; cells.push(c2);
@@ -2077,7 +2091,12 @@ function studentHeader(host, s){
   dl.className = 'idfacts';
   fact(dl, 'Class of', String(s.cohort));
   fact(dl, 'Current phase', PHASE_LABEL[s.phase] || ('Phase ' + s.phase));
-  fact(dl, 'Advisory college', s.college + (/College$/.test(s.college) ? '' : ' College'));
+  /* The two people to call about this student. Faculty names, not the
+     student's - the record stays coded. Shown only when supplied, so an
+     extract that has not been joined to the advising roster yet simply
+     leaves them out rather than printing a dash. */
+  if(s.careerAdvisor) fact(dl, 'Career advisor', s.careerAdvisor);
+  if(s.ccm) fact(dl, 'Clinical competency mentor', s.ccm);
   if(s.advisingGroup) fact(dl, 'Advising group', s.advisingGroup);
   fact(dl, 'Blocks completed', s.completed + (s.upcoming ? ' of ' + (s.completed + s.upcoming) : ''));
   meta.appendChild(dl);
@@ -2757,7 +2776,8 @@ function renderAll(){
    2. CSV - one row per assessment, which is what most registrar and assessment
       exports look like. Recognised columns (header row required):
 
-        student_code, cohort, phase, college, advising_group, class_photo_url,
+        student_code, cohort, phase, career_advisor, ccm, advising_group,
+        class_photo_url,
         seq, block_code, block_name, term, site, result,
         start_date, end_date, status,
         assessment_type   quiz | cas | osce | eval
@@ -2805,7 +2825,9 @@ function csvToData(text){
     /* No name is read, even if the export carries one. */
     const s = students[sid] || (students[sid] = {
       id: sid, cohort: num(get('cohort')) || '—',
-      phase: num(get('phase')) || null, college: get('college') || '—',
+      phase: num(get('phase')) || null,
+      careerAdvisor: get('career_advisor') || '',
+      ccm: get('ccm') || '',
       advisingGroup: get('advising_group') || '',
       classPhotoUrl: get('class_photo_url') || '',
       records: [], contentAreas: {}
