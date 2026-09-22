@@ -257,6 +257,15 @@ main{padding-bottom:44px}
 .classlink a:hover{text-decoration:underline}
 .classlink .off{color:var(--muted)}
 .classlink .ic{color:var(--muted);flex:none;display:block}
+.classlink .sep{color:var(--line-2)}
+/* the re-identification action: deliberate, one student at a time, and it
+   leaves this page to do it */
+.lookup{display:inline-flex;align-items:center;gap:7px;background:none;
+  border:1px solid var(--magenta);color:var(--magenta);border-radius:999px;
+  padding:6px 14px;font-size:12.5px;font-weight:800;cursor:pointer;min-height:34px}
+.lookup:hover{background:var(--magenta);color:#fff}
+.lookup .ic{color:currentColor}
+.said{font-size:12px;color:var(--ok);font-weight:700}
 .idtop{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
 .idtop .kicker{margin-bottom:0}
 .idcode{font-size:30px;font-weight:700;letter-spacing:-.01em;color:var(--ink);
@@ -609,14 +618,19 @@ tr.rosterrow:focus-visible{outline:3px solid var(--s1);outline-offset:-3px}
                    "asOf": "2026-09-21",     // the date "today" is measured from
                    "classPhotos": {          // cohort class picture, by class year
                      "2028": "https://example.edu/class-of-2028"
-                   } },
+                   },
+                   // where the code-to-student key actually lives. {code} is
+                   // substituted if present; without it the code is copied to
+                   // the clipboard and the document is opened to paste into.
+                   "lookupUrl": "https://sso.example.edu/key?code={code}" },
      "students": [ Student, ... ]
    }
 
    THE DATA IS DE-IDENTIFIED. A student carries a code and nothing else that
    names them; the code-to-student key is held separately and never loaded
-   here. Do not add a name field, and do not add a portrait - the page will
-   render neither. A face identifies a person outright, which is the one
+   here - re-identification happens through meta.lookupUrl, by leaving this
+   page for a system that can decide whether you are allowed. Do not add a
+   name field, and do not add a portrait - the page will render neither. A face identifies a person outright, which is the one
    thing the coding exists to prevent. The card links to the cohort's class
    picture instead: a class-level resource that identifies nobody in
    particular.
@@ -1771,6 +1785,67 @@ const PHASE_LABEL = {1:'Phase 1 · Pre-clerkship', 2:'Phase 2 · Clerkships',
    is the one thing the coding is there to prevent, so the card links to the
    cohort's class picture instead - a class-level resource that identifies
    nobody in particular. */
+/* ---------------------------------------------------------------------------
+   RE-IDENTIFICATION
+   The code-to-student key never lives here. What lives here is a doorway to
+   wherever it does live - a URL the institution controls and protects.
+
+   meta.lookupUrl is either
+     "https://<system>/lookup?code={code}"   - {code} is substituted, so the
+                                               target opens straight on the
+                                               student, or
+     "https://<system>/key-document"         - no placeholder, so the code is
+                                               copied to the clipboard and the
+                                               key document is opened to paste
+                                               it into.
+
+   Either way the authorisation decision is made by that system, not by this
+   page, and the act of looking someone up is a visit it can log. The link
+   carries rel="noreferrer" so the code is not handed to the target in a
+   Referer header it did not ask for.
+   --------------------------------------------------------------------------- */
+function lookupButton(s){
+  const raw = (DATA.meta && DATA.meta.lookupUrl) || '';
+  const url = /^https?:\/\//i.test(String(raw)) ? String(raw) : '';   /* http(s) only */
+  if(!url){
+    const off = elc('span','off','Code lookup not configured');
+    off.title = 'Set meta.lookupUrl in the loaded data to the address of the ' +
+                'access-controlled system that holds the code key. Use {code} ' +
+                'in the URL to open it straight on this student.';
+    return off;
+  }
+  const hasSlot = url.indexOf('{code}') >= 0;
+  const btn = elc('button','lookup');
+  btn.type = 'button';
+  const ic = sv('svg',{width:'14',height:'14',viewBox:'0 0 16 16','aria-hidden':'true'});
+  ic.setAttribute('class','ic');
+  add(ic,'circle',{cx:7,cy:7,r:4.4,fill:'none',stroke:'currentColor','stroke-width':1.5});
+  add(ic,'path',{d:'M10.3 10.3 14 14',stroke:'currentColor','stroke-width':1.5,
+    'stroke-linecap':'round'});
+  btn.appendChild(ic);
+  btn.appendChild(elc('span', null, 'Look up this code'));
+  btn.title = hasSlot
+    ? 'Opens the code key in a new tab, on this student. The key is held ' +
+      'outside this dashboard and decides for itself whether you may see it.'
+    : 'Copies ' + s.id + ' and opens the code key in a new tab to paste it into. ' +
+      'The key is held outside this dashboard.';
+
+  const said = elc('span','said');
+  btn.addEventListener('click', async () => {
+    const target = hasSlot ? url.replace(/\{code\}/g, encodeURIComponent(s.id)) : url;
+    if(!hasSlot){
+      try{ await navigator.clipboard.writeText(s.id); said.textContent = 'Code copied'; }
+      catch(e){ said.textContent = s.id; }      /* no clipboard: show it to copy by hand */
+      setTimeout(() => { said.textContent = ''; }, 4000);
+    }
+    window.open(target, '_blank', 'noopener,noreferrer');
+  });
+  const wrap = elc('span');
+  wrap.style.cssText = 'display:inline-flex;align-items:center;gap:10px';
+  wrap.appendChild(btn); wrap.appendChild(said);
+  return wrap;
+}
+
 function classPictureLink(s){
   const map = (DATA.meta && DATA.meta.classPhotos) || {};
   const raw = s.classPhotoUrl || map[s.cohort] || map[String(s.cohort)] || '';
@@ -1851,7 +1926,10 @@ function studentHeader(host, s){
     now.appendChild(elc('span','wk','Not in a scheduled block on ' + fmtDate(asOfDate())));
   }
   meta.appendChild(now);
-  meta.appendChild(classPictureLink(s));
+  const links = classPictureLink(s);
+  links.appendChild(elc('span','sep','\u00b7'));
+  links.appendChild(lookupButton(s));
+  meta.appendChild(links);
   row.appendChild(meta);
   body.appendChild(row);
 }
