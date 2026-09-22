@@ -1103,6 +1103,32 @@ function rankPct(value, pool){
 
 function quizAvg(rec){ return rec.quizzes && rec.quizzes.length ? mean(rec.quizzes.map(q=>q.pct)) : null }
 
+/* The kinds of lower-stakes assessment a module runs, told apart by name - a
+   gradebook calls them "iRAT 3", "CCSG Basics 2", "Amboss Quiz 4". Listed in
+   display order: [label, name test, short column label]. Anything that
+   matches none is a plain quiz. The pooled quiz average above is kept for
+   the knowledge percentile and the standings, so splitting the display does
+   not move anyone's rank. */
+const QUIZ_KINDS = [
+  ['Quiz',           null,                                               'Quiz'],
+  ['AMBOSS quiz',    /\bamboss\b/i,                                      'AMBOSS'],
+  ['TBL (iRAT)',     /\b[it]rat\b|\btbl\b/i,                             'TBL'],
+  ['CCSG',           /\bccsg\b/i,                                        'CCSG'],
+  ['Practical',      /practical/i,                                       'Practical'],
+  ['Lab',            /^lab\s*\d/i,                                       'Lab'],
+  ['Formative quiz', /formative|practice (quiz|questions)|self[\s-]?study/i, 'Formative']
+];
+/* tested most-specific first: a "Practical Quiz" is a practical */
+const QUIZ_TEST_ORDER = ['Practical','TBL (iRAT)','CCSG','Lab','Formative quiz','AMBOSS quiz'];
+function quizKind(name){
+  const n = String(name || '');
+  for(const label of QUIZ_TEST_ORDER){
+    const k = QUIZ_KINDS.find(q => q[0] === label);
+    if(k[1].test(n)) return label;
+  }
+  return 'Quiz';
+}
+
 /* rec.cas is a list after hydrate, but these are also called while the sample
    data is still being built, before it has been normalised - so accept either
    shape rather than depending on the order the two run in. */
@@ -1178,6 +1204,34 @@ function hydrate(data){
     rec.quizPercentile = a == null ? null : rankPct(a, pool[s.cohort + '|' + rec.code] || [a]);
   }));
 
+  /* --- the same, kind by kind: Quiz, TBL, CCSG, ... --- */
+  /* Each kind is ranked against the same kind in the same module and class. */
+  const kindPool = {}, kindsPresent = new Set();
+  students.forEach(s => (s.records||[]).forEach(rec => {
+    rec.qtypes = {};
+    (rec.quizzes||[]).forEach(q => {
+      q.kind = quizKind(q.name);
+      if(q.pct == null) return;
+      const v = rec.qtypes[q.kind] = rec.qtypes[q.kind] || {sum:0, n:0, names:[]};
+      v.sum += q.pct; v.n++; v.names.push(q.name);
+    });
+    Object.entries(rec.qtypes).forEach(([kind, v]) => {
+      v.pct = v.sum / v.n;
+      kindsPresent.add(kind);
+      const k = s.cohort + '|' + rec.code + '|' + kind;
+      (kindPool[k] = kindPool[k] || []).push(v.pct);
+    });
+  }));
+  students.forEach(s => (s.records||[]).forEach(rec =>
+    Object.entries(rec.qtypes).forEach(([kind, v]) => {
+      v.percentile = rankPct(v.pct, kindPool[s.cohort + '|' + rec.code + '|' + kind] || [v.pct]);
+    })));
+  /* every view reads its list of assessment types from TYPE_META, so the
+     kinds this data actually holds become panels, bars and columns */
+  TYPE_META = QUIZ_KINDS.filter(k => kindsPresent.has(k[0]))
+    .map(k => ({key:'q:' + k[0], label:k[0], short:k[2], varName:'--s1'}))
+    .concat(BASE_TYPES);
+
   /* --- per-student standings, domain profile, flags --- */
   students.forEach(s => {
     const recs = s.records || [];
@@ -1217,13 +1271,17 @@ function hydrate(data){
     s.skillDomains = dom;
 
     /* trajectory: one point per assessment, in academic order */
-    s.timeline = recs.map(rec => ({
-      seq: rec.seq, code: rec.code, name: rec.name, term: rec.term, phase: rec.phase,
-      quiz: rec.quizPercentile,
-      cas:  casPercentile(rec),
-      osce: rec.osce ? rec.osce.percentile : null,
-      eval: rec.eval ? rec.eval.percentile : null
-    }));
+    s.timeline = recs.map(rec => {
+      const p = {
+        seq: rec.seq, code: rec.code, name: rec.name, term: rec.term, phase: rec.phase,
+        quiz: rec.quizPercentile,          /* pooled: still used for the trend lines */
+        cas:  casPercentile(rec),
+        osce: rec.osce ? rec.osce.percentile : null,
+        eval: rec.eval ? rec.eval.percentile : null
+      };
+      Object.entries(rec.qtypes || {}).forEach(([kind, v]) => { p['q:' + kind] = v.percentile });
+      return p;
+    });
 
     s.flags = buildFlags(s);
     s.status = standingOf(s);
@@ -1249,7 +1307,7 @@ function hydrate(data){
     /* median percentile by academic position, for the trajectory panels */
     const bySeq = {};
     grp.forEach(s => s.timeline.forEach(t => {
-      ['quiz','cas','osce','eval'].forEach(k => {
+      TYPE_META.map(m => m.key).forEach(k => {
         if(t[k] == null) return;
         ((bySeq[k] = bySeq[k] || {})[t.seq] = bySeq[k][t.seq] || []).push(t[k]);
       });
@@ -1496,13 +1554,16 @@ function buildTable(host, cols, rows, caption){
     tb.appendChild(row) });
   t.appendChild(tb); wrap.appendChild(t); host.appendChild(wrap);
 }
-/* Colour-follows-the-entity: these four never get reassigned. */
-const TYPE_META = [
-  {key:'quiz', label:'Module quizzes',       varName:'--s1'},
-  {key:'cas',  label:'NBME CAS / shelf',     varName:'--s2'},
-  {key:'osce', label:'OSCE',                 varName:'--s3'},
-  {key:'eval', label:'Clinical evaluations', varName:'--s4'}
+/* Colour-follows-the-entity: these never get reassigned. The quiz family -
+   Quiz, AMBOSS, TBL, CCSG, Practical, Lab, Formative - shares the quiz hue and
+   is told apart by label: each kind is its own panel, bar and column. */
+const BASE_TYPES = [
+  {key:'cas',  label:'NBME CAS / shelf',     short:'NBME',          varName:'--s2'},
+  {key:'osce', label:'OSCE',                 short:'OSCE',          varName:'--s3'},
+  {key:'eval', label:'Clinical evaluations', short:'Clinical eval', varName:'--s4'}
 ];
+/* rebuilt by hydrate() from the kinds the loaded data holds */
+let TYPE_META = [{key:'q:Quiz', label:'Quiz', short:'Quiz', varName:'--s1'}].concat(BASE_TYPES);
 
 /* ============================================================================
    STATE + COHORT VIEW
@@ -1667,9 +1728,12 @@ function renderSkillsScatter(){
    never a ramp on the value. Every bar is labelled, and a table twin carries
    the numbers, which is the relief the amber slot's contrast requires. */
 function typePercentiles(list){
-  const buckets = {quiz:[], cas:[], osce:[], eval:[]};
+  const buckets = {};
+  TYPE_META.forEach(t => { buckets[t.key] = [] });
   list.forEach(s => (s.records||[]).forEach(rec => {
-    if(rec.quizPercentile != null) buckets.quiz.push(rec.quizPercentile);
+    Object.entries(rec.qtypes || {}).forEach(([kind, v]) => {
+      if(v.percentile != null && buckets['q:' + kind]) buckets['q:' + kind].push(v.percentile);
+    });
     casPcts(rec).forEach(p => buckets.cas.push(p));
     if(rec.osce && rec.osce.percentile != null) buckets.osce.push(rec.osce.percentile);
     if(rec.eval && rec.eval.percentile != null) buckets.eval.push(rec.eval.percentile);
@@ -2352,12 +2416,10 @@ function renderTrajectory(host, s){
 
   /* table twin: one row per block, every assessment type side by side */
   buildTable($('trajTable'),
-    [{label:'#',num:true},{label:'Block'},{label:'Term'},
-     {label:'Quiz percentile',num:true},{label:'NBME percentile',num:true},
-     {label:'OSCE percentile',num:true},{label:'Clinical eval percentile',num:true}],
-    (s.timeline||[]).map(p => [p.seq, p.code + ' — ' + p.name, p.term || '—',
-      p.quiz == null ? '—' : p.quiz, p.cas == null ? '—' : p.cas,
-      p.osce == null ? '—' : p.osce, p.eval == null ? '—' : p.eval]),
+    [{label:'#',num:true},{label:'Block'},{label:'Term'}]
+      .concat(TYPE_META.map(t => ({label:(t.short || t.label) + ' percentile', num:true}))),
+    (s.timeline||[]).map(p => [p.seq, p.code + ' — ' + p.name, p.term || '—']
+      .concat(TYPE_META.map(t => p[t.key] == null ? '—' : p[t.key]))),
     'Percentile by block and assessment type');
 }
 
@@ -2462,16 +2524,18 @@ function hexLum(hex){
 /* label inside a filled cell picks white or ink by the fill's luminance */
 function inkOn(bg){ return hexLum(bg) > 0.42 ? cssv('--ink') : '#ffffff' }
 
-const MATRIX_COLS = [
-  {key:'quiz', label:'Quizzes'},
-  {key:'cas',  label:'NBME'},
-  {key:'osce', label:'OSCE'},
-  {key:'eval', label:'Clinical eval'}
-];
+/* one column per assessment type the data holds - the quiz family split by kind */
+const matrixCols = () => TYPE_META.map(t => ({key:t.key, label:t.short || t.label}));
 const PHASE_NAME = {1:'Phase 1 · Pre-clerkship modules', 2:'Phase 2 · Clerkships',
                     3:'Phase 3 · Integration & Transitions'};
 
 function cellData(rec, key){
+  if(key.indexOf('q:') === 0){
+    const v = rec.qtypes && rec.qtypes[key.slice(2)];
+    if(!v || v.percentile == null) return null;
+    return {pct: v.percentile, label: key.slice(2),
+      detail: Math.round(v.pct) + '% correct across ' + v.n + (v.n === 1 ? ' assessment' : ' assessments')};
+  }
   if(key === 'quiz' && rec.quizPercentile != null)
     return {pct: rec.quizPercentile, detail: Math.round(rec.quizPct) + '% correct across ' +
       rec.quizzes.length + ' quizzes', label:'Module quizzes'};
@@ -2511,7 +2575,7 @@ function renderMatrix(host, s){
   t.appendChild(cap);
   const thead = elc('thead'), hr = elc('tr');
   const h0 = elc('th','rowhd','Block'); hr.appendChild(h0);
-  MATRIX_COLS.forEach(c => hr.appendChild(elc('th', null, c.label)));
+  matrixCols().forEach(c => hr.appendChild(elc('th', null, c.label)));
   hr.appendChild(elc('th', null, 'Result'));
   thead.appendChild(hr); t.appendChild(thead);
 
@@ -2522,7 +2586,7 @@ function renderMatrix(host, s){
       phase = rec.phase;
       const pr = elc('tr','phasehd');
       const th = elc('th', null, PHASE_NAME[phase] || ('Phase ' + phase));
-      th.colSpan = MATRIX_COLS.length + 2;
+      th.colSpan = matrixCols().length + 2;
       pr.appendChild(th); tb.appendChild(pr);
     }
     const tr = elc('tr');
@@ -2532,7 +2596,7 @@ function renderMatrix(host, s){
     rh.appendChild(sub);
     tr.appendChild(rh);
 
-    MATRIX_COLS.forEach(c => {
+    matrixCols().forEach(c => {
       const td = elc('td','cell');
       const d = cellData(rec, c.key);
       if(!d){ td.classList.add('na'); td.textContent = '—';
@@ -2574,7 +2638,7 @@ function renderMatrix(host, s){
 
   /* table twin with the underlying scores, not just the percentiles */
   const rows = [];
-  recs.forEach(rec => MATRIX_COLS.forEach(c => {
+  recs.forEach(rec => matrixCols().forEach(c => {
     const d = cellData(rec, c.key);
     if(d) rows.push(['Phase ' + rec.phase, rec.code + ' — ' + rec.name, d.label,
       d.pct, d.detail, rec.result]);
@@ -2728,9 +2792,13 @@ function renderLog(host, s){
   host.textContent = '';
   const rows = [];
   (s.records||[]).forEach(rec => {
-    (rec.quizzes||[]).forEach(q => rows.push([rec.seq, 'Phase ' + rec.phase,
-      rec.code, 'Quiz — ' + q.name, q.pct + '%', 'class mean ' + q.cohortMean + '%',
-      rec.quizPercentile == null ? '—' : rec.quizPercentile, rec.result]));
+    (rec.quizzes||[]).forEach(q => {
+      const kind = q.kind || quizKind(q.name);
+      const v = rec.qtypes && rec.qtypes[kind];
+      rows.push([rec.seq, 'Phase ' + rec.phase, rec.code, kind + ' — ' + q.name,
+        q.pct + '%', 'class mean ' + q.cohortMean + '%',
+        v && v.percentile != null ? v.percentile : '—', rec.result]);
+    });
     casList(rec).forEach(c => rows.push([rec.seq, 'Phase ' + rec.phase, rec.code, c.label,
       'scaled ' + c.scaled,
       c.natlMean != null ? 'national mean ' + c.natlMean
