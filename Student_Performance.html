@@ -440,8 +440,97 @@ tr.rosterrow:focus-visible{outline:3px solid var(--s1);outline-offset:-3px}
   .tableview{display:block !important}
 }
 </style>
+<style>
+/* ============================================================
+   ACCESS GATE
+
+   The hub gates this dashboard behind a tier code, but the hub
+   cannot gate a direct link to this file: anyone who knows the
+   filename arrives here without ever passing it. So the check is
+   repeated at the door it actually protects.
+
+   The code itself is never in this file - only the SHA-256 of its
+   uppercased form, the same digest the hub keys its tiers by.
+   Coming in through the hub sets sessionStorage.ascendTier on the
+   shared origin, so the front door does not ask twice.
+
+   Worth being plain about the limit: this stops a casual visitor
+   and a search crawler. It is not server-side access control, and
+   a page served publicly can always be read in full by someone who
+   looks at its source. It is a lock on a glass door - the real
+   protection for anything identifying remains not putting it here.
+   ============================================================ */
+body.gated{overflow:hidden}
+.gate{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;
+  padding:24px;
+  padding-top:calc(24px + env(safe-area-inset-top));
+  padding-bottom:calc(24px + env(safe-area-inset-bottom));
+  background:linear-gradient(120deg,var(--navy) 0%,var(--navy2) 55%,var(--navy3) 100%);
+  overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  transition:opacity .45s ease, visibility .45s ease}
+.gate.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.gate .peaks{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.gate .peak{position:absolute;bottom:-12vh;width:14vw;min-width:120px;height:120vh;
+  background:linear-gradient(to top,rgba(0,160,200,.10),rgba(0,160,200,0) 70%);
+  transform:skewX(-24deg)}
+.gate .peak:nth-child(1){left:4%}
+.gate .peak:nth-child(2){left:22%;height:90vh;opacity:.7}
+.gate .peak:nth-child(3){left:43%;height:130vh}
+.gate .peak:nth-child(4){left:64%;height:85vh;opacity:.6}
+.gate .peak:nth-child(5){left:82%;height:110vh;opacity:.8}
+.gtile{position:relative;background:#fff;border-radius:var(--radius);
+  padding:34px 32px 28px;width:min(440px,94vw);text-align:center;
+  box-shadow:0 24px 60px rgba(0,0,0,.28)}
+.gtile .inst{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#6b7689;margin-bottom:4px}
+.gtile .eyebrow{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--magenta);font-weight:700;margin-bottom:16px}
+.gtile img.glogo{width:150px;height:auto;margin:0 auto 14px;display:block}
+.gtile h2{margin:0 0 6px;font-size:21px;color:var(--navy);font-family:var(--sans)}
+.gtile .gsub{margin:0 0 20px;font-size:13.5px;line-height:1.5;color:#4d586b}
+.gRow{display:flex;gap:8px}
+.gRow input{flex:1;min-width:0;padding:11px 13px;font-size:15px;font-family:var(--sans);
+  border:1px solid #cfd6e2;border-radius:10px;background:#fff;color:#16203a}
+.gRow input:focus{outline:none;border-color:var(--navy3);box-shadow:0 0 0 3px rgba(20,58,115,.14)}
+.gRow button{padding:11px 18px;font-size:14.5px;font-weight:600;font-family:var(--sans);
+  border:0;border-radius:10px;background:var(--navy);color:#fff;cursor:pointer}
+.gRow button:hover{background:var(--navy3)}
+.gErr{margin-top:11px;font-size:13px;color:#c0392b;opacity:0;transition:opacity .2s;text-align:left}
+.gErr.show{opacity:1}
+.gNote{margin-top:18px;padding-top:15px;border-top:1px solid #e6eaf1;
+  font-size:12.5px;line-height:1.5;color:#6b7689;text-align:left}
+@keyframes gshake{10%,90%{transform:translateX(-2px)}30%,70%{transform:translateX(4px)}
+  50%{transform:translateX(-6px)}}
+.gtile.shake{animation:gshake .4s}
+@media (prefers-reduced-motion: reduce){
+  .gate{transition:none}
+  .gtile.shake{animation:none}
+}
+</style>
 </head>
-<body>
+<body class="gated">
+
+<!-- ============ ACCESS GATE ============ -->
+<div class="gate" id="gate" role="dialog" aria-modal="true" aria-labelledby="gateTitle">
+  <div class="peaks" aria-hidden="true">
+    <div class="peak"></div><div class="peak"></div><div class="peak"></div><div class="peak"></div><div class="peak"></div>
+  </div>
+  <div class="gtile" id="gtile">
+    <div class="inst">Icahn School of Medicine at Mount Sinai</div>
+    <div class="eyebrow">Office of Curricular Affairs</div>
+    <img class="glogo" id="gateLogo" alt="ASCEND Curriculum" src="">
+    <h2 id="gateTitle">Student Performance Dashboard</h2>
+    <p class="gsub">These are coded education records. Enter the access code to continue.</p>
+    <div class="gRow">
+      <input type="password" id="gateInput" placeholder="Access code" autocomplete="off"
+             aria-describedby="gateErr" aria-label="Access code">
+      <button id="gateGo" type="button">Unlock</button>
+    </div>
+    <div class="gErr" id="gateErr" role="alert">That code isn’t recognized. Check with the Office of Curricular Affairs.</div>
+    <div class="gNote">Open only the students you have a legitimate educational interest in.
+      Do not leave this page open on an unattended screen.</div>
+  </div>
+</div>
+
 
 <header class="mast">
   <div class="wrap">
@@ -2788,7 +2877,89 @@ function init(){
 
   renderAll();
 }
-document.addEventListener('DOMContentLoaded', init);
+
+/* ============================================================================
+   ACCESS GATE -- see the note beside the gate styles in <head>.
+   init() is deferred rather than merely covered: nothing is measured, drawn
+   or rendered until the code is accepted. The charts size themselves from
+   real pixel widths, so the reveal has to happen before init() runs.
+   ============================================================================ */
+/* Compact SHA-256 (pure JS, no dependencies) */
+function sha256(ascii){function rightRotate(v,a){return(v>>>a)|(v<<(32-a))}
+var maxWord=Math.pow(2,32),result='',words=[],asciiBitLength=ascii.length*8,
+hash=sha256.h=sha256.h||[],k=sha256.k=sha256.k||[],primeCounter=k.length,isComposite={};
+for(var candidate=2;primeCounter<64;candidate++){if(!isComposite[candidate]){
+for(var i=0;i<313;i+=candidate)isComposite[i]=candidate;
+hash[primeCounter]=(Math.pow(candidate,.5)*maxWord)|0;
+k[primeCounter++]=(Math.pow(candidate,1/3)*maxWord)|0}}
+ascii+='\x80';while(ascii.length%64-56)ascii+='\x00';
+for(i=0;i<ascii.length;i++){var j=ascii.charCodeAt(i);if(j>>8)return;
+words[i>>2]|=j<<((3-i)%4)*8}
+words[words.length]=(asciiBitLength/maxWord)|0;words[words.length]=asciiBitLength;
+for(j=0;j<words.length;){var w=words.slice(j,j+=16),oldHash=hash;hash=hash.slice(0,8);
+for(i=0;i<64;i++){var w15=w[i-15],w2=w[i-2],a=hash[0],e=hash[4],
+temp1=hash[7]+(rightRotate(e,6)^rightRotate(e,11)^rightRotate(e,25))+((e&hash[5])^(~e&hash[6]))+k[i]+(w[i]=i<16?w[i]:(w[i-16]+(rightRotate(w15,7)^rightRotate(w15,18)^(w15>>>3))+w[i-7]+(rightRotate(w2,17)^rightRotate(w2,19)^(w2>>>10)))|0),
+temp2=(rightRotate(a,2)^rightRotate(a,13)^rightRotate(a,22))+((a&hash[1])^(a&hash[2])^(hash[1]&hash[2]));
+hash=[(temp1+temp2)|0].concat(hash);hash[4]=(hash[4]+temp1)|0}
+for(i=0;i<8;i++)hash[i]=(hash[i]+oldHash[i])|0}
+for(i=0;i<8;i++)for(j=3;j+1;j--){var b=(hash[i]>>(j*8))&255;result+=((b<16)?0:'')+b.toString(16)}
+return result}
+
+/* SHA-256 of the uppercased access code. The code is not stored in this file.
+   To change it: uppercase it, hash it with any SHA-256 tool, replace this. */
+const GATE_HASH = 'b9b2b6f01aa767c022763ca563e0882c08635da21f2519dc7b02564aaf0aa9ba';
+
+function gateAlreadyPassed(){
+  /* The hub records the tier it unlocked, on the same origin as this page. */
+  try { return sessionStorage.getItem('ascendTier') === GATE_HASH }
+  catch(e){ return false }
+}
+
+let booted = false;
+function revealDashboard(){
+  if(booted) return;
+  booted = true;
+  const gate = document.getElementById('gate');
+  if(gate) gate.classList.add('hidden');
+  document.body.classList.remove('gated');
+  /* let the layout settle so charts measure a real width, then draw */
+  requestAnimationFrame(() => {
+    init();
+    if(gate) setTimeout(() => gate.remove(), 500);
+  });
+}
+
+function bootGate(){
+  if(gateAlreadyPassed()){ revealDashboard(); return }
+
+  const input = document.getElementById('gateInput'),
+        err   = document.getElementById('gateErr'),
+        tile  = document.getElementById('gtile'),
+        logo  = document.getElementById('gateLogo');
+  if(logo) logo.src = ASCEND_LOGO;
+
+  function attempt(){
+    const code = input.value.trim().toUpperCase();
+    if(!code) return;
+    if(sha256(code) !== GATE_HASH){
+      err.classList.add('show');
+      tile.classList.remove('shake'); void tile.offsetWidth; tile.classList.add('shake');
+      input.select();
+      return;
+    }
+    err.classList.remove('show');
+    try { sessionStorage.setItem('ascendTier', GATE_HASH) } catch(e){}
+    input.value = '';
+    revealDashboard();
+  }
+
+  document.getElementById('gateGo').addEventListener('click', attempt);
+  input.addEventListener('keydown', e => { if(e.key === 'Enter') attempt() });
+  input.addEventListener('input', () => err.classList.remove('show'));
+  setTimeout(() => input.focus(), 120);
+}
+document.addEventListener('DOMContentLoaded', bootGate);
+
 </script>
 </body>
 </html>
