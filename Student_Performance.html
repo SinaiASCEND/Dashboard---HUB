@@ -264,6 +264,17 @@ main{padding-bottom:44px}
   border:1px solid var(--magenta);color:var(--magenta);border-radius:999px;
   padding:6px 14px;font-size:12.5px;font-weight:800;cursor:pointer;min-height:34px}
 .lookup:hover{background:var(--magenta);color:#fff}
+/* FERPA confirmation, shown inline before the key is opened */
+.ferpa{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:10px;padding:10px 12px;
+  border:1px solid var(--line);border-left:3px solid var(--magenta);background:var(--surface-2);max-width:560px}
+.ferpa[hidden]{display:none}
+.ferpa p{flex:1 1 100%;margin:0;font-size:12.5px;color:var(--ink-2)}
+.ferpa input{flex:1 1 140px;min-width:0;padding:7px 10px;font:inherit;font-size:13px;
+  border:1px solid var(--line-2);border-radius:8px;background:var(--surface);color:var(--ink)}
+.ferpa input:focus{outline:none;border-color:var(--magenta);box-shadow:0 0 0 3px var(--ring)}
+.ferpa button{padding:7px 14px;font:inherit;font-size:12.5px;font-weight:700;border:0;border-radius:8px;
+  background:var(--magenta);color:#fff;cursor:pointer}
+.ferpa .err{flex:1 1 100%;font-size:12.5px;color:var(--crit);min-height:1em}
 .lookup .ic{color:currentColor}
 .said{font-size:12px;color:var(--ok);font-weight:700}
 .idtop{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
@@ -2016,8 +2027,42 @@ function lookupButton(s){
     : 'Copies ' + s.id + ' and opens the code key in a new tab to paste it into. ' +
       'The key is held outside this dashboard.';
 
+  /* A FERPA acknowledgment code stands between the button and the key: looking
+     a student up is a deliberate act, and the panel says what it means. Like
+     the page's own access code, only the SHA-256 of the uppercased code is
+     stored here. It is a speed bump, not the protection - that is the
+     permission on the key itself, which this page never sees. */
   const said = elc('span','said');
-  btn.addEventListener('click', async () => {
+  const panel = elc('form','ferpa');
+  panel.hidden = true;
+  panel.noValidate = true;
+  const note = elc('p', null, 'Looking up ' + s.id + ' re-identifies a student. ' +
+    'Continue only with a legitimate educational interest. Enter the FERPA code to open the key.');
+  const input = document.createElement('input');
+  input.type = 'password'; input.autocomplete = 'off'; input.placeholder = 'FERPA code';
+  input.setAttribute('aria-label', 'FERPA code');
+  const go = elc('button', null, 'Open key');
+  go.type = 'submit';
+  const err = elc('span','err');
+  err.setAttribute('role', 'alert');
+  panel.append(note, input, go, err);
+
+  btn.setAttribute('aria-expanded', 'false');
+  btn.addEventListener('click', () => {
+    panel.hidden = !panel.hidden;
+    btn.setAttribute('aria-expanded', String(!panel.hidden));
+    err.textContent = ''; input.value = '';
+    if(!panel.hidden) input.focus();
+  });
+  input.addEventListener('input', () => { err.textContent = '' });
+  panel.addEventListener('submit', async ev => {
+    ev.preventDefault();
+    if(sha256(input.value.trim().toUpperCase()) !== LOOKUP_HASH){
+      err.textContent = 'That code isn’t recognized.';
+      input.select();
+      return;
+    }
+    input.value = ''; panel.hidden = true; btn.setAttribute('aria-expanded', 'false');
     const target = hasSlot ? url.replace(/\{code\}/g, encodeURIComponent(s.id)) : url;
     if(!hasSlot){
       try{ await navigator.clipboard.writeText(s.id); said.textContent = 'Code copied'; }
@@ -2026,11 +2071,19 @@ function lookupButton(s){
     }
     window.open(target, '_blank', 'noopener,noreferrer');
   });
+
   const wrap = elc('span');
-  wrap.style.cssText = 'display:inline-flex;align-items:center;gap:10px';
-  wrap.appendChild(btn); wrap.appendChild(said);
+  wrap.style.cssText = 'display:inline-flex;flex-wrap:wrap;align-items:center;gap:10px;flex-basis:100%';
+  const row = elc('span');
+  row.style.cssText = 'display:inline-flex;align-items:center;gap:10px';
+  row.append(btn, said);
+  wrap.append(row, panel);
   return wrap;
 }
+
+/* SHA-256 of the uppercased FERPA acknowledgment code (not the code itself).
+   To change it: uppercase the new code, hash it, replace this value. */
+const LOOKUP_HASH = '28f1339ffc323de47879d9c7d6ec761f8bd4737841daa5c0acb7ab4d6f3ab5e6';
 
 function classPictureLink(s){
   const map = (DATA.meta && DATA.meta.classPhotos) || {};
