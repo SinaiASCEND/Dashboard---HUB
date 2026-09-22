@@ -747,8 +747,18 @@ body.gated{overflow:hidden}
                                   //   | "In progress" | "Scheduled"
 
      quizzes: [ {name, pct, cohortMean} ],          // module quizzes, % correct
-     cas:     {label, scaled, percentile,           // NBME CAS / shelf / CBSE
-               natlMean, cohortMean},
+     cas:     [ {label, scaled, percentile,         // NBME CAS / shelf / CBSE
+                 natlMean, cohortMean}, ... ],
+                                  //   A LIST, because a Phase 1 module can sit
+                                  //   both a Mid Module and an End of Module
+                                  //   paper. A single object is still accepted
+                                  //   and wrapped, so older extracts keep
+                                  //   working. Each exam counts separately
+                                  //   toward the knowledge percentile; the
+                                  //   trajectory plots one point per block, so
+                                  //   several papers in one block average
+                                  //   there and are listed individually in the
+                                  //   record detail and the table view.
      osce:    {pct, percentile, cohortMean,
                domains: { "History taking": 84, ... }},
      eval:    {overall, percentile, cohortMean,     // clinical evaluation, 1-5
@@ -971,7 +981,7 @@ function makeStudent(rng, idx, cohort){
 
     if(done){
       const weakest = rec.quizzes && rec.quizzes.length ? Math.min(...rec.quizzes.map(q => q.pct)) : 100;
-      const lowExam = rec.cas && rec.cas.percentile <= 1;
+      const lowExam = casPcts(rec).some(p => p <= 1);
       const lowEval = rec.eval && rec.eval.overall < 3.0;
       rec.result = (lowExam || weakest < 55) ? (r() < 0.3 ? 'Fail' : 'Pass with remediation')
                  : lowEval ? 'Pass with remediation' : 'Pass';
@@ -1066,8 +1076,66 @@ function rankPct(value, pool){
 
 function quizAvg(rec){ return rec.quizzes && rec.quizzes.length ? mean(rec.quizzes.map(q=>q.pct)) : null }
 
+/* rec.cas is a list after hydrate, but these are also called while the sample
+   data is still being built, before it has been normalised - so accept either
+   shape rather than depending on the order the two run in. */
+function casList(rec){
+  if(!rec || !rec.cas) return [];
+  return Array.isArray(rec.cas) ? rec.cas : [rec.cas];
+}
+function casPcts(rec){ return casList(rec).map(c => c.percentile).filter(v => v != null) }
+/* One number per block, for the trajectory: a block plots one point, so two
+   proctored exams in the same block average. Every individual result stays
+   visible in the record detail and the table view. */
+function casPercentile(rec){ const v = casPcts(rec); return v.length ? Math.round(mean(v)) : null }
+
 function hydrate(data){
   const students = data.students || [];
+
+  /* --- a block can sit more than one proctored exam --- */
+  /* Phase 1 modules that hold BOTH a Mid Module and an End of Module NBME
+     CAS need both on record, so rec.cas is a LIST. A bare object is still
+     accepted - the sample data and every extract written before this use
+     one - and an empty list collapses to null so that the `if(rec.cas)`
+     guards everywhere still read as "sat no proctored exam". */
+  students.forEach(s => (s.records||[]).forEach(rec => {
+    if(rec.cas == null){ rec.cas = null; return }
+    const list = (Array.isArray(rec.cas) ? rec.cas : [rec.cas])
+      .filter(c => c && (c.scaled != null || c.percentile != null));
+    rec.cas = list.length ? list : null;
+  }));
+
+  /* --- cohort-relative CAS percentiles, exam by exam --- */
+  /* A registrar extract carries the NBME percentile already. A gradebook
+     export does not - it has the scaled score and nothing else - and a CAS
+     with no percentile is invisible to every comparison on this page. The
+     contract says a percentile is cohort-relative unless it says otherwise,
+     and the whole cohort is right here, so derive the missing ones.
+     Ranked per exam, not per block: a mid module paper and an end of module
+     paper are different tests and do not belong in one pool. */
+  const casPool = {};
+  students.forEach(s => (s.records||[]).forEach(rec => {
+    const list = Array.isArray(rec.cas) ? rec.cas : (rec.cas ? [rec.cas] : []);
+    list.forEach(c => {
+      if(c && c.percentile == null && c.scaled != null){
+        const k = s.cohort + '|' + rec.code + '|' + (c.label || '');
+        (casPool[k] = casPool[k] || []).push(c.scaled);
+      }
+    });
+  }));
+  students.forEach(s => (s.records||[]).forEach(rec => {
+    const list = Array.isArray(rec.cas) ? rec.cas : (rec.cas ? [rec.cas] : []);
+    list.forEach(c => {
+      if(c && c.percentile == null && c.scaled != null){
+        const k = s.cohort + '|' + rec.code + '|' + (c.label || '');
+        const pool = casPool[k];
+        if(pool && pool.length > 1){
+          c.percentile = rankPct(c.scaled, pool);
+          c.percentileDerived = true;   /* cohort-relative, not national */
+        }
+      }
+    });
+  }));
 
   /* --- cohort-relative quiz percentiles, module by module --- */
   const pool = {};
@@ -1096,7 +1164,9 @@ function hydrate(data){
               : (recs.filter(r => r.status === 'completed').slice(-1)[0] || {phase:1}).phase;
     const know = [], skill = [];
     recs.forEach(rec => {
-      if(rec.cas && rec.cas.percentile != null) know.push(rec.cas.percentile);
+      /* Each proctored exam counts in its own right. Averaging them first
+         would let one weak sitting be hidden by a strong one. */
+      casPcts(rec).forEach(p => know.push(p));
       if(rec.quizPercentile != null) know.push(rec.quizPercentile);
       if(rec.osce && rec.osce.percentile != null) skill.push(rec.osce.percentile);
       if(rec.eval && rec.eval.percentile != null) skill.push(rec.eval.percentile);
@@ -1123,7 +1193,7 @@ function hydrate(data){
     s.timeline = recs.map(rec => ({
       seq: rec.seq, code: rec.code, name: rec.name, term: rec.term, phase: rec.phase,
       quiz: rec.quizPercentile,
-      cas:  rec.cas  ? rec.cas.percentile  : null,
+      cas:  casPercentile(rec),
       osce: rec.osce ? rec.osce.percentile : null,
       eval: rec.eval ? rec.eval.percentile : null
     }));
@@ -1194,11 +1264,20 @@ function buildFlags(s){
       why: lowEval.map(r => r.code + ' ' + r.eval.overall.toFixed(1)).join(', ') +
            ' — below the 3.0 expectation, on an absolute scale.'});
 
-  const lowNbme = recs.filter(r => r.cas && r.cas.percentile != null && r.cas.percentile < CONCERN_PCTILE);
+  /* Counted per EXAM, not per block: a module sitting both a mid and an end
+     of module paper can be below the line twice, and that is two things to
+     look at, not one. The exam is named only when its block holds more than
+     one, so a module with a single paper reads exactly as it did before. */
+  const lowNbme = [];
+  recs.forEach(r => casList(r).forEach(c => {
+    if(c.percentile != null && c.percentile < CONCERN_PCTILE) lowNbme.push({rec:r, cas:c});
+  }));
   if(lowNbme.length)
     out.push({level:'watch', what: count(lowNbme.length, 'NBME assessment', 'NBME assessments') +
       ' below the 10th percentile',
-      why: lowNbme.map(r => r.code + ' (scaled ' + r.cas.scaled + ')').join(', ') + '.'});
+      why: lowNbme.map(x => x.rec.code +
+        (casList(x.rec).length > 1 && x.cas.label ? ' ' + x.cas.label : '') +
+        ' (scaled ' + x.cas.scaled + ')').join(', ') + '.'});
 
   const lowOsce = recs.filter(r => r.osce && r.osce.percentile != null && r.osce.percentile < CONCERN_PCTILE);
   if(lowOsce.length)
@@ -1564,7 +1643,7 @@ function typePercentiles(list){
   const buckets = {quiz:[], cas:[], osce:[], eval:[]};
   list.forEach(s => (s.records||[]).forEach(rec => {
     if(rec.quizPercentile != null) buckets.quiz.push(rec.quizPercentile);
-    if(rec.cas  && rec.cas.percentile  != null) buckets.cas.push(rec.cas.percentile);
+    casPcts(rec).forEach(p => buckets.cas.push(p));
     if(rec.osce && rec.osce.percentile != null) buckets.osce.push(rec.osce.percentile);
     if(rec.eval && rec.eval.percentile != null) buckets.eval.push(rec.eval.percentile);
   }));
@@ -2285,9 +2364,22 @@ function cellData(rec, key){
   if(key === 'quiz' && rec.quizPercentile != null)
     return {pct: rec.quizPercentile, detail: Math.round(rec.quizPct) + '% correct across ' +
       rec.quizzes.length + ' quizzes', label:'Module quizzes'};
-  if(key === 'cas' && rec.cas && rec.cas.percentile != null)
-    return {pct: rec.cas.percentile, detail:'Scaled ' + rec.cas.scaled +
-      ' · national mean ' + rec.cas.natlMean, label: rec.cas.label};
+  if(key === 'cas' && casPercentile(rec) != null){
+    const list = casList(rec).filter(c => c.percentile != null);
+    /* A gradebook export has no national mean; say nothing rather than
+       "national mean null", and mark a percentile we worked out from the
+       cohort so it is not read as an NBME national one. */
+    const casDetail = c => 'Scaled ' + c.scaled +
+      (c.natlMean != null ? ' · national mean ' + c.natlMean : '') +
+      (c.percentileDerived ? ' · percentile within cohort' : '');
+    if(list.length === 1)
+      return {pct: list[0].percentile, detail: casDetail(list[0]), label: list[0].label};
+    /* More than one proctored paper in the block: show them all rather than
+       a single averaged number with no way to see what it averages. */
+    return {pct: casPercentile(rec),
+      detail: list.map(c => (c.label || 'exam') + ' ' + c.scaled).join(' · '),
+      label: list.length + ' proctored exams'};
+  }
   if(key === 'osce' && rec.osce && rec.osce.percentile != null)
     return {pct: rec.osce.percentile, detail: rec.osce.pct + '% · class mean ' +
       rec.osce.cohortMean + '%', label: rec.osce.label};
@@ -2528,9 +2620,11 @@ function renderLog(host, s){
     (rec.quizzes||[]).forEach(q => rows.push([rec.seq, 'Phase ' + rec.phase,
       rec.code, 'Quiz — ' + q.name, q.pct + '%', 'class mean ' + q.cohortMean + '%',
       rec.quizPercentile == null ? '—' : rec.quizPercentile, rec.result]));
-    if(rec.cas) rows.push([rec.seq, 'Phase ' + rec.phase, rec.code, rec.cas.label,
-      'scaled ' + rec.cas.scaled, 'national mean ' + rec.cas.natlMean,
-      rec.cas.percentile, rec.result]);
+    casList(rec).forEach(c => rows.push([rec.seq, 'Phase ' + rec.phase, rec.code, c.label,
+      'scaled ' + c.scaled,
+      c.natlMean != null ? 'national mean ' + c.natlMean
+                         : (c.cohortMean != null ? 'class mean ' + c.cohortMean : '—'),
+      c.percentile == null ? '—' : c.percentile, rec.result]));
     if(rec.osce) rows.push([rec.seq, 'Phase ' + rec.phase, rec.code, rec.osce.label,
       rec.osce.pct + '%', 'class mean ' + rec.osce.cohortMean + '%', rec.osce.percentile, rec.result]);
     if(rec.eval) rows.push([rec.seq, 'Phase ' + rec.phase, rec.code, rec.eval.label,
@@ -2741,8 +2835,12 @@ function csvToData(text){
       (rec.quizzes = rec.quizzes || []).push({name: get('assessment_label') || 'Quiz',
         pct: score, cohortMean: num(get('cohort_mean'))});
     } else if(type === 'cas' || type === 'shelf' || type === 'nbme'){
-      rec.cas = {label: get('assessment_label') || 'NBME assessment', scaled: score,
-        percentile: pct, natlMean: num(get('national_mean')), cohortMean: num(get('cohort_mean'))};
+      /* Appended, not assigned: a module sitting both a mid and an end of
+         module paper has two cas rows for the same block, and assigning
+         would drop the first without saying so. */
+      (rec.cas = rec.cas || []).push(
+        {label: get('assessment_label') || 'NBME assessment', scaled: score,
+         percentile: pct, natlMean: num(get('national_mean')), cohortMean: num(get('cohort_mean'))});
     } else if(type === 'osce'){
       rec.osce = {label: get('assessment_label') || 'OSCE', pct: score, percentile: pct,
         cohortMean: num(get('cohort_mean')), domains};
