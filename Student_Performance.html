@@ -2908,23 +2908,6 @@ function renderSkillDomains(s){
     emptyText:'No OSCE or clinical evaluation domain scores on record yet.'
   });
 }
-function renderContentAreas(s){
-  const refs = (DATA.refs||{})[s.cohort] || {areas:{}};
-  const src = s.contentAreas || {};
-  const items = CONTENT_AREAS.map(a => {
-    const v = src[a] ? src[a].percentile : null;
-    if(v == null) return {label:a, delta:null};
-    const r = (refs.areas && refs.areas[a] != null) ? refs.areas[a] : 50;
-    return {label:a, delta: v - r, studentText: ord(v) + ' percentile', refText: ord(r) + ' percentile',
-      detail: ord(v) + ' percentile against a class mean of ' + ord(r)};
-  });
-  divergingBars('areaChart','areaTable', items, {
-    refName:'class mean', unit:'percentile points', rowLabel:'NBME content area',
-    axisLabel:'Percentile points above or below the class mean', axisLabelShort:'vs. class mean',
-    ariaLabel:'NBME content-area performance compared with the class mean',
-    emptyText:'No NBME content-area report on record yet.'
-  });
-}
 
 /* ---------------- clerkship NBME exams by content area ---------------- */
 /* Small multiples, one per exam sat, in the order sat: the subject's content
@@ -3101,21 +3084,15 @@ function renderStudent(s){
     renderShelfAreas($('shelfChart'), s);
   }
 
-  const two = elc('div','two'); host.appendChild(two);
-  const dBody = makeCard(two, 'Clinical skills',
+  /* The NBME content areas that exist in the data are the clerkship exams'
+     own, drawn exam by exam in the card above; there is no national
+     content-area report to profile, so no card pretends to one. */
+  const dBody = makeCard(host, 'Clinical skills',
     'Where the bedside strengths and gaps are',
     'OSCE domain scores and clinical-evaluation ratings pooled onto one 0–100 scale, ' +
     'then compared with the class mean for each domain.', 'domainTable');
   chartAndTable(dBody, 'domainChart', 'domainTable');
-
-  const aBody = makeCard(two, 'Medical knowledge',
-    'NBME content-area profile',
-    'Content-area performance from NBME score reports, compared with the class mean — ' +
-    'the view that points at what to study, not just how much.', 'areaTable');
-  chartAndTable(aBody, 'areaChart', 'areaTable');
-
   renderSkillDomains(s);
-  renderContentAreas(s);
 
   const fBody = makeCard(host, 'Review', 'What needs a conversation', null, null);
   const fHost = elc('div'); fHost.id = 'flagHost'; fBody.appendChild(fHost);
