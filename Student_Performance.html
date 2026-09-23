@@ -187,6 +187,7 @@ button,select,input{font:inherit;color:inherit}
 .ghost{background:rgba(255,255,255,.10);color:#fff;border:1px solid rgba(255,255,255,.28);
   border-radius:999px;padding:7px 14px;font-size:12.5px;font-weight:700;cursor:pointer}
 .ghost:hover{background:rgba(255,255,255,.20)}
+a.ghost{text-decoration:none;display:inline-block;line-height:normal}
 
 /* ================= notices ================= */
 .notices{margin:16px 0 0;display:grid;gap:8px}
@@ -595,6 +596,9 @@ body.gated{overflow:hidden}
         <div class="mastactions">
           <button class="ghost" id="loadBtn" type="button">Load data file</button>
           <button class="ghost" id="photoBtn" type="button">Load photos</button>
+          <a class="ghost" id="logBtn" href="https://forms.cloud.microsoft/Pages/DesignPageV2.aspx?subpage=design&amp;id=YZ3odw9XsEO55GNPRi40uOOTNvWX3itIuGr2h3RZNNZUM0tRSzZXSzE0QUhYNkUyVUVGREg1VDVJTi4u"
+             target="_blank" rel="noopener noreferrer"
+             title="Opens the access-log form in Microsoft Forms (View responses). Only the form's owner in the Office of Curricular Affairs can open it.">Access log &#8599;</a>
           <button class="ghost" id="themeBtn" type="button" aria-pressed="false">Dark mode</button>
           <button class="ghost" id="printBtn" type="button">Print / PDF</button>
         </div>
@@ -1443,7 +1447,22 @@ function hydrate(data){
       examAreas[k] = {};
       Object.entries(byA).forEach(([a, v]) => examAreas[k][a] = Math.round(mean(v)*10)/10);
     });
-    refs[c] = {domains, areas, seqMedian, examAreas, n: grp.length};
+    /* class mean for each observed case of each clerkship's direct
+       observations (an OSCE entry on a clerkship record, its cases as
+       domains) */
+    const obsCases = {}, poolO = {};
+    grp.forEach(s => (s.records||[]).forEach(rec => {
+      if(!isClerkshipRec(rec) || !rec.osce || !rec.osce.domains) return;
+      const k = rec.code;
+      Object.entries(rec.osce.domains).forEach(([a, v]) => {
+        if(v != null) ((poolO[k] = poolO[k] || {})[a] = poolO[k][a] || []).push(v);
+      });
+    }));
+    Object.entries(poolO).forEach(([k, byA]) => {
+      obsCases[k] = {};
+      Object.entries(byA).forEach(([a, v]) => obsCases[k][a] = Math.round(mean(v)*10)/10);
+    });
+    refs[c] = {domains, areas, seqMedian, examAreas, obsCases, n: grp.length};
   });
   data.refs = refs;
   return data;
@@ -1688,7 +1707,7 @@ function buildTable(host, cols, rows, caption){
 const BASE_TYPES = [
   {key:'cas',  label:'NBME CAS (modules)',   short:'NBME CAS',      varName:'--s2'},
   {key:'shelf',label:'NBME clerkship exams', short:'Clerkship NBME',varName:'--s5'},
-  {key:'osce', label:'OSCE',                 short:'OSCE',          varName:'--s3'},
+  {key:'osce', label:'OSCE & direct observations', short:'OSCE / DO', varName:'--s3'},
   {key:'eval', label:'Clinical evaluations', short:'Clinical eval', varName:'--s4'}
 ];
 /* rebuilt by hydrate() from the kinds the loaded data holds */
@@ -2216,7 +2235,7 @@ function studentTiles(host, s){
      note:'Within the Class of ' + s.cohort + ' · NBME exams and module quizzes'},
     {lab:'Clinical skills', val: s.skillsPct, unit: pctUnit(s.skillsPct), delta:sD,
      series:sSeries, accent:cssv('--s4'),
-     note:'Within the Class of ' + s.cohort + ' · OSCEs and clinical evaluations'},
+     note:'Within the Class of ' + s.cohort + ' · OSCEs, direct observations and clinical evaluations'},
     {lab:'Blocks completed', val: s.completed,
      note: s.upcoming ? s.upcoming + ' still scheduled' : 'Nothing left on the schedule'},
     {lab:'Items needing attention', val: openFlags,
@@ -2409,12 +2428,33 @@ function accessLogUrl(rec){
    a blocked popup) and pointed at the pre-filled form once the load is
    known. If nothing is loaded, it is closed again. */
 let pendingLogWin = null;
+const LOG_WIN_STYLE = 'font:15px/1.5 system-ui,-apple-system,sans-serif;padding:28px;max-width:560px;color:#1c2333';
 function openLogWindow(){
   try { pendingLogWin = window.open('about:blank', '_blank') } catch(e){ pendingLogWin = null }
-  if(pendingLogWin) pendingLogWin.document.write('<title>Access log</title><p style="font:14px system-ui;padding:20px">' +
-    'Waiting for the file to load… the access-log form opens here.</p>');
+  if(!pendingLogWin) return;
+  try {
+    const d = pendingLogWin.document;
+    d.open();
+    d.write('<!doctype html><title>Access log</title><div style="' + LOG_WIN_STYLE + '">' +
+      '<p><strong>Access log</strong></p>' +
+      '<p id="msg">Waiting for the file to load… the access-log form opens here.</p>' +
+      '<p style="color:#6b7689;font-size:13px">If you cancelled the file picker, just close this tab.</p></div>');
+    d.close();
+  } catch(e){}
 }
 function closeLogWindow(){ if(pendingLogWin){ try { pendingLogWin.close() } catch(e){} pendingLogWin = null } }
+/* Point the placeholder at the form. The link is written first, so the tab
+   is usable even where the navigation itself does not take. */
+function sendLogWindow(url){
+  const w = pendingLogWin; pendingLogWin = null;
+  if(!w || w.closed) return false;
+  try {
+    const m = w.document.getElementById('msg');
+    if(m) m.innerHTML = 'Please <a href="' + url.replace(/"/g, '&quot;') + '">open and submit the access-log form</a>.';
+  } catch(e){}
+  try { w.location.href = url } catch(e){}
+  return true;
+}
 function logAccess(action, file, asOf){
   const who = whoAmI() || {};
   const rec = {name: who.name || '', role: who.role || '', reason: who.reason || '', action, file: file || '',
@@ -2424,7 +2464,7 @@ function logAccess(action, file, asOf){
     log.push(rec); localStorage.setItem('ascendAccessLog', JSON.stringify(log.slice(-500)));
   } catch(e){}
   const url = accessLogUrl(rec);
-  if(pendingLogWin && !pendingLogWin.closed){ pendingLogWin.location = url; pendingLogWin = null; return }
+  if(sendLogWindow(url)) return;
   const nudge = $('logNudge');
   if(nudge){ $('logNudgeLink').href = url; nudge.hidden = false; nudge.scrollIntoView({block:'nearest'}) }
 }
@@ -3086,57 +3126,87 @@ function renderSkillDomains(s){
    areas as bars of equated percent correct on a shared 0-100 scale, each with
    the class mean for that area on the same exam as a tick. A retake is its
    own panel. The table view lists every area with the difference. */
-function renderShelfAreas(host, s){
+/* One small panel per item: a title line, a sub line, and horizontal bars
+   for each part (0-100) with the class mean as a tick. Shared by the NBME
+   content areas and the direct observations. */
+function barPanels(host, tableId, panels, opt){
   host.textContent = '';
-  const refs = ((DATA.refs||{})[s.cohort] || {}).examAreas || {};
-  const exams = [];
-  (s.records||[]).filter(isClerkshipRec).forEach(rec =>
-    casList(rec).forEach(e => exams.push({rec, e})));
-  exams.sort((a,b) => (a.rec.start < b.rec.start ? -1 : a.rec.start > b.rec.start ? 1 : 0));
   const grid = elc('div','shelfGrid'); host.appendChild(grid);
-  const color = cssv('--s5'), rows = [];
-  exams.forEach(({rec, e}) => {
+  const color = cssv(opt.varName), rows = [];
+  panels.forEach(p => {
     const panel = elc('div','shelfPanel'); grid.appendChild(panel);
     const head = elc('div','shelfHead');
-    head.appendChild(elc('div','shelfTitle', e.label));
-    head.appendChild(elc('div','shelfSub', rec.code + ' · ' + fmtRange(rec.start, rec.end) +
-      ' · total ' + e.scaled + (e.cohortMean != null ? ' (class mean ' + e.cohortMean + ')' : '') +
-      (e.percentile != null ? ' · ' + ord(e.percentile) + ' pct in class' : '')));
+    head.appendChild(elc('div','shelfTitle', p.title));
+    head.appendChild(elc('div','shelfSub', p.sub));
     panel.appendChild(head);
-    const areas = Object.entries(e.areas || {});
-    if(!areas.length){ panel.appendChild(elc('div','empty','No content-area breakdown in this score report.')); return }
-    const ref = refs[examName(e.label)] || {};
+    const parts = p.parts;
+    if(!parts.length){ panel.appendChild(elc('div','empty', opt.emptyText)); return }
     const W = widthOf(panel), rowH = 22, m = {t:6, r:40, b:24};
     const lw = Math.min(250, Math.round(W*0.52));
-    const H = m.t + areas.length*rowH + m.b, pw = W - lw - m.r;
+    const H = m.t + parts.length*rowH + m.b, pw = W - lw - m.r;
     const X = v => lw + (Math.max(0, Math.min(100, v))/100)*pw;
     const svg = add(panel,'svg',{class:'chart',width:W,height:H,role:'img',
-      'aria-label': e.label + ': equated percent correct by content area, with the class mean.'});
+      'aria-label': p.title + ': ' + opt.unitLong + ' by ' + opt.partName + ', with the class mean.'});
     [0,50,100].forEach(t => {
-      add(svg,'line',{x1:X(t),x2:X(t),y1:m.t-2,y2:m.t+areas.length*rowH,class:'gridline'});
+      add(svg,'line',{x1:X(t),x2:X(t),y1:m.t-2,y2:m.t+parts.length*rowH,class:'gridline'});
       add(svg,'text',{x:X(t),y:H-8,'text-anchor':'middle',class:'ax'}, t);
     });
-    areas.forEach(([a, v], i) => {
+    parts.forEach(([a, v], i) => {
       const y = m.t + i*rowH, by = y + 5, bh = rowH - 10;
       add(svg,'text',{x:lw-8,y:y+rowH/2+4,'text-anchor':'end',class:'dlab'}, fitLabel(a, lw-12));
       add(svg,'rect',{x:X(0),y:by,width:Math.max(2, X(v)-X(0)),height:bh,rx:2,fill:color});
-      const r = ref[a];
+      const r = p.ref[a];
       if(r != null) add(svg,'line',{x1:X(r),x2:X(r),y1:by-3,y2:by+bh+3,stroke:cssv('--ink'),'stroke-width':2});
       /* the number clears the class-mean tick when the two sit close */
       add(svg,'text',{x:Math.max(X(v), r != null && Math.abs(X(r) - X(v)) < 22 ? X(r) : 0)+6,
         y:y+rowH/2+4,class:'dlab'}, Math.round(v));
       const hit = add(svg,'rect',{x:0,y:y,width:W,height:rowH,class:'hit',tabindex:'0',role:'button',
-        'aria-label': a + ': ' + v + ' percent correct' + (r != null ? ', class mean ' + r : '') + '.'});
+        'aria-label': a + ': ' + v + ' ' + opt.unitLong + (r != null ? ', class mean ' + r : '') + '.'});
       hoverable(hit, a, [{value: v + '%', label:'this student', color},
                          ...(r != null ? [{value: r + '%', label:'class mean'}] : [])]);
-      rows.push([e.label, rec.code, a, v, r == null ? '—' : r,
-                 r == null ? '—' : Math.round((v - r)*10)/10]);
+      rows.push([p.title, p.code, a, v, r == null ? '—' : r, r == null ? '—' : Math.round((v - r)*10)/10]);
     });
   });
-  buildTable($('shelfTable'),
-    [{label:'Exam'},{label:'Clerkship'},{label:'Content area'},{label:'Percent correct',num:true},
+  buildTable($(tableId),
+    [{label: opt.itemName},{label:'Clerkship'},{label: opt.partLabel},{label: opt.unitShort,num:true},
      {label:'Class mean',num:true},{label:'Difference',num:true}],
-    rows, 'Clerkship NBME exams by content area');
+    rows, opt.caption);
+}
+
+function renderShelfAreas(host, s){
+  const refs = ((DATA.refs||{})[s.cohort] || {}).examAreas || {};
+  const exams = [];
+  (s.records||[]).filter(isClerkshipRec).forEach(rec =>
+    casList(rec).forEach(e => exams.push({rec, e})));
+  exams.sort((a,b) => (a.rec.start < b.rec.start ? -1 : a.rec.start > b.rec.start ? 1 : 0));
+  barPanels(host, 'shelfTable', exams.map(({rec, e}) => ({
+    title: e.label, code: rec.code,
+    sub: rec.code + ' · ' + fmtRange(rec.start, rec.end) + ' · total ' + e.scaled +
+         (e.cohortMean != null ? ' (class mean ' + e.cohortMean + ')' : '') +
+         (e.percentile != null ? ' · ' + ord(e.percentile) + ' pct in class' : ''),
+    parts: Object.entries(e.areas || {}), ref: refs[examName(e.label)] || {}
+  })), {varName:'--s5', partName:'content area', partLabel:'Content area', itemName:'Exam',
+        unitShort:'Percent correct', unitLong:'equated percent correct',
+        emptyText:'No content-area breakdown in this score report.',
+        caption:'Clerkship NBME exams by content area'});
+}
+
+/* Direct observations: each clerkship's standardized-patient cases, the
+   share of checklist items done, against the class mean for the same case. */
+function renderDirectObs(host, s){
+  const refs = ((DATA.refs||{})[s.cohort] || {}).obsCases || {};
+  const recs = (s.records||[]).filter(r => isClerkshipRec(r) && r.osce && r.osce.domains)
+    .sort((a,b) => (a.start < b.start ? -1 : a.start > b.start ? 1 : 0));
+  barPanels(host, 'obsTable', recs.map(rec => ({
+    title: rec.name + ' — ' + rec.osce.label, code: rec.code,
+    sub: rec.code + ' · ' + fmtRange(rec.start, rec.end) + ' · mean ' + rec.osce.pct + '%' +
+         (rec.osce.cohortMean != null ? ' (class mean ' + rec.osce.cohortMean + '%)' : '') +
+         (rec.osce.percentile != null ? ' · ' + ord(rec.osce.percentile) + ' pct in class' : ''),
+    parts: Object.entries(rec.osce.domains), ref: refs[rec.code] || {}
+  })), {varName:'--s3', partName:'case', partLabel:'Case', itemName:'Clerkship observations',
+        unitShort:'Checklist done (%)', unitLong:'percent of checklist items done',
+        emptyText:'No cases observed yet.',
+        caption:'Clerkship direct observations by case'});
 }
 
 /* ---------------- flags & narrative ---------------- */
@@ -3254,6 +3324,16 @@ function renderStudent(s){
       ' mean for that area on the same exam.', 'shelfTable');
     chartAndTable(shBody, 'shelfChart', 'shelfTable');
     renderShelfAreas($('shelfChart'), s);
+  }
+  /* every clerkship's direct observations, case by case */
+  if((s.records||[]).some(r => isClerkshipRec(r) && r.osce && r.osce.domains)){
+    const obBody = makeCard(host, 'Direct observations',
+      'Observed clinical skills, case by case',
+      'Standardized-patient cases observed during each clerkship. Each bar is the share of the ' +
+      'checklist this student completed on that case; the tick is the Class of ' + s.cohort +
+      ' mean on the same case.', 'obsTable');
+    chartAndTable(obBody, 'obsChart', 'obsTable');
+    renderDirectObs($('obsChart'), s);
   }
 
   /* The NBME content areas that exist in the data are the clerkship exams'
@@ -3596,8 +3676,9 @@ function init(){
   $('photoInput').addEventListener('cancel', closeLogWindow);
   $('fileInput').addEventListener('cancel', closeLogWindow);
   $('fileInput').addEventListener('change', e => {
-    const f = e.target.files && e.target.files[0]; if(!f) return;
+    const f = e.target.files && e.target.files[0]; if(!f){ closeLogWindow(); return }
     const fr = new FileReader();
+    fr.onerror = closeLogWindow;
     fr.onload = () => {
       try{
         const txt = String(fr.result);
