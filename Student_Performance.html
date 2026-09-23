@@ -51,10 +51,12 @@
   --s2:#D6177F;  /* NBME CAS / Shelf   */
   --s3:#C88A00;  /* OSCE               */
   --s4:#00869E;  /* Clinical evaluation*/
+  --s5:#7A4FC9;  /* Clerkship NBME exams */
   --s1-wash:rgba(49,121,198,.10);
   --s2-wash:rgba(214,23,127,.10);
   --s3-wash:rgba(200,138,0,.10);
   --s4-wash:rgba(0,134,158,.10);
+  --s5-wash:rgba(122,79,201,.10);
 
   /* --- emphasis: the subject vs. everyone else --- */
   --context:#9aa3b2;
@@ -96,7 +98,7 @@
     --line-2:#33405c;
     --ring:rgba(255,255,255,.10);
 
-    --s1:#4A8ACF; --s2:#D6458A; --s3:#B8850F; --s4:#168EA4;
+    --s1:#4A8ACF; --s2:#D6458A; --s3:#B8850F; --s4:#168EA4; --s5:#9B7BDB;
     --s1-wash:rgba(74,138,207,.16);
     --s2-wash:rgba(214,69,138,.16);
     --s3-wash:rgba(184,133,15,.16);
@@ -130,7 +132,7 @@
   --line-2:#33405c;
   --ring:rgba(255,255,255,.10);
 
-  --s1:#4A8ACF; --s2:#D6458A; --s3:#B8850F; --s4:#168EA4;
+  --s1:#4A8ACF; --s2:#D6458A; --s3:#B8850F; --s4:#168EA4; --s5:#9B7BDB;
   --s1-wash:rgba(74,138,207,.16);
   --s2-wash:rgba(214,69,138,.16);
   --s3-wash:rgba(184,133,15,.16);
@@ -299,6 +301,22 @@ main{padding-bottom:44px}
 
 /* the single number the student view leads with */
 .hero{display:flex;flex-direction:column;gap:6px;margin-top:2px}
+
+/* clerkship NBME exams: one small panel per exam */
+.shelfGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:18px 22px}
+.shelfPanel{min-width:0;border-top:1px solid var(--line);padding-top:10px}
+.shelfTitle{font-size:13.5px;font-weight:700;color:var(--ink)}
+.shelfSub{font-size:12px;color:var(--muted);margin:2px 0 6px;font-variant-numeric:tabular-nums}
+
+/* a long table folded until asked for */
+details.fold > summary{cursor:pointer;display:inline-flex;align-items:center;gap:8px;
+  font-size:13px;font-weight:600;color:var(--ink-2);padding:6px 12px;border:1px solid var(--line-2);
+  border-radius:999px;list-style:none;user-select:none}
+details.fold > summary::-webkit-details-marker{display:none}
+details.fold > summary::before{content:'\25B8';font-size:11px;transition:transform .15s}
+details.fold[open] > summary::before{transform:rotate(90deg)}
+details.fold > summary:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
+details.fold[open] > summary{margin-bottom:12px}
 .hero .fig{font-size:56px;font-weight:700;letter-spacing:-.03em;line-height:1;color:var(--ink)}
 .hero .fig .u{font-size:17px;font-weight:600;color:var(--muted);margin-left:6px;letter-spacing:0}
 .hero .cap{font-size:13px;color:var(--ink-2);max-width:62ch}
@@ -772,7 +790,14 @@ body.gated{overflow:hidden}
 
      quizzes: [ {name, pct, cohortMean} ],          // module quizzes, % correct
      cas:     [ {label, scaled, percentile,         // NBME CAS / shelf / CBSE
-                 natlMean, cohortMean}, ... ],
+                 natlMean, cohortMean,
+                 areas: {"Cardiovascular System": 81, ...}}, ... ],
+                                  //   areas (optional): the exam's content areas,
+                                  //   each an equated percent correct, drawn
+                                  //   against the class mean on the same exam.
+                                  //   On a clerkship (Phase 2) the list is its
+                                  //   NBME subject / customized exams, a type of
+                                  //   their own - never pooled with a module's CAS.
                                   //   A LIST, because a Phase 1 module can sit
                                   //   both a Mid Module and an End of Module
                                   //   paper. A single object is still accepted
@@ -1141,6 +1166,29 @@ function casList(rec){
   return Array.isArray(rec.cas) ? rec.cas : [rec.cas];
 }
 function casPcts(rec){ return casList(rec).map(c => c.percentile).filter(v => v != null) }
+/* A clerkship's NBME exams (subject/shelf exams, and customised exams such
+   as the Surgery CAS) are one assessment type; a Phase 1 module's NBME CAS is
+   another. They are never pooled: different tests, different stakes. */
+function isClerkshipRec(rec){ return rec.kind === 'clerkship' || rec.phase === 2 }
+function nbmeKey(rec){ return isClerkshipRec(rec) ? 'shelf' : 'cas' }
+function examName(label){ return String(label || '').replace(/\s*\(retake\)\s*$/i, '') }
+/* knowledge / skills / overall percentile from a set of records - the whole
+   record, or one phase of it */
+function standings(recs){
+  const know = [], skill = [];
+  recs.forEach(rec => {
+    /* Each proctored exam counts in its own right. Averaging them first
+       would let one weak sitting be hidden by a strong one. */
+    casPcts(rec).forEach(p => know.push(p));
+    if(rec.quizPercentile != null) know.push(rec.quizPercentile);
+    if(rec.osce && rec.osce.percentile != null) skill.push(rec.osce.percentile);
+    if(rec.eval && rec.eval.percentile != null) skill.push(rec.eval.percentile);
+  });
+  const k = know.length ? Math.round(mean(know)) : null;
+  const sk = skill.length ? Math.round(mean(skill)) : null;
+  return {knowledge: k, skills: sk, n: know.length + skill.length,
+          overall: k == null ? sk : sk == null ? k : Math.round(0.6*k + 0.4*sk)};
+}
 /* One number per block, for the trajectory: a block plots one point, so two
    proctored exams in the same block average. Every individual result stays
    visible in the record detail and the table view. */
@@ -1247,20 +1295,17 @@ function hydrate(data){
     if(s.phase == null)
       s.phase = s.current ? s.current.phase
               : (recs.filter(r => r.status === 'completed').slice(-1)[0] || {phase:1}).phase;
-    const know = [], skill = [];
-    recs.forEach(rec => {
-      /* Each proctored exam counts in its own right. Averaging them first
-         would let one weak sitting be hidden by a strong one. */
-      casPcts(rec).forEach(p => know.push(p));
-      if(rec.quizPercentile != null) know.push(rec.quizPercentile);
-      if(rec.osce && rec.osce.percentile != null) skill.push(rec.osce.percentile);
-      if(rec.eval && rec.eval.percentile != null) skill.push(rec.eval.percentile);
+    const all = standings(recs);
+    s.knowledgePct = all.knowledge;
+    s.skillsPct    = all.skills;
+    s.overallPct   = all.overall;
+    /* the same, phase by phase: the class view filtered to a phase reads
+       only that phase's assessments */
+    s.byPhase = {};
+    [1, 2, 3].forEach(ph => {
+      const st = standings(recs.filter(r => r.phase === ph));
+      if(st.n) s.byPhase[ph] = st;
     });
-    s.knowledgePct = know.length ? Math.round(mean(know)) : null;
-    s.skillsPct    = skill.length ? Math.round(mean(skill)) : null;
-    s.overallPct   = s.knowledgePct == null ? s.skillsPct
-                   : s.skillsPct == null ? s.knowledgePct
-                   : Math.round(0.6*s.knowledgePct + 0.4*s.skillsPct);
 
     /* clinical-skills domain profile: OSCE (0-100) and evaluations (1-5) on one scale */
     const dom = {};
@@ -1279,7 +1324,8 @@ function hydrate(data){
       const p = {
         seq: rec.seq, code: rec.code, name: rec.name, term: rec.term, phase: rec.phase,
         quiz: rec.quizPercentile,          /* pooled: still used for the trend lines */
-        cas:  casPercentile(rec),
+        cas:   isClerkshipRec(rec) ? null : casPercentile(rec),
+        shelf: isClerkshipRec(rec) ? casPercentile(rec) : null,
         osce: rec.osce ? rec.osce.percentile : null,
         eval: rec.eval ? rec.eval.percentile : null
       };
@@ -1321,7 +1367,20 @@ function hydrate(data){
       seqMedian[k] = {};
       Object.keys(bySeq[k]).forEach(sq => seqMedian[k][sq] = Math.round(median(bySeq[k][sq])));
     });
-    refs[c] = {domains, areas, seqMedian, n: grp.length};
+    /* class mean for each content area of each NBME exam (a retake is
+       pooled with its exam's first sittings) */
+    const examAreas = {}, poolA = {};
+    grp.forEach(s => (s.records||[]).forEach(rec => casList(rec).forEach(e => {
+      Object.entries(e.areas || {}).forEach(([a, v]) => {
+        const k = examName(e.label);
+        ((poolA[k] = poolA[k] || {})[a] = poolA[k][a] || []).push(v);
+      });
+    })));
+    Object.entries(poolA).forEach(([k, byA]) => {
+      examAreas[k] = {};
+      Object.entries(byA).forEach(([a, v]) => examAreas[k][a] = Math.round(mean(v)*10)/10);
+    });
+    refs[c] = {domains, areas, seqMedian, examAreas, n: grp.length};
   });
   data.refs = refs;
   return data;
@@ -1562,7 +1621,8 @@ function buildTable(host, cols, rows, caption){
    Quiz, AMBOSS, TBL, CCSG, Practical, Lab, Formative - shares the quiz hue and
    is told apart by label: each kind is its own panel, bar and column. */
 const BASE_TYPES = [
-  {key:'cas',  label:'NBME CAS / shelf',     short:'NBME',          varName:'--s2'},
+  {key:'cas',  label:'NBME CAS (modules)',   short:'NBME CAS',      varName:'--s2'},
+  {key:'shelf',label:'NBME clerkship exams', short:'Clerkship NBME',varName:'--s5'},
   {key:'osce', label:'OSCE',                 short:'OSCE',          varName:'--s3'},
   {key:'eval', label:'Clinical evaluations', short:'Clinical eval', varName:'--s4'}
 ];
@@ -1579,11 +1639,24 @@ const state = {
 };
 const $ = id => document.getElementById(id);
 
+/* The phase filter is a lens, not only a roster filter: with a phase chosen,
+   the class view holds the students who have assessments in that phase and
+   reads every standing - tiles, both graphs, roster - from that phase's
+   assessments alone. */
+const NO_STANDING = {knowledge:null, skills:null, overall:null};
+function stand(s){
+  if(state.phase === 'all')
+    return {knowledge:s.knowledgePct, skills:s.skillsPct, overall:s.overallPct};
+  return (s.byPhase && s.byPhase[state.phase]) || NO_STANDING;
+}
+const kOf = s => stand(s).knowledge, skOf = s => stand(s).skills, ovOf = s => stand(s).overall;
+function inPhase(rec){ return state.phase === 'all' || String(rec.phase) === state.phase }
+
 function filtered(){
   const q = state.q.trim().toLowerCase();
   return (DATA.students||[]).filter(s => {
     if(state.cohort !== 'all' && String(s.cohort) !== state.cohort) return false;
-    if(state.phase !== 'all' && String(s.phase) !== state.phase) return false;
+    if(state.phase !== 'all' && !(s.byPhase && s.byPhase[state.phase])) return false;
     if(state.standing !== 'all' && s.status !== state.standing) return false;
     if(q && !String(s.id).toLowerCase().includes(q)) return false;
     return true;
@@ -1591,9 +1664,9 @@ function filtered(){
 }
 /* The emphasis filter chooses which standing the roster and tiles lead with. */
 function leadPct(s){
-  return state.emphasis === 'knowledge' ? s.knowledgePct
-       : state.emphasis === 'skills'    ? s.skillsPct
-       : s.overallPct;
+  return state.emphasis === 'knowledge' ? kOf(s)
+       : state.emphasis === 'skills'    ? skOf(s)
+       : ovOf(s);
 }
 const EMPH_LABEL = {overall:'Overall', knowledge:'Medical knowledge', skills:'Clinical skills'};
 
@@ -1602,14 +1675,17 @@ function renderKpis(list){
   const host = $('cohortKpis'); host.textContent = '';
   const conc = list.filter(s=>s.status==='concern').length;
   const watch = list.filter(s=>s.status==='watch').length;
-  const k = median(list.map(s=>s.knowledgePct).filter(v=>v!=null));
-  const sk = median(list.map(s=>s.skillsPct).filter(v=>v!=null));
+  const k = median(list.map(kOf).filter(v=>v!=null));
+  const sk = median(list.map(skOf).filter(v=>v!=null));
   const tiles = [
     {lab:'Students in view', val: list.length, note: describeFilter()},
-    {lab:'Median medical knowledge', val: k==null?'—':Math.round(k), unit:'th pct',
-     note:'Across NBME customized assessments, shelf exams, and module quizzes.'},
-    {lab:'Median clinical skills', val: sk==null?'—':Math.round(sk), unit:'th pct',
-     note:'Across OSCE performance and clinical evaluations.'},
+    {lab:'Median medical knowledge', val: k==null?'—':Math.round(k), unit: k==null ? '' : 'th pct',
+     note: state.phase === '2' ? 'Across clerkship NBME subject and customized exams.'
+         : state.phase === '1' ? 'Across module NBME CAS exams and module quizzes.'
+         : 'Across NBME exams (module CAS and clerkship) and module quizzes.'},
+    {lab:'Median clinical skills', val: sk==null?'—':Math.round(sk), unit: sk==null ? '' : 'th pct',
+     note: sk==null && state.phase !== 'all' ? 'No OSCE or clinical evaluation on record for this phase yet.'
+         : 'Across OSCE performance and clinical evaluations.'},
     {lab:'Flagged for review', val: conc + watch,
      note: conc + ' in academic concern · ' + watch + ' to monitor',
      status: conc ? 'crit' : watch ? 'warn' : 'ok'}
@@ -1631,7 +1707,7 @@ function renderKpis(list){
 function describeFilter(){
   const bits = [];
   bits.push(state.cohort === 'all' ? 'All cohorts' : 'Class of ' + state.cohort);
-  if(state.phase !== 'all') bits.push('Phase ' + state.phase);
+  if(state.phase !== 'all') bits.push('Phase ' + state.phase + ' assessments only');
   if(state.standing !== 'all') bits.push(STANDING[state.standing].label);
   return bits.join(' · ');
 }
@@ -1641,8 +1717,13 @@ function describeFilter(){
    never relies on colour alone. Nearest-point layer does the hit-testing. */
 function renderSkillsScatter(){
   const host = $('skillsChart'); host.textContent = '';
-  const list = filtered().filter(s => s.knowledgePct != null && s.skillsPct != null);
-  if(!list.length){ host.innerHTML = '<div class="empty">No students with both measures in this filter.</div>';
+  const list = filtered().filter(s => kOf(s) != null && skOf(s) != null);
+  if(!list.length){
+    /* a phase with knowledge measures but no clinical-skills ones yet (Phase 2
+       before any clinical evaluation is loaded) still gets a picture */
+    const known = filtered().filter(s => kOf(s) != null);
+    if(known.length) return renderKnowledgeStrip(host, known);
+    host.innerHTML = '<div class="empty">No students with both measures in this filter.</div>';
     buildTable($('skillsTable'), [{label:'Student'}], [], 'Empty'); return }
 
   legend(host, [
@@ -1675,7 +1756,7 @@ function renderSkillsScatter(){
 
   const shapeOf = st => st==='ok' ? 'circle' : st==='watch' ? 'tri' : 'sq';
   const colorOf = st => st==='ok' ? cssv('--ok') : st==='watch' ? cssv('--warn') : cssv('--crit');
-  const pts = list.map(s => ({s, x:X(s.knowledgePct), y:Y(s.skillsPct)}));
+  const pts = list.map(s => ({s, x:X(kOf(s)), y:Y(skOf(s))}));
   const g = add(svg,'g',{});
   pts.forEach(p => {
     const c = colorOf(p.s.status), sh = shapeOf(p.s.status);
@@ -1704,8 +1785,8 @@ function renderSkillsScatter(){
     marker = add(g,'circle',{cx:best.x,cy:best.y,r:10,fill:'none',
       stroke:colorOf(best.s.status),'stroke-width':2});
     tipShow(ev, best.s.id, [
-      {value: ord(best.s.knowledgePct), label:'medical knowledge', color:cssv('--s1')},
-      {value: ord(best.s.skillsPct),    label:'clinical skills',   color:cssv('--s4')},
+      {value: ord(kOf(best.s)),  label:'medical knowledge', color:cssv('--s1')},
+      {value: ord(skOf(best.s)), label:'clinical skills',   color:cssv('--s4')},
       {value: STANDING[best.s.status].label, label:'standing',     color: colorOf(best.s.status)}
     ]);
   });
@@ -1721,9 +1802,56 @@ function renderSkillsScatter(){
   buildTable($('skillsTable'),
     [{label:'Student code'},{label:'Cohort',num:true},{label:'Phase',num:true},
      {label:'Medical knowledge (pct)',num:true},{label:'Clinical skills (pct)',num:true},{label:'Standing'}],
-    list.slice().sort((a,b)=>a.knowledgePct-b.knowledgePct)
-        .map(s=>[s.id, s.cohort, s.phase, s.knowledgePct, s.skillsPct, STANDING[s.status].label]),
+    list.slice().sort((a,b)=>kOf(a)-kOf(b))
+        .map(s=>[s.id, s.cohort, s.phase, kOf(s), skOf(s), STANDING[s.status].label]),
     'Medical knowledge and clinical skills percentile for every student in view');
+}
+
+/* One axis when the phase in view has no clinical-skills measure: each
+   student's medical-knowledge percentile, jittered vertically so students at
+   the same percentile stay separate, with the same standing hue and shape. */
+function renderKnowledgeStrip(host, list){
+  const note = elc('p','why', 'No OSCE or clinical evaluation is on record for this phase yet, ' +
+    'so this shows medical knowledge only.');
+  note.style.cssText = 'margin:0 0 10px;font-size:12.5px;color:var(--muted)';
+  host.appendChild(note);
+  legend(host, [
+    {label:'On track',         color:cssv('--ok'),   shape:'box'},
+    {label:'Monitor',          color:cssv('--warn'), shape:'box'},
+    {label:'Academic concern', color:cssv('--crit'), shape:'box'}
+  ]);
+  const W = widthOf(host), H = 200, m = {t:14, r:16, b:46, l:24};
+  const pw = W - m.l - m.r, ph = H - m.t - m.b;
+  const svg = add(host,'svg',{class:'chart',width:W,height:H,role:'img',
+    'aria-label':'Strip plot of medical knowledge percentile, one point per student.'});
+  const X = v => m.l + (v/100)*pw;
+  [0,25,50,75,100].forEach(t => {
+    add(svg,'line',{x1:X(t),x2:X(t),y1:m.t,y2:m.t+ph,class:'gridline'});
+    add(svg,'text',{x:X(t),y:m.t+ph+18,'text-anchor':'middle',class:'ax'}, t);
+  });
+  add(svg,'line',{x1:X(25),x2:X(25),y1:m.t,y2:m.t+ph,stroke:cssv('--line-2'),'stroke-width':1});
+  add(svg,'text',{x:m.l+pw/2,y:H-8,'text-anchor':'middle',class:'axlab'}, 'Medical knowledge percentile');
+  const colorOf = st => st==='ok' ? cssv('--ok') : st==='watch' ? cssv('--warn') : cssv('--crit');
+  /* deterministic jitter from the code, so the picture does not move on redraw */
+  const jit = id => { let h = 2166136261; for(const ch of String(id)){ h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619) >>> 0 }
+    h ^= h >>> 13; h = Math.imul(h, 0x5bd1e995) >>> 0; h ^= h >>> 15; return (h >>> 0) / 4294967296 };
+  list.forEach(s => {
+    const x = X(kOf(s)), y = m.t + 8 + jit(s.id)*(ph - 16), c = colorOf(s.status);
+    const sh = s.status==='ok' ? 'circle' : s.status==='watch' ? 'tri' : 'sq';
+    const el = sh === 'circle' ? add(svg,'circle',{cx:x,cy:y,r:5,fill:c,stroke:cssv('--surface'),'stroke-width':2})
+      : sh === 'tri' ? add(svg,'path',{d:`M${x},${y-6} L${x+5.5},${y+4} L${x-5.5},${y+4} Z`,fill:c,stroke:cssv('--surface'),'stroke-width':2})
+      : add(svg,'rect',{x:x-4.5,y:y-4.5,width:9,height:9,rx:1.5,fill:c,stroke:cssv('--surface'),'stroke-width':2});
+    el.setAttribute('tabindex','0'); el.setAttribute('role','button');
+    el.setAttribute('aria-label', s.id + ': medical knowledge ' + ord(kOf(s)) + ' percentile, ' + STANDING[s.status].label);
+    el.style.cursor = 'pointer';
+    hoverable(el, s.id, [{value: ord(kOf(s)), label:'medical knowledge', color:cssv('--s1')},
+                         {value: STANDING[s.status].label, label:'standing', color:c}]);
+    el.addEventListener('click', () => openStudent(s.id));
+  });
+  buildTable($('skillsTable'),
+    [{label:'Student code'},{label:'Cohort',num:true},{label:'Medical knowledge (pct)',num:true},{label:'Standing'}],
+    list.slice().sort((a,b)=>kOf(a)-kOf(b)).map(s=>[s.id, s.cohort, kOf(s), STANDING[s.status].label]),
+    'Medical knowledge percentile for every student in view');
 }
 
 /* ---------------- class median by assessment type ---------------- */
@@ -1734,11 +1862,11 @@ function renderSkillsScatter(){
 function typePercentiles(list){
   const buckets = {};
   TYPE_META.forEach(t => { buckets[t.key] = [] });
-  list.forEach(s => (s.records||[]).forEach(rec => {
+  list.forEach(s => (s.records||[]).filter(inPhase).forEach(rec => {
     Object.entries(rec.qtypes || {}).forEach(([kind, v]) => {
       if(v.percentile != null && buckets['q:' + kind]) buckets['q:' + kind].push(v.percentile);
     });
-    casPcts(rec).forEach(p => buckets.cas.push(p));
+    casPcts(rec).forEach(p => buckets[nbmeKey(rec)].push(p));
     if(rec.osce && rec.osce.percentile != null) buckets.osce.push(rec.osce.percentile);
     if(rec.eval && rec.eval.percentile != null) buckets.eval.push(rec.eval.percentile);
   }));
@@ -1748,8 +1876,21 @@ function renderTypeChart(){
   const host = $('typeChart'); host.textContent = '';
   const list = filtered();
   const buckets = typePercentiles(list);
-  const rows = TYPE_META.map(t => ({...t, n: buckets[t.key].length,
+  let rows = TYPE_META.map(t => ({...t, n: buckets[t.key].length,
     med: median(buckets[t.key]), color: cssv(t.varName)})).filter(r => r.n);
+  /* the clerkship exams are one type, but in the Phase 2 lens each subject
+     gets its own bar beneath it - the question there is "which clerkship" */
+  if(state.phase === '2'){
+    const bySubj = {};
+    list.forEach(s => (s.records||[]).filter(r => inPhase(r) && isClerkshipRec(r)).forEach(rec =>
+      casList(rec).forEach(e => { if(e.percentile != null)
+        (bySubj[examName(e.label)] = bySubj[examName(e.label)] || []).push(e.percentile) })));
+    const subj = Object.keys(bySubj).sort().map(k => ({key:'x:' + k,
+      label: k.replace(/^NBME\s+/, '').replace(/\s+subject\s+exam$/i, '').replace(/\s+exam$/i, ''),
+      n: bySubj[k].length, med: median(bySubj[k]), color: cssv('--s5')}));
+    const at = rows.findIndex(r => r.key === 'shelf');
+    if(at >= 0 && subj.length > 1) rows = rows.slice(0, at + 1).concat(subj, rows.slice(at + 1));
+  }
   if(!rows.length){ host.innerHTML = '<div class="empty">No assessments in this filter.</div>';
     buildTable($('typeTable'), [{label:'Assessment type'}], [], 'Empty'); return }
 
@@ -1810,9 +1951,9 @@ const SORT_VAL = {
   cohort: s => s.cohort,
   phase: s => s.phase,
   done: s => s.completed,
-  knowledge: s => s.knowledgePct == null ? -1 : s.knowledgePct,
-  skills: s => s.skillsPct == null ? -1 : s.skillsPct,
-  overall: s => s.overallPct == null ? -1 : s.overallPct,
+  knowledge: s => kOf(s) == null ? -1 : kOf(s),
+  skills: s => skOf(s) == null ? -1 : skOf(s),
+  overall: s => ovOf(s) == null ? -1 : ovOf(s),
   standing: s => ({concern:0, watch:1, ok:2})[s.status]
 };
 function meterCell(v){
@@ -1907,9 +2048,9 @@ function renderRoster(){
     const c2 = document.createElement('td'); c2.className = 'num'; c2.textContent = s.cohort; cells.push(c2);
     const c3 = document.createElement('td'); c3.className = 'num'; c3.textContent = s.phase; cells.push(c3);
     const c4 = document.createElement('td'); c4.className = 'num'; c4.textContent = s.completed; cells.push(c4);
-    const c5 = document.createElement('td'); c5.appendChild(meterCell(s.knowledgePct)); cells.push(c5);
-    const c6 = document.createElement('td'); c6.appendChild(meterCell(s.skillsPct)); cells.push(c6);
-    const c7 = document.createElement('td'); c7.appendChild(meterCell(s.overallPct)); cells.push(c7);
+    const c5 = document.createElement('td'); c5.appendChild(meterCell(kOf(s))); cells.push(c5);
+    const c6 = document.createElement('td'); c6.appendChild(meterCell(skOf(s))); cells.push(c6);
+    const c7 = document.createElement('td'); c7.appendChild(meterCell(ovOf(s))); cells.push(c7);
     const c8 = document.createElement('td'); c8.appendChild(chipFor(s.status)); cells.push(c8);
     const c9 = document.createElement('td'); c9.className = 'opencell'; c9.textContent = 'Open →'; cells.push(c9);
 
@@ -1990,7 +2131,7 @@ function deltaOf(series){
 }
 
 function studentTiles(host, s){
-  const kSeries = trendSeries(s, ['quiz','cas']);
+  const kSeries = trendSeries(s, ['quiz','cas','shelf']);
   const sSeries = trendSeries(s, ['osce','eval']);
   const kD = deltaOf(kSeries), sD = deltaOf(sSeries);
   const openFlags = (s.flags||[]).filter(f => f.level !== 'info').length;
@@ -2264,11 +2405,26 @@ function weeksBetween(a, b){
   if(!a || !b) return null;
   return Math.round((new Date(b) - new Date(a)) / (7*864e5));
 }
+/* A finished block wears its outcome: green passed, red failed, amber passed
+   after remediation. One with no final grade on record stays neutral grey -
+   the page never implies a pass it has not seen. The status colours ship with
+   their label in the legend, the hover and the table. */
 const SCHED_STYLE = {
-  'completed':   {label:'Completed',   varName:'--context'},
-  'in progress': {label:'In progress', varName:'--s1'},
+  'passed':      {label:'Passed',                  varName:'--ok',   onColor:true},
+  'remediated':  {label:'Passed with remediation', varName:'--warn'},
+  'failed':      {label:'Failed',                  varName:'--crit', onColor:true},
+  'completed':   {label:'Completed · no final grade on record', varName:'--context'},
+  'in progress': {label:'In progress', varName:'--s1', onColor:true},
   'scheduled':   {label:'Scheduled',   varName:'--sched'}
 };
+function schedState(rec){
+  if(rec.status !== 'completed') return rec.status;
+  const r = String(rec.result || '');
+  if(/remediation/i.test(r)) return 'remediated';
+  if(/^pass/i.test(r)) return 'passed';
+  if(/^fail/i.test(r)) return 'failed';
+  return 'completed';
+}
 
 /* A dated plan of blocks is a Gantt, not a statistical chart: one bar per
    rotation on a shared calendar axis, the current block in the accent and
@@ -2282,7 +2438,9 @@ function renderSchedule(host, s){
     return;
   }
 
-  legend(host, Object.keys(SCHED_STYLE).map(k =>
+  /* only the states this student's schedule actually shows */
+  const shown = new Set(recs.map(schedState));
+  legend(host, Object.keys(SCHED_STYLE).filter(k => shown.has(k)).map(k =>
     ({label: SCHED_STYLE[k].label, color: cssv(SCHED_STYLE[k].varName), shape:'box'})));
 
   /* A strip, not a row per block. One lane per phase, blocks laid end to end
@@ -2359,7 +2517,7 @@ function renderSchedule(host, s){
     if(ln.first)
       add(svg,'text',{x:m.l-8,y:by+bh/2+4,'text-anchor':'end',class:'dlab'}, ln.label);
     ln.recs.forEach(rec => {
-      const st = SCHED_STYLE[rec.status] || SCHED_STYLE['scheduled'];
+      const st = SCHED_STYLE[schedState(rec)] || SCHED_STYLE['scheduled'];
       const color = cssv(st.varName);
       const x0 = X(T(rec.start));
       /* the 2px surface gap keeps back-to-back blocks reading as two bars */
@@ -2367,7 +2525,7 @@ function renderSchedule(host, s){
       add(svg,'rect',{x:x0,y:by,width:w,height:bh,rx:3,fill:color});
       if(textWidth(rec.code, codeFont) + 6 <= w)
         add(svg,'text',{x:x0 + w/2,y:by+bh/2+3.5,'text-anchor':'middle',
-          class:'schedCode' + (rec.status === 'in progress' ? ' onAccent' : '')}, rec.code);
+          class:'schedCode' + (st.onColor ? ' onAccent' : '')}, rec.code);
       const hit = add(svg,'rect',{x:x0,y:laneY[i],width:Math.max(w,8),height:laneH,class:'hit',
         tabindex:'0',role:'button','aria-label': rec.code + ' ' + rec.name + ', ' +
           st.label.toLowerCase() + ', ' + fmtRange(rec.start, rec.end) +
@@ -2385,7 +2543,7 @@ function renderSchedule(host, s){
      {label:'Dates'},{label:'Weeks',num:true},{label:'Status'}],
     recs.map(r => [r.seq, 'Phase ' + r.phase, r.code + ' — ' + r.name, r.term || '—',
       r.site || '—', fmtRange(r.start, r.end), weeksBetween(r.start, r.end) ?? '—',
-      (SCHED_STYLE[r.status] || {label:r.status || '—'}).label]),
+      (SCHED_STYLE[schedState(r)] || {label:r.status || '—'}).label]),
     'Rotation schedule with dates, sites, and status');
 }
 
@@ -2554,7 +2712,7 @@ function cellData(rec, key){
   if(key === 'quiz' && rec.quizPercentile != null)
     return {pct: rec.quizPercentile, detail: Math.round(rec.quizPct) + '% correct across ' +
       rec.quizzes.length + ' quizzes', label:'Module quizzes'};
-  if(key === 'cas' && casPercentile(rec) != null){
+  if((key === 'cas' || key === 'shelf') && nbmeKey(rec) === key && casPercentile(rec) != null){
     const list = casList(rec).filter(c => c.percentile != null);
     /* A gradebook export has no national mean; say nothing rather than
        "national mean null", and mark a percentile we worked out from the
@@ -2762,6 +2920,64 @@ function renderContentAreas(s){
   });
 }
 
+/* ---------------- clerkship NBME exams by content area ---------------- */
+/* Small multiples, one per exam sat, in the order sat: the subject's content
+   areas as bars of equated percent correct on a shared 0-100 scale, each with
+   the class mean for that area on the same exam as a tick. A retake is its
+   own panel. The table view lists every area with the difference. */
+function renderShelfAreas(host, s){
+  host.textContent = '';
+  const refs = ((DATA.refs||{})[s.cohort] || {}).examAreas || {};
+  const exams = [];
+  (s.records||[]).filter(isClerkshipRec).forEach(rec =>
+    casList(rec).forEach(e => exams.push({rec, e})));
+  exams.sort((a,b) => (a.rec.start < b.rec.start ? -1 : a.rec.start > b.rec.start ? 1 : 0));
+  const grid = elc('div','shelfGrid'); host.appendChild(grid);
+  const color = cssv('--s5'), rows = [];
+  exams.forEach(({rec, e}) => {
+    const panel = elc('div','shelfPanel'); grid.appendChild(panel);
+    const head = elc('div','shelfHead');
+    head.appendChild(elc('div','shelfTitle', e.label));
+    head.appendChild(elc('div','shelfSub', rec.code + ' · ' + fmtRange(rec.start, rec.end) +
+      ' · total ' + e.scaled + (e.cohortMean != null ? ' (class mean ' + e.cohortMean + ')' : '') +
+      (e.percentile != null ? ' · ' + ord(e.percentile) + ' pct in class' : '')));
+    panel.appendChild(head);
+    const areas = Object.entries(e.areas || {});
+    if(!areas.length){ panel.appendChild(elc('div','empty','No content-area breakdown in this score report.')); return }
+    const ref = refs[examName(e.label)] || {};
+    const W = widthOf(panel), rowH = 22, m = {t:6, r:40, b:24};
+    const lw = Math.min(250, Math.round(W*0.52));
+    const H = m.t + areas.length*rowH + m.b, pw = W - lw - m.r;
+    const X = v => lw + (Math.max(0, Math.min(100, v))/100)*pw;
+    const svg = add(panel,'svg',{class:'chart',width:W,height:H,role:'img',
+      'aria-label': e.label + ': equated percent correct by content area, with the class mean.'});
+    [0,50,100].forEach(t => {
+      add(svg,'line',{x1:X(t),x2:X(t),y1:m.t-2,y2:m.t+areas.length*rowH,class:'gridline'});
+      add(svg,'text',{x:X(t),y:H-8,'text-anchor':'middle',class:'ax'}, t);
+    });
+    areas.forEach(([a, v], i) => {
+      const y = m.t + i*rowH, by = y + 5, bh = rowH - 10;
+      add(svg,'text',{x:lw-8,y:y+rowH/2+4,'text-anchor':'end',class:'dlab'}, fitLabel(a, lw-12));
+      add(svg,'rect',{x:X(0),y:by,width:Math.max(2, X(v)-X(0)),height:bh,rx:2,fill:color});
+      const r = ref[a];
+      if(r != null) add(svg,'line',{x1:X(r),x2:X(r),y1:by-3,y2:by+bh+3,stroke:cssv('--ink'),'stroke-width':2});
+      /* the number clears the class-mean tick when the two sit close */
+      add(svg,'text',{x:Math.max(X(v), r != null && Math.abs(X(r) - X(v)) < 22 ? X(r) : 0)+6,
+        y:y+rowH/2+4,class:'dlab'}, Math.round(v));
+      const hit = add(svg,'rect',{x:0,y:y,width:W,height:rowH,class:'hit',tabindex:'0',role:'button',
+        'aria-label': a + ': ' + v + ' percent correct' + (r != null ? ', class mean ' + r : '') + '.'});
+      hoverable(hit, a, [{value: v + '%', label:'this student', color},
+                         ...(r != null ? [{value: r + '%', label:'class mean'}] : [])]);
+      rows.push([e.label, rec.code, a, v, r == null ? '—' : r,
+                 r == null ? '—' : Math.round((v - r)*10)/10]);
+    });
+  });
+  buildTable($('shelfTable'),
+    [{label:'Exam'},{label:'Clerkship'},{label:'Content area'},{label:'Percent correct',num:true},
+     {label:'Class mean',num:true},{label:'Difference',num:true}],
+    rows, 'Clerkship NBME exams by content area');
+}
+
 /* ---------------- flags & narrative ---------------- */
 function renderFlags(host, s){
   host.textContent = '';
@@ -2829,6 +3045,7 @@ function renderLog(host, s){
     [{label:'#',num:true},{label:'Phase'},{label:'Block'},{label:'Assessment'},
      {label:'Score'},{label:'Reference'},{label:'Percentile',num:true},{label:'Block result'}],
     rows, 'Complete assessment log');
+  return rows.length;
 }
 
 /* ---------------- assemble the student view ---------------- */
@@ -2876,6 +3093,17 @@ function renderStudent(s){
   chartAndTable(mxBody, 'matrixChart', 'matrixTable');
   renderMatrix($('matrixChart'), s);
 
+  /* every clerkship NBME exam together, each with its content areas */
+  if((s.records||[]).some(r => isClerkshipRec(r) && casList(r).length)){
+    const shBody = makeCard(host, 'Clerkship NBME exams',
+      'Subject exams, content area by content area',
+      'Every clerkship NBME exam on record, in the order sat. Each bar is this student’s ' +
+      'equated percent correct in one content area; the tick is the Class of ' + s.cohort +
+      ' mean for that area on the same exam.', 'shelfTable');
+    chartAndTable(shBody, 'shelfChart', 'shelfTable');
+    renderShelfAreas($('shelfChart'), s);
+  }
+
   const two = elc('div','two'); host.appendChild(two);
   const dBody = makeCard(two, 'Clinical skills',
     'Where the bedside strengths and gaps are',
@@ -2896,10 +3124,19 @@ function renderStudent(s){
   const fHost = elc('div'); fHost.id = 'flagHost'; fBody.appendChild(fHost);
   renderFlags(fHost, s);
 
+  /* the full log runs to hundreds of rows: folded until asked for */
   const lBody = makeCard(host, 'Source data', 'Complete assessment log',
     'Every score behind the charts above, including the raw values the percentiles come from.', null);
-  const lHost = elc('div'); lHost.id = 'logHost'; lBody.appendChild(lHost);
-  renderLog(lHost, s);
+  const fold = elc('details','fold');
+  const sum = elc('summary');
+  fold.appendChild(sum);
+  const lHost = elc('div'); lHost.id = 'logHost'; fold.appendChild(lHost);
+  lBody.appendChild(fold);
+  const n = renderLog(lHost, s);
+  const setSum = () => { sum.textContent = (fold.open ? 'Hide' : 'Show') + ' all ' + n +
+    (n === 1 ? ' assessment' : ' assessments') };
+  setSum();
+  fold.addEventListener('toggle', setSum);
 }
 
 function openStudent(id){
@@ -2961,6 +3198,7 @@ function renderAll(){
         assessment_label, score, percentile, national_mean, cohort_mean,
         comment
         domain:<name>     any number of columns, e.g. domain:Clinical reasoning
+        area:<name>       an NBME exam's content areas, e.g. area:Cardiovascular System
 
       Rows for the same student_code and block_code are folded into one block.
       start_date / end_date are ISO dates and drive the rotation schedule; the
@@ -2993,6 +3231,7 @@ function csvToData(text){
   const idCol = idx('student_code') >= 0 ? 'student_code' : 'student_id';
   if(idx(idCol) < 0) throw new Error('The CSV needs a student_code column.');
   const domCols = head.map((h,i) => ({h,i})).filter(o => o.h.toLowerCase().startsWith('domain:'));
+  const areaCols = head.map((h,i) => ({h,i})).filter(o => o.h.toLowerCase().startsWith('area:'));
   const num = v => { const n = parseFloat(v); return isNaN(n) ? null : n };
   const students = {};
 
@@ -3037,9 +3276,13 @@ function csvToData(text){
       /* Appended, not assigned: a module sitting both a mid and an end of
          module paper has two cas rows for the same block, and assigning
          would drop the first without saying so. */
-      (rec.cas = rec.cas || []).push(
-        {label: get('assessment_label') || 'NBME assessment', scaled: score,
-         percentile: pct, natlMean: num(get('national_mean')), cohortMean: num(get('cohort_mean'))});
+      const entry = {label: get('assessment_label') || 'NBME assessment', scaled: score,
+         percentile: pct, natlMean: num(get('national_mean')), cohortMean: num(get('cohort_mean'))};
+      const areas = {};
+      areaCols.forEach(o => { const v = num((r[o.i]||'').trim());
+        if(v != null) areas[o.h.slice(5).trim()] = v });
+      if(Object.keys(areas).length) entry.areas = areas;
+      (rec.cas = rec.cas || []).push(entry);
     } else if(type === 'osce'){
       rec.osce = {label: get('assessment_label') || 'OSCE', pct: score, percentile: pct,
         cohortMean: num(get('cohort_mean')), domains};
