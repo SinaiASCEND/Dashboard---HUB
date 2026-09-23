@@ -623,6 +623,10 @@ body.gated{overflow:hidden}
       <label for="fCohort">Cohort</label>
       <select id="fCohort"></select>
     </div>
+    <div class="field" id="fProgramField" hidden>
+      <label for="fProgram">Program</label>
+      <select id="fProgram"></select>
+    </div>
     <div class="field">
       <label for="fPhase">Phase</label>
       <select id="fPhase">
@@ -790,6 +794,9 @@ body.gated{overflow:hidden}
                                   //   Optional; omitted when the extract has not
                                   //   been joined to the advising roster.
      advisingGroup,               // advising group code
+     program,                     // degree programme: "MSTP (MD-PhD)", "PORTAL",
+                                  //   "FlexMed", "Traditional", ... Optional;
+                                  //   shown on the record and as a filter.
      classPhotoUrl,               // optional per-student override for the cohort
                                   //   class picture link; http(s) only
      records: [ Record, ... ]     // one per module / clerkship / transition course
@@ -1658,7 +1665,7 @@ let TYPE_META = [{key:'q:Quiz', label:'Quiz', short:'Quiz', varName:'--s1'}].con
    ============================================================================ */
 let DATA = hydrate(buildSampleData());
 const state = {
-  cohort:'all', phase:'all', standing:'all', emphasis:'knowledge', q:'',
+  cohort:'all', program:'all', phase:'all', standing:'all', emphasis:'knowledge', q:'',
   sort:{key:'knowledge', dir:'desc'}, student:null
 };
 const $ = id => document.getElementById(id);
@@ -1680,6 +1687,7 @@ function filtered(){
   const q = state.q.trim().toLowerCase();
   return (DATA.students||[]).filter(s => {
     if(state.cohort !== 'all' && String(s.cohort) !== state.cohort) return false;
+    if(state.program !== 'all' && (s.program || '') !== state.program) return false;
     if(state.phase !== 'all' && !(s.byPhase && s.byPhase[state.phase])) return false;
     if(state.standing !== 'all' && s.status !== state.standing) return false;
     if(q && !String(s.id).toLowerCase().includes(q)) return false;
@@ -1729,6 +1737,7 @@ function renderKpis(list){
 function describeFilter(){
   const bits = [];
   bits.push(state.cohort === 'all' ? 'All cohorts' : 'Class of ' + state.cohort);
+  if(state.program !== 'all') bits.push(state.program || 'No program set');
   if(state.phase !== 'all') bits.push('Phase ' + state.phase + ' assessments only');
   if(state.standing !== 'all') bits.push(STANDING[state.standing].label);
   return bits.join(' · ');
@@ -2067,7 +2076,8 @@ function renderRoster(){
     const b = document.createElement('span'); b.className = 'sid';
     /* The roster line is for scanning, so it carries the advising group and
        the block in progress. The people to call are on the record itself. */
-    b.textContent = (s.advisingGroup || '—') + (s.current ? ' · in ' + s.current.code : '');
+    b.textContent = [s.program, s.advisingGroup].filter(Boolean).join(' · ') +
+                    (s.current ? (s.program || s.advisingGroup ? ' · ' : '') + 'in ' + s.current.code : '') || '—';
     nm.appendChild(a); nm.appendChild(b); c1.appendChild(nm); cells.push(c1);
 
     const c2 = document.createElement('td'); c2.className = 'num'; c2.textContent = s.cohort; cells.push(c2);
@@ -2428,6 +2438,7 @@ function studentHeader(host, s){
      leaves them out rather than printing a dash. */
   if(s.careerAdvisor) fact(dl, 'Career advisor', s.careerAdvisor);
   if(s.ccm) fact(dl, 'Clinical competency mentor', s.ccm);
+  if(s.program) fact(dl, 'Program', s.program);
   if(s.advisingGroup) fact(dl, 'Advising group', s.advisingGroup);
   fact(dl, 'Blocks completed', s.completed + (s.upcoming ? ' of ' + (s.completed + s.upcoming) : ''));
   meta.appendChild(dl);
@@ -3278,6 +3289,7 @@ function csvToData(text){
       careerAdvisor: get('career_advisor') || '',
       ccm: get('ccm') || '',
       advisingGroup: get('advising_group') || '',
+      program: get('program') || '',
       classPhotoUrl: get('class_photo_url') || '',
       records: [], contentAreas: {}
     });
@@ -3356,6 +3368,26 @@ function fillCohortFilter(){
     o.value = String(y); o.textContent = 'Class of ' + y; sel.appendChild(o) });
   sel.value = years.map(String).includes(keep) ? keep : 'all';
   state.cohort = sel.value;
+  fillProgramFilter();
+}
+/* The Program filter lists the programmes the loaded data names (MSTP,
+   PORTAL, FlexMed, ...) and hides itself when it names none. Students with
+   no programme set are reachable as their own entry. */
+function fillProgramFilter(){
+  const sel = $('fProgram'), field = $('fProgramField');
+  if(!sel) return;
+  const students = DATA.students || [];
+  const progs = [...new Set(students.map(s => s.program || '').filter(Boolean))].sort();
+  const unset = students.some(s => !s.program);
+  field.hidden = !progs.length;
+  const keep = state.program;
+  sel.textContent = '';
+  const all = document.createElement('option');
+  all.value = 'all'; all.textContent = 'All programs'; sel.appendChild(all);
+  progs.forEach(p => { const o = document.createElement('option'); o.value = p; o.textContent = p; sel.appendChild(o) });
+  if(progs.length && unset){ const o = document.createElement('option'); o.value = ''; o.textContent = 'No program set'; sel.appendChild(o) }
+  sel.value = [...sel.options].some(o => o.value === keep) ? keep : 'all';
+  state.program = progs.length ? sel.value : 'all';
 }
 
 function init(){
@@ -3370,7 +3402,7 @@ function init(){
     state[key] = e.target.value; state.student = null;
     $('studentView').hidden = true; $('cohortView').hidden = false; renderAll();
   });
-  bind('fCohort','cohort'); bind('fPhase','phase'); bind('fStatus','standing');
+  bind('fCohort','cohort'); bind('fProgram','program'); bind('fPhase','phase'); bind('fStatus','standing');
   /* Emphasis also decides which column the roster leads with. */
   $('fDomain').addEventListener('change', e => {
     state.emphasis = e.target.value;
@@ -3386,10 +3418,10 @@ function init(){
       $('studentView').hidden = true; $('cohortView').hidden = false; renderAll() }, 160);
   });
   $('fClear').addEventListener('click', () => {
-    state.cohort = 'all'; state.phase = 'all'; state.standing = 'all';
+    state.cohort = 'all'; state.program = 'all'; state.phase = 'all'; state.standing = 'all';
     state.emphasis = 'knowledge'; state.q = ''; state.student = null;
     state.sort = {key:'knowledge', dir:'desc'};
-    $('fCohort').value = 'all'; $('fPhase').value = 'all'; $('fStatus').value = 'all';
+    $('fCohort').value = 'all'; $('fProgram').value = 'all'; $('fPhase').value = 'all'; $('fStatus').value = 'all';
     $('fDomain').value = 'knowledge'; $('fSearch').value = '';
     $('studentView').hidden = true; $('cohortView').hidden = false;
     renderAll();
