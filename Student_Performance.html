@@ -2428,12 +2428,33 @@ function accessLogUrl(rec){
    a blocked popup) and pointed at the pre-filled form once the load is
    known. If nothing is loaded, it is closed again. */
 let pendingLogWin = null;
+const LOG_WIN_STYLE = 'font:15px/1.5 system-ui,-apple-system,sans-serif;padding:28px;max-width:560px;color:#1c2333';
 function openLogWindow(){
   try { pendingLogWin = window.open('about:blank', '_blank') } catch(e){ pendingLogWin = null }
-  if(pendingLogWin) pendingLogWin.document.write('<title>Access log</title><p style="font:14px system-ui;padding:20px">' +
-    'Waiting for the file to load… the access-log form opens here.</p>');
+  if(!pendingLogWin) return;
+  try {
+    const d = pendingLogWin.document;
+    d.open();
+    d.write('<!doctype html><title>Access log</title><div style="' + LOG_WIN_STYLE + '">' +
+      '<p><strong>Access log</strong></p>' +
+      '<p id="msg">Waiting for the file to load… the access-log form opens here.</p>' +
+      '<p style="color:#6b7689;font-size:13px">If you cancelled the file picker, just close this tab.</p></div>');
+    d.close();
+  } catch(e){}
 }
 function closeLogWindow(){ if(pendingLogWin){ try { pendingLogWin.close() } catch(e){} pendingLogWin = null } }
+/* Point the placeholder at the form. The link is written first, so the tab
+   is usable even where the navigation itself does not take. */
+function sendLogWindow(url){
+  const w = pendingLogWin; pendingLogWin = null;
+  if(!w || w.closed) return false;
+  try {
+    const m = w.document.getElementById('msg');
+    if(m) m.innerHTML = 'Please <a href="' + url.replace(/"/g, '&quot;') + '">open and submit the access-log form</a>.';
+  } catch(e){}
+  try { w.location.href = url } catch(e){}
+  return true;
+}
 function logAccess(action, file, asOf){
   const who = whoAmI() || {};
   const rec = {name: who.name || '', role: who.role || '', reason: who.reason || '', action, file: file || '',
@@ -2443,7 +2464,7 @@ function logAccess(action, file, asOf){
     log.push(rec); localStorage.setItem('ascendAccessLog', JSON.stringify(log.slice(-500)));
   } catch(e){}
   const url = accessLogUrl(rec);
-  if(pendingLogWin && !pendingLogWin.closed){ pendingLogWin.location = url; pendingLogWin = null; return }
+  if(sendLogWindow(url)) return;
   const nudge = $('logNudge');
   if(nudge){ $('logNudgeLink').href = url; nudge.hidden = false; nudge.scrollIntoView({block:'nearest'}) }
 }
@@ -3655,8 +3676,9 @@ function init(){
   $('photoInput').addEventListener('cancel', closeLogWindow);
   $('fileInput').addEventListener('cancel', closeLogWindow);
   $('fileInput').addEventListener('change', e => {
-    const f = e.target.files && e.target.files[0]; if(!f) return;
+    const f = e.target.files && e.target.files[0]; if(!f){ closeLogWindow(); return }
     const fr = new FileReader();
+    fr.onerror = closeLogWindow;
     fr.onload = () => {
       try{
         const txt = String(fr.result);
