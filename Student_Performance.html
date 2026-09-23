@@ -275,6 +275,8 @@ main{padding-bottom:44px}
 .ferpa{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:10px;padding:10px 12px;
   border:1px solid var(--line);border-left:3px solid var(--magenta);background:var(--surface-2);max-width:560px}
 .ferpa[hidden]{display:none}
+#loadGate{margin:0 0 16px}
+.ferpa .ghostBtn{background:transparent;color:var(--ink-2);border:1px solid var(--line-2)}
 .ferpa p{flex:1 1 100%;margin:0;font-size:12.5px;color:var(--ink-2)}
 .ferpa input{flex:1 1 140px;min-width:0;padding:7px 10px;font:inherit;font-size:13px;
   border:1px solid var(--line-2);border-radius:8px;background:var(--surface);color:var(--ink)}
@@ -621,6 +623,18 @@ body.gated{overflow:hidden}
       <label for="fCohort">Cohort</label>
       <select id="fCohort"></select>
     </div>
+    <div class="field" id="fProgramField" hidden>
+      <label for="fProgram">Program</label>
+      <select id="fProgram"></select>
+    </div>
+    <div class="field" id="fAdvisorField" hidden>
+      <label for="fAdvisor">Career advisor</label>
+      <select id="fAdvisor"></select>
+    </div>
+    <div class="field" id="fCcmField" hidden>
+      <label for="fCcm">CCM</label>
+      <select id="fCcm"></select>
+    </div>
     <div class="field">
       <label for="fPhase">Phase</label>
       <select id="fPhase">
@@ -655,6 +669,15 @@ body.gated{overflow:hidden}
 </div>
 
 <main class="wrap">
+  <!-- FERPA acknowledgment before student data or photos are loaded: asked
+       once per session, then the file or folder picker opens -->
+  <form class="ferpa" id="loadGate" hidden novalidate>
+    <p id="loadGateNote"></p>
+    <input type="password" id="loadGateInput" placeholder="FERPA code" autocomplete="off" aria-label="FERPA code">
+    <button type="submit" id="loadGateGo">Continue</button>
+    <button type="button" class="ghostBtn" id="loadGateCancel">Cancel</button>
+    <span class="err" id="loadGateErr" role="alert"></span>
+  </form>
   <!-- ============ COHORT VIEW ============ -->
   <section id="cohortView" aria-label="Cohort overview">
     <div class="kpis" id="cohortKpis"></div>
@@ -779,6 +802,9 @@ body.gated{overflow:hidden}
                                   //   Optional; omitted when the extract has not
                                   //   been joined to the advising roster.
      advisingGroup,               // advising group code
+     program,                     // degree programme: "MSTP (MD-PhD)", "PORTAL",
+                                  //   "FlexMed", "Traditional", ... Optional;
+                                  //   shown on the record and as a filter.
      classPhotoUrl,               // optional per-student override for the cohort
                                   //   class picture link; http(s) only
      records: [ Record, ... ]     // one per module / clerkship / transition course
@@ -1153,13 +1179,13 @@ const QUIZ_KINDS = [
   ['Quiz',           null,                                               'Quiz'],
   ['AMBOSS quiz',    /\bamboss\b/i,                                      'AMBOSS'],
   ['TBL (iRAT)',     /\b[it]rat\b|\btbl\b/i,                             'TBL'],
-  ['CCSG',           /\bccsg\b/i,                                        'CCSG'],
+  ['Pre-CCSG quiz',  /\bccsg\b/i,                                        'Pre-CCSG'],
   ['Practical',      /practical/i,                                       'Practical'],
   ['Lab',            /^lab\s*\d/i,                                       'Lab'],
-  ['Formative quiz', /formative|practice (quiz|questions)|self[\s-]?study/i, 'Formative']
+  ['Blackboard quiz', /formative|practice (quiz|questions)|self[\s-]?study/i, 'Blackboard']
 ];
 /* tested most-specific first: a "Practical Quiz" is a practical */
-const QUIZ_TEST_ORDER = ['Practical','TBL (iRAT)','CCSG','Lab','Formative quiz','AMBOSS quiz'];
+const QUIZ_TEST_ORDER = ['Practical','TBL (iRAT)','Pre-CCSG quiz','Lab','Blackboard quiz','AMBOSS quiz'];
 function quizKind(name){
   const n = String(name || '');
   for(const label of QUIZ_TEST_ORDER){
@@ -1647,7 +1673,7 @@ let TYPE_META = [{key:'q:Quiz', label:'Quiz', short:'Quiz', varName:'--s1'}].con
    ============================================================================ */
 let DATA = hydrate(buildSampleData());
 const state = {
-  cohort:'all', phase:'all', standing:'all', emphasis:'knowledge', q:'',
+  cohort:'all', program:'all', advisor:'all', ccm:'all', phase:'all', standing:'all', emphasis:'knowledge', q:'',
   sort:{key:'knowledge', dir:'desc'}, student:null
 };
 const $ = id => document.getElementById(id);
@@ -1669,6 +1695,9 @@ function filtered(){
   const q = state.q.trim().toLowerCase();
   return (DATA.students||[]).filter(s => {
     if(state.cohort !== 'all' && String(s.cohort) !== state.cohort) return false;
+    if(state.program !== 'all' && (s.program || '') !== state.program) return false;
+    if(state.advisor !== 'all' && (s.careerAdvisor || '') !== state.advisor) return false;
+    if(state.ccm !== 'all' && (s.ccm || '') !== state.ccm) return false;
     if(state.phase !== 'all' && !(s.byPhase && s.byPhase[state.phase])) return false;
     if(state.standing !== 'all' && s.status !== state.standing) return false;
     if(q && !String(s.id).toLowerCase().includes(q)) return false;
@@ -1718,6 +1747,9 @@ function renderKpis(list){
 function describeFilter(){
   const bits = [];
   bits.push(state.cohort === 'all' ? 'All cohorts' : 'Class of ' + state.cohort);
+  if(state.program !== 'all') bits.push(state.program || 'No program set');
+  if(state.advisor !== 'all') bits.push(state.advisor ? 'Advisor ' + state.advisor : 'No career advisor set');
+  if(state.ccm !== 'all') bits.push(state.ccm ? 'CCM ' + state.ccm : 'No CCM set');
   if(state.phase !== 'all') bits.push('Phase ' + state.phase + ' assessments only');
   if(state.standing !== 'all') bits.push(STANDING[state.standing].label);
   return bits.join(' · ');
@@ -2056,7 +2088,8 @@ function renderRoster(){
     const b = document.createElement('span'); b.className = 'sid';
     /* The roster line is for scanning, so it carries the advising group and
        the block in progress. The people to call are on the record itself. */
-    b.textContent = (s.advisingGroup || '—') + (s.current ? ' · in ' + s.current.code : '');
+    b.textContent = [s.program, s.advisingGroup].filter(Boolean).join(' · ') +
+                    (s.current ? (s.program || s.advisingGroup ? ' · ' : '') + 'in ' + s.current.code : '') || '—';
     nm.appendChild(a); nm.appendChild(b); c1.appendChild(nm); cells.push(c1);
 
     const c2 = document.createElement('td'); c2.className = 'num'; c2.textContent = s.cohort; cells.push(c2);
@@ -2308,6 +2341,41 @@ function lookupButton(s){
    To change it: uppercase the new code, hash it, replace this value. */
 const LOOKUP_HASH = '28f1339ffc323de47879d9c7d6ec761f8bd4737841daa5c0acb7ab4d6f3ab5e6';
 
+/* The same acknowledgment before student data or photos are loaded. Asked
+   once per browser session (sessionStorage, cleared when the tab closes);
+   `then` runs from the form's submit so a file picker may open from it. */
+let loadGateThen = null;
+function ferpaGate(why, then){
+  let ok = false;
+  try { ok = sessionStorage.getItem('ascendFerpa') === LOOKUP_HASH } catch(e){}
+  if(ok){ then(); return }
+  const form = $('loadGate');
+  loadGateThen = then;
+  $('loadGateNote').textContent = why + ' Enter the FERPA code to continue.';
+  $('loadGateErr').textContent = ''; $('loadGateInput').value = '';
+  form.hidden = false;
+  form.scrollIntoView({block:'nearest'});
+  $('loadGateInput').focus();
+}
+function bootLoadGate(){
+  const form = $('loadGate'), input = $('loadGateInput'), err = $('loadGateErr');
+  if(!form) return;
+  input.addEventListener('input', () => { err.textContent = '' });
+  $('loadGateCancel').addEventListener('click', () => { form.hidden = true; loadGateThen = null });
+  form.addEventListener('submit', ev => {
+    ev.preventDefault();
+    if(sha256(input.value.trim().toUpperCase()) !== LOOKUP_HASH){
+      err.textContent = 'That code isn’t recognized.';
+      input.select();
+      return;
+    }
+    try { sessionStorage.setItem('ascendFerpa', LOOKUP_HASH) } catch(e){}
+    input.value = ''; form.hidden = true;
+    const run = loadGateThen; loadGateThen = null;
+    if(run) run();
+  });
+}
+
 /* Student photos live in a folder the viewer picks with "Load photos" - one
    image per file, named by the code (ASC-2028-014.jpg). They are held as
    in-memory object URLs for this session only: the page carries none, the
@@ -2382,6 +2450,7 @@ function studentHeader(host, s){
      leaves them out rather than printing a dash. */
   if(s.careerAdvisor) fact(dl, 'Career advisor', s.careerAdvisor);
   if(s.ccm) fact(dl, 'Clinical competency mentor', s.ccm);
+  if(s.program) fact(dl, 'Program', s.program);
   if(s.advisingGroup) fact(dl, 'Advising group', s.advisingGroup);
   fact(dl, 'Blocks completed', s.completed + (s.upcoming ? ' of ' + (s.completed + s.upcoming) : ''));
   meta.appendChild(dl);
@@ -3232,6 +3301,7 @@ function csvToData(text){
       careerAdvisor: get('career_advisor') || '',
       ccm: get('ccm') || '',
       advisingGroup: get('advising_group') || '',
+      program: get('program') || '',
       classPhotoUrl: get('class_photo_url') || '',
       records: [], contentAreas: {}
     });
@@ -3310,6 +3380,31 @@ function fillCohortFilter(){
     o.value = String(y); o.textContent = 'Class of ' + y; sel.appendChild(o) });
   sel.value = years.map(String).includes(keep) ? keep : 'all';
   state.cohort = sel.value;
+  fillListFilter('fProgram', 'fProgramField', 'program', 'program', 'All programs', 'No program set');
+  fillListFilter('fAdvisor', 'fAdvisorField', 'careerAdvisor', 'advisor', 'All career advisors', 'No career advisor set');
+  fillListFilter('fCcm', 'fCcmField', 'ccm', 'ccm', 'All CCMs', 'No CCM set');
+}
+/* Filters that list whatever the loaded data names - programmes, career
+   advisors, clinical competency mentors - and hide themselves when it names
+   none. Students with the field unset are reachable as their own entry, so
+   an advising gap is one click to find. Faculty names sort by surname. */
+function fillListFilter(selId, fieldId, prop, stateKey, allLabel, unsetLabel){
+  const sel = $(selId), field = $(fieldId);
+  if(!sel) return;
+  const students = DATA.students || [];
+  const bySurname = v => v.trim().split(/\s+/).slice(-1)[0].toLowerCase() + ' ' + v.toLowerCase();
+  const vals = [...new Set(students.map(s => s[prop] || '').filter(Boolean))]
+    .sort((a, b) => bySurname(a).localeCompare(bySurname(b)));
+  const unset = students.some(s => !s[prop]);
+  field.hidden = !vals.length;
+  const keep = state[stateKey];
+  sel.textContent = '';
+  const all = document.createElement('option');
+  all.value = 'all'; all.textContent = allLabel; sel.appendChild(all);
+  vals.forEach(v => { const o = document.createElement('option'); o.value = v; o.textContent = v; sel.appendChild(o) });
+  if(vals.length && unset){ const o = document.createElement('option'); o.value = ''; o.textContent = unsetLabel; sel.appendChild(o) }
+  sel.value = [...sel.options].some(o => o.value === keep) ? keep : 'all';
+  state[stateKey] = vals.length ? sel.value : 'all';
 }
 
 function init(){
@@ -3324,7 +3419,8 @@ function init(){
     state[key] = e.target.value; state.student = null;
     $('studentView').hidden = true; $('cohortView').hidden = false; renderAll();
   });
-  bind('fCohort','cohort'); bind('fPhase','phase'); bind('fStatus','standing');
+  bind('fCohort','cohort'); bind('fProgram','program'); bind('fAdvisor','advisor'); bind('fCcm','ccm');
+  bind('fPhase','phase'); bind('fStatus','standing');
   /* Emphasis also decides which column the roster leads with. */
   $('fDomain').addEventListener('change', e => {
     state.emphasis = e.target.value;
@@ -3340,10 +3436,12 @@ function init(){
       $('studentView').hidden = true; $('cohortView').hidden = false; renderAll() }, 160);
   });
   $('fClear').addEventListener('click', () => {
-    state.cohort = 'all'; state.phase = 'all'; state.standing = 'all';
+    state.cohort = 'all'; state.program = 'all'; state.advisor = 'all'; state.ccm = 'all';
+    state.phase = 'all'; state.standing = 'all';
     state.emphasis = 'knowledge'; state.q = ''; state.student = null;
     state.sort = {key:'knowledge', dir:'desc'};
-    $('fCohort').value = 'all'; $('fPhase').value = 'all'; $('fStatus').value = 'all';
+    $('fCohort').value = 'all'; $('fProgram').value = 'all'; $('fAdvisor').value = 'all'; $('fCcm').value = 'all';
+    $('fPhase').value = 'all'; $('fStatus').value = 'all';
     $('fDomain').value = 'knowledge'; $('fSearch').value = '';
     $('studentView').hidden = true; $('cohortView').hidden = false;
     renderAll();
@@ -3382,9 +3480,18 @@ function init(){
   applyTheme(null);
 
   $('printBtn').addEventListener('click', () => window.print());
-  $('loadBtn').addEventListener('click', () => $('fileInput').click());
+  bootLoadGate();
+  /* Both loads bring education records into the browser, so both stand
+     behind the FERPA acknowledgment - the same code as the lookup, asked
+     once per session. The picker opens from the form's submit, which is
+     still a user gesture. */
+  $('loadBtn').addEventListener('click', () =>
+    ferpaGate('Loading the student data file brings coded education records into this browser. ' +
+              'Continue only with a legitimate educational interest.', () => $('fileInput').click()));
   /* a folder of <code>.jpg photos, kept in memory for this session only */
-  $('photoBtn').addEventListener('click', () => $('photoInput').click());
+  $('photoBtn').addEventListener('click', () =>
+    ferpaGate('Loading the photo folder pairs a face with each code, which re-identifies the student. ' +
+              'Continue only with a legitimate educational interest.', () => $('photoInput').click()));
   $('photoInput').addEventListener('change', e => {
     const n = adoptPhotos(e.target.files || []);
     if(!n) alert('No images were found in that folder.\n\nExpected one image per student, named by ' +
