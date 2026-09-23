@@ -275,6 +275,8 @@ main{padding-bottom:44px}
 .ferpa{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:10px;padding:10px 12px;
   border:1px solid var(--line);border-left:3px solid var(--magenta);background:var(--surface-2);max-width:560px}
 .ferpa[hidden]{display:none}
+#loadGate{margin:0 0 16px}
+.ferpa .ghostBtn{background:transparent;color:var(--ink-2);border:1px solid var(--line-2)}
 .ferpa p{flex:1 1 100%;margin:0;font-size:12.5px;color:var(--ink-2)}
 .ferpa input{flex:1 1 140px;min-width:0;padding:7px 10px;font:inherit;font-size:13px;
   border:1px solid var(--line-2);border-radius:8px;background:var(--surface);color:var(--ink)}
@@ -655,6 +657,15 @@ body.gated{overflow:hidden}
 </div>
 
 <main class="wrap">
+  <!-- FERPA acknowledgment before student data or photos are loaded: asked
+       once per session, then the file or folder picker opens -->
+  <form class="ferpa" id="loadGate" hidden novalidate>
+    <p id="loadGateNote"></p>
+    <input type="password" id="loadGateInput" placeholder="FERPA code" autocomplete="off" aria-label="FERPA code">
+    <button type="submit" id="loadGateGo">Continue</button>
+    <button type="button" class="ghostBtn" id="loadGateCancel">Cancel</button>
+    <span class="err" id="loadGateErr" role="alert"></span>
+  </form>
   <!-- ============ COHORT VIEW ============ -->
   <section id="cohortView" aria-label="Cohort overview">
     <div class="kpis" id="cohortKpis"></div>
@@ -2308,6 +2319,41 @@ function lookupButton(s){
    To change it: uppercase the new code, hash it, replace this value. */
 const LOOKUP_HASH = '28f1339ffc323de47879d9c7d6ec761f8bd4737841daa5c0acb7ab4d6f3ab5e6';
 
+/* The same acknowledgment before student data or photos are loaded. Asked
+   once per browser session (sessionStorage, cleared when the tab closes);
+   `then` runs from the form's submit so a file picker may open from it. */
+let loadGateThen = null;
+function ferpaGate(why, then){
+  let ok = false;
+  try { ok = sessionStorage.getItem('ascendFerpa') === LOOKUP_HASH } catch(e){}
+  if(ok){ then(); return }
+  const form = $('loadGate');
+  loadGateThen = then;
+  $('loadGateNote').textContent = why + ' Enter the FERPA code to continue.';
+  $('loadGateErr').textContent = ''; $('loadGateInput').value = '';
+  form.hidden = false;
+  form.scrollIntoView({block:'nearest'});
+  $('loadGateInput').focus();
+}
+function bootLoadGate(){
+  const form = $('loadGate'), input = $('loadGateInput'), err = $('loadGateErr');
+  if(!form) return;
+  input.addEventListener('input', () => { err.textContent = '' });
+  $('loadGateCancel').addEventListener('click', () => { form.hidden = true; loadGateThen = null });
+  form.addEventListener('submit', ev => {
+    ev.preventDefault();
+    if(sha256(input.value.trim().toUpperCase()) !== LOOKUP_HASH){
+      err.textContent = 'That code isn’t recognized.';
+      input.select();
+      return;
+    }
+    try { sessionStorage.setItem('ascendFerpa', LOOKUP_HASH) } catch(e){}
+    input.value = ''; form.hidden = true;
+    const run = loadGateThen; loadGateThen = null;
+    if(run) run();
+  });
+}
+
 /* Student photos live in a folder the viewer picks with "Load photos" - one
    image per file, named by the code (ASC-2028-014.jpg). They are held as
    in-memory object URLs for this session only: the page carries none, the
@@ -3382,9 +3428,18 @@ function init(){
   applyTheme(null);
 
   $('printBtn').addEventListener('click', () => window.print());
-  $('loadBtn').addEventListener('click', () => $('fileInput').click());
+  bootLoadGate();
+  /* Both loads bring education records into the browser, so both stand
+     behind the FERPA acknowledgment - the same code as the lookup, asked
+     once per session. The picker opens from the form's submit, which is
+     still a user gesture. */
+  $('loadBtn').addEventListener('click', () =>
+    ferpaGate('Loading the student data file brings coded education records into this browser. ' +
+              'Continue only with a legitimate educational interest.', () => $('fileInput').click()));
   /* a folder of <code>.jpg photos, kept in memory for this session only */
-  $('photoBtn').addEventListener('click', () => $('photoInput').click());
+  $('photoBtn').addEventListener('click', () =>
+    ferpaGate('Loading the photo folder pairs a face with each code, which re-identifies the student. ' +
+              'Continue only with a legitimate educational interest.', () => $('photoInput').click()));
   $('photoInput').addEventListener('change', e => {
     const n = adoptPhotos(e.target.files || []);
     if(!n) alert('No images were found in that folder.\n\nExpected one image per student, named by ' +
