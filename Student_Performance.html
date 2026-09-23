@@ -275,7 +275,14 @@ main{padding-bottom:44px}
 .ferpa{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:10px;padding:10px 12px;
   border:1px solid var(--line);border-left:3px solid var(--magenta);background:var(--surface-2);max-width:560px}
 .ferpa[hidden]{display:none}
-#loadGate{margin:0 0 16px}
+#loadGate,#logNudge{margin:0 0 16px}
+.ferpa .fine{font-size:12px;color:var(--muted)}
+.ferpa .who{flex:1 1 100%;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ferpa .who input,.ferpa .who select{padding:7px 10px;font:inherit;font-size:13px;border:1px solid var(--line-2);
+  border-radius:8px;background:var(--surface);color:var(--ink);min-width:0}
+.ferpa .who input:focus,.ferpa .who select:focus{outline:none;border-color:var(--magenta);box-shadow:0 0 0 3px var(--ring)}
+.ferpa .who input:last-child{grid-column:1 / -1}
+@media (max-width:560px){.ferpa .who{grid-template-columns:1fr}}
 .ferpa .ghostBtn{background:transparent;color:var(--ink-2);border:1px solid var(--line-2)}
 .ferpa p{flex:1 1 100%;margin:0;font-size:12.5px;color:var(--ink-2)}
 .ferpa input{flex:1 1 140px;min-width:0;padding:7px 10px;font:inherit;font-size:13px;
@@ -671,13 +678,32 @@ body.gated{overflow:hidden}
 <main class="wrap">
   <!-- FERPA acknowledgment before student data or photos are loaded: asked
        once per session, then the file or folder picker opens -->
-  <form class="ferpa" id="loadGate" hidden novalidate>
+  <form class="ferpa gate2" id="loadGate" hidden novalidate>
     <p id="loadGateNote"></p>
+    <p class="fine">Access is logged: your name, role and reason, what you loaded and when are recorded
+      with the Office of Curricular Affairs. A pre-filled form opens for you to submit.</p>
+    <div class="who">
+      <input type="text" id="loadGateName" placeholder="Your name" autocomplete="name" aria-label="Your name">
+      <select id="loadGateRole" aria-label="Your role">
+        <option value="">Your role…</option>
+        <option>Career advisor</option>
+        <option>Clinical competency mentor</option>
+        <option>Course or clerkship director</option>
+        <option>Office of Curricular Affairs</option>
+        <option>Student affairs / advising dean</option>
+        <option>Other</option>
+      </select>
+      <input type="text" id="loadGateReason" placeholder="Reason for access (e.g. advising meeting)" autocomplete="off" aria-label="Reason for access">
+    </div>
     <input type="password" id="loadGateInput" placeholder="FERPA code" autocomplete="off" aria-label="FERPA code">
     <button type="submit" id="loadGateGo">Continue</button>
     <button type="button" class="ghostBtn" id="loadGateCancel">Cancel</button>
     <span class="err" id="loadGateErr" role="alert"></span>
   </form>
+  <div class="ferpa" id="logNudge" hidden>
+    <p>Your browser blocked the access-log form from opening. Please
+      <a id="logNudgeLink" href="#" target="_blank" rel="noopener">open and submit it</a> now.</p>
+  </div>
   <!-- ============ COHORT VIEW ============ -->
   <section id="cohortView" aria-label="Cohort overview">
     <div class="kpis" id="cohortKpis"></div>
@@ -2341,35 +2367,99 @@ function lookupButton(s){
    To change it: uppercase the new code, hash it, replace this value. */
 const LOOKUP_HASH = '28f1339ffc323de47879d9c7d6ec761f8bd4737841daa5c0acb7ab4d6f3ab5e6';
 
-/* The same acknowledgment before student data or photos are loaded. Asked
-   once per browser session (sessionStorage, cleared when the tab closes);
-   `then` runs from the form's submit so a file picker may open from it. */
+/* ---------------------------------------------------------------------------
+   BREAK-THE-GLASS: who is loading student data, and why
+   Loading the data file or the photo folder brings education records into
+   the browser. Before either, the viewer gives their name, role and reason
+   and the FERPA code, and is told the access is logged. Each load is then
+   recorded two ways:
+     1. the Office's Microsoft Form opens in a new tab, pre-filled with the
+        record, for the viewer to submit. It is restricted to Mount Sinai
+        accounts and records the signed-in identity, so the log names the
+        real person, not only what was typed;
+     2. a copy is kept in this browser (localStorage 'ascendAccessLog'),
+        readable by the viewer.
+   The page has no server, so the form is the audit trail; ACCESS_LOG_FORM
+   holds its address and the id of each question. The who/why answers are
+   kept for the session, so the second load of a session asks nothing more.
+   --------------------------------------------------------------------------- */
+const PAGE_VERSION = '2026-09-23';
+const ACCESS_LOG_FORM = {
+  url: 'https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=YZ3odw9XsEO55GNPRi40uOOTNvWX3itIuGr2h3RZNNZUM0tRSzZXSzE0QUhYNkUyVUVGREg1VDVJTi4u',
+  q: {name:'rbb798375b6b14afcb0aca39b7f5030bf', role:'rc89f9285cb2540dba7fde715ac3036ff',
+      reason:'rfeb7d3abaa844ad598629a232287cd36', action:'r5c990c81d8c14937991a025f22523919',
+      file:'r784472e09c4848a18530ae9c77e18a41', asOf:'refba71bd0a604761b303fdb0582d9499',
+      pageVersion:'re90caad4b64740c388e19ce3775144f5', when:'r8027ca6392e449b396f36160c622bf08',
+      browser:'r73d88a9da3284e72a208f58439d0b690'}
+};
+function whoAmI(){
+  try { return JSON.parse(sessionStorage.getItem('ascendAccess') || 'null') } catch(e){ return null }
+}
+function browserName(){
+  const ua = navigator.userAgent;
+  const b = /Edg\//.test(ua) ? 'Edge' : /Chrome\//.test(ua) ? 'Chrome' : /Safari\//.test(ua) ? 'Safari' : /Firefox\//.test(ua) ? 'Firefox' : 'Browser';
+  const os = /Mac OS/.test(ua) ? 'Mac' : /Windows/.test(ua) ? 'Windows' : /iPhone|iPad/.test(ua) ? 'iOS' : /Android/.test(ua) ? 'Android' : 'other';
+  return b + ' on ' + os;
+}
+function accessLogUrl(rec){
+  const q = ACCESS_LOG_FORM.q;
+  return ACCESS_LOG_FORM.url + Object.keys(q).map(k => '&' + q[k] + '=' + encodeURIComponent(rec[k] || '')).join('');
+}
+/* A window opened at the moment of the click (a user gesture, so it is not
+   a blocked popup) and pointed at the pre-filled form once the load is
+   known. If nothing is loaded, it is closed again. */
+let pendingLogWin = null;
+function openLogWindow(){
+  try { pendingLogWin = window.open('about:blank', '_blank') } catch(e){ pendingLogWin = null }
+  if(pendingLogWin) pendingLogWin.document.write('<title>Access log</title><p style="font:14px system-ui;padding:20px">' +
+    'Waiting for the file to load… the access-log form opens here.</p>');
+}
+function closeLogWindow(){ if(pendingLogWin){ try { pendingLogWin.close() } catch(e){} pendingLogWin = null } }
+function logAccess(action, file, asOf){
+  const who = whoAmI() || {};
+  const rec = {name: who.name || '', role: who.role || '', reason: who.reason || '', action, file: file || '',
+               asOf: asOf || '', pageVersion: PAGE_VERSION, when: new Date().toISOString(), browser: browserName()};
+  try {
+    const log = JSON.parse(localStorage.getItem('ascendAccessLog') || '[]');
+    log.push(rec); localStorage.setItem('ascendAccessLog', JSON.stringify(log.slice(-500)));
+  } catch(e){}
+  const url = accessLogUrl(rec);
+  if(pendingLogWin && !pendingLogWin.closed){ pendingLogWin.location = url; pendingLogWin = null; return }
+  const nudge = $('logNudge');
+  if(nudge){ $('logNudgeLink').href = url; nudge.hidden = false; nudge.scrollIntoView({block:'nearest'}) }
+}
+
 let loadGateThen = null;
 function ferpaGate(why, then){
   let ok = false;
-  try { ok = sessionStorage.getItem('ascendFerpa') === LOOKUP_HASH } catch(e){}
+  try { ok = sessionStorage.getItem('ascendFerpa') === LOOKUP_HASH && !!whoAmI() } catch(e){}
   if(ok){ then(); return }
   const form = $('loadGate');
   loadGateThen = then;
-  $('loadGateNote').textContent = why + ' Enter the FERPA code to continue.';
+  $('loadGateNote').textContent = why + ' Say who you are and why, and enter the FERPA code to continue.';
   $('loadGateErr').textContent = ''; $('loadGateInput').value = '';
+  const who = whoAmI() || {};
+  $('loadGateName').value = who.name || ''; $('loadGateRole').value = who.role || ''; $('loadGateReason').value = who.reason || '';
   form.hidden = false;
   form.scrollIntoView({block:'nearest'});
-  $('loadGateInput').focus();
+  $('loadGateName').focus();
 }
 function bootLoadGate(){
   const form = $('loadGate'), input = $('loadGateInput'), err = $('loadGateErr');
   if(!form) return;
-  input.addEventListener('input', () => { err.textContent = '' });
+  form.addEventListener('input', () => { err.textContent = '' });
   $('loadGateCancel').addEventListener('click', () => { form.hidden = true; loadGateThen = null });
   form.addEventListener('submit', ev => {
     ev.preventDefault();
+    const name = $('loadGateName').value.trim(), role = $('loadGateRole').value, reason = $('loadGateReason').value.trim();
+    if(!name || !role || !reason){ err.textContent = 'Please give your name, role and reason for access.'; return }
     if(sha256(input.value.trim().toUpperCase()) !== LOOKUP_HASH){
       err.textContent = 'That code isn’t recognized.';
       input.select();
       return;
     }
-    try { sessionStorage.setItem('ascendFerpa', LOOKUP_HASH) } catch(e){}
+    try { sessionStorage.setItem('ascendFerpa', LOOKUP_HASH);
+          sessionStorage.setItem('ascendAccess', JSON.stringify({name, role, reason})) } catch(e){}
     input.value = ''; form.hidden = true;
     const run = loadGateThen; loadGateThen = null;
     if(run) run();
@@ -3485,19 +3575,26 @@ function init(){
      behind the FERPA acknowledgment - the same code as the lookup, asked
      once per session. The picker opens from the form's submit, which is
      still a user gesture. */
+  /* the log window opens from the click itself, so it is not a blocked popup */
   $('loadBtn').addEventListener('click', () =>
     ferpaGate('Loading the student data file brings coded education records into this browser. ' +
-              'Continue only with a legitimate educational interest.', () => $('fileInput').click()));
+              'Continue only with a legitimate educational interest.',
+              () => { openLogWindow(); $('fileInput').click() }));
   /* a folder of <code>.jpg photos, kept in memory for this session only */
   $('photoBtn').addEventListener('click', () =>
     ferpaGate('Loading the photo folder pairs a face with each code, which re-identifies the student. ' +
-              'Continue only with a legitimate educational interest.', () => $('photoInput').click()));
+              'Continue only with a legitimate educational interest.',
+              () => { openLogWindow(); $('photoInput').click() }));
   $('photoInput').addEventListener('change', e => {
     const n = adoptPhotos(e.target.files || []);
-    if(!n) alert('No images were found in that folder.\n\nExpected one image per student, named by ' +
-                 'code, e.g. ASC-2028-014.jpg, as written by pipeline/student_photos.py.');
+    if(!n){ closeLogWindow();
+      alert('No images were found in that folder.\n\nExpected one image per student, named by ' +
+            'code, e.g. ASC-2028-014.jpg, as written by pipeline/student_photos.py.'); }
+    else logAccess('photos', n + ' photos', '');
     e.target.value = '';
   });
+  $('photoInput').addEventListener('cancel', closeLogWindow);
+  $('fileInput').addEventListener('cancel', closeLogWindow);
   $('fileInput').addEventListener('change', e => {
     const f = e.target.files && e.target.files[0]; if(!f) return;
     const fr = new FileReader();
@@ -3505,7 +3602,9 @@ function init(){
       try{
         const txt = String(fr.result);
         adoptData(/\.csv$/i.test(f.name) ? csvToData(txt) : JSON.parse(txt), f.name);
+        logAccess('data', f.name, (DATA.meta && DATA.meta.asOf) || '');
       }catch(err){
+        closeLogWindow();
         alert('That file could not be read as student data.\n\n' + err.message +
               '\n\nExpected either the JSON shape documented at the top of this page’s ' +
               'script, or a CSV with one row per assessment.');
@@ -3520,6 +3619,12 @@ function init(){
   window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(renderAll, 160) });
 
   renderAll();
+
+  /* A copy that opens straight on real data (the Office's local copy) is
+     also an access: the same who/why gate, once per session, logged as such. */
+  if(DATA.meta && !DATA.meta.sample && !whoAmI())
+    ferpaGate('This copy opens on real student records.',
+              () => { openLogWindow(); logAccess('open', 'built-in data', (DATA.meta && DATA.meta.asOf) || '') });
 }
 
 /* ============================================================================
