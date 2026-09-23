@@ -1179,13 +1179,13 @@ const QUIZ_KINDS = [
   ['Quiz',           null,                                               'Quiz'],
   ['AMBOSS quiz',    /\bamboss\b/i,                                      'AMBOSS'],
   ['TBL (iRAT)',     /\b[it]rat\b|\btbl\b/i,                             'TBL'],
-  ['CCSG',           /\bccsg\b/i,                                        'CCSG'],
+  ['Pre-CCSG quiz',  /\bccsg\b/i,                                        'Pre-CCSG'],
   ['Practical',      /practical/i,                                       'Practical'],
   ['Lab',            /^lab\s*\d/i,                                       'Lab'],
-  ['Formative quiz', /formative|practice (quiz|questions)|self[\s-]?study/i, 'Formative']
+  ['Blackboard quiz', /formative|practice (quiz|questions)|self[\s-]?study/i, 'Blackboard']
 ];
 /* tested most-specific first: a "Practical Quiz" is a practical */
-const QUIZ_TEST_ORDER = ['Practical','TBL (iRAT)','CCSG','Lab','Formative quiz','AMBOSS quiz'];
+const QUIZ_TEST_ORDER = ['Practical','TBL (iRAT)','Pre-CCSG quiz','Lab','Blackboard quiz','AMBOSS quiz'];
 function quizKind(name){
   const n = String(name || '');
   for(const label of QUIZ_TEST_ORDER){
