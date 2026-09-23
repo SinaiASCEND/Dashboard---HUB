@@ -627,6 +627,14 @@ body.gated{overflow:hidden}
       <label for="fProgram">Program</label>
       <select id="fProgram"></select>
     </div>
+    <div class="field" id="fAdvisorField" hidden>
+      <label for="fAdvisor">Career advisor</label>
+      <select id="fAdvisor"></select>
+    </div>
+    <div class="field" id="fCcmField" hidden>
+      <label for="fCcm">CCM</label>
+      <select id="fCcm"></select>
+    </div>
     <div class="field">
       <label for="fPhase">Phase</label>
       <select id="fPhase">
@@ -1665,7 +1673,7 @@ let TYPE_META = [{key:'q:Quiz', label:'Quiz', short:'Quiz', varName:'--s1'}].con
    ============================================================================ */
 let DATA = hydrate(buildSampleData());
 const state = {
-  cohort:'all', program:'all', phase:'all', standing:'all', emphasis:'knowledge', q:'',
+  cohort:'all', program:'all', advisor:'all', ccm:'all', phase:'all', standing:'all', emphasis:'knowledge', q:'',
   sort:{key:'knowledge', dir:'desc'}, student:null
 };
 const $ = id => document.getElementById(id);
@@ -1688,6 +1696,8 @@ function filtered(){
   return (DATA.students||[]).filter(s => {
     if(state.cohort !== 'all' && String(s.cohort) !== state.cohort) return false;
     if(state.program !== 'all' && (s.program || '') !== state.program) return false;
+    if(state.advisor !== 'all' && (s.careerAdvisor || '') !== state.advisor) return false;
+    if(state.ccm !== 'all' && (s.ccm || '') !== state.ccm) return false;
     if(state.phase !== 'all' && !(s.byPhase && s.byPhase[state.phase])) return false;
     if(state.standing !== 'all' && s.status !== state.standing) return false;
     if(q && !String(s.id).toLowerCase().includes(q)) return false;
@@ -1738,6 +1748,8 @@ function describeFilter(){
   const bits = [];
   bits.push(state.cohort === 'all' ? 'All cohorts' : 'Class of ' + state.cohort);
   if(state.program !== 'all') bits.push(state.program || 'No program set');
+  if(state.advisor !== 'all') bits.push(state.advisor ? 'Advisor ' + state.advisor : 'No career advisor set');
+  if(state.ccm !== 'all') bits.push(state.ccm ? 'CCM ' + state.ccm : 'No CCM set');
   if(state.phase !== 'all') bits.push('Phase ' + state.phase + ' assessments only');
   if(state.standing !== 'all') bits.push(STANDING[state.standing].label);
   return bits.join(' · ');
@@ -3368,26 +3380,31 @@ function fillCohortFilter(){
     o.value = String(y); o.textContent = 'Class of ' + y; sel.appendChild(o) });
   sel.value = years.map(String).includes(keep) ? keep : 'all';
   state.cohort = sel.value;
-  fillProgramFilter();
+  fillListFilter('fProgram', 'fProgramField', 'program', 'program', 'All programs', 'No program set');
+  fillListFilter('fAdvisor', 'fAdvisorField', 'careerAdvisor', 'advisor', 'All career advisors', 'No career advisor set');
+  fillListFilter('fCcm', 'fCcmField', 'ccm', 'ccm', 'All CCMs', 'No CCM set');
 }
-/* The Program filter lists the programmes the loaded data names (MSTP,
-   PORTAL, FlexMed, ...) and hides itself when it names none. Students with
-   no programme set are reachable as their own entry. */
-function fillProgramFilter(){
-  const sel = $('fProgram'), field = $('fProgramField');
+/* Filters that list whatever the loaded data names - programmes, career
+   advisors, clinical competency mentors - and hide themselves when it names
+   none. Students with the field unset are reachable as their own entry, so
+   an advising gap is one click to find. Faculty names sort by surname. */
+function fillListFilter(selId, fieldId, prop, stateKey, allLabel, unsetLabel){
+  const sel = $(selId), field = $(fieldId);
   if(!sel) return;
   const students = DATA.students || [];
-  const progs = [...new Set(students.map(s => s.program || '').filter(Boolean))].sort();
-  const unset = students.some(s => !s.program);
-  field.hidden = !progs.length;
-  const keep = state.program;
+  const bySurname = v => v.trim().split(/\s+/).slice(-1)[0].toLowerCase() + ' ' + v.toLowerCase();
+  const vals = [...new Set(students.map(s => s[prop] || '').filter(Boolean))]
+    .sort((a, b) => bySurname(a).localeCompare(bySurname(b)));
+  const unset = students.some(s => !s[prop]);
+  field.hidden = !vals.length;
+  const keep = state[stateKey];
   sel.textContent = '';
   const all = document.createElement('option');
-  all.value = 'all'; all.textContent = 'All programs'; sel.appendChild(all);
-  progs.forEach(p => { const o = document.createElement('option'); o.value = p; o.textContent = p; sel.appendChild(o) });
-  if(progs.length && unset){ const o = document.createElement('option'); o.value = ''; o.textContent = 'No program set'; sel.appendChild(o) }
+  all.value = 'all'; all.textContent = allLabel; sel.appendChild(all);
+  vals.forEach(v => { const o = document.createElement('option'); o.value = v; o.textContent = v; sel.appendChild(o) });
+  if(vals.length && unset){ const o = document.createElement('option'); o.value = ''; o.textContent = unsetLabel; sel.appendChild(o) }
   sel.value = [...sel.options].some(o => o.value === keep) ? keep : 'all';
-  state.program = progs.length ? sel.value : 'all';
+  state[stateKey] = vals.length ? sel.value : 'all';
 }
 
 function init(){
@@ -3402,7 +3419,8 @@ function init(){
     state[key] = e.target.value; state.student = null;
     $('studentView').hidden = true; $('cohortView').hidden = false; renderAll();
   });
-  bind('fCohort','cohort'); bind('fProgram','program'); bind('fPhase','phase'); bind('fStatus','standing');
+  bind('fCohort','cohort'); bind('fProgram','program'); bind('fAdvisor','advisor'); bind('fCcm','ccm');
+  bind('fPhase','phase'); bind('fStatus','standing');
   /* Emphasis also decides which column the roster leads with. */
   $('fDomain').addEventListener('change', e => {
     state.emphasis = e.target.value;
@@ -3418,10 +3436,12 @@ function init(){
       $('studentView').hidden = true; $('cohortView').hidden = false; renderAll() }, 160);
   });
   $('fClear').addEventListener('click', () => {
-    state.cohort = 'all'; state.program = 'all'; state.phase = 'all'; state.standing = 'all';
+    state.cohort = 'all'; state.program = 'all'; state.advisor = 'all'; state.ccm = 'all';
+    state.phase = 'all'; state.standing = 'all';
     state.emphasis = 'knowledge'; state.q = ''; state.student = null;
     state.sort = {key:'knowledge', dir:'desc'};
-    $('fCohort').value = 'all'; $('fProgram').value = 'all'; $('fPhase').value = 'all'; $('fStatus').value = 'all';
+    $('fCohort').value = 'all'; $('fProgram').value = 'all'; $('fAdvisor').value = 'all'; $('fCcm').value = 'all';
+    $('fPhase').value = 'all'; $('fStatus').value = 'all';
     $('fDomain').value = 'knowledge'; $('fSearch').value = '';
     $('studentView').hidden = true; $('cohortView').hidden = false;
     renderAll();
