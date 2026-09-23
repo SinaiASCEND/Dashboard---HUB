@@ -441,6 +441,12 @@ const DASHBOARDS = {
     title: "ASCEND Programmatic Assessment \u2014 Phase 3",
     blurb: "Module and Clerkship Director dashboards for the Integration and Transitions phase \u2014 Chronic Care Clerkship, acting internships, and the transition modules \u2014 reporting cohort outcomes, assessment quality, and evaluations by academic year."
   },
+  studentperf: {
+    url: "./Student_Performance.html",
+    kicker: "De-identified Student Data",
+    title: "ASCEND Student Performance Dashboard",
+    blurb: "De-identified student-level performance across all three phases \u2014 module quizzes, NBME customized assessments, OSCE and clinical-skills evaluations, and shelf exams \u2014 with a class roster, a rotation schedule and full record per student code, and review flags. Coded education records; the code key is held separately."
+  },
   sitecomp2526: {
     url: "./Site_Comparability_2025-26.html",
     kicker: "Site Comparability \u00b7 AY 2025\u201326",
@@ -489,6 +495,13 @@ const TIERS = {
     name: "Clinical Competency Mentors",
     sub: "Clinical competency, physical examination, and office resources.",
     dashboards: ["curricularaffairs","babybates","clinicalcompetency","job","directors"]
+  },
+  "b9b2b6f01aa767c022763ca563e0882c08635da21f2519dc7b02564aaf0aa9ba": {  // Tier 8
+    /* Student-level records sit behind their own access code and are reachable
+       from no other tier. Holding a code for another tier grants nothing here. */
+    name: "De-identified Student Data",
+    sub: "Student-level performance across all three phases, by student code. Names are held in a separate key.",
+    dashboards: ["studentperf"]
   },
   "4ed5cb948f5f7c10d66e38ed679d0e5f0be24469df2de636c2da893d5b06ecb3": {  // Tier 7
     name: "Curricular Integration Subcommittee",

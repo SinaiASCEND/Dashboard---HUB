@@ -1,0 +1,9 @@
+student_code,cohort,phase,career_advisor,ccm,advising_group,class_photo_url,seq,block_code,block_name,term,site,start_date,end_date,status,result,assessment_type,assessment_label,score,percentile,national_mean,cohort_mean,comment,domain:History taking,domain:Physical examination,domain:Communication,domain:Clinical reasoning,domain:Documentation & presentation,domain:Professionalism,domain:Patient education & counseling
+ASC-2028-014,2028,1,"A. Whitfield, MD","S. Devereux, MD",AG-03,,1,CVS,Cardiovascular,Winter Y1,,2025-01-06,2025-02-14,completed,Pass,quiz,Quiz 1,88,,,84,,,,,,,,
+ASC-2028-014,2028,1,"A. Whitfield, MD","S. Devereux, MD",AG-03,,1,CVS,Cardiovascular,Winter Y1,,2025-01-06,2025-02-14,completed,Pass,quiz,Quiz 2,81,,,84,,,,,,,,
+ASC-2028-014,2028,1,"A. Whitfield, MD","S. Devereux, MD",AG-03,,1,CVS,Cardiovascular,Winter Y1,,2025-01-06,2025-02-14,completed,Pass,cas,NBME Module CAS,76,68,72,74,,,,,,,,
+ASC-2028-014,2028,2,"A. Whitfield, MD","S. Devereux, MD",AG-03,,2,IM,Internal Medicine,Block 1,Mount Sinai Hospital,2026-02-02,2026-03-13,completed,Pass,cas,NBME Subject Exam (shelf),79,63,75,78,,,,,,,,
+ASC-2028-014,2028,2,"A. Whitfield, MD","S. Devereux, MD",AG-03,,2,IM,Internal Medicine,Block 1,Mount Sinai Hospital,2026-02-02,2026-03-13,completed,Pass,eval,Internal Medicine,4.2,71,,4.15,"Solid, reliable performance. Presentations improved steadily over the block.",4.3,4.0,4.4,4.1,4.2,4.5,4.1
+ASC-2028-014,2028,2,"A. Whitfield, MD","S. Devereux, MD",AG-03,,3,SUR,Surgery,Block 2,Mount Sinai West,2026-03-16,2026-04-24,completed,Pass,osce,Phase 2 Mid-point CPX,84,58,,82,,86,79,88,82,80,90,83
+ASC-2028-014,2028,2,"A. Whitfield, MD","S. Devereux, MD",AG-03,,4,PED,Pediatrics,Block 3,Elmhurst Hospital Center,2026-09-14,2026-10-23,in progress,In progress,,,,,,,,,,,,,,
+ASC-2028-014,2028,2,"A. Whitfield, MD","S. Devereux, MD",AG-03,,5,PSY,Psychiatry,Block 4,Mount Sinai Morningside,2026-10-26,2026-12-04,scheduled,Scheduled,,,,,,,,,,,,,,
