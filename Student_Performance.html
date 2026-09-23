@@ -635,7 +635,6 @@ body.gated{overflow:hidden}
     <div class="field">
       <label for="fDomain">Emphasis</label>
       <select id="fDomain">
-        <option value="overall">Overall performance</option>
         <option value="knowledge">Medical knowledge</option>
         <option value="skills">Clinical skills</option>
       </select>
@@ -694,10 +693,13 @@ body.gated{overflow:hidden}
           <div class="kicker">Roster</div>
           <h2 id="rosterTitle">Students</h2>
           <p class="why">Select a student to open their full assessment record. Sort any column by
-            clicking its header. <strong>Standing is relative to the class</strong> &mdash; a share of
-            every cohort sits below the 25th percentile by construction, so these bands are a prompt
-            to look, not a determination. A failed block, a remediation, or a clinical evaluation
-            below 3.0 is what makes a standing absolute.</p>
+            clicking its header. <strong>Medical knowledge and clinical skills are judged
+            separately</strong>, never blended into one score: a student is expected to meet the
+            standard in each, and either domain below the 25th percentile is a Monitor, below the
+            10th an Academic concern. <strong>Standing is relative to the class</strong> &mdash; a
+            share of every cohort sits below the 25th percentile by construction, so these bands
+            are a prompt to look, not a determination. A failed block, a remediation, or a clinical
+            evaluation below 3.0 is what makes a standing absolute.</p>
         </div>
       </div>
       <div class="cardbody">
@@ -1172,8 +1174,10 @@ function casPcts(rec){ return casList(rec).map(c => c.percentile).filter(v => v 
 function isClerkshipRec(rec){ return rec.kind === 'clerkship' || rec.phase === 2 }
 function nbmeKey(rec){ return isClerkshipRec(rec) ? 'shelf' : 'cas' }
 function examName(label){ return String(label || '').replace(/\s*\(retake\)\s*$/i, '') }
-/* knowledge / skills / overall percentile from a set of records - the whole
-   record, or one phase of it */
+/* knowledge and skills percentile from a set of records - the whole record,
+   or one phase of it. The two are never blended into one number: a student
+   is expected to meet the standard in each domain, and strength in one does
+   not offset weakness in the other. */
 function standings(recs){
   const know = [], skill = [];
   recs.forEach(rec => {
@@ -1186,8 +1190,7 @@ function standings(recs){
   });
   const k = know.length ? Math.round(mean(know)) : null;
   const sk = skill.length ? Math.round(mean(skill)) : null;
-  return {knowledge: k, skills: sk, n: know.length + skill.length,
-          overall: k == null ? sk : sk == null ? k : Math.round(0.6*k + 0.4*sk)};
+  return {knowledge: k, skills: sk, n: know.length + skill.length};
 }
 /* One number per block, for the trajectory: a block plots one point, so two
    proctored exams in the same block average. Every individual result stays
@@ -1298,7 +1301,6 @@ function hydrate(data){
     const all = standings(recs);
     s.knowledgePct = all.knowledge;
     s.skillsPct    = all.skills;
-    s.overallPct   = all.overall;
     /* the same, phase by phase: the class view filtered to a phase reads
        only that phase's assessments */
     s.byPhase = {};
@@ -1433,8 +1435,8 @@ function buildFlags(s){
       ' below the 10th percentile',
       why: lowOsce.map(r => r.code + ' (' + r.osce.pct + '%)').join(', ') + '.'});
 
-  /* A weighted overall hides a student who is fine on one axis and sinking on
-     the other, so each axis is also checked on its own. */
+  /* Each domain is checked on its own: a student fine on one axis and sinking
+     on the other is exactly who this should surface. */
   const axis = (v, name, source) => {
     if(v == null || v >= WATCH_PCTILE) return;
     out.push({level: v < CONCERN_PCTILE ? 'crit' : 'watch',
@@ -1462,18 +1464,20 @@ function buildFlags(s){
   return out;
 }
 
-/* "Academic concern" is reserved for absolute triggers - a failed block, a
-   clinical evaluation below the 3.0 expectation, or an overall standing in the
-   bottom decile. A collapse on a single axis is a Monitor, and arrives with a
-   flag of its own, because strong performance on the other axis is real too. */
+/* Standing is judged domain by domain, never on a blended number.
+   "Academic concern": an absolute trigger - a failed block or a clinical
+   evaluation below the 3.0 expectation - or either domain in the bottom
+   decile of the class. "Monitor": a pass with remediation, or either domain
+   below the 25th percentile. Strong performance in the other domain is real,
+   and stays visible beside the flag, but does not cancel it. */
 function standingOf(s){
   const recs = s.records || [];
+  const domains = [s.knowledgePct, s.skillsPct].filter(v => v != null);
   const absolute = recs.some(r => r.result === 'Fail') ||
                    recs.some(r => r.eval && r.eval.overall != null && r.eval.overall < 3.0);
-  if(absolute || (s.overallPct != null && s.overallPct < CONCERN_PCTILE)) return 'concern';
-  const singleAxis = [s.knowledgePct, s.skillsPct].some(v => v != null && v < CONCERN_PCTILE);
+  if(absolute || domains.some(v => v < CONCERN_PCTILE)) return 'concern';
   const remediated = recs.some(r => r.result === 'Pass with remediation');
-  if(remediated || singleAxis || (s.overallPct != null && s.overallPct < WATCH_PCTILE)) return 'watch';
+  if(remediated || domains.some(v => v < WATCH_PCTILE)) return 'watch';
   return 'ok';
 }
 
@@ -1634,8 +1638,8 @@ let TYPE_META = [{key:'q:Quiz', label:'Quiz', short:'Quiz', varName:'--s1'}].con
    ============================================================================ */
 let DATA = hydrate(buildSampleData());
 const state = {
-  cohort:'all', phase:'all', standing:'all', emphasis:'overall', q:'',
-  sort:{key:'overall', dir:'desc'}, student:null
+  cohort:'all', phase:'all', standing:'all', emphasis:'knowledge', q:'',
+  sort:{key:'knowledge', dir:'desc'}, student:null
 };
 const $ = id => document.getElementById(id);
 
@@ -1643,13 +1647,13 @@ const $ = id => document.getElementById(id);
    the class view holds the students who have assessments in that phase and
    reads every standing - tiles, both graphs, roster - from that phase's
    assessments alone. */
-const NO_STANDING = {knowledge:null, skills:null, overall:null};
+const NO_STANDING = {knowledge:null, skills:null};
 function stand(s){
   if(state.phase === 'all')
-    return {knowledge:s.knowledgePct, skills:s.skillsPct, overall:s.overallPct};
+    return {knowledge:s.knowledgePct, skills:s.skillsPct};
   return (s.byPhase && s.byPhase[state.phase]) || NO_STANDING;
 }
-const kOf = s => stand(s).knowledge, skOf = s => stand(s).skills, ovOf = s => stand(s).overall;
+const kOf = s => stand(s).knowledge, skOf = s => stand(s).skills;
 function inPhase(rec){ return state.phase === 'all' || String(rec.phase) === state.phase }
 
 function filtered(){
@@ -1664,11 +1668,9 @@ function filtered(){
 }
 /* The emphasis filter chooses which standing the roster and tiles lead with. */
 function leadPct(s){
-  return state.emphasis === 'knowledge' ? kOf(s)
-       : state.emphasis === 'skills'    ? skOf(s)
-       : ovOf(s);
+  return state.emphasis === 'skills' ? skOf(s) : kOf(s);
 }
-const EMPH_LABEL = {overall:'Overall', knowledge:'Medical knowledge', skills:'Clinical skills'};
+const EMPH_LABEL = {knowledge:'Medical knowledge', skills:'Clinical skills'};
 
 /* ---------------- KPI row ---------------- */
 function renderKpis(list){
@@ -1679,11 +1681,11 @@ function renderKpis(list){
   const sk = median(list.map(skOf).filter(v=>v!=null));
   const tiles = [
     {lab:'Students in view', val: list.length, note: describeFilter()},
-    {lab:'Median medical knowledge', val: k==null?'—':Math.round(k), unit: k==null ? '' : 'th pct',
+    {lab:'Median medical knowledge', val: k==null?'—':Math.round(k), unit: k==null ? '' : pctUnit(Math.round(k)),
      note: state.phase === '2' ? 'Across clerkship NBME subject and customized exams.'
          : state.phase === '1' ? 'Across module NBME CAS exams and module quizzes.'
          : 'Across NBME exams (module CAS and clerkship) and module quizzes.'},
-    {lab:'Median clinical skills', val: sk==null?'—':Math.round(sk), unit: sk==null ? '' : 'th pct',
+    {lab:'Median clinical skills', val: sk==null?'—':Math.round(sk), unit: sk==null ? '' : pctUnit(Math.round(sk)),
      note: sk==null && state.phase !== 'all' ? 'No OSCE or clinical evaluation on record for this phase yet.'
          : 'Across OSCE performance and clinical evaluations.'},
     {lab:'Flagged for review', val: conc + watch,
@@ -1942,7 +1944,6 @@ const ROSTER_COLS = [
   {key:'done',      label:'Blocks done', num:true},
   {key:'knowledge', label:'Medical knowledge'},
   {key:'skills',    label:'Clinical skills'},
-  {key:'overall',   label:'Overall'},
   {key:'standing',  label:'Standing'},
   {key:'open',      label:''}
 ];
@@ -1953,7 +1954,6 @@ const SORT_VAL = {
   done: s => s.completed,
   knowledge: s => kOf(s) == null ? -1 : kOf(s),
   skills: s => skOf(s) == null ? -1 : skOf(s),
-  overall: s => ovOf(s) == null ? -1 : ovOf(s),
   standing: s => ({concern:0, watch:1, ok:2})[s.status]
 };
 function meterCell(v){
@@ -1999,7 +1999,7 @@ function resultChip(result){
 
 function renderRoster(){
   const list = filtered().slice();
-  const get = SORT_VAL[state.sort.key] || SORT_VAL.overall;
+  const get = SORT_VAL[state.sort.key] || SORT_VAL.knowledge;
   list.sort((a,b) => {
     const x = get(a), y = get(b);
     const c = x < y ? -1 : x > y ? 1 : 0;
@@ -2050,7 +2050,6 @@ function renderRoster(){
     const c4 = document.createElement('td'); c4.className = 'num'; c4.textContent = s.completed; cells.push(c4);
     const c5 = document.createElement('td'); c5.appendChild(meterCell(kOf(s))); cells.push(c5);
     const c6 = document.createElement('td'); c6.appendChild(meterCell(skOf(s))); cells.push(c6);
-    const c7 = document.createElement('td'); c7.appendChild(meterCell(ovOf(s))); cells.push(c7);
     const c8 = document.createElement('td'); c8.appendChild(chipFor(s.status)); cells.push(c8);
     const c9 = document.createElement('td'); c9.className = 'opencell'; c9.textContent = 'Open →'; cells.push(c9);
 
@@ -2064,7 +2063,7 @@ function renderRoster(){
   $('rosterTable').hidden = list.length === 0;
   $('rosterTitle').textContent = list.length + (list.length === 1 ? ' student' : ' students')
     + ' — ' + describeFilter() + ' · sorted by ' +
-    (ROSTER_COLS.find(c=>c.key===state.sort.key)||{label:'Overall'}).label.toLowerCase();
+    (ROSTER_COLS.find(c=>c.key===state.sort.key)||{label:'Medical knowledge'}).label.toLowerCase();
 }
 
 /* ============================================================================
@@ -2130,6 +2129,8 @@ function deltaOf(series){
   return Math.round(mean(series.slice(-half)) - mean(series.slice(0, half)));
 }
 
+/* "42nd pct", not "42th pct": the ordinal suffix that goes with a percentile */
+function pctUnit(v){ return v == null ? '' : ord(v).slice(String(v).length) + ' pct' }
 function studentTiles(host, s){
   const kSeries = trendSeries(s, ['quiz','cas','shelf']);
   const sSeries = trendSeries(s, ['osce','eval']);
@@ -2137,12 +2138,12 @@ function studentTiles(host, s){
   const openFlags = (s.flags||[]).filter(f => f.level !== 'info').length;
 
   const tiles = [
-    {lab:'Medical knowledge', val: s.knowledgePct, unit:'th pct', delta:kD,
+    {lab:'Medical knowledge', val: s.knowledgePct, unit: pctUnit(s.knowledgePct), delta:kD,
      series:kSeries, accent:cssv('--s2'),
-     note:'NBME assessments and module quizzes'},
-    {lab:'Clinical skills', val: s.skillsPct, unit:'th pct', delta:sD,
+     note:'Within the Class of ' + s.cohort + ' · NBME exams and module quizzes'},
+    {lab:'Clinical skills', val: s.skillsPct, unit: pctUnit(s.skillsPct), delta:sD,
      series:sSeries, accent:cssv('--s4'),
-     note:'OSCE and clinical evaluations'},
+     note:'Within the Class of ' + s.cohort + ' · OSCEs and clinical evaluations'},
     {lab:'Blocks completed', val: s.completed,
      note: s.upcoming ? s.upcoming + ' still scheduled' : 'Nothing left on the schedule'},
     {lab:'Items needing attention', val: openFlags,
@@ -3065,17 +3066,8 @@ function renderStudent(s){
   chartAndTable(schedBody, 'schedChart', 'schedTable');
   renderSchedule($('schedChart'), s);
 
-  const perfBody = makeCard(host, 'Performance', 'Overall standing', null, null);
-  const hero = elc('div','hero');
-  const fig = elc('div','fig', s.overallPct == null ? '\u2014' : s.overallPct);
-  if(s.overallPct != null) fig.appendChild(elc('span','u','th percentile'));
-  hero.appendChild(fig);
-  hero.appendChild(elc('div','cap',
-    'Standing in the Class of ' + s.cohort + ', weighting medical knowledge 60% and ' +
-    'clinical skills 40% across every assessment on record. Relative to the class, ' +
-    'not an absolute standard.'));
-  perfBody.appendChild(hero);
-
+  /* Standing is shown domain by domain - medical knowledge and clinical
+     skills each on its own tile below - never blended into one number. */
   studentTiles(host, s);
 
   const trajBody = makeCard(host, 'Trajectory',
@@ -3341,8 +3333,7 @@ function init(){
   /* Emphasis also decides which column the roster leads with. */
   $('fDomain').addEventListener('change', e => {
     state.emphasis = e.target.value;
-    state.sort = {key: state.emphasis === 'knowledge' ? 'knowledge'
-                     : state.emphasis === 'skills' ? 'skills' : 'overall', dir:'desc'};
+    state.sort = {key: state.emphasis === 'skills' ? 'skills' : 'knowledge', dir:'desc'};
     state.student = null;
     setFiltersVisible(true);
     renderAll();
@@ -3355,10 +3346,10 @@ function init(){
   });
   $('fClear').addEventListener('click', () => {
     state.cohort = 'all'; state.phase = 'all'; state.standing = 'all';
-    state.emphasis = 'overall'; state.q = ''; state.student = null;
-    state.sort = {key:'overall', dir:'desc'};
+    state.emphasis = 'knowledge'; state.q = ''; state.student = null;
+    state.sort = {key:'knowledge', dir:'desc'};
     $('fCohort').value = 'all'; $('fPhase').value = 'all'; $('fStatus').value = 'all';
-    $('fDomain').value = 'overall'; $('fSearch').value = '';
+    $('fDomain').value = 'knowledge'; $('fSearch').value = '';
     $('studentView').hidden = true; $('cohortView').hidden = false;
     renderAll();
   });
