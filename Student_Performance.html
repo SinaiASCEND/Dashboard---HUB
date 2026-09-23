@@ -758,6 +758,10 @@ body.gated{overflow:hidden}
    Record = {
      seq,                         // academic order; drives the trajectory charts
      phase, kind,                 // kind: "module" | "clerkship" | "transition"
+                                  //   | "course" - a course that runs alongside
+                                  //   the blocks for a whole term (Practice of
+                                  //   Medicine); it gets its own schedule row
+                                  //   and is never the "block in progress"
      code, name, term,
      site,                        // clerkship training site (optional)
      start, end,                  // ISO dates - these drive the rotation schedule
@@ -1237,7 +1241,7 @@ function hydrate(data){
     const recs = s.records || [];
     /* Where the student is right now comes from the schedule, not a stored
        field, so the phase shown can never drift from the blocks on record. */
-    s.current   = recs.find(r => r.status === 'in progress') || null;
+    s.current   = recs.find(r => r.status === 'in progress' && r.kind !== 'course') || null;
     s.completed = recs.filter(r => r.status === 'completed').length;
     s.upcoming  = recs.filter(r => r.status === 'scheduled').length;
     if(s.phase == null)
@@ -2285,17 +2289,29 @@ function renderSchedule(host, s){
      on a shared calendar axis; a phase takes a second lane only where two of
      its blocks genuinely overlap. A whole curriculum then fits in a few short
      rows instead of twenty-odd. Each bar carries its code when the code fits;
-     name, dates and site are on hover, and every block is in the table view. */
+     name, dates and site are on hover, and every block is in the table view.
+     Courses that run alongside the blocks all term (kind "course", e.g. POM)
+     take a row of their own under their phase, labelled by the course. */
   const T = d => new Date(d).getTime();
-  const lanes = [];
+  const courseName = r => String(r.code).replace(/\s*\d+$/, '');
+  const groups = [];
   [...new Set(recs.map(r => r.phase || 0))].sort((a,b) => a - b).forEach(ph => {
+    const inPhase = recs.filter(r => (r.phase || 0) === ph);
+    groups.push({phase: ph, label: ph ? 'Phase ' + ph : '—', recs: inPhase.filter(r => r.kind !== 'course')});
+    [...new Set(inPhase.filter(r => r.kind === 'course').map(courseName))].forEach(c =>
+      groups.push({phase: ph, label: c, course: true,
+                   recs: inPhase.filter(r => r.kind === 'course' && courseName(r) === c)}));
+  });
+  const lanes = [];
+  groups.filter(g => g.recs.length).forEach(g => {
     const packed = [];
-    recs.filter(r => (r.phase || 0) === ph).forEach(r => {
+    g.recs.forEach(r => {
       const lane = packed.find(l => l.end <= T(r.start));
       if(lane){ lane.recs.push(r); lane.end = T(r.end) }
       else packed.push({end: T(r.end), recs: [r]});
     });
-    packed.forEach((l, i) => lanes.push({phase: ph, first: i === 0, recs: l.recs}));
+    /* a course row sits tight under its phase; a new phase starts a new group */
+    packed.forEach((l, i) => lanes.push({label: g.label, first: i === 0, course: !!g.course, recs: l.recs}));
   });
 
   const W = widthOf(host);
@@ -2304,7 +2320,7 @@ function renderSchedule(host, s){
   const m = {t:22, r:12, b:24, l:labelW};
   const laneY = [];
   let yy = m.t;
-  lanes.forEach((ln, i) => { if(i && ln.first) yy += groupGap; laneY.push(yy); yy += laneH });
+  lanes.forEach((ln, i) => { if(i && ln.first && !ln.course) yy += groupGap; laneY.push(yy); yy += laneH });
   const bottom = yy, H = bottom + m.b;
   const pw = W - m.l - m.r;
   const t0 = T(recs[0].start);
@@ -2341,8 +2357,7 @@ function renderSchedule(host, s){
   lanes.forEach((ln, i) => {
     const by = laneY[i] + (laneH - bh)/2;
     if(ln.first)
-      add(svg,'text',{x:m.l-8,y:by+bh/2+4,'text-anchor':'end',class:'dlab'},
-        ln.phase ? 'Phase ' + ln.phase : '—');
+      add(svg,'text',{x:m.l-8,y:by+bh/2+4,'text-anchor':'end',class:'dlab'}, ln.label);
     ln.recs.forEach(rec => {
       const st = SCHED_STYLE[rec.status] || SCHED_STYLE['scheduled'];
       const color = cssv(st.varName);
@@ -2826,7 +2841,8 @@ function renderStudent(s){
 
   const schedBody = makeCard(host, 'Rotation schedule',
     'Where this student has been and where they are going',
-    'Every module, clerkship, and transition course on one calendar, a lane per phase. ' +
+    'Every module, clerkship, and transition course on one calendar, a lane per phase, ' +
+    'with Practice of Medicine on its own row beneath the modules it runs alongside. ' +
     'The accent bar is the block in progress today; the pale bars are still ahead. ' +
     'Hover a block for its name and dates, or open the table view for the full list.', 'schedTable');
   chartAndTable(schedBody, 'schedChart', 'schedTable');
@@ -3001,7 +3017,7 @@ function csvToData(text){
         (start && end ? statusOn(start, end, CSV_AS_OF) : 'completed');
       rec = {seq: num(get('seq')) || s.records.length + 1,
         phase: num(get('phase')) || s.phase || 1,
-        kind: 'module', code, name: get('block_name') || code, term: get('term') || '',
+        kind: get('kind') || 'module', code, name: get('block_name') || code, term: get('term') || '',
         site: get('site') || '', start, end, status,
         result: get('result') || RESULT_BY_STATUS[status] || 'Pass',
         quizzes: null, cas: null, osce: null, eval: null};
