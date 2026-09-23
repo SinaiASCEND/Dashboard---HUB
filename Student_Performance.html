@@ -1857,6 +1857,11 @@ function renderKnowledgeStrip(host, list){
 }
 
 /* ---------------- class median by assessment type ---------------- */
+/* Kinds left out of the class summary. Practicals were run for one class's
+   Anatomy and Pathology modules and then discontinued (22 Sep 2026), so a
+   class median for them says nothing about the curriculum now. They stay on
+   each student's own record, trajectory and block matrix. */
+const SUMMARY_HIDE = new Set(['q:Practical']);
 /* One measure across four categories. The hue is the assessment type's fixed
    identity colour - the same one it wears in the student trajectory panels -
    never a ramp on the value. Every bar is labelled, and a table twin carries
@@ -1878,7 +1883,7 @@ function renderTypeChart(){
   const host = $('typeChart'); host.textContent = '';
   const list = filtered();
   const buckets = typePercentiles(list);
-  let rows = TYPE_META.map(t => ({...t, n: buckets[t.key].length,
+  let rows = TYPE_META.filter(t => !SUMMARY_HIDE.has(t.key)).map(t => ({...t, n: buckets[t.key].length,
     med: median(buckets[t.key]), color: cssv(t.varName)})).filter(r => r.n);
   /* the clerkship exams are one type, but in the Phase 2 lens each subject
      gets its own bar beneath it - the question there is "which clerkship" */
