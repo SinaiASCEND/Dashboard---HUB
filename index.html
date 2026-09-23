@@ -501,7 +501,8 @@ const TIERS = {
        from no other tier. Holding a code for another tier grants nothing here. */
     name: "De-identified Student Data",
     sub: "Student-level performance across all three phases, by student code. Names are held in a separate key.",
-    dashboards: ["studentperf"]
+    dashboards: ["studentperf"],
+    open: "studentperf"     // one dashboard: go straight to it after the code
   },
   "4ed5cb948f5f7c10d66e38ed679d0e5f0be24469df2de636c2da893d5b06ecb3": {  // Tier 7
     name: "Curricular Integration Subcommittee",
@@ -559,6 +560,7 @@ function tryUnlock(){
   }
   pwErr.classList.remove('show');
   try { sessionStorage.setItem('ascendTier', h); } catch(e){}
+  if(tier.open && DASHBOARDS[tier.open]){ window.location.href = DASHBOARDS[tier.open].url; return; }
   renderTier(tier);
   gate.classList.add('hidden');
   hub.classList.add('active');
