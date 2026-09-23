@@ -248,11 +248,16 @@ main{padding-bottom:44px}
 /* De-identified: a photo, the student code, and where they are in the
    curriculum. No name appears anywhere on this page - the code-to-student
    key is held separately. */
-.idcard{display:block}
-.idmeta{min-width:230px}
-/* A class-level link, never a portrait: a group photograph of a cohort cannot
-   say which code belongs to which face, so it carries no re-identification
-   that the separate key does not already hold. */
+.idcard{display:flex;gap:20px;align-items:flex-start}
+.idmeta{min-width:230px;flex:1 1 auto}
+/* the student's photo: shown only after the viewer loads the photo folder
+   for this session - the page never carries one */
+.idphoto{flex:0 0 auto;width:124px;height:124px;border-radius:12px;object-fit:cover;
+  border:1px solid var(--line);background:var(--surface-2)}
+.idphoto.empty{display:flex;align-items:center;justify-content:center;text-align:center;
+  padding:10px;font-size:11.5px;line-height:1.35;color:var(--muted)}
+@media (max-width:560px){.idcard{flex-direction:column}}
+/* The row that once linked a class picture now holds the code lookup only. */
 .classlink{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px;
   font-size:13px}
 .classlink a{color:var(--magenta);font-weight:700;text-decoration:none}
@@ -580,6 +585,7 @@ body.gated{overflow:hidden}
         <img class="mastlogo" id="mastLogo" alt="ASCEND Curriculum" src="">
         <div class="mastactions">
           <button class="ghost" id="loadBtn" type="button">Load data file</button>
+          <button class="ghost" id="photoBtn" type="button">Load photos</button>
           <button class="ghost" id="themeBtn" type="button" aria-pressed="false">Dark mode</button>
           <button class="ghost" id="printBtn" type="button">Print / PDF</button>
         </div>
@@ -600,7 +606,8 @@ body.gated{overflow:hidden}
     <div class="notice ferpa">
       <span class="ic" aria-hidden="true">&#128274;</span>
       <span><strong>Coded education records.</strong> Students appear by code only &mdash; no names and
-        no portraits are held in or shown by this dashboard. The code-to-student key is kept separately by the Office
+        no portraits are held in this dashboard. A photo appears only after you load the Office&rsquo;s
+        photo folder for this session, and is discarded when the page closes. The code-to-student key is kept separately by the Office
         of Curricular Affairs. Because that key exists these records are still re-identifiable and
         remain protected under FERPA: open only the students you have a legitimate educational
         interest in, never pair this page with the key in a shared channel, and do not leave it open
@@ -726,6 +733,7 @@ body.gated{overflow:hidden}
 
 <div class="tip" id="tip" aria-hidden="true"></div>
 <input type="file" id="fileInput" accept=".json,.csv,application/json,text/csv" hidden>
+<input type="file" id="photoInput" accept="image/*" webkitdirectory multiple hidden>
 <script>
 /* ============================================================================
    ASCEND STUDENT PERFORMANCE DASHBOARD
@@ -754,10 +762,11 @@ body.gated{overflow:hidden}
    names them; the code-to-student key is held separately and never loaded
    here - re-identification happens through meta.lookupUrl, by leaving this
    page for a system that can decide whether you are allowed. Do not add a
-   name field, and do not add a portrait - the page will render neither. A face identifies a person outright, which is the one
-   thing the coding exists to prevent. The card links to the cohort's class
-   picture instead: a class-level resource that identifies nobody in
-   particular.
+   name field - the page will not render one. A face identifies a person
+   outright, so no portrait travels in the data either: a photo is shown only
+   when the viewer loads the Office's photo folder (one <code>.jpg per
+   student, Confidential only) with "Load photos", held in memory for that
+   session and never written anywhere.
 
    Student = {
      id,                          // the de-identified student code, e.g. "ASC-2028-014"
@@ -2193,10 +2202,9 @@ function studentTiles(host, s){
 const PHASE_LABEL = {1:'Phase 1 · Pre-clerkship', 2:'Phase 2 · Clerkships',
                      3:'Phase 3 · Integration & Transitions'};
 
-/* No portrait sits on this record. A face identifies a person outright, which
-   is the one thing the coding is there to prevent, so the card links to the
-   cohort's class picture instead - a class-level resource that identifies
-   nobody in particular. */
+/* No portrait travels with this record. A face identifies a person outright,
+   so a photo is shown only from the folder the viewer loads for the session
+   (see PHOTOS / photoSlot), never from the data. */
 /* ---------------------------------------------------------------------------
    RE-IDENTIFICATION
    The code-to-student key never lives here. What lives here is a doorway to
@@ -2300,38 +2308,43 @@ function lookupButton(s){
    To change it: uppercase the new code, hash it, replace this value. */
 const LOOKUP_HASH = '28f1339ffc323de47879d9c7d6ec761f8bd4737841daa5c0acb7ab4d6f3ab5e6';
 
-function classPictureLink(s){
-  const map = (DATA.meta && DATA.meta.classPhotos) || {};
-  const raw = s.classPhotoUrl || map[s.cohort] || map[String(s.cohort)] || '';
-  const url = /^https?:\/\//i.test(String(raw)) ? String(raw) : '';   /* http(s) only */
-  const row = elc('div','classlink');
-  /* drawn rather than an emoji - the picture-frame glyph is tofu wherever no
-     emoji font is installed */
-  const ic = sv('svg',{width:'15',height:'15',viewBox:'0 0 16 16','aria-hidden':'true'});
-  ic.setAttribute('class','ic');
-  add(ic,'rect',{x:1.5,y:2.5,width:13,height:11,rx:1.8,fill:'none',
-    stroke:'currentColor','stroke-width':1.3});
-  add(ic,'circle',{cx:5.6,cy:6.4,r:1.2,fill:'currentColor'});
-  add(ic,'path',{d:'M2.6 12 6.4 8.4l2.3 2.2 2.4-2.6 2.3 4',fill:'none',
-    stroke:'currentColor','stroke-width':1.3,'stroke-linejoin':'round'});
-  row.appendChild(ic);
+/* Student photos live in a folder the viewer picks with "Load photos" - one
+   image per file, named by the code (ASC-2028-014.jpg). They are held as
+   in-memory object URLs for this session only: the page carries none, the
+   loaded data carries none, and nothing is written anywhere. Pairing a face
+   with a code re-identifies the student, so that folder belongs with the
+   name key in the Confidential library and nowhere else. */
+const PHOTOS = {};
+function adoptPhotos(files){
+  Object.values(PHOTOS).forEach(u => URL.revokeObjectURL(u));
+  Object.keys(PHOTOS).forEach(k => delete PHOTOS[k]);
+  let n = 0;
+  [...files].forEach(f => {
+    if(!/^image\//.test(f.type)) return;
+    const code = f.name.replace(/\.[^.]+$/, '').trim().toUpperCase();
+    if(!code) return;
+    PHOTOS[code] = URL.createObjectURL(f); n++;
+  });
+  const b = $('photoBtn');
+  if(b) b.textContent = n ? 'Photos loaded (' + n + ')' : 'Load photos';
+  renderAll();
+  return n;
+}
+function photoSlot(s){
+  const url = PHOTOS[String(s.id).toUpperCase()];
   if(url){
-    const a = document.createElement('a');
-    a.href = url;
-    a.target = '_blank';
-    a.rel = 'noopener noreferrer';
-    a.textContent = 'Class of ' + s.cohort + ' class picture';
-    a.title = 'Opens the cohort class picture in a new tab. It is a class-level ' +
-              'resource and does not say which student this code belongs to.';
-    row.appendChild(a);
-    row.appendChild(elc('span','off','\u2197'));
-  } else {
-    const off = elc('span','off', 'Class of ' + s.cohort + ' class picture \u2014 no link set');
-    off.title = 'Set meta.classPhotos["' + s.cohort + '"] in the loaded data to the ' +
-                'cohort class picture URL.';
-    row.appendChild(off);
+    const img = document.createElement('img');
+    img.className = 'idphoto';
+    img.src = url;
+    img.alt = 'Photo of student ' + s.id;
+    return img;
   }
-  return row;
+  const box = elc('div','idphoto empty', Object.keys(PHOTOS).length
+    ? 'No photo for this code in the loaded folder'
+    : 'No photo loaded \u2014 use Load photos');
+  box.setAttribute('role','img');
+  box.setAttribute('aria-label','No photo loaded for ' + s.id);
+  return box;
 }
 
 function fact(dl, label, value){
@@ -2385,10 +2398,10 @@ function studentHeader(host, s){
     now.appendChild(elc('span','wk','Not in a scheduled block on ' + fmtDate(asOfDate())));
   }
   meta.appendChild(now);
-  const links = classPictureLink(s);
-  links.appendChild(elc('span','sep','\u00b7'));
+  const links = elc('div','classlink');
   links.appendChild(lookupButton(s));
   meta.appendChild(links);
+  row.appendChild(photoSlot(s));
   row.appendChild(meta);
   body.appendChild(row);
 }
@@ -3370,6 +3383,14 @@ function init(){
 
   $('printBtn').addEventListener('click', () => window.print());
   $('loadBtn').addEventListener('click', () => $('fileInput').click());
+  /* a folder of <code>.jpg photos, kept in memory for this session only */
+  $('photoBtn').addEventListener('click', () => $('photoInput').click());
+  $('photoInput').addEventListener('change', e => {
+    const n = adoptPhotos(e.target.files || []);
+    if(!n) alert('No images were found in that folder.\n\nExpected one image per student, named by ' +
+                 'code, e.g. ASC-2028-014.jpg, as written by pipeline/student_photos.py.');
+    e.target.value = '';
+  });
   $('fileInput').addEventListener('change', e => {
     const f = e.target.files && e.target.files[0]; if(!f) return;
     const fr = new FileReader();
