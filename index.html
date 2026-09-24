@@ -369,11 +369,11 @@ const DASHBOARDS = {
     title: "Electives/NEXUS Catalog Explorer",
     blurb: "Browse medical student electives and NEXUS Learning offerings \u2014 filter by field, Area of Concentration, and schedule to support career exploration."
   },
-  asqisa: {
-    url: "https://sinaiascend.github.io/ASQ-ISA/",
-    kicker: "Student Feedback",
-    title: "ASQ & ISA Dashboard",
-    blurb: "ASCEND Student Questionnaire and Independent Student Analysis results \u2014 student feedback trends to support program monitoring and accreditation."
+  surveysbenchmarks: {
+    url: "https://sinaiascend.github.io/Surveys-Benchmarks/",
+    kicker: "Student Feedback \u00b7 National Benchmarking",
+    title: "Surveys & Benchmarks",
+    blurb: "AAMC Graduation Questionnaire, ASQ/ISA, and AAMC Curriculum SCOPE in one place \u2014 what graduating and current students report, and how the curriculum compares nationally, for program monitoring and accreditation."
   },
   phase1map: {
     url: "https://sinaiascend.github.io/PMB-MLOs/",
@@ -392,18 +392,6 @@ const DASHBOARDS = {
     kicker: "Policies",
     title: "ASCEND Policy Library",
     blurb: "The central library of approved curricular and student policies \u2014 searchable, versioned, and organized for quick reference."
-  },
-  aamcscope: {
-    url: "https://sinaiascend.github.io/AAMC-SCOPE/",
-    kicker: "National Benchmarking",
-    title: "AAMC Curriculum SCOPE Reports",
-    blurb: "National undergraduate medical curriculum data \u2014 three years of the AAMC Curriculum SCOPE Survey plus topical Data Snapshots, filterable and benchmarked against Mount Sinai."
-  },
-  aamcgq: {
-    url: "https://sinaiascend.github.io/GQSinai/",
-    kicker: "Student Feedback",
-    title: "AAMC Graduation Questionnaire Dashboard",
-    blurb: "Class of 2026 GQ results \u2014 satisfaction, learning environment, and curricular items benchmarked against 155 LCME-accredited MD programs with national percentiles."
   },
   sitecomparability: {
     url: "https://sinaiascend.github.io/Dashboard-Site-Comparability/",
@@ -461,7 +449,7 @@ const TIERS = {
   "5942bd952f12e02478b5a6aba902340a58c9c769a961f128dbb57f0b79358537": {  // Tier 1
     name: "Office of Curricular Affairs",
     sub: "Full access — all monitoring, mapping, governance, and accreditation views.",
-    dashboards: ["phase1assessment","phase2assessment","phase3assessment","clerkships","sitecomparability","sitecomp2526","DO","nbme","clerkshipassessments","mepo","electives","asqisa","aamcgq","aamcscope","phase1map","milestonesmap","policyreview","policylibrary","directors","students","governance","LCME","job","babybates","clinicalcompetency","curricularaffairs"]
+    dashboards: ["phase1assessment","phase2assessment","phase3assessment","clerkships","sitecomparability","sitecomp2526","DO","nbme","clerkshipassessments","mepo","electives","surveysbenchmarks","phase1map","milestonesmap","policyreview","policylibrary","directors","students","governance","LCME","job","babybates","clinicalcompetency","curricularaffairs"]
   },
   "31016cceeab858e9880093fcb959e82b5ac270f082b80c9ef9a63a731c9c7d86": {  // Tier 2
     name: "Pre-Clerkship Curriculum Directors",
@@ -471,7 +459,7 @@ const TIERS = {
   "5156cc64ad912a74bb8bd6a96ec955fa6d4fc4c4f97815d53e6eef9439d398a0": {  // Tier 3
     name: "Clinical Curriculum Directors",
     sub: "Clerkship monitoring, direct-observation assessment, curriculum maps, and governance.",
-    dashboards: ["phase2assessment","phase3assessment","DO","clerkships","sitecomparability","sitecomp2526","nbme","asqisa","governance","directors","job"],
+    dashboards: ["phase2assessment","phase3assessment","DO","clerkships","sitecomparability","sitecomp2526","nbme","surveysbenchmarks","governance","directors","job"],
     /* Sub-tier: tiles listed here appear locked until the code is re-entered.
        To change the code: uppercase it, hash it (any SHA-256 tool), replace the hash.
        Code is stored as a hash below (same as the tier code — acts as a confirmation gate) */
