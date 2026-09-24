@@ -200,9 +200,20 @@ a.ghost{text-decoration:none;display:inline-block;line-height:normal}
 
 /* ================= filter row ================= */
 /* One row, above everything it scopes. Every view re-renders from it. */
-.filters{display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap;
+.filterbar{display:flex;gap:14px;align-items:stretch;margin:16px 0 18px}
+.filters{display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap;flex:1 1 auto;min-width:0;
   background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
-  padding:14px 16px;margin:16px 0 18px;box-shadow:0 1px 2px var(--ring)}
+  padding:14px 16px;box-shadow:0 1px 2px var(--ring)}
+/* the advisor and mentor pickers sit to the side, in their own panel */
+.filters-aside{flex:0 0 232px;display:flex;flex-direction:column;gap:10px;
+  background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius);
+  padding:14px 16px;box-shadow:0 1px 2px var(--ring)}
+.filters-aside[hidden]{display:none}
+.filters-aside .field{min-width:0}
+.filters-aside .field select{width:100%}
+.aside-kicker{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;
+  color:var(--magenta)}
+@media (max-width:820px){.filterbar{flex-direction:column}.filters-aside{flex-basis:auto}}
 .field{display:flex;flex-direction:column;gap:5px;min-width:150px}
 .field label{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
   font-weight:800;color:var(--muted)}
@@ -277,6 +288,9 @@ main{padding-bottom:44px}
   border:1px solid var(--line);border-left:3px solid var(--magenta);background:var(--surface-2);max-width:560px}
 .ferpa[hidden]{display:none}
 #loadGate,#logNudge{margin:0 0 16px}
+.ferpa.nudge{border-color:var(--magenta)}
+.ferpa .go{display:inline-block;padding:7px 14px;font-size:12.5px;font-weight:700;border-radius:8px;
+  background:var(--magenta);color:#fff;text-decoration:none}
 .ferpa .fine{font-size:12px;color:var(--muted)}
 .ferpa .who{flex:1 1 100%;display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .ferpa .who input,.ferpa .who select{padding:7px 10px;font:inherit;font-size:13px;border:1px solid var(--line-2);
@@ -629,6 +643,7 @@ body.gated{overflow:hidden}
   </div>
 
   <!-- One filter row, above everything it scopes. -->
+  <div class="filterbar">
   <div class="filters" role="group" aria-label="Filter students">
     <div class="field">
       <label for="fCohort">Cohort</label>
@@ -637,14 +652,6 @@ body.gated{overflow:hidden}
     <div class="field" id="fProgramField" hidden>
       <label for="fProgram">Program</label>
       <select id="fProgram"></select>
-    </div>
-    <div class="field" id="fAdvisorField" hidden>
-      <label for="fAdvisor">Career advisor</label>
-      <select id="fAdvisor"></select>
-    </div>
-    <div class="field" id="fCcmField" hidden>
-      <label for="fCcm">CCM</label>
-      <select id="fCcm"></select>
     </div>
     <div class="field">
       <label for="fPhase">Phase</label>
@@ -677,6 +684,20 @@ body.gated{overflow:hidden}
     </div>
     <button class="clear" id="fClear" type="button">Reset</button>
   </div>
+  <!-- the people who look after a student: kept to the side of the filters
+       so an advisor or mentor can pull up their own group in one move -->
+  <aside class="filters-aside" id="groupBy" role="group" aria-label="Group by advisor or mentor" hidden>
+    <div class="aside-kicker">Group by</div>
+    <div class="field" id="fAdvisorField" hidden>
+      <label for="fAdvisor">Career advisor</label>
+      <select id="fAdvisor"></select>
+    </div>
+    <div class="field" id="fCcmField" hidden>
+      <label for="fCcm">CCM</label>
+      <select id="fCcm"></select>
+    </div>
+  </aside>
+  </div>
 </div>
 
 <main class="wrap">
@@ -704,9 +725,12 @@ body.gated{overflow:hidden}
     <button type="button" class="ghostBtn" id="loadGateCancel">Cancel</button>
     <span class="err" id="loadGateErr" role="alert"></span>
   </form>
-  <div class="ferpa" id="logNudge" hidden>
-    <p>Your browser blocked the access-log form from opening. Please
-      <a id="logNudgeLink" href="#" target="_blank" rel="noopener">open and submit it</a> now.</p>
+  <div class="ferpa nudge" id="logNudge" hidden>
+    <p><strong>Access recorded for <span id="logNudgeWhat">this load</span>.</strong>
+      The access-log form should have opened in a new tab; if it did not, or you closed it, open it here
+      and press Submit.</p>
+    <a class="go" id="logNudgeLink" href="#" target="_blank" rel="noopener">Open the access-log form &#8599;</a>
+    <button type="button" class="ghostBtn" id="logNudgeDone">Done</button>
   </div>
   <!-- ============ COHORT VIEW ============ -->
   <section id="cohortView" aria-label="Cohort overview">
@@ -2424,37 +2448,13 @@ function accessLogUrl(rec){
   const q = ACCESS_LOG_FORM.q;
   return ACCESS_LOG_FORM.url + Object.keys(q).map(k => '&' + q[k] + '=' + encodeURIComponent(rec[k] || '')).join('');
 }
-/* A window opened at the moment of the click (a user gesture, so it is not
-   a blocked popup) and pointed at the pre-filled form once the load is
-   known. If nothing is loaded, it is closed again. */
-let pendingLogWin = null;
-const LOG_WIN_STYLE = 'font:15px/1.5 system-ui,-apple-system,sans-serif;padding:28px;max-width:560px;color:#1c2333';
-function openLogWindow(){
-  try { pendingLogWin = window.open('about:blank', '_blank') } catch(e){ pendingLogWin = null }
-  if(!pendingLogWin) return;
-  try {
-    const d = pendingLogWin.document;
-    d.open();
-    d.write('<!doctype html><title>Access log</title><div style="' + LOG_WIN_STYLE + '">' +
-      '<p><strong>Access log</strong></p>' +
-      '<p id="msg">Waiting for the file to load… the access-log form opens here.</p>' +
-      '<p style="color:#6b7689;font-size:13px">If you cancelled the file picker, just close this tab.</p></div>');
-    d.close();
-  } catch(e){}
-}
-function closeLogWindow(){ if(pendingLogWin){ try { pendingLogWin.close() } catch(e){} pendingLogWin = null } }
-/* Point the placeholder at the form. The link is written first, so the tab
-   is usable even where the navigation itself does not take. */
-function sendLogWindow(url){
-  const w = pendingLogWin; pendingLogWin = null;
-  if(!w || w.closed) return false;
-  try {
-    const m = w.document.getElementById('msg');
-    if(m) m.innerHTML = 'Please <a href="' + url.replace(/"/g, '&quot;') + '">open and submit the access-log form</a>.';
-  } catch(e){}
-  try { w.location.href = url } catch(e){}
-  return true;
-}
+/* Once a load is known, the pre-filled form is opened in a new tab. From a
+   click (the gate's Continue on a copy that opens on real data) that just
+   works; after a file picker there is no click left to spend, so browsers
+   generally refuse the new tab - then the page shows a button, and the
+   viewer's own click on it opens the form. (A placeholder tab opened at
+   click time was tried and abandoned: the click it consumed was the one the
+   file picker needed, so the picker never opened.) */
 function logAccess(action, file, asOf){
   const who = whoAmI() || {};
   const rec = {name: who.name || '', role: who.role || '', reason: who.reason || '', action, file: file || '',
@@ -2464,9 +2464,16 @@ function logAccess(action, file, asOf){
     log.push(rec); localStorage.setItem('ascendAccessLog', JSON.stringify(log.slice(-500)));
   } catch(e){}
   const url = accessLogUrl(rec);
-  if(sendLogWindow(url)) return;
+  try { window.open(url, '_blank', 'noopener') } catch(e){}
   const nudge = $('logNudge');
-  if(nudge){ $('logNudgeLink').href = url; nudge.hidden = false; nudge.scrollIntoView({block:'nearest'}) }
+  if(!nudge) return;
+  $('logNudgeLink').href = url;
+  $('logNudgeWhat').textContent = action === 'photos' ? 'loading the photo folder'
+    : action === 'data' ? 'loading the data file' : 'opening this copy';
+  /* shown whether or not the tab opened: the button reopens the same form,
+     and the viewer sees that a submission is expected */
+  nudge.hidden = false;
+  nudge.scrollIntoView({block:'nearest'});
 }
 
 let loadGateThen = null;
@@ -2489,6 +2496,8 @@ function bootLoadGate(){
   if(!form) return;
   form.addEventListener('input', () => { err.textContent = '' });
   $('loadGateCancel').addEventListener('click', () => { form.hidden = true; loadGateThen = null });
+  const nudge = $('logNudge');
+  if(nudge) $('logNudgeDone').addEventListener('click', () => { nudge.hidden = true });
   form.addEventListener('submit', ev => {
     ev.preventDefault();
     const name = $('loadGateName').value.trim(), role = $('loadGateRole').value, reason = $('loadGateReason').value.trim();
@@ -3377,7 +3386,7 @@ function openStudent(id){
   window.scrollTo({top:0, behavior:'auto'});
 }
 function setFiltersVisible(on){
-  const f = document.querySelector('.filters');
+  const f = document.querySelector('.filterbar');
   if(f) f.style.display = on ? '' : 'none';
 }
 function closeStudent(){
@@ -3553,6 +3562,9 @@ function fillCohortFilter(){
   fillListFilter('fProgram', 'fProgramField', 'program', 'program', 'All programs', 'No program set');
   fillListFilter('fAdvisor', 'fAdvisorField', 'careerAdvisor', 'advisor', 'All career advisors', 'No career advisor set');
   fillListFilter('fCcm', 'fCcmField', 'ccm', 'ccm', 'All CCMs', 'No CCM set');
+  /* the side panel shows only when the data names an advisor or a mentor */
+  const aside = $('groupBy');
+  if(aside) aside.hidden = $('fAdvisorField').hidden && $('fCcmField').hidden;
 }
 /* Filters that list whatever the loaded data names - programmes, career
    advisors, clinical competency mentors - and hide themselves when it names
@@ -3655,37 +3667,31 @@ function init(){
      behind the FERPA acknowledgment - the same code as the lookup, asked
      once per session. The picker opens from the form's submit, which is
      still a user gesture. */
-  /* the log window opens from the click itself, so it is not a blocked popup */
   $('loadBtn').addEventListener('click', () =>
     ferpaGate('Loading the student data file brings coded education records into this browser. ' +
               'Continue only with a legitimate educational interest.',
-              () => { openLogWindow(); $('fileInput').click() }));
+              () => $('fileInput').click()));
   /* a folder of <code>.jpg photos, kept in memory for this session only */
   $('photoBtn').addEventListener('click', () =>
     ferpaGate('Loading the photo folder pairs a face with each code, which re-identifies the student. ' +
               'Continue only with a legitimate educational interest.',
-              () => { openLogWindow(); $('photoInput').click() }));
+              () => $('photoInput').click()));
   $('photoInput').addEventListener('change', e => {
     const n = adoptPhotos(e.target.files || []);
-    if(!n){ closeLogWindow();
-      alert('No images were found in that folder.\n\nExpected one image per student, named by ' +
-            'code, e.g. ASC-2028-014.jpg, as written by pipeline/student_photos.py.'); }
+    if(!n) alert('No images were found in that folder.\n\nExpected one image per student, named by ' +
+                 'code, e.g. ASC-2028-014.jpg, as written by pipeline/student_photos.py.');
     else logAccess('photos', n + ' photos', '');
     e.target.value = '';
   });
-  $('photoInput').addEventListener('cancel', closeLogWindow);
-  $('fileInput').addEventListener('cancel', closeLogWindow);
   $('fileInput').addEventListener('change', e => {
-    const f = e.target.files && e.target.files[0]; if(!f){ closeLogWindow(); return }
+    const f = e.target.files && e.target.files[0]; if(!f) return;
     const fr = new FileReader();
-    fr.onerror = closeLogWindow;
     fr.onload = () => {
       try{
         const txt = String(fr.result);
         adoptData(/\.csv$/i.test(f.name) ? csvToData(txt) : JSON.parse(txt), f.name);
         logAccess('data', f.name, (DATA.meta && DATA.meta.asOf) || '');
       }catch(err){
-        closeLogWindow();
         alert('That file could not be read as student data.\n\n' + err.message +
               '\n\nExpected either the JSON shape documented at the top of this page’s ' +
               'script, or a CSV with one row per assessment.');
@@ -3705,7 +3711,7 @@ function init(){
      also an access: the same who/why gate, once per session, logged as such. */
   if(DATA.meta && !DATA.meta.sample && !whoAmI())
     ferpaGate('This copy opens on real student records.',
-              () => { openLogWindow(); logAccess('open', 'built-in data', (DATA.meta && DATA.meta.asOf) || '') });
+              () => logAccess('open', 'built-in data', (DATA.meta && DATA.meta.asOf) || ''));
 }
 
 /* ============================================================================
