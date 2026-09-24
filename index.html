@@ -447,12 +447,6 @@ const DASHBOARDS = {
     title: "ASCEND Student Performance Dashboard",
     blurb: "De-identified student-level performance across all three phases \u2014 module quizzes, NBME customized assessments, OSCE and clinical-skills evaluations, and shelf exams \u2014 with a class roster, a rotation schedule and full record per student code, and review flags. Coded education records; the code key is held separately."
   },
-  sitecomp2526: {
-    url: "./Site_Comparability_2025-26.html",
-    kicker: "Site Comparability \u00b7 AY 2025\u201326",
-    title: "Clerkship Site Comparability (2025\u201326)",
-    blurb: "Are the training sites comparable? Shelf/NBME performance with verified ANOVA (OB/GYN flagged), physical-space and supervision/quality between-site tests, grades, and the site-usage matrix \u2014 LCME Element 8.7."
-  }
 };
 
 /* Tiers, keyed by SHA-256 of the UPPERCASED access code.
@@ -461,7 +455,7 @@ const TIERS = {
   "5942bd952f12e02478b5a6aba902340a58c9c769a961f128dbb57f0b79358537": {  // Tier 1
     name: "Office of Curricular Affairs",
     sub: "Full access — all monitoring, mapping, governance, and accreditation views.",
-    dashboards: ["phase1assessment","phase2assessment","phase3assessment","clerkships","sitecomparability","sitecomp2526","DO","nbme","clerkshipassessments","mepo","electives","asqisa","aamcgq","aamcscope","phase1map","milestonesmap","policyreview","policylibrary","directors","students","governance","LCME","job","babybates","clinicalcompetency","curricularaffairs"]
+    dashboards: ["phase1assessment","phase2assessment","phase3assessment","clerkships","sitecomparability","DO","nbme","clerkshipassessments","mepo","electives","asqisa","aamcgq","aamcscope","phase1map","milestonesmap","policyreview","policylibrary","directors","students","governance","LCME","job","babybates","clinicalcompetency","curricularaffairs"]
   },
   "31016cceeab858e9880093fcb959e82b5ac270f082b80c9ef9a63a731c9c7d86": {  // Tier 2
     name: "Pre-Clerkship Curriculum Directors",
@@ -471,7 +465,7 @@ const TIERS = {
   "5156cc64ad912a74bb8bd6a96ec955fa6d4fc4c4f97815d53e6eef9439d398a0": {  // Tier 3
     name: "Clinical Curriculum Directors",
     sub: "Clerkship monitoring, direct-observation assessment, curriculum maps, and governance.",
-    dashboards: ["phase2assessment","phase3assessment","DO","clerkships","sitecomparability","sitecomp2526","nbme","asqisa","governance","directors","job"],
+    dashboards: ["phase2assessment","phase3assessment","DO","clerkships","sitecomparability","nbme","asqisa","governance","directors","job"],
     /* Sub-tier: tiles listed here appear locked until the code is re-entered.
        To change the code: uppercase it, hash it (any SHA-256 tool), replace the hash.
        Code is stored as a hash below (same as the tier code — acts as a confirmation gate) */
