@@ -247,6 +247,49 @@ main{padding-bottom:44px}
 
 /* ================= stat tiles ================= */
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(196px,1fr));gap:14px;margin-bottom:18px}
+
+/* review cards: one per flagged student, identical shape */
+.rv-toggle{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;
+  color:var(--ink-2);white-space:nowrap;cursor:pointer}
+.rv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:14px}
+.rv-card{border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--surface);
+  display:flex;flex-direction:column;gap:10px;cursor:pointer;text-align:left;font:inherit;color:inherit}
+.rv-card:hover{border-color:var(--line-2);box-shadow:0 2px 8px var(--ring)}
+.rv-card:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
+.rv-card.concern{border-top:4px solid var(--crit)}
+.rv-card.watch{border-top:4px solid var(--warn)}
+.rv-head{display:flex;align-items:flex-start;gap:10px}
+.rv-head .rv-id{flex:1 1 auto;min-width:0}
+.rv-photo{flex:0 0 auto;width:52px;height:52px;border-radius:8px;object-fit:cover;
+  border:1px solid var(--line);background:var(--surface-2)}
+.rv-photo.empty::after{content:'';display:block;width:100%;height:100%;border-radius:8px;
+  background:radial-gradient(circle at 50% 38%,var(--line-2) 0 9px,transparent 10px),
+             radial-gradient(ellipse at 50% 92%,var(--line-2) 0 16px,transparent 17px)}
+.rv-code{font-size:17px;font-weight:800;letter-spacing:-.01em}
+.rv-meta{font-size:11.5px;color:var(--muted);margin-top:2px}
+.rv-big{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rv-big div{background:var(--surface-2);border-radius:8px;padding:8px 10px}
+.rv-big .l{font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--muted)}
+.rv-big .v{font-size:22px;font-weight:800;line-height:1.2}
+.rv-big .v.low{color:var(--crit)} .rv-big .v.mid{color:#9a6b00}
+.rv-big .v small{font-size:11px;font-weight:600;color:var(--muted);margin-left:2px}
+.rv-sec{font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--muted);
+  margin-top:2px}
+.rv-row{display:grid;grid-template-columns:104px 1fr 34px;align-items:center;gap:8px;font-size:11.5px}
+.rv-row .lab{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink-2)}
+.rv-row .val{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+.rv-track{position:relative;height:9px;border-radius:5px;background:var(--surface-2);overflow:hidden}
+.rv-track .fill{position:absolute;top:0;bottom:0;left:0;border-radius:5px;background:var(--s1)}
+.rv-track .fill.low{background:var(--crit)} .rv-track .fill.mid{background:var(--warn)}
+.rv-track.dv::before{content:'';position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--line-2)}
+.rv-track.dv .fill{left:auto;border-radius:0}
+.rv-track.dv .fill.pos{left:50%;background:var(--dv-pos-2)} .rv-track.dv .fill.neg{right:50%;background:var(--dv-neg-2)}
+.rv-chips{display:flex;flex-wrap:wrap;gap:5px}
+.rv-chips span{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;border:1px solid}
+.rv-chips .fail{background:var(--crit-wash);border-color:rgba(208,59,59,.45);color:var(--crit)}
+.rv-chips .rem{background:var(--warn-wash);border-color:rgba(224,172,53,.75);color:#8a5a00}
+.rv-flag{font-size:11.5px;color:var(--ink-2);line-height:1.35}
+.rv-empty{padding:26px 12px;text-align:center;color:var(--muted);font-size:13.5px}
 .kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
   padding:14px 16px;box-shadow:0 1px 2px var(--ring)}
 .kpi .lab{font-size:12px;color:var(--muted);font-weight:600}
@@ -705,10 +748,10 @@ body.gated{overflow:hidden}
        once per session, then the file or folder picker opens -->
   <form class="ferpa gate2" id="loadGate" hidden novalidate>
     <p id="loadGateNote"></p>
-    <p class="fine">Access is logged: your name, role and reason, what you loaded and when are recorded
-      with the Office of Curricular Affairs. A pre-filled form opens for you to submit.</p>
+    <p class="fine">Access is logged with the Office of Curricular Affairs: your role and reason, what you
+      loaded and when. A pre-filled form then opens for you to submit; it records your name from your
+      Mount Sinai sign-in, so you are not asked for it here.</p>
     <div class="who">
-      <input type="text" id="loadGateName" placeholder="Your name" autocomplete="name" aria-label="Your name">
       <select id="loadGateRole" aria-label="Your role">
         <option value="">Your role…</option>
         <option>Career advisor</option>
@@ -768,6 +811,25 @@ body.gated{overflow:hidden}
           <div class="chartarea" id="typeChart"></div>
           <div class="tableview" id="typeTable"></div>
         </div>
+      </div>
+    </div>
+
+    <!-- every flagged student as one card of the same shape, so domains can
+         be read across students without opening each record -->
+    <div class="card" id="reviewCard">
+      <div class="cardhd">
+        <div>
+          <div class="kicker">Review</div>
+          <h2 id="reviewTitle">Students needing attention, side by side</h2>
+          <p class="why">One card per student in the current filter whose standing is Academic concern &mdash;
+            the same layout on every card, so a domain can be compared across students at a glance.
+            Percentiles are within the student&rsquo;s class; domain bars show points above or below the
+            class mean. Open a card for the full record.</p>
+        </div>
+        <label class="rv-toggle"><input type="checkbox" id="rvWatch"> Include students to monitor</label>
+      </div>
+      <div class="cardbody">
+        <div class="rv-grid" id="reviewGrid"></div>
       </div>
     </div>
 
@@ -856,6 +918,12 @@ body.gated{overflow:hidden}
                                   //   Optional; omitted when the extract has not
                                   //   been joined to the advising roster.
      advisingGroup,               // advising group code
+     enteredWith,                 // optional: the class the student entered with,
+                                  //   when they now progress with a later one
+                                  //   (repeating a phase). Blocks of the earlier
+                                  //   attempt carry attempt: "prior", a "*" on
+                                  //   their code and pool: "<class>|<code>", the
+                                  //   class they are ranked in.
      program,                     // degree programme: "MSTP (MD-PhD)", "PORTAL",
                                   //   "FlexMed", "Traditional", ... Optional;
                                   //   shown on the record and as a filter.
@@ -1285,6 +1353,11 @@ function standings(recs){
    proctored exams in the same block average. Every individual result stays
    visible in the record detail and the table view. */
 function casPercentile(rec){ const v = casPcts(rec); return v.length ? Math.round(mean(v)) : null }
+/* The class a block is ranked in. Normally the student's own; a repeated
+   phase's earlier attempt (rec.attempt "prior") carries rec.pool naming the
+   class the student entered with, so it is compared with the classmates who
+   sat it alongside them. */
+function poolKey(s, rec){ return rec.pool || (s.cohort + '|' + rec.code) }
 
 function hydrate(data){
   const students = data.students || [];
@@ -1315,7 +1388,7 @@ function hydrate(data){
     const list = Array.isArray(rec.cas) ? rec.cas : (rec.cas ? [rec.cas] : []);
     list.forEach(c => {
       if(c && c.percentile == null && c.scaled != null){
-        const k = s.cohort + '|' + rec.code + '|' + (c.label || '');
+        const k = poolKey(s, rec) + '|' + (c.label || '');
         (casPool[k] = casPool[k] || []).push(c.scaled);
       }
     });
@@ -1324,7 +1397,7 @@ function hydrate(data){
     const list = Array.isArray(rec.cas) ? rec.cas : (rec.cas ? [rec.cas] : []);
     list.forEach(c => {
       if(c && c.percentile == null && c.scaled != null){
-        const k = s.cohort + '|' + rec.code + '|' + (c.label || '');
+        const k = poolKey(s, rec) + '|' + (c.label || '');
         const pool = casPool[k];
         if(pool && pool.length > 1){
           c.percentile = rankPct(c.scaled, pool);
@@ -1339,13 +1412,13 @@ function hydrate(data){
   students.forEach(s => (s.records||[]).forEach(rec => {
     const a = quizAvg(rec);
     if(a == null) return;
-    const k = s.cohort + '|' + rec.code;
+    const k = poolKey(s, rec);
     (pool[k] = pool[k] || []).push(a);
   }));
   students.forEach(s => (s.records||[]).forEach(rec => {
     const a = quizAvg(rec);
     rec.quizPct = a;
-    rec.quizPercentile = a == null ? null : rankPct(a, pool[s.cohort + '|' + rec.code] || [a]);
+    rec.quizPercentile = a == null ? null : rankPct(a, pool[poolKey(s, rec)] || [a]);
   }));
 
   /* --- the same, kind by kind: Quiz, TBL, CCSG, ... --- */
@@ -1362,13 +1435,13 @@ function hydrate(data){
     Object.entries(rec.qtypes).forEach(([kind, v]) => {
       v.pct = v.sum / v.n;
       kindsPresent.add(kind);
-      const k = s.cohort + '|' + rec.code + '|' + kind;
+      const k = poolKey(s, rec) + '|' + kind;
       (kindPool[k] = kindPool[k] || []).push(v.pct);
     });
   }));
   students.forEach(s => (s.records||[]).forEach(rec =>
     Object.entries(rec.qtypes).forEach(([kind, v]) => {
-      v.percentile = rankPct(v.pct, kindPool[s.cohort + '|' + rec.code + '|' + kind] || [v.pct]);
+      v.percentile = rankPct(v.pct, kindPool[poolKey(s, rec) + '|' + kind] || [v.pct]);
     })));
   /* every view reads its list of assessment types from TYPE_META, so the
      kinds this data actually holds become panels, bars and columns */
@@ -1743,6 +1816,7 @@ let TYPE_META = [{key:'q:Quiz', label:'Quiz', short:'Quiz', varName:'--s1'}].con
 let DATA = hydrate(buildSampleData());
 const state = {
   cohort:'all', program:'all', advisor:'all', ccm:'all', phase:'all', standing:'all', emphasis:'knowledge', q:'',
+  reviewWatch:false,
   sort:{key:'knowledge', dir:'desc'}, student:null
 };
 const $ = id => document.getElementById(id);
@@ -2435,8 +2509,17 @@ const ACCESS_LOG_FORM = {
       pageVersion:'re90caad4b64740c388e19ce3775144f5', when:'r8027ca6392e449b396f36160c622bf08',
       browser:'r73d88a9da3284e72a208f58439d0b690'}
 };
+/* The gate's answers for this session. sessionStorage first; a copy in
+   memory as well, so a browser that refuses storage (some do for a page
+   opened from a file) does not ask again at every load. */
+let memAccess = null, memFerpa = false;
 function whoAmI(){
-  try { return JSON.parse(sessionStorage.getItem('ascendAccess') || 'null') } catch(e){ return null }
+  try { const v = sessionStorage.getItem('ascendAccess'); if(v) return JSON.parse(v) } catch(e){}
+  return memAccess;
+}
+function ferpaPassed(){
+  try { if(sessionStorage.getItem('ascendFerpa') === LOOKUP_HASH) return true } catch(e){}
+  return memFerpa;
 }
 function browserName(){
   const ua = navigator.userAgent;
@@ -2478,18 +2561,16 @@ function logAccess(action, file, asOf){
 
 let loadGateThen = null;
 function ferpaGate(why, then){
-  let ok = false;
-  try { ok = sessionStorage.getItem('ascendFerpa') === LOOKUP_HASH && !!whoAmI() } catch(e){}
-  if(ok){ then(); return }
+  if(ferpaPassed() && whoAmI()){ then(); return }
   const form = $('loadGate');
   loadGateThen = then;
-  $('loadGateNote').textContent = why + ' Say who you are and why, and enter the FERPA code to continue.';
+  $('loadGateNote').textContent = why + ' Give your role and reason, and enter the FERPA code to continue.';
   $('loadGateErr').textContent = ''; $('loadGateInput').value = '';
   const who = whoAmI() || {};
-  $('loadGateName').value = who.name || ''; $('loadGateRole').value = who.role || ''; $('loadGateReason').value = who.reason || '';
+  $('loadGateRole').value = who.role || ''; $('loadGateReason').value = who.reason || '';
   form.hidden = false;
   form.scrollIntoView({block:'nearest'});
-  $('loadGateName').focus();
+  $('loadGateRole').focus();
 }
 function bootLoadGate(){
   const form = $('loadGate'), input = $('loadGateInput'), err = $('loadGateErr');
@@ -2500,15 +2581,16 @@ function bootLoadGate(){
   if(nudge) $('logNudgeDone').addEventListener('click', () => { nudge.hidden = true });
   form.addEventListener('submit', ev => {
     ev.preventDefault();
-    const name = $('loadGateName').value.trim(), role = $('loadGateRole').value, reason = $('loadGateReason').value.trim();
-    if(!name || !role || !reason){ err.textContent = 'Please give your name, role and reason for access.'; return }
+    const role = $('loadGateRole').value, reason = $('loadGateReason').value.trim();
+    if(!role || !reason){ err.textContent = 'Please give your role and reason for access.'; return }
     if(sha256(input.value.trim().toUpperCase()) !== LOOKUP_HASH){
       err.textContent = 'That code isn’t recognized.';
       input.select();
       return;
     }
+    memFerpa = true; memAccess = {role, reason};
     try { sessionStorage.setItem('ascendFerpa', LOOKUP_HASH);
-          sessionStorage.setItem('ascendAccess', JSON.stringify({name, role, reason})) } catch(e){}
+          sessionStorage.setItem('ascendAccess', JSON.stringify(memAccess)) } catch(e){}
     input.value = ''; form.hidden = true;
     const run = loadGateThen; loadGateThen = null;
     if(run) run();
@@ -2590,6 +2672,10 @@ function studentHeader(host, s){
   if(s.careerAdvisor) fact(dl, 'Career advisor', s.careerAdvisor);
   if(s.ccm) fact(dl, 'Clinical competency mentor', s.ccm);
   if(s.program) fact(dl, 'Program', s.program);
+  /* a student repeating a phase progresses with a later class than the one
+     they entered with; both are said, and the prior attempt stays on record */
+  if(s.enteredWith && s.enteredWith !== s.cohort)
+    fact(dl, 'Entered with', 'Class of ' + s.enteredWith + ' · repeating, now with the Class of ' + s.cohort);
   if(s.advisingGroup) fact(dl, 'Advising group', s.advisingGroup);
   fact(dl, 'Blocks completed', s.completed + (s.upcoming ? ' of ' + (s.completed + s.upcoming) : ''));
   meta.appendChild(dl);
@@ -3298,6 +3384,10 @@ function renderStudent(s){
 
   const schedBody = makeCard(host, 'Rotation schedule',
     'Where this student has been and where they are going',
+    (s.enteredWith && s.enteredWith !== s.cohort
+      ? 'This student is repeating a phase: blocks marked * are the prior attempt, kept on record ' +
+        'and compared with the Class of ' + s.enteredWith + '; the rest follow the Class of ' + s.cohort + '. '
+      : '') +
     'Every module, clerkship, and transition course on one calendar, a lane per phase, ' +
     'with Practice of Medicine on its own row beneath the modules it runs alongside. ' +
     'The accent bar is the block in progress today; the pale bars are still ahead. ' +
@@ -3413,7 +3503,113 @@ function renderAll(){
   renderKpis(list);
   renderSkillsScatter();
   renderTypeChart();
+  renderReview(list);
   renderRoster();
+}
+
+/* ---------------- review cards ---------------- */
+/* Every flagged student on one page, each card the same shape: standings,
+   clinical-skills domains against the class mean, knowledge by assessment
+   type, failed or remediated blocks, and the leading flag. Academic concern
+   by default; Monitor on request. Sorted by how far below the class they sit. */
+function renderReview(list){
+  const grid = $('reviewGrid'); if(!grid) return;
+  grid.textContent = '';
+  const want = new Set(['concern'].concat(state.reviewWatch ? ['watch'] : []));
+  const picked = list.filter(s => want.has(s.status));
+  const worst = s => Math.min(...[kOf(s), skOf(s)].filter(v => v != null).concat([101]));
+  picked.sort((a, b) => (a.status === b.status ? 0 : a.status === 'concern' ? -1 : 1) || worst(a) - worst(b));
+  $('reviewTitle').textContent = picked.length
+    ? picked.length + (picked.length === 1 ? ' student' : ' students') + ' needing attention, side by side'
+    : 'Students needing attention, side by side';
+  if(!picked.length){
+    grid.appendChild(elc('div','rv-empty', 'No student in this filter is in academic concern' +
+      (state.reviewWatch ? ' or to monitor.' : '. Tick “Include students to monitor” to widen it.')));
+    return;
+  }
+  const band = v => v == null ? '' : v < CONCERN_PCTILE ? 'low' : v < WATCH_PCTILE ? 'mid' : '';
+  const bar = (label, v, cls, text) => {
+    const row = elc('div','rv-row');
+    row.appendChild(elc('span','lab', label)); row.title = label;
+    const tr = elc('div','rv-track');
+    const f = elc('div','fill ' + (cls || band(v))); f.style.width = (v == null ? 0 : Math.max(2, v)) + '%';
+    tr.appendChild(f); row.appendChild(tr);
+    row.appendChild(elc('span','val', v == null ? '—' : (text != null ? text : v)));
+    return row;
+  };
+  const dvbar = (label, delta) => {
+    const row = elc('div','rv-row');
+    row.appendChild(elc('span','lab', label)); row.title = label;
+    const tr = elc('div','rv-track dv');
+    if(delta != null){
+      const f = elc('div','fill ' + (delta >= 0 ? 'pos' : 'neg'));
+      f.style.width = Math.min(50, Math.abs(delta)) + '%'; tr.appendChild(f);
+    }
+    row.appendChild(tr);
+    row.appendChild(elc('span','val', delta == null ? '—' : (delta > 0 ? '+' : '') + Math.round(delta)));
+    return row;
+  };
+  picked.forEach(s => {
+    const refs = (DATA.refs||{})[s.cohort] || {};
+    const card = elc('button','rv-card ' + s.status);
+    card.type = 'button';
+    card.setAttribute('aria-label', 'Open the record for student ' + s.id);
+    card.addEventListener('click', () => openStudent(s.id));
+    const head = elc('div','rv-head');
+    /* the photo, when the viewer has loaded the photo folder this session */
+    const url = PHOTOS[String(s.id).toUpperCase()];
+    const ph = url ? document.createElement('img') : elc('div','rv-photo empty');
+    ph.className = 'rv-photo' + (url ? '' : ' empty');
+    if(url){ ph.src = url; ph.alt = 'Photo of student ' + s.id } else ph.setAttribute('aria-hidden','true');
+    head.appendChild(ph);
+    const hl = elc('div','rv-id');
+    hl.appendChild(elc('div','rv-code', s.id));
+    hl.appendChild(elc('div','rv-meta', 'Class of ' + s.cohort + (s.program ? ' · ' + s.program : '') +
+      (s.current ? ' · in ' + s.current.code : '')));
+    if(s.careerAdvisor || s.ccm)
+      hl.appendChild(elc('div','rv-meta', [s.careerAdvisor && 'Advisor ' + s.careerAdvisor, s.ccm && 'CCM ' + s.ccm]
+        .filter(Boolean).join(' · ')));
+    head.appendChild(hl); head.appendChild(chipFor(s.status)); card.appendChild(head);
+
+    const big = elc('div','rv-big');
+    [['Medical knowledge', kOf(s)], ['Clinical skills', skOf(s)]].forEach(([l, v]) => {
+      const d = elc('div'); d.appendChild(elc('div','l', l));
+      const vv = elc('div','v ' + band(v), v == null ? '—' : String(v));
+      if(v != null) vv.appendChild(elc('small', null, pctUnit(v)));
+      d.appendChild(vv); big.appendChild(d);
+    });
+    card.appendChild(big);
+
+    /* clinical-skills domains against the class mean */
+    const doms = SKILL_DOMAINS.filter(d => s.skillDomains && s.skillDomains[d] != null && refs.domains && refs.domains[d] != null);
+    if(doms.length){
+      card.appendChild(elc('div','rv-sec','Clinical skills vs. class mean'));
+      doms.forEach(d => card.appendChild(dvbar(d, s.skillDomains[d] - refs.domains[d])));
+    }
+    /* knowledge by assessment type, this student's median percentile */
+    const buckets = typePercentiles([s]);
+    const types = TYPE_META.filter(t => !SUMMARY_HIDE.has(t.key) && buckets[t.key] && buckets[t.key].length);
+    if(types.length){
+      card.appendChild(elc('div','rv-sec','By assessment type · percentile in class'));
+      types.forEach(t => card.appendChild(bar(t.short || t.label, Math.round(median(buckets[t.key])))));
+    }
+    /* what is absolute: failed and remediated blocks */
+    const failed = (s.records||[]).filter(r => r.result === 'Fail');
+    const rem = (s.records||[]).filter(r => /remediation/i.test(r.result || ''));
+    if(failed.length || rem.length){
+      card.appendChild(elc('div','rv-sec','Blocks'));
+      const chips = elc('div','rv-chips');
+      failed.forEach(r => chips.appendChild(elc('span','fail', r.code + ' failed')));
+      rem.forEach(r => chips.appendChild(elc('span','rem', r.code + ' remediated')));
+      card.appendChild(chips);
+    }
+    const flags = (s.flags||[]).filter(f => f.level !== 'info');
+    if(flags.length){
+      card.appendChild(elc('div','rv-sec', flags.length + (flags.length === 1 ? ' flag' : ' flags')));
+      card.appendChild(elc('div','rv-flag', flags[0].what + (flags.length > 1 ? ' · +' + (flags.length - 1) + ' more' : '')));
+    }
+    grid.appendChild(card);
+  });
 }
 
 /* ============================================================================
@@ -3481,6 +3677,7 @@ function csvToData(text){
       ccm: get('ccm') || '',
       advisingGroup: get('advising_group') || '',
       program: get('program') || '',
+      enteredWith: num(get('entered_with')),
       classPhotoUrl: get('class_photo_url') || '',
       records: [], contentAreas: {}
     });
@@ -3493,6 +3690,7 @@ function csvToData(text){
       rec = {seq: num(get('seq')) || s.records.length + 1,
         phase: num(get('phase')) || s.phase || 1,
         kind: get('kind') || 'module', code, name: get('block_name') || code, term: get('term') || '',
+        pool: get('pool') || null, attempt: get('attempt') || null,
         site: get('site') || '', start, end, status,
         result: get('result') || RESULT_BY_STATUS[status] || 'Pass',
         quizzes: null, cas: null, osce: null, eval: null};
@@ -3662,6 +3860,7 @@ function init(){
   applyTheme(null);
 
   $('printBtn').addEventListener('click', () => window.print());
+  $('rvWatch').addEventListener('change', e => { state.reviewWatch = e.target.checked; renderReview(filtered()) });
   bootLoadGate();
   /* Both loads bring education records into the browser, so both stand
      behind the FERPA acknowledgment - the same code as the lookup, asked
