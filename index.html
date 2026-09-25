@@ -136,6 +136,10 @@ a.card{display:block;background:#fff;border:1px solid var(--line);border-radius:
   text-decoration:none;color:var(--ink);transition:box-shadow .15s ease,transform .15s ease;border-top:4px solid var(--magenta)}
 a.card:nth-child(even){border-top-color:var(--cyan)}
 a.card:hover{box-shadow:0 8px 26px rgba(10,31,68,.13);transform:translateY(-2px)}
+a.card.pinned{background:linear-gradient(180deg,#e9f3fb 0%,#f3f8fd 100%);border-color:#b7d6ec;border-top:3px solid var(--cyan)}
+a.card.pinned .cardkicker{color:var(--navy2)}
+a.card.pinned[data-key="governance"]{background:linear-gradient(180deg,#fbeaf3 0%,#fdf5f9 100%);border-color:#e9b6d3;border-top-color:var(--magenta)}
+a.card.pinned[data-key="governance"] .cardgo{color:var(--magenta)}
 a.card:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
 .cardkicker{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:800;color:var(--muted);margin-bottom:8px}
 .cardtitle{font-size:18px;font-weight:800;line-height:1.25;margin-bottom:8px;color:var(--navy)}
@@ -293,25 +297,25 @@ const DASHBOARDS = {
   phase1: {
     url: "overview/phase-1-assessment.html",
     kicker: "Programmatic Assessment",
-    title: "Programmatic Assessment \u2014 Phase 1",
+    title: "ASCEND Phase 1 Directors Dashboard",
     blurb: "Module Director dashboards for the pre-clerkship phase: cohort outcomes, assessment quality, and module evaluation for every Phase 1 module."
   },
   clinicalskills: {
     url: "overview/clinical-skills.html",
     kicker: "Clinical Skills",
-    title: "Clinical Skills Dashboard",
+    title: "ASCEND Clinical Skills Dashboard",
     blurb: "Student-level Practice of Medicine and PEAKS I clinical skills by domain, with analytics and the competency framework crosswalk."
   },
   phase2: {
     url: "overview/phase-2-assessment.html",
     kicker: "Programmatic Assessment",
-    title: "Programmatic Assessment \u2014 Phase 2",
+    title: "ASCEND Phase 2 Directors Dashboard",
     blurb: "Clerkship Director dashboards for the clinical phase: cohort outcomes, assessment quality, and clerkship and site evaluations by academic year."
   },
   phase3: {
     url: "overview/phase-3-assessment.html",
     kicker: "Programmatic Assessment",
-    title: "Programmatic Assessment \u2014 Phase 3",
+    title: "ASCEND Phase 3 Dashboard",
     blurb: "Director dashboards for the Integration and Transitions phase: Chronic Care Clerkship, acting internships, and the transition modules."
   },
   nbme: {
@@ -323,19 +327,19 @@ const DASHBOARDS = {
   clerkshipquality: {
     url: "overview/clerkship-quality.html",
     kicker: "Clinical Learning Environment",
-    title: "Clerkship Quality",
+    title: "ASCEND Clerkship Dashboard",
     blurb: "LCME element monitoring by clerkship, site comparability, direct observations, and assessment validity."
   },
   objectives: {
     url: "overview/objectives-outcomes.html",
     kicker: "Curriculum Mapping",
-    title: "Objectives and Outcomes",
+    title: "ASCEND MEPOs, Learning Objectives and Outcomes Dashboard",
     blurb: "The learning objectives library, the 23 program objectives, milestones, and MEPO outcomes."
   },
   policies: {
     url: "overview/policies.html",
     kicker: "Policies",
-    title: "Policies",
+    title: "ASCEND Policy Library",
     blurb: "The policy library, review packets, and the policy desk."
   },
   surveys: {
@@ -353,7 +357,7 @@ const DASHBOARDS = {
   governance: {
     url: "overview/governance.html",
     kicker: "Governance",
-    title: "Curriculum Governance",
+    title: "ASCEND Curriculum Governance Dashboard",
     blurb: "EEC and subcommittee meetings, minutes, membership, and curriculum reviews."
   },
   studentperf: {
@@ -370,12 +374,14 @@ const TIERS = {
   "5942bd952f12e02478b5a6aba902340a58c9c769a961f128dbb57f0b79358537": {  // ASCEND
     name: "Office of Curricular Affairs",
     sub: "Full access \u2014 all monitoring, mapping, governance, and accreditation views.",
-    dashboards: ["phase1", "clinicalskills", "phase2", "phase3", "nbme", "clerkshipquality", "objectives", "policies", "surveys", "lcme", "governance"]
+    dashboards: ["phase1", "clinicalskills", "phase2", "phase3", "nbme", "clerkshipquality", "objectives", "policies", "surveys", "lcme", "governance"],
+    pinned: ["phase1","phase2","phase3","governance"]
   },
   "255af8d0734e8438d7fcef7cb457da08d130e24f574065175f2ab73ed2ffb360": {  // EEC
     name: "Executive Education Committee",
     sub: "All monitoring, mapping, governance, and accreditation views.",
-    dashboards: ["phase1", "clinicalskills", "phase2", "phase3", "nbme", "clerkshipquality", "objectives", "policies", "surveys", "lcme", "governance"]
+    dashboards: ["phase1", "clinicalskills", "phase2", "phase3", "nbme", "clerkshipquality", "objectives", "policies", "surveys", "lcme", "governance"],
+    pinned: ["phase1","phase2","phase3","governance"]
   },
   "31016cceeab858e9880093fcb959e82b5ac270f082b80c9ef9a63a731c9c7d86": {  // PCCS
     name: "Pre-Clerkship Curriculum Subcommittee",
@@ -482,7 +488,13 @@ function renderTier(tier){
 
   const favs = getFavorites();
   // Alphabetical by title; favorited tiles float to the top of that order.
+  // Pinned tiles (tier.pinned) always come first, in the order listed; then
+  // favorites; then the rest alphabetically by title.
+  const pinned = tier.pinned || [];
+  const rank = k => { const i = pinned.indexOf(k); return i < 0 ? pinned.length : i; };
   const ordered = tier.dashboards.slice().sort((a,b)=>{
+    const pa = rank(a), pb = rank(b);
+    if(pa!==pb) return pa-pb;
     const fa = favs.has(a)?0:1, fb = favs.has(b)?0:1;
     if(fa!==fb) return fa-fb;
     return DASHBOARDS[a].title.localeCompare(DASHBOARDS[b].title);
@@ -494,6 +506,8 @@ function renderTier(tier){
     const isLocked = tier.locked && tier.locked.dashboards.includes(key) && !subUnlocked(tier);
     const a=document.createElement('a');
     a.className='card';
+    if(pinned.includes(key)) a.classList.add('pinned');
+    a.dataset.key = key;
     if(isLocked){
       a.classList.add('locked');
       a.setAttribute('role','button');
