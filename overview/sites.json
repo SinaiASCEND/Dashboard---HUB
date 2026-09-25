@@ -1,146 +1,471 @@
 {
-  "base": "https://sinaiascend.github.io/",
-  "sites": [
-    {"slug":"navigator","key":"navigator","public":true,"kicker":"Curriculum Search","title":"Curriculum Navigator","short":"the Navigator",
-     "audience":"Students, faculty, and staff. Open to everyone.",
-     "intro":"Search the ASCEND curriculum from one place. Find any session, learning objective, or calendar date across all three phases, and see how sessions connect to program objectives, threads, and Areas of Concentration.",
-     "primary":"Dashboard---Students/",
-     "views":[
-      {"title":"Sessions","blurb":"Every Phase 1 session by module, with objectives, format, and hours. Built from the master curriculum map."},
-      {"title":"Learning objectives","blurb":"Module objectives and their mapping to the 23 Medical Education Program Objectives."},
-      {"title":"Clerkships","blurb":"The Phase 2 clerkships with their learning objectives."},
-      {"title":"Threads and Areas of Concentration","blurb":"Where each curricular thread and AOC is taught, by session."},
-      {"title":"Academic calendar","blurb":"The current and next academic year, searchable by date or event."},
-      {"title":"Directors view","blurb":"The same content with mapping detail for module and clerkship directors.","url":"Dashboard---Directors/"},
-      {"title":"Ask ASCEND","blurb":"Plain-language questions answered from the curriculum map and policies."}]},
-    {"slug":"electives","key":"electives","public":true,"kicker":"Career Exploration","title":"Electives and NEXUS Catalog","short":"the catalog",
-     "audience":"Students. Open to everyone.",
-     "intro":"Explore the career-exploration options offered to ISMMS students: electives, NEXUS Learning offerings, host institutions for away rotations, and what returning students said about them.",
-     "primary":"Dashboard---Electives/",
-     "views":[
-      {"title":"Electives catalog","blurb":"All medical student electives, filterable by field, Area of Concentration, phase, and schedule. Built from the master electives catalog.","url":"Dashboard---Electives/"},
-      {"title":"NEXUS offerings","blurb":"The NEXUS Learning catalog with the same filters.","url":"Dashboard---Electives/?lens=nexus"},
-      {"title":"Away electives","blurb":"Host institutions where students have completed extramural rotations.","url":"Dashboard---Electives/away-electives.html"},
-      {"title":"Extramural ratings","blurb":"Ratings and comments on host institutions from returning students.","url":"Dashboard---Electives/extramural-ratings.html"}]},
-    {"slug":"baby-bates","key":"babybates","public":true,"kicker":"Physical Examination","title":"Baby Bates","short":"Baby Bates",
-     "audience":"Students. Open to everyone.",
-     "intro":"A pocket clinical reference for history-taking and physical examination, drawn from Bates' Guide, to support clinical skills coaching and direct observation.",
-     "primary":"Dashboard---BabyBates/",
-     "views":[
-      {"title":"Core physical exam","blurb":"The core exam and exam clusters by system."},
-      {"title":"Scripts and algorithms","blurb":"Illness scripts, clinical scripts, and diagnostic algorithms."},
-      {"title":"Quick reference","blurb":"Devices, labs, abbreviations, and structural vulnerability resources."},
-      {"title":"Practice of Medicine resources","blurb":"Materials for coaching and direct observation in the POM modules."}]},
-    {"slug":"people","key":"people","public":true,"kicker":"Office Resources","title":"People","short":"the directory",
-     "audience":"Students, faculty, and staff. Open to everyone.",
-     "intro":"Who does what across the ASCEND curriculum: the Office of Curricular Affairs, the students who represent their classes in governance, and the faculty roles that are open.",
-     "primary":"Curricular-Affairs/",
-     "views":[
-      {"title":"Office of Curricular Affairs","blurb":"Org chart and directory of directors, co-directors, coordinators, and managers by phase and area.","url":"Curricular-Affairs/"},
-      {"title":"Curricular student leadership","blurb":"Student representatives on the EEC and its subcommittees, and per-module and per-clerkship representatives by class.","url":"Dashboard---Curricular-Students/"},
-      {"title":"Faculty opportunities","blurb":"Open roles, leadership positions, and ways to get involved in medical education.","url":"Dashboard---JobPostings/"}]},
-    {"slug":"phase-1-assessment","key":"phase1","kicker":"Programmatic Assessment","title":"Programmatic Assessment: Phase 1","short":"Phase 1",
-     "audience":"Module directors, the Pre-Clerkship Curriculum Subcommittee, the Curricular Integration Subcommittee, the EEC, and OCA leadership.",
-     "intro":"Module-level outcomes for the pre-clerkship phase. Aggregate data by class cohort: how each module's assessments performed, what students said, and how the module maps to the program objectives.",
-     "primary":"Dashboard-Phase-1-Program-Assessment/",
-     "views":[
-      {"title":"Module dashboards","blurb":"One page per module with grading structure, final and component results, NBME customized assessment and end-of-module exam statistics, quizzes, and cohort comparison."},
-      {"title":"Student evaluations","blurb":"Module evaluation results and trends."},
-      {"title":"Curricular hours and objective mapping","blurb":"Hours by format, and module objectives mapped to program objectives."},
-      {"title":"Clinical skills","blurb":"Student-level Practice of Medicine and PEAKS I clinical skills by domain, with faculty-group analytics and the competency framework crosswalk. Opens behind its own access code.","url":"Dashboard---ClinicalCompetency/"}]},
-    {"slug":"clinical-skills","key":"clinicalskills","kicker":"Clinical Skills","title":"Clinical Skills Dashboard","short":"Clinical Skills",
-     "audience":"Clinical competency mentors, Practice of Medicine faculty, the Pre-Clerkship Curriculum Subcommittee, the Curricular Integration Subcommittee, the EEC, and OCA leadership.",
-     "intro":"Student-level clinical skills results from the Practice of Medicine modules and PEAKS I, by skill domain, to guide mentoring conversations and developmental feedback. The dashboard asks for your access code again when it opens.",
-     "primary":"Dashboard---ClinicalCompetency/",
-     "views":[
-      {"title":"Dashboard","blurb":"Each student's skill domains across POM1, POM2, POM3, and PEAKS I, by cohort and module."},
-      {"title":"Analytics","blurb":"Performance by skill, competency framework, quartile band, or faculty group, with sortable heatmaps and cohort comparison."},
-      {"title":"Frameworks","blurb":"The crosswalk from the six skill domains to the ISMMS program objectives, AAMC competencies, Core EPAs, and communication functions."}]},
-    {"slug":"phase-2-assessment","key":"phase2","kicker":"Programmatic Assessment","title":"Programmatic Assessment: Phase 2","short":"Phase 2",
-     "audience":"Clerkship directors, the Clinical Curriculum Subcommittee, the Curricular Integration Subcommittee, the EEC, and OCA leadership.",
-     "intro":"Clerkship-level outcomes for the clinical phase. Aggregate data by academic year with prior-year comparison; student-level files go to directors separately.",
-     "primary":"Dashboard-Phase-2-Program-Assessment/",
-     "views":[
-      {"title":"Clerkship dashboards","blurb":"One page per clerkship with grade distribution, NBME subject exam results by site, preceptor evaluation reliability, and direct-observation trends."},
-      {"title":"Clerkship and site evaluations","blurb":"Student evaluation items by clerkship and by teaching site, including the LCME supervision and learning-environment items."},
-      {"title":"CAMP and Transition to Phase 2","blurb":"Results for the bridging courses.","url":"Dashboard-Phase-2-Program-Assessment/clerkships/camp.html"},
-      {"title":"Objective mapping","blurb":"Clerkship learning objectives mapped to program objectives."}]},
-    {"slug":"phase-3-assessment","key":"phase3","kicker":"Programmatic Assessment","title":"Programmatic Assessment: Phase 3","short":"Phase 3",
-     "audience":"Course and clerkship directors, the Clinical Curriculum Subcommittee, the Curricular Integration Subcommittee, the EEC, and OCA leadership.",
-     "intro":"Outcomes for the Integration and Transitions phase. This site is being built. It will cover the Chronic Care Clerkship, the acting internships, Transition to Phase 3, Transition to Residency, and PEAKS III, in the same format as the Phase 1 and Phase 2 sites.",
-     "primary":"Dashboard-Phase-3-Program-Assessment/",
-     "views":[
-      {"title":"Chronic Care Clerkship","blurb":"Coming: cohort outcomes, assessment quality, and evaluations."},
-      {"title":"Acting internships","blurb":"Coming: the five acting internships, reported in one format."},
-      {"title":"Transitions and PEAKS III","blurb":"Coming: Transition to Phase 3, Transition to Residency, and PEAKS III."}]},
-    {"slug":"nbme-usmle","key":"nbme","kicker":"Assessment Monitoring","title":"NBME and USMLE Performance","short":"the exam dashboard",
-     "audience":"The Pre-Clerkship and Clinical Curriculum Subcommittees, the EEC, and OCA leadership.",
-     "intro":"Content-area strengths and gaps across national examinations, for curricular review across all phases.",
-     "primary":"Dashboard---NBME-CAS-Performance/",
-     "views":[
-      {"title":"Step 1 and Step 2","blurb":"Pass rates and content-area performance against national, by year."},
-      {"title":"Module customized assessments","blurb":"Phase 1 module exams by content category, with the CAS to CBSE correlation."},
-      {"title":"Comprehensive Basic Science Exam","blurb":"End-of-Phase-1 results by content area against national."},
-      {"title":"Clerkship shelf exams","blurb":"NBME subject exam content areas against national over three academic years."}]},
-    {"slug":"clerkship-quality","key":"clerkshipquality","kicker":"Clinical Learning Environment","title":"Clerkship Quality","short":"Clerkship Quality",
-     "audience":"Clerkship directors, the Clinical Curriculum Subcommittee, the EEC, and OCA leadership. Confidential, for accreditation use.",
-     "intro":"Monitoring of the clinical learning environment and assessment quality across the clerkships and their teaching sites. The site reports ask for your access code again when they open.",
-     "primary":"Dashboard---Clerkships/",
-     "views":[
-      {"title":"LCME element monitoring","blurb":"Elements 9.7, 9.4, 9.3, and 3.5 by clerkship against adjustable benchmarks, with trends and AAMC Graduation Questionnaire comparators.","url":"Dashboard---Clerkships/"},
-      {"title":"Site comparability","blurb":"The same supervision and learning-environment items by teaching site, each site benchmarked against its peers, plus a description of each site and which clerkships rotate there.","url":"Dashboard-Site-Comparability/"},
-      {"title":"Direct observations","blurb":"Item-level standardized-patient performance by station and clerkship, mapped to the NBME physician tasks framework.","url":"Dashboard---Direct-Observations/"},
-      {"title":"Assessment validity and reliability","blurb":"Psychometric review of the preceptor evaluation forms, including internal consistency and dimensionality.","url":"Dashboard---Clerkship-Assessments/"}]},
-    {"slug":"objectives-outcomes","key":"objectives","kicker":"Curriculum Mapping","title":"Objectives and Outcomes","short":"Objectives and Outcomes",
-     "audience":"Curriculum leaders, all EEC subcommittees, the EEC, and OCA leadership.",
-     "intro":"The program's learning objectives and how students are meeting them: every objective in Phases 1 to 3, the 23 program objectives, the milestones expected at each phase, and measured outcomes.",
-     "primary":"PMB-MLOs/",
-     "views":[
-      {"title":"Learning objectives library","blurb":"Every module and clerkship objective in Phases 1 to 3, mapped to the 23 program objectives, with a coverage matrix and CSV export.","url":"PMB-MLOs/"},
-      {"title":"Program objectives reference","blurb":"The 23 MEPOs by competency domain."},
-      {"title":"Milestones","blurb":"The end-of-phase milestone for each program objective at three gates, with measured Phase 1 results.","url":"Dashboard-MILESTONES-Map/"},
-      {"title":"MEPO outcomes","blurb":"Each program objective traced through its assessments and measures, with cohort and threshold views. Opens behind its own access code.","url":"MEPO-Outcomes-Dashboard/"}]},
-    {"slug":"policies","key":"policies","kicker":"Policies","title":"Policies","short":"the policy library",
-     "audience":"Faculty, staff, committee members, and OCA leadership.",
-     "intro":"The governed text of MD program policies, their procedures, and their review history.",
-     "primary":"Dashboard---Policy-Library/",
-     "views":[
-      {"title":"Policy library","blurb":"The approved curricular and student policies, searchable, with procedures, oversight, and related policies.","url":"Dashboard---Policy-Library/"},
-      {"title":"Review packets","blurb":"Current versus proposed text, rationale, and approval history for policies under committee review.","url":"PMB-Policies/"},
-      {"title":"Ask the policy desk","blurb":"Plain-language questions answered from the policy text."}]},
-    {"slug":"student-surveys","key":"surveys","kicker":"Student Feedback","title":"Student Surveys","short":"the surveys",
-     "audience":"The EEC and OCA leadership. The Graduation Questionnaire view is restricted.",
-     "intro":"What students report about the program, mapped to LCME elements, alongside national curriculum benchmarks.",
-     "primary":"ASQ-ISA/",
-     "views":[
-      {"title":"ASQ and ISA","blurb":"Results of the annual student questionnaire by class year and LCME element, with trends and flagged items.","url":"ASQ-ISA/"},
-      {"title":"AAMC Graduation Questionnaire","blurb":"The graduating class's results with five-year trends and national percentiles.","url":"GQSinai/"},
-      {"title":"AAMC Curriculum SCOPE","blurb":"National curriculum survey data over three years with a Mount Sinai overlay.","url":"AAMC-SCOPE/"}]},
-    {"slug":"lcme","key":"lcme","kicker":"Accreditation","title":"LCME Task Force","short":"the task force site",
-     "audience":"LCME Task Force members, the EEC, and OCA leadership.",
-     "intro":"Working materials for the 2027–28 self-study and site visit.",
-     "primary":"Dashboard---LCME/",
-     "views":[
-      {"title":"Data Collection Instrument","blurb":"All standards and elements with narratives, tables, and supporting documents.","url":"Dashboard---LCME/#/dci"},
-      {"title":"Independent Student Analysis","blurb":"The required survey items by domain.","url":"Dashboard---LCME/#/isa"},
-      {"title":"Subcommittees and tasks","blurb":"Membership, element assignments, and due dates.","url":"Dashboard---LCME/#/members"},
-      {"title":"Glossary and kickoff reference","blurb":"Terms, dates, roadmap, and program objectives.","url":"Dashboard---LCME/#/glossary"}]},
-    {"slug":"governance","key":"governance","kicker":"Governance","title":"Curriculum Governance","short":"Governance",
-     "audience":"Committee members and coordinators, all EEC subcommittees, the EEC, and OCA leadership.",
-     "intro":"The Executive Education Committee and its subcommittees: what is scheduled, what was decided, who serves, and the reviews they oversee. The site has its own sign-in.",
-     "primaryAbs":"https://ascend-governance.vercel.app/",
-     "views":[
-      {"title":"Meetings and agendas","blurb":"The governance calendar and planned agendas."},
-      {"title":"Minutes","blurb":"Approved minutes with full-text search, motions, and action items."},
-      {"title":"Membership and attendance","blurb":"Rosters, bylaws, and charters."},
-      {"title":"Curriculum reviews","blurb":"The LCME-mapped phase reviews and pre-meeting briefs."}]},
-    {"slug":"student-performance","key":"studentperf","kicker":"De-identified Student Data","title":"Student Performance Dashboard","short":"the dashboard",
-     "audience":"Holders of the student-data code only. Names are held in a separate key.",
-     "intro":"De-identified student-level performance across all three phases, by student code: module quizzes, NBME customized assessments, OSCE and clinical skills evaluations, and shelf exams, with a class roster and a rotation view.",
-     "primaryAbs":"../Student_Performance.html",
-     "views":[
-      {"title":"Class roster","blurb":"Every student by code, with phase and rotation."},
-      {"title":"Assessments","blurb":"Quizzes, NBME customized assessments, OSCE and clinical skills evaluations, and shelf exams by student."},
-      {"title":"Rotation view","blurb":"Performance by rotation and site."}]}
-  ]
+ "base": "https://sinaiascend.github.io/",
+ "sites": [
+  {
+   "slug": "navigator",
+   "key": "navigator",
+   "public": true,
+   "kicker": "Curriculum Search",
+   "title": "Curriculum Navigator",
+   "short": "the Navigator",
+   "audience": "Students, faculty, and staff. Open to everyone.",
+   "intro": "Search the ASCEND curriculum from one place. Find any session, learning objective, or calendar date across all three phases, and see how sessions connect to program objectives, threads, and Areas of Concentration.",
+   "primary": "Dashboard---Students/",
+   "views": [
+    {
+     "title": "Sessions",
+     "blurb": "Every Phase 1 session by module, with objectives, format, and hours. Built from the master curriculum map."
+    },
+    {
+     "title": "Learning objectives",
+     "blurb": "Module objectives and their mapping to the 23 Medical Education Program Objectives."
+    },
+    {
+     "title": "Clerkships",
+     "blurb": "The Phase 2 clerkships with their learning objectives."
+    },
+    {
+     "title": "Threads and Areas of Concentration",
+     "blurb": "Where each curricular thread and AOC is taught, by session."
+    },
+    {
+     "title": "Academic calendar",
+     "blurb": "The current and next academic year, searchable by date or event."
+    },
+    {
+     "title": "Directors view",
+     "blurb": "The same content labelled for module and clerkship directors. This is the former Directors’ Dashboard.",
+     "url": "Dashboard---Students/?view=directors"
+    },
+    {
+     "title": "Ask ASCEND",
+     "blurb": "Plain-language questions answered from the curriculum map and policies."
+    }
+   ]
+  },
+  {
+   "slug": "electives",
+   "key": "electives",
+   "public": true,
+   "kicker": "Career Exploration",
+   "title": "Electives and NEXUS Catalog",
+   "short": "the catalog",
+   "audience": "Students. Open to everyone.",
+   "intro": "Explore the career-exploration options offered to ISMMS students: electives, NEXUS Learning offerings, host institutions for away rotations, and what returning students said about them.",
+   "primary": "Dashboard---Electives/",
+   "views": [
+    {
+     "title": "Electives catalog",
+     "blurb": "All medical student electives, filterable by field, Area of Concentration, phase, and schedule. Built from the master electives catalog.",
+     "url": "Dashboard---Electives/"
+    },
+    {
+     "title": "NEXUS offerings",
+     "blurb": "The NEXUS Learning catalog with the same filters.",
+     "url": "Dashboard---Electives/?lens=nexus"
+    },
+    {
+     "title": "Away electives",
+     "blurb": "Host institutions where students have completed extramural rotations.",
+     "url": "Dashboard---Electives/away-electives.html"
+    },
+    {
+     "title": "Extramural ratings",
+     "blurb": "Ratings and comments on host institutions from returning students.",
+     "url": "Dashboard---Electives/extramural-ratings.html"
+    }
+   ]
+  },
+  {
+   "slug": "baby-bates",
+   "key": "babybates",
+   "public": true,
+   "kicker": "Physical Examination",
+   "title": "Baby Bates",
+   "short": "Baby Bates",
+   "audience": "Students. Open to everyone.",
+   "intro": "A pocket clinical reference for history-taking and physical examination, drawn from Bates' Guide, to support clinical skills coaching and direct observation.",
+   "primary": "Dashboard---BabyBates/",
+   "views": [
+    {
+     "title": "Core physical exam",
+     "blurb": "The core exam and exam clusters by system."
+    },
+    {
+     "title": "Scripts and algorithms",
+     "blurb": "Illness scripts, clinical scripts, and diagnostic algorithms."
+    },
+    {
+     "title": "Quick reference",
+     "blurb": "Devices, labs, abbreviations, and structural vulnerability resources."
+    },
+    {
+     "title": "Practice of Medicine resources",
+     "blurb": "Materials for coaching and direct observation in the POM modules."
+    }
+   ]
+  },
+  {
+   "slug": "people",
+   "key": "people",
+   "public": true,
+   "kicker": "Office Resources",
+   "title": "People",
+   "short": "the directory",
+   "audience": "Students, faculty, and staff. Open to everyone.",
+   "intro": "Who does what across the ASCEND curriculum: the Office of Curricular Affairs, the students who represent their classes in governance, and the faculty roles that are open.",
+   "primary": "Curricular-Affairs/",
+   "views": [
+    {
+     "title": "Office of Curricular Affairs",
+     "blurb": "Org chart and directory of directors, co-directors, coordinators, and managers by phase and area.",
+     "url": "Curricular-Affairs/"
+    },
+    {
+     "title": "Curricular student leadership",
+     "blurb": "Student representatives on the EEC and its subcommittees, and per-module and per-clerkship representatives by class.",
+     "url": "Dashboard---Curricular-Students/"
+    },
+    {
+     "title": "Faculty opportunities",
+     "blurb": "Open roles, leadership positions, and ways to get involved in medical education.",
+     "url": "Dashboard---JobPostings/"
+    }
+   ]
+  },
+  {
+   "slug": "phase-1-assessment",
+   "key": "phase1",
+   "kicker": "Programmatic Assessment",
+   "title": "Programmatic Assessment: Phase 1",
+   "short": "Phase 1",
+   "audience": "Module directors, the Pre-Clerkship Curriculum Subcommittee, the Curricular Integration Subcommittee, the EEC, and OCA leadership.",
+   "intro": "Module-level outcomes for the pre-clerkship phase. Aggregate data by class cohort: how each module's assessments performed, what students said, and how the module maps to the program objectives.",
+   "primary": "Dashboard-Phase-1-Program-Assessment/",
+   "views": [
+    {
+     "title": "Module dashboards",
+     "blurb": "One page per module with grading structure, final and component results, NBME customized assessment and end-of-module exam statistics, quizzes, and cohort comparison."
+    },
+    {
+     "title": "Student evaluations",
+     "blurb": "Module evaluation results and trends."
+    },
+    {
+     "title": "Curricular hours and objective mapping",
+     "blurb": "Hours by format, and module objectives mapped to program objectives."
+    },
+    {
+     "title": "Clinical skills",
+     "blurb": "Student-level Practice of Medicine and PEAKS I clinical skills by domain, with faculty-group analytics and the competency framework crosswalk. Opens behind its own access code.",
+     "url": "Dashboard---ClinicalCompetency/"
+    }
+   ]
+  },
+  {
+   "slug": "clinical-skills",
+   "key": "clinicalskills",
+   "kicker": "Clinical Skills",
+   "title": "Clinical Skills Dashboard",
+   "short": "Clinical Skills",
+   "audience": "Clinical competency mentors, Practice of Medicine faculty, the Pre-Clerkship Curriculum Subcommittee, the Curricular Integration Subcommittee, the EEC, and OCA leadership.",
+   "intro": "Student-level clinical skills results from the Practice of Medicine modules and PEAKS I, by skill domain, to guide mentoring conversations and developmental feedback. The dashboard asks for your access code again when it opens.",
+   "primary": "Dashboard---ClinicalCompetency/",
+   "views": [
+    {
+     "title": "Dashboard",
+     "blurb": "Each student's skill domains across POM1, POM2, POM3, and PEAKS I, by cohort and module."
+    },
+    {
+     "title": "Analytics",
+     "blurb": "Performance by skill, competency framework, quartile band, or faculty group, with sortable heatmaps and cohort comparison."
+    },
+    {
+     "title": "Frameworks",
+     "blurb": "The crosswalk from the six skill domains to the ISMMS program objectives, AAMC competencies, Core EPAs, and communication functions."
+    }
+   ]
+  },
+  {
+   "slug": "phase-2-assessment",
+   "key": "phase2",
+   "kicker": "Programmatic Assessment",
+   "title": "Programmatic Assessment: Phase 2",
+   "short": "Phase 2",
+   "audience": "Clerkship directors, the Clinical Curriculum Subcommittee, the Curricular Integration Subcommittee, the EEC, and OCA leadership.",
+   "intro": "Clerkship-level outcomes for the clinical phase. Aggregate data by academic year with prior-year comparison; student-level files go to directors separately.",
+   "primary": "Dashboard-Phase-2-Program-Assessment/",
+   "views": [
+    {
+     "title": "Clerkship dashboards",
+     "blurb": "One page per clerkship with grade distribution, NBME subject exam results by site, preceptor evaluation reliability, and direct-observation trends."
+    },
+    {
+     "title": "Clerkship and site evaluations",
+     "blurb": "Student evaluation items by clerkship and by teaching site, including the LCME supervision and learning-environment items."
+    },
+    {
+     "title": "CAMP and Transition to Phase 2",
+     "blurb": "Results for the bridging courses.",
+     "url": "Dashboard-Phase-2-Program-Assessment/clerkships/camp.html"
+    },
+    {
+     "title": "Objective mapping",
+     "blurb": "Clerkship learning objectives mapped to program objectives."
+    }
+   ]
+  },
+  {
+   "slug": "phase-3-assessment",
+   "key": "phase3",
+   "kicker": "Programmatic Assessment",
+   "title": "Programmatic Assessment: Phase 3",
+   "short": "Phase 3",
+   "audience": "Course and clerkship directors, the Clinical Curriculum Subcommittee, the Curricular Integration Subcommittee, the EEC, and OCA leadership.",
+   "intro": "Outcomes for the Integration and Transitions phase. This site is being built. It will cover the Chronic Care Clerkship, the acting internships, Transition to Phase 3, Transition to Residency, and PEAKS III, in the same format as the Phase 1 and Phase 2 sites.",
+   "primary": "Dashboard-Phase-3-Program-Assessment/",
+   "views": [
+    {
+     "title": "Chronic Care Clerkship",
+     "blurb": "Coming: cohort outcomes, assessment quality, and evaluations."
+    },
+    {
+     "title": "Acting internships",
+     "blurb": "Coming: the five acting internships, reported in one format."
+    },
+    {
+     "title": "Transitions and PEAKS III",
+     "blurb": "Coming: Transition to Phase 3, Transition to Residency, and PEAKS III."
+    }
+   ]
+  },
+  {
+   "slug": "nbme-usmle",
+   "key": "nbme",
+   "kicker": "Assessment Monitoring",
+   "title": "NBME and USMLE Performance",
+   "short": "the exam dashboard",
+   "audience": "The Pre-Clerkship and Clinical Curriculum Subcommittees, the EEC, and OCA leadership.",
+   "intro": "Content-area strengths and gaps across national examinations, for curricular review across all phases.",
+   "primary": "Dashboard---NBME-CAS-Performance/",
+   "views": [
+    {
+     "title": "Step 1 and Step 2",
+     "blurb": "Pass rates and content-area performance against national, by year."
+    },
+    {
+     "title": "Module customized assessments",
+     "blurb": "Phase 1 module exams by content category, with the CAS to CBSE correlation."
+    },
+    {
+     "title": "Comprehensive Basic Science Exam",
+     "blurb": "End-of-Phase-1 results by content area against national."
+    },
+    {
+     "title": "Clerkship shelf exams",
+     "blurb": "NBME subject exam content areas against national over three academic years."
+    }
+   ]
+  },
+  {
+   "slug": "clerkship-quality",
+   "key": "clerkshipquality",
+   "kicker": "Clinical Learning Environment",
+   "title": "Clerkship Quality",
+   "short": "Clerkship Quality",
+   "audience": "Clerkship directors, the Clinical Curriculum Subcommittee, the EEC, and OCA leadership. Confidential, for accreditation use.",
+   "intro": "Monitoring of the clinical learning environment and assessment quality across the clerkships and their teaching sites. The site reports ask for your access code again when they open.",
+   "primary": "Dashboard---Clerkships/",
+   "views": [
+    {
+     "title": "LCME element monitoring",
+     "blurb": "Elements 9.7, 9.4, 9.3, and 3.5 by clerkship against adjustable benchmarks, with trends and AAMC Graduation Questionnaire comparators.",
+     "url": "Dashboard---Clerkships/"
+    },
+    {
+     "title": "Site comparability",
+     "blurb": "The same supervision and learning-environment items by teaching site, each site benchmarked against its peers, plus a description of each site and which clerkships rotate there.",
+     "url": "Dashboard-Site-Comparability/"
+    },
+    {
+     "title": "Direct observations",
+     "blurb": "Item-level standardized-patient performance by station and clerkship, mapped to the NBME physician tasks framework.",
+     "url": "Dashboard---Direct-Observations/"
+    },
+    {
+     "title": "Assessment validity and reliability",
+     "blurb": "Psychometric review of the preceptor evaluation forms, including internal consistency and dimensionality.",
+     "url": "Dashboard---Clerkship-Assessments/"
+    }
+   ]
+  },
+  {
+   "slug": "objectives-outcomes",
+   "key": "objectives",
+   "kicker": "Curriculum Mapping",
+   "title": "Objectives and Outcomes",
+   "short": "Objectives and Outcomes",
+   "audience": "Curriculum leaders, all EEC subcommittees, the EEC, and OCA leadership.",
+   "intro": "The program's learning objectives and how students are meeting them: every objective in Phases 1 to 3, the 23 program objectives, the milestones expected at each phase, and measured outcomes.",
+   "primary": "PMB-MLOs/",
+   "views": [
+    {
+     "title": "Learning objectives library",
+     "blurb": "Every module and clerkship objective in Phases 1 to 3, mapped to the 23 program objectives, with a coverage matrix and CSV export.",
+     "url": "PMB-MLOs/"
+    },
+    {
+     "title": "Program objectives reference",
+     "blurb": "The 23 MEPOs by competency domain."
+    },
+    {
+     "title": "Milestones",
+     "blurb": "The end-of-phase milestone for each program objective at three gates, with measured Phase 1 results.",
+     "url": "Dashboard-MILESTONES-Map/"
+    },
+    {
+     "title": "MEPO outcomes",
+     "blurb": "Each program objective traced through its assessments and measures, with cohort and threshold views. Opens behind its own access code.",
+     "url": "MEPO-Outcomes-Dashboard/"
+    }
+   ]
+  },
+  {
+   "slug": "policies",
+   "key": "policies",
+   "kicker": "Policies",
+   "title": "Policies",
+   "short": "the policy library",
+   "audience": "Faculty, staff, committee members, and OCA leadership.",
+   "intro": "The governed text of MD program policies, their procedures, and their review history.",
+   "primary": "Dashboard---Policy-Library/",
+   "views": [
+    {
+     "title": "Policy library",
+     "blurb": "The approved curricular and student policies, searchable, with procedures, oversight, and related policies.",
+     "url": "Dashboard---Policy-Library/"
+    },
+    {
+     "title": "Review packets",
+     "blurb": "Current versus proposed text, rationale, and approval history for policies under committee review.",
+     "url": "PMB-Policies/"
+    },
+    {
+     "title": "Ask the policy desk",
+     "blurb": "Plain-language questions answered from the policy text."
+    }
+   ]
+  },
+  {
+   "slug": "student-surveys",
+   "key": "surveys",
+   "kicker": "Student Feedback",
+   "title": "Student Surveys",
+   "short": "the surveys",
+   "audience": "The EEC and OCA leadership. The Graduation Questionnaire view is restricted.",
+   "intro": "What students report about the program, mapped to LCME elements, alongside national curriculum benchmarks.",
+   "primary": "ASQ-ISA/",
+   "views": [
+    {
+     "title": "ASQ and ISA",
+     "blurb": "Results of the annual student questionnaire by class year and LCME element, with trends and flagged items.",
+     "url": "ASQ-ISA/"
+    },
+    {
+     "title": "AAMC Graduation Questionnaire",
+     "blurb": "The graduating class's results with five-year trends and national percentiles.",
+     "url": "GQSinai/"
+    },
+    {
+     "title": "AAMC Curriculum SCOPE",
+     "blurb": "National curriculum survey data over three years with a Mount Sinai overlay.",
+     "url": "AAMC-SCOPE/"
+    }
+   ]
+  },
+  {
+   "slug": "lcme",
+   "key": "lcme",
+   "kicker": "Accreditation",
+   "title": "LCME Task Force",
+   "short": "the task force site",
+   "audience": "LCME Task Force members, the EEC, and OCA leadership.",
+   "intro": "Working materials for the 2027–28 self-study and site visit.",
+   "primary": "Dashboard---LCME/",
+   "views": [
+    {
+     "title": "Data Collection Instrument",
+     "blurb": "All standards and elements with narratives, tables, and supporting documents.",
+     "url": "Dashboard---LCME/#/dci"
+    },
+    {
+     "title": "Independent Student Analysis",
+     "blurb": "The required survey items by domain.",
+     "url": "Dashboard---LCME/#/isa"
+    },
+    {
+     "title": "Subcommittees and tasks",
+     "blurb": "Membership, element assignments, and due dates.",
+     "url": "Dashboard---LCME/#/members"
+    },
+    {
+     "title": "Glossary and kickoff reference",
+     "blurb": "Terms, dates, roadmap, and program objectives.",
+     "url": "Dashboard---LCME/#/glossary"
+    }
+   ]
+  },
+  {
+   "slug": "governance",
+   "key": "governance",
+   "kicker": "Governance",
+   "title": "Curriculum Governance",
+   "short": "Governance",
+   "audience": "Committee members and coordinators, all EEC subcommittees, the EEC, and OCA leadership.",
+   "intro": "The Executive Education Committee and its subcommittees: what is scheduled, what was decided, who serves, and the reviews they oversee. The site has its own sign-in.",
+   "primaryAbs": "https://ascend-governance.vercel.app/",
+   "views": [
+    {
+     "title": "Meetings and agendas",
+     "blurb": "The governance calendar and planned agendas."
+    },
+    {
+     "title": "Minutes",
+     "blurb": "Approved minutes with full-text search, motions, and action items."
+    },
+    {
+     "title": "Membership and attendance",
+     "blurb": "Rosters, bylaws, and charters."
+    },
+    {
+     "title": "Curriculum reviews",
+     "blurb": "The LCME-mapped phase reviews and pre-meeting briefs."
+    }
+   ]
+  },
+  {
+   "slug": "student-performance",
+   "key": "studentperf",
+   "kicker": "De-identified Student Data",
+   "title": "Student Performance Dashboard",
+   "short": "the dashboard",
+   "audience": "Holders of the student-data code only. Names are held in a separate key.",
+   "intro": "De-identified student-level performance across all three phases, by student code: module quizzes, NBME customized assessments, OSCE and clinical skills evaluations, and shelf exams, with a class roster and a rotation view.",
+   "primaryAbs": "../Student_Performance.html",
+   "views": [
+    {
+     "title": "Class roster",
+     "blurb": "Every student by code, with phase and rotation."
+    },
+    {
+     "title": "Assessments",
+     "blurb": "Quizzes, NBME customized assessments, OSCE and clinical skills evaluations, and shelf exams by student."
+    },
+    {
+     "title": "Rotation view",
+     "blurb": "Performance by rotation and site."
+    }
+   ]
+  }
+ ]
 }
