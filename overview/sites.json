@@ -274,7 +274,7 @@
    "title": "Clerkship Quality",
    "short": "Clerkship Quality",
    "audience": "Clerkship directors, the Clinical Curriculum Subcommittee, the EEC, and OCA leadership. Confidential, for accreditation use.",
-   "intro": "Monitoring of the clinical learning environment and assessment quality across the clerkships and their teaching sites. The site reports ask for your access code again when they open.",
+   "intro": "Monitoring of the clinical learning environment and assessment quality across the clerkships and their teaching sites, in one site with four views. The site reports ask for your access code again when they open.",
    "primary": "Dashboard---Clerkships/",
    "views": [
     {
@@ -285,17 +285,17 @@
     {
      "title": "Site comparability",
      "blurb": "The same supervision and learning-environment items by teaching site, each site benchmarked against its peers, plus a description of each site and which clerkships rotate there.",
-     "url": "Dashboard-Site-Comparability/"
+     "url": "Dashboard---Clerkships/sites/"
     },
     {
      "title": "Direct observations",
      "blurb": "Item-level standardized-patient performance by station and clerkship, mapped to the NBME physician tasks framework.",
-     "url": "Dashboard---Direct-Observations/"
+     "url": "Dashboard---Clerkships/observations/"
     },
     {
      "title": "Assessment validity and reliability",
      "blurb": "Psychometric review of the preceptor evaluation forms, including internal consistency and dimensionality.",
-     "url": "Dashboard---Clerkship-Assessments/"
+     "url": "Dashboard---Clerkships/validity/"
     }
    ]
   },
