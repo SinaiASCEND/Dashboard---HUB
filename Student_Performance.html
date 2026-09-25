@@ -184,6 +184,10 @@ button,select,input{font:inherit;color:inherit}
 .mastsub{color:#c3d6ee;font-size:13.5px;margin-top:6px;max-width:74ch}
 .mastlogo{height:52px;width:auto;flex:none;margin-bottom:2px;-webkit-user-drag:none;user-select:none}
 .mastactions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+/* Once the shared ASCEND masthead is in place (ascend-mast.js hides header.mast),
+   the action buttons are moved into its utility row and sit at the right. */
+#ascend-masthead .am-util .in .mastactions{margin-left:auto}
+@media(max-width:640px){#ascend-masthead .am-util .in .mastactions{margin-left:0}}
 .ghost{background:rgba(255,255,255,.10);color:#fff;border:1px solid rgba(255,255,255,.28);
   border-radius:999px;padding:7px 14px;font-size:12.5px;font-weight:700;cursor:pointer}
 .ghost:hover{background:rgba(255,255,255,.20)}
@@ -3997,5 +4001,19 @@ document.addEventListener('DOMContentLoaded', bootGate);
 
 </script>
 <script src="https://sinaiascend.github.io/Dashboard---HUB/ascend-mast.js" data-title="Student Performance Dashboard" data-site="De-identified student data · all phases" data-hide="header.mast"></script>
+<script>
+/* The shared masthead hides this page's own header, which is where the Load data
+   file, Load photos, Access log, Dark mode and Print buttons lived. Move that
+   button group into the shared masthead's utility row so it stays reachable. */
+(function(){
+  function move(){
+    var row = document.querySelector('#ascend-masthead .am-util .in');
+    var acts = document.querySelector('header.mast .mastactions');
+    if(row && acts) row.appendChild(acts);
+  }
+  if(document.getElementById('ascend-masthead')) move();
+  else document.addEventListener('DOMContentLoaded', move);
+})();
+</script>
 </body>
 </html>
