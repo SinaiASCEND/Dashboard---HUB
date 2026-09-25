@@ -193,7 +193,7 @@
    "title": "ASCEND Phase 2 Directors Dashboard",
    "short": "Phase 2",
    "audience": "Clerkship directors, the Clinical Curriculum Subcommittee, the Curricular Integration Subcommittee, the EEC, and OCA leadership.",
-   "intro": "Clerkship-level outcomes for the clinical phase. Aggregate data by academic year with prior-year comparison; student-level files go to directors separately.",
+   "intro": "Clerkship-level outcomes for the clinical phase, plus program-wide clerkship monitoring across teaching sites. Aggregate data by academic year with prior-year comparison; student-level files go to directors separately.",
    "primary": "Dashboard-Phase-2-Program-Assessment/",
    "views": [
     {
@@ -201,8 +201,24 @@
      "blurb": "One page per clerkship with grade distribution, NBME subject exam results by site, preceptor evaluation reliability, and direct-observation trends."
     },
     {
-     "title": "Clerkship and site evaluations",
-     "blurb": "Student evaluation items by clerkship and by teaching site, including the LCME supervision and learning-environment items."
+     "title": "Clerkship monitoring",
+     "blurb": "LCME items by clerkship (feedback, direct observation, workload), site items by clerkship and teaching site, trends, and the GQ comparator, against an adjustable benchmark.",
+     "url": "Dashboard-Phase-2-Program-Assessment/monitoring.html"
+    },
+    {
+     "title": "Site reports",
+     "blurb": "One teaching site at a time: every clerkship that rotates there against the other sites of the same clerkship and the prior year, with the site’s history.",
+     "url": "Dashboard-Phase-2-Program-Assessment/sites.html"
+    },
+    {
+     "title": "Direct observations",
+     "blurb": "Item-level standardized-patient performance by station and clerkship, mapped to the NBME physician tasks framework.",
+     "url": "Dashboard-Phase-2-Program-Assessment/observations/"
+    },
+    {
+     "title": "Assessment validity and reliability",
+     "blurb": "Psychometric review of the preceptor evaluation forms, including internal consistency and dimensionality.",
+     "url": "Dashboard-Phase-2-Program-Assessment/validity/"
     },
     {
      "title": "CAMP and Transition to Phase 2",
@@ -264,38 +280,6 @@
     {
      "title": "Clerkship shelf exams",
      "blurb": "NBME subject exam content areas against national over three academic years."
-    }
-   ]
-  },
-  {
-   "slug": "clerkship-quality",
-   "key": "clerkshipquality",
-   "kicker": "Clinical Learning Environment",
-   "title": "ASCEND Clerkship Dashboard",
-   "short": "Clerkship Quality",
-   "audience": "Clerkship directors, the Clinical Curriculum Subcommittee, the EEC, and OCA leadership. Confidential, for accreditation use.",
-   "intro": "Monitoring of the clinical learning environment and assessment quality across the clerkships and their teaching sites, in one site with four views.",
-   "primary": "Dashboard---Clerkships/",
-   "views": [
-    {
-     "title": "LCME element monitoring",
-     "blurb": "Elements 9.7, 9.4, 9.3, and 3.5 by clerkship against adjustable benchmarks, with trends and AAMC Graduation Questionnaire comparators.",
-     "url": "Dashboard---Clerkships/"
-    },
-    {
-     "title": "Site comparability",
-     "blurb": "The same supervision and learning-environment items by teaching site, each site benchmarked against its peers, plus a description of each site and which clerkships rotate there.",
-     "url": "Dashboard---Clerkships/sites/"
-    },
-    {
-     "title": "Direct observations",
-     "blurb": "Item-level standardized-patient performance by station and clerkship, mapped to the NBME physician tasks framework.",
-     "url": "Dashboard---Clerkships/observations/"
-    },
-    {
-     "title": "Assessment validity and reliability",
-     "blurb": "Psychometric review of the preceptor evaluation forms, including internal consistency and dimensionality.",
-     "url": "Dashboard---Clerkships/validity/"
     }
    ]
   },
