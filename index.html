@@ -138,6 +138,8 @@ a.card:nth-child(even){border-top-color:var(--cyan)}
 a.card:hover{box-shadow:0 8px 26px rgba(10,31,68,.13);transform:translateY(-2px)}
 a.card.pinned{background:linear-gradient(180deg,#e9f3fb 0%,#f3f8fd 100%);border-color:#b7d6ec;border-top:3px solid var(--cyan)}
 a.card.pinned .cardkicker{color:var(--navy2)}
+a.card.pinned[data-key="governance"]{background:linear-gradient(180deg,#fbeaf3 0%,#fdf5f9 100%);border-color:#e9b6d3;border-top-color:var(--magenta)}
+a.card.pinned[data-key="governance"] .cardgo{color:var(--magenta)}
 a.card:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
 .cardkicker{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:800;color:var(--muted);margin-bottom:8px}
 .cardtitle{font-size:18px;font-weight:800;line-height:1.25;margin-bottom:8px;color:var(--navy)}
@@ -505,6 +507,7 @@ function renderTier(tier){
     const a=document.createElement('a');
     a.className='card';
     if(pinned.includes(key)) a.classList.add('pinned');
+    a.dataset.key = key;
     if(isLocked){
       a.classList.add('locked');
       a.setAttribute('role','button');
