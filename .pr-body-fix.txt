@@ -1,0 +1,1 @@
+The 'Clerkship Site Comparability (2025–26)' card linked to ./Site_Comparability_2025-26.html, which exists neither in this repo nor in the OneDrive source, so it returned 404. Removed the card and its tier references; the live Site Comparability site keeps its own card.

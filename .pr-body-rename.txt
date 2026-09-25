@@ -1,0 +1,1 @@
+The Clinical Competency dashboard is now the Clinical Skills dashboard. The MEPO card linked straight to desktop.html, bypassing the site's index; it now opens the site root, which is the access-code gate that routes to desktop or mobile. (The OneDrive Hub source needs the same two edits.)
