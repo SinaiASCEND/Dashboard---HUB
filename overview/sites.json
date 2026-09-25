@@ -157,7 +157,7 @@
     },
     {
      "title": "Clinical skills",
-     "blurb": "Student-level Practice of Medicine and PEAKS I clinical skills by domain, with faculty-group analytics and the competency framework crosswalk. Opens behind its own access code.",
+     "blurb": "Practice of Medicine and PEAKS I clinical skills by domain, with faculty-group analytics and the competency framework crosswalk.",
      "url": "Dashboard---ClinicalCompetency/"
     }
    ]
@@ -169,7 +169,7 @@
    "title": "Clinical Skills Dashboard",
    "short": "Clinical Skills",
    "audience": "Clinical competency mentors, Practice of Medicine faculty, the Pre-Clerkship Curriculum Subcommittee, the Curricular Integration Subcommittee, the EEC, and OCA leadership.",
-   "intro": "Student-level clinical skills results from the Practice of Medicine modules and PEAKS I, by skill domain, to guide mentoring conversations and developmental feedback. The dashboard asks for your access code again when it opens.",
+   "intro": "Student clinical skills results from the Practice of Medicine modules and PEAKS I, by skill domain, to guide mentoring conversations and developmental feedback.",
    "primary": "Dashboard---ClinicalCompetency/",
    "views": [
     {
@@ -274,7 +274,7 @@
    "title": "Clerkship Quality",
    "short": "Clerkship Quality",
    "audience": "Clerkship directors, the Clinical Curriculum Subcommittee, the EEC, and OCA leadership. Confidential, for accreditation use.",
-   "intro": "Monitoring of the clinical learning environment and assessment quality across the clerkships and their teaching sites, in one site with four views. The site reports ask for your access code again when they open.",
+   "intro": "Monitoring of the clinical learning environment and assessment quality across the clerkships and their teaching sites, in one site with four views.",
    "primary": "Dashboard---Clerkships/",
    "views": [
     {
@@ -326,7 +326,7 @@
     },
     {
      "title": "MEPO outcomes",
-     "blurb": "Each program objective traced through its assessments and measures, with cohort and threshold views. Opens behind its own access code.",
+     "blurb": "Each program objective traced through its assessments and measures, with cohort and threshold views.",
      "url": "MEPO-Outcomes-Dashboard/"
     }
    ]
