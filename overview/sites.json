@@ -306,7 +306,7 @@
    "title": "Objectives and Outcomes",
    "short": "Objectives and Outcomes",
    "audience": "Curriculum leaders, all EEC subcommittees, the EEC, and OCA leadership.",
-   "intro": "The program's learning objectives and how students are meeting them: every objective in Phases 1 to 3, the 23 program objectives, the milestones expected at each phase, and measured outcomes.",
+   "intro": "The program's learning objectives and how students are meeting them: every objective in Phases 1 to 3, the 23 program objectives, the milestones expected at each phase, and measured outcomes. The library and the Milestones Map share one framework file and one MEPO wording.",
    "primary": "PMB-MLOs/",
    "views": [
     {
@@ -316,12 +316,13 @@
     },
     {
      "title": "Program objectives reference",
-     "blurb": "The 23 MEPOs by competency domain."
+     "blurb": "The 23 MEPOs by competency domain.",
+     "url": "PMB-MLOs/#view=mepos"
     },
     {
      "title": "Milestones",
      "blurb": "The end-of-phase milestone for each program objective at three gates, with measured Phase 1 results.",
-     "url": "Dashboard-MILESTONES-Map/"
+     "url": "PMB-MLOs/milestones.html"
     },
     {
      "title": "MEPO outcomes",
