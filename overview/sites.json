@@ -113,7 +113,7 @@
    "title": "People",
    "short": "the directory",
    "audience": "Students, faculty, and staff. Open to everyone.",
-   "intro": "Who does what across the ASCEND curriculum: the Office of Curricular Affairs, the students who represent their classes in governance, and the faculty roles that are open.",
+   "intro": "Who does what across the ASCEND curriculum, in one site: the Office of Curricular Affairs, the students who represent their classes in governance, and the faculty roles that are open.",
    "primary": "Curricular-Affairs/",
    "views": [
     {
@@ -124,12 +124,12 @@
     {
      "title": "Curricular student leadership",
      "blurb": "Student representatives on the EEC and its subcommittees, and per-module and per-clerkship representatives by class.",
-     "url": "Dashboard---Curricular-Students/"
+     "url": "Curricular-Affairs/students/"
     },
     {
      "title": "Faculty opportunities",
      "blurb": "Open roles, leadership positions, and ways to get involved in medical education.",
-     "url": "Dashboard---JobPostings/"
+     "url": "Curricular-Affairs/opportunities/"
     }
    ]
   },
@@ -338,7 +338,7 @@
    "title": "Policies",
    "short": "the policy library",
    "audience": "Faculty, staff, committee members, and OCA leadership.",
-   "intro": "The governed text of MD program policies, their procedures, and their review history.",
+   "intro": "The governed text of MD program policies, their procedures, and their review history, in one site.",
    "primary": "Dashboard---Policy-Library/",
    "views": [
     {
@@ -349,7 +349,7 @@
     {
      "title": "Review packets",
      "blurb": "Current versus proposed text, rationale, and approval history for policies under committee review.",
-     "url": "PMB-Policies/"
+     "url": "Dashboard---Policy-Library/review/"
     },
     {
      "title": "Ask the policy desk",
@@ -364,7 +364,7 @@
    "title": "Student Surveys",
    "short": "the surveys",
    "audience": "The EEC and OCA leadership. The Graduation Questionnaire view is restricted.",
-   "intro": "What students report about the program, mapped to LCME elements, alongside national curriculum benchmarks.",
+   "intro": "What students report about the program, mapped to LCME elements, alongside national curriculum benchmarks, in one site with three views.",
    "primary": "ASQ-ISA/",
    "views": [
     {
@@ -375,12 +375,12 @@
     {
      "title": "AAMC Graduation Questionnaire",
      "blurb": "The graduating class's results with five-year trends and national percentiles.",
-     "url": "GQSinai/"
+     "url": "ASQ-ISA/gq/"
     },
     {
      "title": "AAMC Curriculum SCOPE",
      "blurb": "National curriculum survey data over three years with a Mount Sinai overlay.",
-     "url": "AAMC-SCOPE/"
+     "url": "ASQ-ISA/scope/"
     }
    ]
   },
