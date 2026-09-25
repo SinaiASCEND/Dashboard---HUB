@@ -82,3 +82,10 @@
   .ascend-mast .am-util .in{padding:8px 14px;font-size:12px;gap:8px}
   .ascend-mast .am-hub{padding:6px 12px;font-size:12px}
 }
+
+/* Section links in the utility row (set by ascend-mast.js data-nav). */
+.ascend-mast .am-util .in .am-nav{margin-left:auto;display:flex;gap:4px;flex-wrap:wrap}
+.ascend-mast .am-util .in .am-nav a{color:#fff;text-decoration:none;font-weight:600;font-size:13px;padding:5px 11px;border-radius:999px;border:1px solid transparent;opacity:.85}
+.ascend-mast .am-util .in .am-nav a:hover{opacity:1;border-color:rgba(255,255,255,.45)}
+.ascend-mast .am-util .in .am-nav a.on{opacity:1;background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.45)}
+@media(max-width:640px){.ascend-mast .am-util .in .am-nav{margin-left:0}}
