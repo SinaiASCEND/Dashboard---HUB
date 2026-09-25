@@ -1,0 +1,1 @@
+Removes studentdashboard.html, an older copy of Landing-Page---Students/index.html that still carries the REPLACE_ELECTIVES_URL placeholder. Nothing in the Hub or landing pages links to it.
