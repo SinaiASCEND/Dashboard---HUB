@@ -105,6 +105,10 @@
     {
      "title": "Cohort, module and type filters",
      "blurb": "Switch between class calendars, pick one module, choose session types or assessments from a dropdown, show only mandatory sessions, or search any session by name. The two mini-calendars show where the filtered sessions fall."
+    },
+    {
+     "title": "Contact hours",
+     "blurb": "A button on the calendar that totals the scheduled hours for a module, or for every module, in an academic year: instructional and assessment hours, a table by session type, and a CSV download. A planning estimate from the published calendar."
     }
    ]
   },
