@@ -77,6 +77,38 @@
    ]
   },
   {
+   "slug": "class-calendar",
+   "key": "calendar",
+   "public": true,
+   "kicker": "Class Schedule",
+   "title": "ASCEND Class Calendar",
+   "short": "the calendar",
+   "audience": "Students, faculty, and staff. Open to everyone.",
+   "intro": "The class schedule exactly as it stands in the Office of Curricular Affairs' Google Calendar, refreshed automatically every 30 minutes. Two small calendars for the current and next month sit at the top of every view; open on today's sessions with what is next up, see the week as a Monday-to-Friday board, or list every scheduled session grouped by module, by session type (LEC, SGD, CCSG, LAB, PNL, REV, INT and the assessments) or by week.",
+   "primary": "Dashboard---Calendar/",
+   "views": [
+    {
+     "title": "Today",
+     "blurb": "The day at a glance: what is happening now or next, every session as a full card with time and type, and a preview of the next three class days. Opens by default.",
+     "url": "Dashboard---Calendar/#today"
+    },
+    {
+     "title": "Week",
+     "blurb": "Monday to Friday, each session as a card, plus a strip of all-day items and quiz or pre-check windows that span several days.",
+     "url": "Dashboard---Calendar/#week"
+    },
+    {
+     "title": "All sessions",
+     "blurb": "Every scheduled session from today onward (or the whole calendar), grouped by module, by session type or by week, with each group collapsible. Combine with the module or type filter to see one module's or one type's full schedule.",
+     "url": "Dashboard---Calendar/#list"
+    },
+    {
+     "title": "Cohort, module and type filters",
+     "blurb": "Switch between class calendars, pick one module, choose session types or assessments from a dropdown, show only mandatory sessions, or search any session by name. The two mini-calendars show where the filtered sessions fall."
+    }
+   ]
+  },
+  {
    "slug": "baby-bates",
    "key": "babybates",
    "public": true,

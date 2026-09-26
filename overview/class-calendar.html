@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ASCEND Class Calendar · ASCEND</title>
+<link rel="stylesheet" href="../ascend-mast.css">
+<style>
+:root{--navy:#0A1F44;--navy2:#0E2C5C;--ink:#1d2433;--bg:#eef1f6;--line:#d7dde8;--muted:#5b6678;--soft:#f6f8fc;--magenta:#D6177F;--cyan:#00A0C8;--radius:14px;
+  --sans:"Helvetica Neue",-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+.wrap{max-width:980px;margin:0 auto;padding:0 22px}
+.intro{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:26px 26px 22px;margin:26px auto 0;box-shadow:0 2px 12px rgba(10,31,68,.06)}
+.lead{font-size:16px;line-height:1.6;margin:0;color:var(--ink);max-width:760px}
+.btn{display:inline-block;margin-top:18px;background:var(--navy);color:#fff;text-decoration:none;font-weight:700;font-size:14px;padding:12px 20px;border-radius:999px}
+.btn:hover{background:var(--magenta)}
+h2{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:800;margin:30px 0 12px}
+.vgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.vcard{background:#fff;border:1px solid var(--line);border-top:3px solid var(--magenta);border-radius:var(--radius);padding:20px 20px 18px;position:relative}
+.vcard:nth-child(even){border-top-color:var(--cyan)}
+.vk{font-size:10.5px;letter-spacing:.16em;font-weight:800;color:var(--muted)}
+.vt{font-size:17px;font-weight:800;color:var(--navy);margin:6px 0 6px;line-height:1.25}
+.vb{font-size:13.5px;color:var(--muted);line-height:1.5}
+.vgo{display:inline-block;margin-top:12px;font-weight:700;font-size:13px;color:var(--magenta);text-decoration:none}
+.vcard:nth-child(even) .vgo{color:var(--cyan)}
+.aud{margin:28px 0 40px;font-size:13px;color:var(--muted);line-height:1.6;border-left:3px solid var(--line);padding-left:14px}
+.aud b{color:var(--navy)}
+@media (max-width:680px){.vgrid{grid-template-columns:1fr}.wrap{padding:0 16px}}
+</style></head><body>
+<header class="ascend-mast ascend-mast--compact">
+  <img class="am-logo" src="../oca-mountain.png" alt="">
+  <div class="am-wrap">
+    <div class="am-top"><span class="am-dot"></span>
+      <div class="am-eyebrow">ICAHN SCHOOL OF MEDICINE AT MOUNT SINAI<br>OFFICE OF CURRICULAR AFFAIRS &middot; ASCEND DASHBOARD HUB</div>
+      <a class="am-hub" href="../">&larr; Back to ASCEND Hub</a></div>
+    <h1>ASCEND Class Calendar</h1>
+    <div class="am-motto"><span class="a">Climb higher.</span><span class="b">Reach further.</span><span class="c">Care deeper.</span></div>
+  </div>
+  <div class="am-util"><div class="in">Class Schedule <span>&middot; Open to everyone</span></div></div>
+  <div class="am-stripe"><i></i><i></i><i></i></div>
+</header>
+<main class="wrap">
+  <section class="intro">
+    <p class="lead">The class schedule exactly as it stands in the Office of Curricular Affairs' Google Calendar, refreshed automatically every 30 minutes. Two small calendars for the current and next month sit at the top of every view; open on today's sessions with what is next up, see the week as a Monday-to-Friday board, or list every scheduled session grouped by module, by session type (LEC, SGD, CCSG, LAB, PNL, REV, INT and the assessments) or by week.</p>
+    <a class="btn" href="https://sinaiascend.github.io/Dashboard---Calendar/">Open the calendar &rarr;</a>
+  </section>
+  <h2>What you will find</h2>
+  <div class="vgrid">
+      <div class="vcard">
+        <div class="vk">01</div>
+        <div class="vt">Today</div>
+        <div class="vb">The day at a glance: what is happening now or next, every session as a full card with time and type, and a preview of the next three class days. Opens by default.</div>
+        <a class="vgo" href="https://sinaiascend.github.io/Dashboard---Calendar/#today">Open &rarr;</a>
+      </div>
+      <div class="vcard">
+        <div class="vk">02</div>
+        <div class="vt">Week</div>
+        <div class="vb">Monday to Friday, each session as a card, plus a strip of all-day items and quiz or pre-check windows that span several days.</div>
+        <a class="vgo" href="https://sinaiascend.github.io/Dashboard---Calendar/#week">Open &rarr;</a>
+      </div>
+      <div class="vcard">
+        <div class="vk">03</div>
+        <div class="vt">All sessions</div>
+        <div class="vb">Every scheduled session from today onward (or the whole calendar), grouped by module, by session type or by week, with each group collapsible. Combine with the module or type filter to see one module's or one type's full schedule.</div>
+        <a class="vgo" href="https://sinaiascend.github.io/Dashboard---Calendar/#list">Open &rarr;</a>
+      </div>
+      <div class="vcard">
+        <div class="vk">04</div>
+        <div class="vt">Cohort, module and type filters</div>
+        <div class="vb">Switch between class calendars, pick one module, choose session types or assessments from a dropdown, show only mandatory sessions, or search any session by name. The two mini-calendars show where the filtered sessions fall.</div>
+        
+      </div>
+  </div>
+  <div class="aud"><b>Who this is for.</b> Students, faculty, and staff. Open to everyone.</div>
+</main>
+</body></html>
