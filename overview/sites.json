@@ -84,27 +84,27 @@
    "title": "ASCEND Class Calendar",
    "short": "the calendar",
    "audience": "Students, faculty, and staff. Open to everyone.",
-   "intro": "The class schedule exactly as it stands in the Office of Curricular Affairs' Google Calendar, refreshed automatically every 30 minutes. See a month, a week, or a running agenda; spot mandatory sessions at a glance; filter by session type; and open the Zoom or document link attached to a session.",
+   "intro": "The class schedule exactly as it stands in the Office of Curricular Affairs' Google Calendar, refreshed automatically every 30 minutes. Open on today's sessions with what is next up, see the week as a board, or browse the month; spot mandatory sessions at a glance, filter by session type, and open the Zoom or document link attached to a session.",
    "primary": "Dashboard---Calendar/",
    "views": [
     {
-     "title": "Month",
-     "blurb": "The whole month at a glance, colour-coded by session type (lecture, lab, small group, quiz, exam, pre-check window…). Mandatory sessions are flagged.",
-     "url": "Dashboard---Calendar/#month"
+     "title": "Today",
+     "blurb": "The day at a glance: what is happening now or next, every session as a full card with time and type, and a preview of the next three days. Opens by default.",
+     "url": "Dashboard---Calendar/#today"
     },
     {
      "title": "Week",
-     "blurb": "A timetable for one week, with all-day items and multi-day windows across the top and the current time marked.",
+     "blurb": "Seven day columns with each session as a card, plus a strip of all-day items and quiz or pre-check windows that span several days.",
      "url": "Dashboard---Calendar/#week"
     },
     {
-     "title": "Agenda",
-     "blurb": "A running list of sessions four weeks at a time, with times, rooms when named, and the session type. The default view on phones.",
-     "url": "Dashboard---Calendar/#agenda"
+     "title": "Month",
+     "blurb": "A compact month with dots for session types and a mark for mandatory days; pick a day to see its sessions in full beside it.",
+     "url": "Dashboard---Calendar/#month"
     },
     {
-     "title": "Search and filters",
-     "blurb": "Search any session by name, show only mandatory sessions, or switch session types on and off. Every session opens a card with its details and links."
+     "title": "Cohort switcher, search and filters",
+     "blurb": "Switch between class calendars, search any session by name, show only mandatory sessions, or switch session types on and off."
     }
    ]
   },
