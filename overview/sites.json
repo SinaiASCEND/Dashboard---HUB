@@ -77,6 +77,38 @@
    ]
   },
   {
+   "slug": "class-calendar",
+   "key": "calendar",
+   "public": true,
+   "kicker": "Class Schedule",
+   "title": "ASCEND Class Calendar",
+   "short": "the calendar",
+   "audience": "Students, faculty, and staff. Open to everyone.",
+   "intro": "The class schedule exactly as it stands in the Office of Curricular Affairs' Google Calendar, refreshed automatically every 30 minutes. See a month, a week, or a running agenda; spot mandatory sessions at a glance; filter by session type; and open the Zoom or document link attached to a session.",
+   "primary": "Dashboard---Calendar/",
+   "views": [
+    {
+     "title": "Month",
+     "blurb": "The whole month at a glance, colour-coded by session type (lecture, lab, small group, quiz, exam, pre-check window…). Mandatory sessions are flagged.",
+     "url": "Dashboard---Calendar/#month"
+    },
+    {
+     "title": "Week",
+     "blurb": "A timetable for one week, with all-day items and multi-day windows across the top and the current time marked.",
+     "url": "Dashboard---Calendar/#week"
+    },
+    {
+     "title": "Agenda",
+     "blurb": "A running list of sessions four weeks at a time, with times, rooms when named, and the session type. The default view on phones.",
+     "url": "Dashboard---Calendar/#agenda"
+    },
+    {
+     "title": "Search and filters",
+     "blurb": "Search any session by name, show only mandatory sessions, or switch session types on and off. Every session opens a card with its details and links."
+    }
+   ]
+  },
+  {
    "slug": "baby-bates",
    "key": "babybates",
    "public": true,
