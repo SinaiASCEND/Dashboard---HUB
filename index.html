@@ -294,6 +294,12 @@ a.card.locked .cardgo{color:var(--muted)}
    or a full URL (e.g. "https://yourorg.github.io/clerkships/").
    ============================================================ */
 const DASHBOARDS = {
+  calendar: {
+    url: "overview/class-calendar.html",
+    kicker: "Class Schedule",
+    title: "ASCEND Class Calendar",
+    blurb: "The Phase 1 class schedule read live from Google Calendar: today, the week, and every session by module or type, with quiz and pre-check windows."
+  },
   phase1: {
     url: "overview/phase-1-assessment.html",
     kicker: "Programmatic Assessment",
@@ -368,7 +374,7 @@ const TIERS = {
   "5942bd952f12e02478b5a6aba902340a58c9c769a961f128dbb57f0b79358537": {  // ASCEND
     name: "Office of Curricular Affairs",
     sub: "Full access \u2014 all monitoring, mapping, governance, and accreditation views.",
-    dashboards: ["phase1", "clinicalskills", "phase2", "phase3", "nbme",  "objectives", "policies", "surveys", "lcme", "governance"],
+    dashboards: ["calendar", "phase1", "clinicalskills", "phase2", "phase3", "nbme",  "objectives", "policies", "surveys", "lcme", "governance"],
     pinned: ["phase1","phase2","phase3","governance"]
   },
   "255af8d0734e8438d7fcef7cb457da08d130e24f574065175f2ab73ed2ffb360": {  // EEC

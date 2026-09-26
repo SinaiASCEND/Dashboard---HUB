@@ -79,11 +79,11 @@
   {
    "slug": "class-calendar",
    "key": "calendar",
-   "public": true,
+   "public": false,
    "kicker": "Class Schedule",
    "title": "ASCEND Class Calendar",
    "short": "the calendar",
-   "audience": "Students, faculty, and staff. Open to everyone.",
+   "audience": "Office of Curricular Affairs staff, via the ASCEND access code on the Hub.",
    "intro": "The class schedule exactly as it stands in the Office of Curricular Affairs' Google Calendar, refreshed automatically every 30 minutes. Two small calendars for the current and next month sit at the top of every view; open on today's sessions with what is next up, see the week as a Monday-to-Friday board, or list every scheduled session grouped by module, by session type (LEC, SGD, CCSG, LAB, PNL, REV, INT and the assessments) or by week.",
    "primary": "Dashboard---Calendar/",
    "views": [
