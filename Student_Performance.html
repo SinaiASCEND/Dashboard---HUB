@@ -364,8 +364,11 @@ main{padding-bottom:44px}
 .idfact dt{font-size:10px;letter-spacing:.14em;text-transform:uppercase;
   font-weight:800;color:var(--muted);margin:0}
 .idfact dd{margin:3px 0 0;font-size:13.5px;font-weight:600;color:var(--ink)}
+.idname{font-size:26px;font-weight:700;letter-spacing:-.01em;color:var(--ink);margin:2px 0 0}
+.idname + .idcode{font-size:16px;font-weight:600;color:var(--muted);margin:0 0 8px}
 @media (max-width:520px){
   .idcode{font-size:24px}
+  .idname{font-size:21px}
 }
 
 /* ================= rotation schedule ================= */
@@ -657,6 +660,7 @@ body.gated{overflow:hidden}
         <div class="mastactions">
           <button class="ghost" id="loadBtn" type="button">Load data file</button>
           <button class="ghost" id="photoBtn" type="button">Load photos</button>
+          <button class="ghost" id="nameBtn" type="button">Load names</button>
           <a class="ghost" id="logBtn" href="https://forms.cloud.microsoft/Pages/DesignPageV2.aspx?subpage=design&amp;id=YZ3odw9XsEO55GNPRi40uOOTNvWX3itIuGr2h3RZNNZUM0tRSzZXSzE0QUhYNkUyVUVGREg1VDVJTi4u"
              target="_blank" rel="noopener noreferrer"
              title="Opens the access-log form in Microsoft Forms (View responses). Only the form's owner in the Office of Curricular Affairs can open it.">Access log &#8599;</a>
@@ -680,8 +684,8 @@ body.gated{overflow:hidden}
     <div class="notice ferpa">
       <span class="ic" aria-hidden="true">&#128274;</span>
       <span><strong>Coded education records.</strong> Students appear by code only &mdash; no names and
-        no portraits are held in this dashboard. A photo appears only after you load the Office&rsquo;s
-        photo folder for this session, and is discarded when the page closes. The code-to-student key is kept separately by the Office
+        no portraits are held in this dashboard. A name or photo appears only after you load the Office&rsquo;s
+        name key or photo folder for this session, and both are discarded when the page closes. The code-to-student key is kept separately by the Office
         of Curricular Affairs. Because that key exists these records are still re-identifiable and
         remain protected under FERPA: open only the students you have a legitimate educational
         interest in, never pair this page with the key in a shared channel, and do not leave it open
@@ -726,8 +730,8 @@ body.gated{overflow:hidden}
       </select>
     </div>
     <div class="field search">
-      <label for="fSearch">Find a student code</label>
-      <input id="fSearch" type="search" placeholder="e.g. ASC-2028-014" autocomplete="off">
+      <label for="fSearch">Find a student</label>
+      <input id="fSearch" type="search" placeholder="code, or name once loaded" autocomplete="off">
     </div>
     <button class="clear" id="fClear" type="button">Reset</button>
   </div>
@@ -877,6 +881,7 @@ body.gated{overflow:hidden}
 <div class="tip" id="tip" aria-hidden="true"></div>
 <input type="file" id="fileInput" accept=".json,.csv,application/json,text/csv" hidden>
 <input type="file" id="photoInput" accept="image/*" webkitdirectory multiple hidden>
+<input type="file" id="nameInput" accept=".csv,.json,.txt,text/csv,application/json,text/plain" hidden>
 <script>
 /* ============================================================================
    ASCEND STUDENT PERFORMANCE DASHBOARD
@@ -1847,7 +1852,7 @@ function filtered(){
     if(state.ccm !== 'all' && (s.ccm || '') !== state.ccm) return false;
     if(state.phase !== 'all' && !(s.byPhase && s.byPhase[state.phase])) return false;
     if(state.standing !== 'all' && s.status !== state.standing) return false;
-    if(q && !String(s.id).toLowerCase().includes(q)) return false;
+    if(q && !String(s.id).toLowerCase().includes(q) && !nameOf(s.id).toLowerCase().includes(q)) return false;
     return true;
   });
 }
@@ -2141,7 +2146,7 @@ const ROSTER_COLS = [
   {key:'open',      label:''}
 ];
 const SORT_VAL = {
-  name: s => String(s.id).toLowerCase(),
+  name: s => (nameOf(s.id) || String(s.id)).toLowerCase(),
   cohort: s => s.cohort,
   phase: s => s.phase,
   done: s => s.completed,
@@ -2208,7 +2213,7 @@ function renderRoster(){
     th.tabIndex = 0; th.setAttribute('role','columnheader');
     th.setAttribute('aria-sort', state.sort.key === c.key
       ? (state.sort.dir === 'asc' ? 'ascending' : 'descending') : 'none');
-    th.textContent = c.label;
+    th.textContent = c.key === 'name' && Object.keys(NAMES).length ? 'Student' : c.label;
     const ar = document.createElement('span'); ar.className = 'ar'; ar.setAttribute('aria-hidden','true');
     ar.textContent = state.sort.key === c.key ? (state.sort.dir === 'asc' ? ' ▲' : ' ▼') : ' ⇅';
     th.appendChild(ar);
@@ -2231,12 +2236,15 @@ function renderRoster(){
 
     const c1 = document.createElement('td');
     const nm = document.createElement('div'); nm.className = 'namecell';
-    const a = document.createElement('span'); a.className = 'nm'; a.textContent = s.id;
+    const nm0 = nameOf(s.id);
+    const a = document.createElement('span'); a.className = 'nm'; a.textContent = nm0 || s.id;
     const b = document.createElement('span'); b.className = 'sid';
     /* The roster line is for scanning, so it carries the advising group and
-       the block in progress. The people to call are on the record itself. */
-    b.textContent = [s.program, s.advisingGroup].filter(Boolean).join(' · ') +
-                    (s.current ? (s.program || s.advisingGroup ? ' · ' : '') + 'in ' + s.current.code : '') || '—';
+       the block in progress. The people to call are on the record itself.
+       When a name key is loaded the name leads and the code moves down here. */
+    const bits = [nm0 ? s.id : '', s.program, s.advisingGroup].filter(Boolean);
+    b.textContent = bits.join(' · ') +
+                    (s.current ? (bits.length ? ' · ' : '') + 'in ' + s.current.code : '') || '—';
     nm.appendChild(a); nm.appendChild(b); c1.appendChild(nm); cells.push(c1);
 
     const c2 = document.createElement('td'); c2.className = 'num'; c2.textContent = s.cohort; cells.push(c2);
@@ -2623,6 +2631,58 @@ function adoptPhotos(files){
   renderAll();
   return n;
 }
+/* Student names come from the code key the viewer picks with "Load names" -
+   a CSV (student_code,name - or first_name/last_name) or a JSON map of code to
+   name. Like the photos it is held in memory for this session only: nothing is
+   written anywhere, and closing the page forgets it. The key re-identifies
+   every student on the page, so it belongs in the Confidential library. */
+const NAMES = {};
+function nameOf(id){ return NAMES[String(id).toUpperCase()] || '' }
+function adoptNames(text){
+  Object.keys(NAMES).forEach(k => delete NAMES[k]);
+  const put = (code, name) => {
+    code = String(code == null ? '' : code).trim().toUpperCase();
+    name = String(name == null ? '' : name).replace(/\s+/g, ' ').trim();
+    if(code && name) NAMES[code] = name;
+  };
+  const t = String(text).replace(/^\uFEFF/, '').trim();
+  if(/^[\[{]/.test(t)){
+    const j = JSON.parse(t);
+    if(Array.isArray(j)){
+      j.forEach(r => { if(!r || typeof r !== 'object') return;
+        const full = r.name || r.student_name || r.full_name ||
+          [r.first_name || r.first, r.last_name || r.last].filter(Boolean).join(' ');
+        put(r.student_code || r.code || r.student_id || r.id, full) });
+    } else if(j && typeof j === 'object'){
+      const src = j.names && typeof j.names === 'object' ? j.names : j;
+      Object.keys(src).forEach(k => put(k, typeof src[k] === 'string' ? src[k] :
+        (src[k] && (src[k].name || [src[k].first_name, src[k].last_name].filter(Boolean).join(' ')))));
+    }
+  } else {
+    const rows = parseCsv(t);
+    if(rows.length){
+      const head = rows[0].map(h => h.trim().toLowerCase());
+      const find = re => head.findIndex(h => re.test(h));
+      let cCode = find(/^(student_?)?(code|id)$/), cName = find(/^(student_?|full_?)?name$/),
+          cFirst = find(/first/), cLast = find(/last|surname|family/);
+      const hasHead = cCode >= 0 || cName >= 0 || (cFirst >= 0 && cLast >= 0);
+      if(cCode < 0) cCode = 0;
+      if(cName < 0 && !(cFirst >= 0 && cLast >= 0)){
+        /* a header without a name column is some other roster, not the key */
+        if(hasHead) throw new Error('The CSV has a header row but no name column. ' +
+          'Expected name, student_name, or first_name and last_name beside student_code.');
+        cName = 1;
+      }
+      rows.slice(hasHead ? 1 : 0).forEach(r => put(r[cCode],
+        cName >= 0 ? r[cName] : [r[cFirst], r[cLast]].filter(Boolean).join(' ')));
+    }
+  }
+  const n = Object.keys(NAMES).length;
+  const b = $('nameBtn');
+  if(b) b.textContent = n ? 'Names loaded (' + n + ')' : 'Load names';
+  renderAll();
+  return n;
+}
 function photoSlot(s){
   const url = PHOTOS[String(s.id).toUpperCase()];
   if(url){
@@ -2663,6 +2723,9 @@ function studentHeader(host, s){
   top.appendChild(elc('div','kicker','Student code'));
   top.appendChild(chipFor(s.status));
   meta.appendChild(top);
+  /* the name appears only from the key loaded for this session */
+  const nm = nameOf(s.id);
+  if(nm) meta.appendChild(elc('div','idname', nm));
   meta.appendChild(elc('div','idcode', s.id));
 
   const dl = document.createElement('dl');
@@ -3879,6 +3942,25 @@ function init(){
     ferpaGate('Loading the photo folder pairs a face with each code, which re-identifies the student. ' +
               'Continue only with a legitimate educational interest.',
               () => $('photoInput').click()));
+  /* the code key, kept in memory for this session only */
+  $('nameBtn').addEventListener('click', () =>
+    ferpaGate('Loading the name key pairs a name with every code on this page, which re-identifies ' +
+              'the students. Continue only with a legitimate educational interest.',
+              () => $('nameInput').click()));
+  $('nameInput').addEventListener('change', e => {
+    const f = e.target.files && e.target.files[0]; if(!f) return;
+    const fr = new FileReader();
+    fr.onload = () => {
+      let n = 0;
+      try{ n = adoptNames(String(fr.result)) }
+      catch(err){ alert('That file could not be read as a name key.\n\n' + err.message); return }
+      if(!n) alert('No names were found in that file.\n\nExpected a CSV with student_code and name ' +
+                   'columns (or first_name and last_name), or a JSON object mapping each code to a name.');
+      else logAccess('names', f.name, '');
+    };
+    fr.readAsText(f);
+    e.target.value = '';
+  });
   $('photoInput').addEventListener('change', e => {
     const n = adoptPhotos(e.target.files || []);
     if(!n) alert('No images were found in that folder.\n\nExpected one image per student, named by ' +
