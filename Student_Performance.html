@@ -544,6 +544,37 @@ tr.rosterrow:focus-visible{outline:3px solid var(--s1);outline-offset:-3px}
   .cardhd{padding:14px 13px 0}
   .wrap{padding:0 14px}
 }
+/* ── Phones (≤767px): 44px targets, 16px gutters and body text; the review
+   section shows five cards then a Show-all button; the roster keeps its table
+   with the student-code column pinned while the rest scrolls. Tablets and
+   desktop are untouched: .rv-more never renders outside this query. */
+.rv-more{display:none}
+@media screen and (max-width:767px){
+  .wrap{padding:0 16px}
+  #ascend-masthead .am-util .in .mastactions,.mastactions{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-left:0}
+  .ghost{min-height:44px;font-size:14px;padding:10px 12px;display:inline-flex;align-items:center;justify-content:center;text-align:center}
+  .notice{font-size:15px}
+  .ferpa p{font-size:15px}
+  .field label,.aside-kicker{font-size:11.5px}
+  .field select,.field input{min-height:44px;font-size:16px}
+  .filters .clear{min-height:44px;font-size:15px}
+  .tv{min-height:44px;padding:8px 16px;font-size:14px}
+  .backlink{min-height:44px;display:inline-flex;align-items:center;font-size:15px}
+  .rv-toggle{min-height:44px;font-size:15px;gap:10px}
+  .rv-toggle input{width:20px;height:20px}
+  .rv-head{flex-wrap:wrap}
+  .rv-head > :last-child{margin-left:auto}
+  .rv-head .rv-id{flex:1 1 100%;order:3}
+  .rv-meta{font-size:14px}
+  .rv-row{font-size:13.5px}
+  .rv-grid:not(.rv-all) > .rv-card:nth-child(n+6){display:none}
+  .rv-more:not([hidden]){display:flex;align-items:center;justify-content:center;width:100%;min-height:48px;margin-top:12px;
+    background:none;border:1px solid var(--line-2);border-radius:999px;font:inherit;font-size:15px;font-weight:700;color:var(--ink-2);cursor:pointer}
+  table.grid{font-size:14px}
+  table.grid th:first-child,table.grid td:first-child{position:sticky;left:0;background:var(--surface);z-index:1;box-shadow:1px 0 0 var(--line)}
+  table.grid thead th:first-child{z-index:3}
+  table.grid tbody tr:hover td:first-child{background:var(--surface-2)}
+}
 @media print{
   body{background:#fff}
   .mast{background:#0A1F44 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
@@ -838,6 +869,7 @@ body.gated{overflow:hidden}
       </div>
       <div class="cardbody">
         <div class="rv-grid" id="reviewGrid"></div>
+        <button type="button" class="rv-more" id="rvMore" hidden>Show all</button>
       </div>
     </div>
 
@@ -3582,6 +3614,9 @@ function renderAll(){
 function renderReview(list){
   const grid = $('reviewGrid'); if(!grid) return;
   grid.textContent = '';
+  /* Phones show the first five cards and a Show-all button (see .rv-more). */
+  grid.classList.toggle('rv-all', !!state.reviewAll);
+  const more = $('rvMore'); if(more) more.hidden = true;
   const want = new Set(['concern'].concat(state.reviewWatch ? ['watch'] : []));
   const picked = list.filter(s => want.has(s.status));
   const worst = s => Math.min(...[kOf(s), skOf(s)].filter(v => v != null).concat([101]));
@@ -3594,6 +3629,7 @@ function renderReview(list){
       (state.reviewWatch ? ' or to monitor.' : '. Tick “Include students to monitor” to widen it.')));
     return;
   }
+  if(more && !state.reviewAll && picked.length > 5){ more.hidden = false; more.textContent = 'Show all ' + picked.length + ' students'; }
   const band = v => v == null ? '' : v < CONCERN_PCTILE ? 'low' : v < WATCH_PCTILE ? 'mid' : '';
   const bar = (label, v, cls, text) => {
     const row = elc('div','rv-row');
@@ -3928,6 +3964,7 @@ function init(){
 
   $('printBtn').addEventListener('click', () => window.print());
   $('rvWatch').addEventListener('change', e => { state.reviewWatch = e.target.checked; renderReview(filtered()) });
+  $('rvMore').addEventListener('click', () => { state.reviewAll = true; $('reviewGrid').classList.add('rv-all'); $('rvMore').hidden = true; });
   bootLoadGate();
   /* Both loads bring education records into the browser, so both stand
      behind the FERPA acknowledgment - the same code as the lookup, asked
