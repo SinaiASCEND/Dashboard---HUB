@@ -23,12 +23,21 @@ h2{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute
 .aud{margin:28px 0 40px;font-size:13px;color:var(--muted);line-height:1.6;border-left:3px solid var(--line);padding-left:14px}
 .aud b{color:var(--navy)}
 @media (max-width:680px){.vgrid{grid-template-columns:1fr}.wrap{padding:0 16px}}
+/* Phones: 16px text and 44px targets. Desktop untouched. */
+@media (max-width:767px){
+  .btn{display:inline-flex;align-items:center;min-height:44px;font-size:15px;padding:10px 20px}
+  h2{font-size:13px}
+  .vk{font-size:11.5px}
+  .vb{font-size:16px}
+  .vgo{display:inline-flex;align-items:center;min-height:44px;font-size:15px;margin-top:4px}
+  .aud{font-size:14.5px}
+}
 </style></head><body>
 <header class="ascend-mast ascend-mast--compact">
   <img class="am-logo" src="../oca-mountain.png" alt="">
   <div class="am-wrap">
     <div class="am-top"><span class="am-dot"></span>
-      <div class="am-eyebrow">ICAHN SCHOOL OF MEDICINE AT MOUNT SINAI<br>OFFICE OF CURRICULAR AFFAIRS &middot; ASCEND DASHBOARD HUB</div>
+      <div class="am-eyebrow">ICAHN SCHOOL OF MEDICINE AT MOUNT SINAI<br><span class="am-dept">OFFICE OF CURRICULAR AFFAIRS &middot; ASCEND DASHBOARD HUB</span></div>
       <a class="am-hub" href="../">&larr; Back to ASCEND Hub</a></div>
     <h1>ASCEND Phase 3 Dashboard</h1>
     <div class="am-motto"><span class="a">Climb higher.</span><span class="b">Reach further.</span><span class="c">Care deeper.</span></div>

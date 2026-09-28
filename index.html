@@ -188,6 +188,18 @@ a.card.locked .cardgo{color:var(--muted)}
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
 }
+/* Phones (≤767px): 44px targets and 16px card text. The front card, the
+   code form and the one-column card grid above are unchanged. */
+@media (max-width:767px){
+  .enterBtn{min-height:44px;font-size:14px;padding:11px 24px}
+  .lockBtn{min-height:44px;font-size:14px}
+  .eyebrow2{font-size:12.5px}
+  .favstar{width:44px;height:44px;top:2px;right:4px;font-size:22px}
+  .cardkicker{font-size:11.5px}
+  .cardtitle{font-size:19px}
+  .cardblurb{font-size:16px}
+  .cardgo{font-size:15px}
+}
 </style>
 </head>
 <body>

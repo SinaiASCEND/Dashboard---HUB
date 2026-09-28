@@ -89,3 +89,27 @@
 .ascend-mast .am-util .in .am-nav a:hover{opacity:1;border-color:rgba(255,255,255,.45)}
 .ascend-mast .am-util .in .am-nav a.on{opacity:1;background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.45)}
 @media(max-width:640px){.ascend-mast .am-util .in .am-nav{margin-left:0}}
+
+/* ── Phones (≤767px) ──────────────────────────────────────────────────────
+   A slim band, so the page's own content starts near the top: the dot, the
+   school line, the title and a 44px Hub link. The department line is hidden
+   when it is wrapped in <span class="am-dept"> (ascend-mast.js and the Hub's
+   explainer template do this; static mastheads can add the span). The motto
+   is hidden. A utility row that only repeats the title is hidden; one that
+   carries links or controls (section nav, page actions) stays, trimmed to
+   those controls. Tablets and desktop are untouched. */
+@media(max-width:767px){
+  .ascend-mast .am-wrap{padding:10px 16px 12px}
+  .ascend-mast .am-top{align-items:center;flex-wrap:nowrap;gap:9px}
+  .ascend-mast .am-eyebrow{font-size:9.5px;letter-spacing:1px;line-height:1.3;min-width:0;flex:1 1 auto}
+  .ascend-mast .am-eyebrow .am-dept,.ascend-mast .am-eyebrow br:has(+ .am-dept){display:none}
+  .ascend-mast .am-hub{min-height:44px;padding:8px 12px;font-size:12.5px;flex:0 0 auto}
+  .ascend-mast h1{font-size:21px;letter-spacing:-.4px;margin:6px 0 0}
+  .ascend-mast .am-lead{margin:10px 0 0;font-size:14px}
+  .ascend-mast .am-motto{display:none}
+  .ascend-mast .am-util:not(:has(a,button,input,select)){display:none}
+  .ascend-mast .am-util .in{padding:6px 16px;gap:8px}
+  .ascend-mast .am-util .in>span:not(.am-nav){display:none}
+  .ascend-mast .am-util .in .am-nav a{min-height:44px;display:inline-flex;align-items:center}
+  .ascend-mast .am-logo{opacity:.3}
+}
