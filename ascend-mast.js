@@ -31,7 +31,7 @@
     h.innerHTML =
       '<img class="am-logo" src="' + HUB + 'oca-mountain.png" alt="">' +
       '<div class="am-wrap"><div class="am-top"><span class="am-dot"></span>' +
-      '<div class="am-eyebrow">ICAHN SCHOOL OF MEDICINE AT MOUNT SINAI<br>OFFICE OF CURRICULAR AFFAIRS &middot; ASCEND CURRICULUM</div>' +
+      '<div class="am-eyebrow">ICAHN SCHOOL OF MEDICINE AT MOUNT SINAI<br><span class="am-dept">OFFICE OF CURRICULAR AFFAIRS &middot; ASCEND CURRICULUM</span></div>' +
       '<a class="am-hub" href="' + HUB + '">&larr; Back to ASCEND Hub</a></div>' +
       '<h1>' + esc(d.title || document.title) + '</h1>' +
       '<div class="am-motto"><span class="a">Climb higher.</span><span class="b">Reach further.</span><span class="c">Care deeper.</span></div></div>' +
