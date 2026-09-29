@@ -1856,7 +1856,7 @@ let TYPE_META = [{key:'q:Quiz', label:'Quiz', short:'Quiz', varName:'--s1'}].con
    ============================================================================ */
 let DATA = hydrate(buildSampleData());
 const state = {
-  cohort:'all', program:'all', advisor:'all', ccm:'all', phase:'all', standing:'all', emphasis:'knowledge', q:'',
+  cohort:null, program:'all', advisor:'all', ccm:'all', phase:'all', standing:'all', emphasis:'knowledge', q:'',
   reviewWatch:false,
   sort:{key:'knowledge', dir:'desc'}, student:null
 };
@@ -1888,6 +1888,30 @@ function filtered(){
     return true;
   });
 }
+/* The class the page opens on, and returns to on Reset: the newest class in
+   the data, so the view rolls forward on its own when next year's extract
+   adds a class. "All cohorts" stays in the list as a deliberate choice. */
+function cohortYears(){
+  return [...new Set((DATA.students||[]).map(s => s.cohort))].sort();
+}
+function latestCohort(){
+  const yrs = cohortYears().map(Number).filter(Number.isFinite);
+  return yrs.length ? String(Math.max(...yrs)) : 'all';
+}
+/* With one class chosen, a section that class has nothing for says so in the
+   same words everywhere, rather than reading as a quiet zero or borrowing
+   another class's numbers. Null when the class has data in the lens. */
+function unavailableMsg(){
+  if(state.cohort === 'all') return null;
+  const mine = (DATA.students||[]).filter(s => String(s.cohort) === state.cohort);
+  const has = state.phase === 'all' ? mine.length > 0
+    : mine.some(s => s.byPhase && s.byPhase[state.phase]);
+  if(has) return null;
+  return (state.phase === 'all' ? 'Data' : 'Phase ' + state.phase + ' data') +
+    ' not yet available for the Class of ' + state.cohort + '.';
+}
+const emptyDiv = t => { const d = document.createElement('div'); d.className = 'empty'; d.textContent = t; return d };
+
 /* The emphasis filter chooses which standing the roster and tiles lead with. */
 function leadPct(s){
   return state.emphasis === 'skills' ? skOf(s) : kOf(s);
@@ -1901,14 +1925,21 @@ function renderKpis(list){
   const watch = list.filter(s=>s.status==='watch').length;
   const k = median(list.map(kOf).filter(v=>v!=null));
   const sk = median(list.map(skOf).filter(v=>v!=null));
-  const tiles = [
+  const na = unavailableMsg();
+  const tiles = na ? [
+    {lab:'Students in view', val:'—', note: na},
+    {lab:'Median medical knowledge', val:'—', note:''},
+    {lab:'Median clinical skills', val:'—', note:''},
+    {lab:'Flagged for review', val:'—', note:''}
+  ] : [
     {lab:'Students in view', val: list.length, note: describeFilter()},
     {lab:'Median medical knowledge', val: k==null?'—':Math.round(k), unit: k==null ? '' : pctUnit(Math.round(k)),
      note: state.phase === '2' ? 'Across clerkship NBME subject and customized exams.'
          : state.phase === '1' ? 'Across module NBME CAS exams and module quizzes.'
          : 'Across NBME exams (module CAS and clerkship) and module quizzes.'},
     {lab:'Median clinical skills', val: sk==null?'—':Math.round(sk), unit: sk==null ? '' : pctUnit(Math.round(sk)),
-     note: sk==null && state.phase !== 'all' ? 'No OSCE or clinical evaluation on record for this phase yet.'
+     note: sk==null ? 'No OSCE or clinical evaluation on record for ' +
+           (state.phase !== 'all' ? 'this phase' : state.cohort !== 'all' ? 'this class' : 'this filter') + ' yet.'
          : 'Across OSCE performance and clinical evaluations.'},
     {lab:'Flagged for review', val: conc + watch,
      note: conc + ' in academic concern · ' + watch + ' to monitor',
@@ -1945,6 +1976,9 @@ function describeFilter(){
 function renderSkillsScatter(){
   const host = $('skillsChart'); host.textContent = '';
   const list = filtered().filter(s => kOf(s) != null && skOf(s) != null);
+  const na = unavailableMsg();
+  if(na){ host.appendChild(emptyDiv(na));
+    buildTable($('skillsTable'), [{label:'Student'}], [], 'Empty'); return }
   if(!list.length){
     /* a phase with knowledge measures but no clinical-skills ones yet (Phase 2
        before any clinical evaluation is loaded) still gets a picture */
@@ -2123,7 +2157,7 @@ function renderTypeChart(){
     const at = rows.findIndex(r => r.key === 'shelf');
     if(at >= 0 && subj.length > 1) rows = rows.slice(0, at + 1).concat(subj, rows.slice(at + 1));
   }
-  if(!rows.length){ host.innerHTML = '<div class="empty">No assessments in this filter.</div>';
+  if(!rows.length){ host.appendChild(emptyDiv(unavailableMsg() || 'No assessments in this filter.'));
     buildTable($('typeTable'), [{label:'Assessment type'}], [], 'Empty'); return }
 
   const W = widthOf(host), rowH = 40, m = {t:18, r:56, b:34, l:150};
@@ -2293,6 +2327,7 @@ function renderRoster(){
     body.appendChild(tr);
   });
 
+  $('rosterEmpty').textContent = unavailableMsg() || 'No students match these filters.';
   $('rosterEmpty').hidden = list.length > 0;
   $('rosterTable').hidden = list.length === 0;
   $('rosterTitle').textContent = list.length + (list.length === 1 ? ' student' : ' students')
@@ -3624,6 +3659,8 @@ function renderReview(list){
   $('reviewTitle').textContent = picked.length
     ? picked.length + (picked.length === 1 ? ' student' : ' students') + ' needing attention, side by side'
     : 'Students needing attention, side by side';
+  const na = unavailableMsg();
+  if(na){ grid.appendChild(elc('div','rv-empty', na)); return }
   if(!picked.length){
     grid.appendChild(elc('div','rv-empty', 'No student in this filter is in academic concern' +
       (state.reviewWatch ? ' or to monitor.' : '. Tick “Include students to monitor” to widen it.')));
@@ -3839,7 +3876,7 @@ function adoptData(obj, sourceName){
     throw new Error('No students found in that file.');
   DATA = hydrate(obj);
   state.student = null;
-  state.cohort = 'all';
+  state.cohort = null;          /* a new extract opens on its own newest class */
   fillCohortFilter();
   $('sampleNotice').hidden = !(DATA.meta && DATA.meta.sample);
   $('dataStamp').textContent = ' · Source: ' +
@@ -3851,14 +3888,14 @@ function adoptData(obj, sourceName){
 /* ---------------- wiring ---------------- */
 function fillCohortFilter(){
   const sel = $('fCohort');
-  const years = [...new Set((DATA.students||[]).map(s => s.cohort))].sort();
+  const years = cohortYears();
   const keep = state.cohort;
   sel.textContent = '';
   const all = document.createElement('option');
   all.value = 'all'; all.textContent = 'All cohorts'; sel.appendChild(all);
   years.forEach(y => { const o = document.createElement('option');
     o.value = String(y); o.textContent = 'Class of ' + y; sel.appendChild(o) });
-  sel.value = years.map(String).includes(keep) ? keep : 'all';
+  sel.value = keep === 'all' || years.map(String).includes(keep) ? keep : latestCohort();
   state.cohort = sel.value;
   fillListFilter('fProgram', 'fProgramField', 'program', 'program', 'All programs', 'No program set');
   fillListFilter('fAdvisor', 'fAdvisorField', 'careerAdvisor', 'advisor', 'All career advisors', 'No career advisor set');
@@ -3919,11 +3956,11 @@ function init(){
       $('studentView').hidden = true; $('cohortView').hidden = false; renderAll() }, 160);
   });
   $('fClear').addEventListener('click', () => {
-    state.cohort = 'all'; state.program = 'all'; state.advisor = 'all'; state.ccm = 'all';
+    state.cohort = latestCohort(); state.program = 'all'; state.advisor = 'all'; state.ccm = 'all';
     state.phase = 'all'; state.standing = 'all';
     state.emphasis = 'knowledge'; state.q = ''; state.student = null;
     state.sort = {key:'knowledge', dir:'desc'};
-    $('fCohort').value = 'all'; $('fProgram').value = 'all'; $('fAdvisor').value = 'all'; $('fCcm').value = 'all';
+    $('fCohort').value = state.cohort; $('fProgram').value = 'all'; $('fAdvisor').value = 'all'; $('fCcm').value = 'all';
     $('fPhase').value = 'all'; $('fStatus').value = 'all';
     $('fDomain').value = 'knowledge'; $('fSearch').value = '';
     $('studentView').hidden = true; $('cohortView').hidden = false;
