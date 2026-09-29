@@ -443,8 +443,9 @@
    "title": "ASCEND Curriculum Governance Dashboard",
    "short": "Governance",
    "audience": "Committee members and coordinators, all EEC subcommittees, the EEC, and OCA leadership.",
-   "intro": "The Executive Education Committee and its subcommittees: what is scheduled, what was decided, who serves, and the reviews they oversee. The site has its own sign-in.",
+   "intro": "The Executive Education Committee and its subcommittees: what is scheduled, what was decided, who serves, and the reviews they oversee. Your Hub code opens it.",
    "primaryAbs": "https://ascend-governance.vercel.app/",
+   "unlock": "https://ascend-governance.vercel.app/api/unlock",
    "views": [
     {
      "title": "Meetings and agendas",

@@ -72,7 +72,25 @@ h2{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute
   </div>
   <div class="aud"><b>Who this is for.</b> ${esc(s.audience)}</div>
 </main>
-</body></html>
+${s.unlock ? `<script>
+/* This site keeps its own server-side gate on another origin, so the hub's
+   unlock cannot reach it. The hub kept the code this tab was opened with; the
+   button posts it to the site's unlock endpoint, which sets the cookie and
+   sends the person on. Without a stored code the button is a plain link and
+   the site's own gate asks. */
+document.querySelector('.btn').addEventListener('click', function(e){
+  var code = null;
+  try { code = sessionStorage.getItem('ascendCode'); } catch(_){}
+  if(!code) return;
+  e.preventDefault();
+  var f = document.createElement('form');
+  f.method = 'post'; f.action = ${JSON.stringify(s.unlock)};
+  var add = function(n, v){ var i = document.createElement('input'); i.type = 'hidden'; i.name = n; i.value = v; f.appendChild(i); };
+  add('code', code); add('to', '/');
+  document.body.appendChild(f); f.submit();
+});
+</script>
+` : ""}</body></html>
 `;
   writeFileSync(`overview/${s.slug}.html`, html);
   console.log("wrote overview/" + s.slug + ".html");

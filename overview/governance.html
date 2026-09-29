@@ -47,7 +47,7 @@ h2{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute
 </header>
 <main class="wrap">
   <section class="intro">
-    <p class="lead">The Executive Education Committee and its subcommittees: what is scheduled, what was decided, who serves, and the reviews they oversee. The site has its own sign-in.</p>
+    <p class="lead">The Executive Education Committee and its subcommittees: what is scheduled, what was decided, who serves, and the reviews they oversee. Your Hub code opens it.</p>
     <a class="btn" href="https://ascend-governance.vercel.app/">Open Governance &rarr;</a>
   </section>
   <h2>What you will find</h2>
@@ -79,4 +79,22 @@ h2{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute
   </div>
   <div class="aud"><b>Who this is for.</b> Committee members and coordinators, all EEC subcommittees, the EEC, and OCA leadership.</div>
 </main>
+<script>
+/* This site keeps its own server-side gate on another origin, so the hub's
+   unlock cannot reach it. The hub kept the code this tab was opened with; the
+   button posts it to the site's unlock endpoint, which sets the cookie and
+   sends the person on. Without a stored code the button is a plain link and
+   the site's own gate asks. */
+document.querySelector('.btn').addEventListener('click', function(e){
+  var code = null;
+  try { code = sessionStorage.getItem('ascendCode'); } catch(_){}
+  if(!code) return;
+  e.preventDefault();
+  var f = document.createElement('form');
+  f.method = 'post'; f.action = "https://ascend-governance.vercel.app/api/unlock";
+  var add = function(n, v){ var i = document.createElement('input'); i.type = 'hidden'; i.name = n; i.value = v; f.appendChild(i); };
+  add('code', code); add('to', '/');
+  document.body.appendChild(f); f.submit();
+});
+</script>
 </body></html>

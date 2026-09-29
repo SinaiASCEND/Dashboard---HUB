@@ -472,6 +472,9 @@ function tryUnlock(){
   }
   pwErr.classList.remove('show');
   try { sessionStorage.setItem('ascendTier', h); } catch(e){}
+  /* The code itself, for this tab only: a site on another origin (Governance)
+     cannot see this hub's unlock, so its explainer hands the code across. */
+  try { sessionStorage.setItem('ascendCode', code); } catch(e){}
   if(tier.open && DASHBOARDS[tier.open]){ window.location.href = DASHBOARDS[tier.open].url; return; }
   renderTier(tier);
   gate.classList.add('hidden');
@@ -617,6 +620,7 @@ subGate.addEventListener('click', e => { if(e.target===subGate) closeSubGate(); 
 document.getElementById('lockBtn').addEventListener('click', () => {
   try { sessionStorage.removeItem('ascendTier'); } catch(e){}
   try { sessionStorage.removeItem('ascendSub'); } catch(e){}
+  try { sessionStorage.removeItem('ascendCode'); } catch(e){}
   hub.classList.remove('active');
   gate.classList.remove('hidden');
   pwArea.classList.remove('open');
