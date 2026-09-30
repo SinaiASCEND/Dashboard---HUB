@@ -2698,6 +2698,103 @@ function adoptPhotos(files){
   renderAll();
   return n;
 }
+/* ---------------------------------------------------------------------------
+   WHERE THE LOADS COME FROM
+   The data file, the photo folder and the name key all live in one OneDrive
+   folder: Curricular Affairs - Documents / # RPS / # Confidential, as
+     Student Performance Dashboard <yyyy-mm-dd>/phase1_all.json
+     Student Photos <yyyy-mm-dd>/<code>.jpg
+     ASCEND_Names_Key_for_Dashboard_<yyyy-mm-dd>.csv
+   An ordinary file picker cannot be told where to open, so in Chrome and Edge
+   the viewer picks that folder once and the browser keeps a handle to it
+   (IndexedDB 'ascendConfidential' - a pointer the browser re-asks permission
+   for, never the files' contents). Each button then takes the newest dated
+   entry from it. Safari and Firefox keep the ordinary picker.
+   --------------------------------------------------------------------------- */
+const CONF = {
+  data: {why: 'Loading the student data file brings coded education records into this browser. ' +
+              'Continue only with a legitimate educational interest.',
+         dir: /^Student Performance Dashboard \d{4}-\d{2}-\d{2}/i, file: /^phase1_all\.json$/i,
+         alsoFile: /\.json$/i, what: 'a "Student Performance Dashboard <date>" folder holding phase1_all.json'},
+  photos: {why: 'Loading the photo folder pairs a face with each code, which re-identifies the student. ' +
+                'Continue only with a legitimate educational interest.',
+           dir: /^Student Photos \d{4}-\d{2}-\d{2}/i, images: true, what: 'a "Student Photos <date>" folder'},
+  names: {why: 'Loading the name key pairs a name with every code on this page, which re-identifies ' +
+               'the students. Continue only with a legitimate educational interest.',
+          file: /^ASCEND_Names_Key_for_Dashboard_.*\.(csv|json)$/i,
+          what: 'an ASCEND_Names_Key_for_Dashboard_<date>.csv file'}
+};
+let confKnown = false;
+function confPickerOk(){ return typeof window.showDirectoryPicker === 'function' && !!window.indexedDB }
+function confStore(write, fn){
+  return new Promise((res, rej) => {
+    const rq = indexedDB.open('ascendConfidential', 1);
+    rq.onupgradeneeded = () => rq.result.createObjectStore('h');
+    rq.onerror = () => rej(rq.error);
+    rq.onsuccess = () => {
+      let r;
+      try { r = fn(rq.result.transaction('h', write ? 'readwrite' : 'readonly').objectStore('h')) }
+      catch(e){ rq.result.close(); rej(e); return }
+      r.onsuccess = () => { res(r.result); rq.result.close() };
+      r.onerror = () => { rej(r.error); rq.result.close() };
+    };
+  });
+}
+async function confRemembered(){
+  return confPickerOk() && !!(await confStore(false, st => st.get('folder')));
+}
+/* newest first: the dated names sort as text */
+async function confEntries(dir, kind, re){
+  const out = [];
+  for await (const h of dir.values()) if(h.kind === kind && re.test(h.name)) out.push(h);
+  return out.sort((a, b) => b.name.localeCompare(a.name));
+}
+async function confFind(dir, want){
+  if(want.dir){
+    for(const sub of await confEntries(dir, 'directory', want.dir)){
+      if(want.images){
+        const files = [];
+        for await (const h of sub.values())
+          if(h.kind === 'file' && /\.(jpe?g|png|gif|webp|heic)$/i.test(h.name)) files.push(await h.getFile());
+        if(files.length){ files.folder = sub.name; return files }
+      } else {
+        const hit = (await confEntries(sub, 'file', want.file))[0] || (await confEntries(sub, 'file', want.alsoFile))[0];
+        if(hit) return hit.getFile();
+      }
+    }
+    return null;
+  }
+  const hit = (await confEntries(dir, 'file', want.file))[0];
+  return hit ? hit.getFile() : null;
+}
+/* the remembered folder, re-permitted, or a fresh pick of it */
+async function confidentialFolder(){
+  let dir = null;
+  try { dir = await confStore(false, st => st.get('folder')) } catch(e){}
+  if(dir){
+    try {
+      let p = await dir.queryPermission({mode: 'read'});
+      if(p !== 'granted') p = await dir.requestPermission({mode: 'read'});
+      if(p === 'granted') return dir;
+    } catch(e){}
+  }
+  dir = await window.showDirectoryPicker({id: 'ascend-confidential', mode: 'read'});
+  /* picked # RPS (or anything holding it) - step into # Confidential */
+  for await (const h of dir.values())
+    if(h.kind === 'directory' && /^#\s*confidential$/i.test(h.name)){ dir = h; break }
+  try { await confStore(true, st => st.put(dir, 'folder')); confKnown = true } catch(e){}
+  return dir;
+}
+async function fromConfidential(want){
+  const dir = await confidentialFolder();
+  const got = await confFind(dir, want);
+  if(got) return got;
+  try { await confStore(true, st => st.delete('folder')); confKnown = false } catch(e){}
+  throw new Error('Could not find ' + want.what + ' in "' + dir.name + '".\n\n' +
+    'Click the button again and pick the # Confidential folder (OneDrive › Curricular Affairs - Documents › ' +
+    '# RPS › # Confidential), or shift-click to choose the file yourself.');
+}
+
 /* Student names come from the code key the viewer picks with "Load names" -
    a CSV (student_code,name - or first_name/last_name) or a JSON map of code to
    name. Like the photos it is held in memory for this session only: nothing is
@@ -4007,22 +4104,31 @@ function init(){
      behind the FERPA acknowledgment - the same code as the lookup, asked
      once per session. The picker opens from the form's submit, which is
      still a user gesture. */
-  $('loadBtn').addEventListener('click', () =>
-    ferpaGate('Loading the student data file brings coded education records into this browser. ' +
-              'Continue only with a legitimate educational interest.',
-              () => $('fileInput').click()));
+  const HOW_FIRST = ' The first time, pick the # Confidential folder (OneDrive › Curricular Affairs - Documents › # RPS › # Confidential); ' +
+                    'after that each button opens the newest file there by itself.';
+  const firstNote = () => confPickerOk() && !confKnown ? HOW_FIRST : '';
+  /* Each button opens the newest file in the Confidential folder by itself
+     (see confidentialFolder); shift-click, or a browser without folder access,
+     falls back to the ordinary file picker. */
+  const loadFrom = (want, use, input) => ev => {
+    const plain = ev.shiftKey || !confPickerOk();
+    ferpaGate(want.why + (plain ? '' : firstNote()), async () => {
+      if(plain){ $(input).click(); return }
+      try {
+        const got = await fromConfidential(want);
+        if(got) use(got);
+      } catch(err){
+        if(err && err.name === 'AbortError') return;      /* the viewer closed the picker */
+        alert(err.message || String(err));
+      }
+    });
+  };
+  $('loadBtn').addEventListener('click', loadFrom(CONF.data, f => readData(f), 'fileInput'));
   /* a folder of <code>.jpg photos, kept in memory for this session only */
-  $('photoBtn').addEventListener('click', () =>
-    ferpaGate('Loading the photo folder pairs a face with each code, which re-identifies the student. ' +
-              'Continue only with a legitimate educational interest.',
-              () => $('photoInput').click()));
+  $('photoBtn').addEventListener('click', loadFrom(CONF.photos, files => readPhotos(files), 'photoInput'));
   /* the code key, kept in memory for this session only */
-  $('nameBtn').addEventListener('click', () =>
-    ferpaGate('Loading the name key pairs a name with every code on this page, which re-identifies ' +
-              'the students. Continue only with a legitimate educational interest.',
-              () => $('nameInput').click()));
-  $('nameInput').addEventListener('change', e => {
-    const f = e.target.files && e.target.files[0]; if(!f) return;
+  $('nameBtn').addEventListener('click', loadFrom(CONF.names, f => readNames(f), 'nameInput'));
+  const readNames = f => {
     const fr = new FileReader();
     fr.onload = () => {
       let n = 0;
@@ -4033,17 +4139,14 @@ function init(){
       else logAccess('names', f.name, '');
     };
     fr.readAsText(f);
-    e.target.value = '';
-  });
-  $('photoInput').addEventListener('change', e => {
-    const n = adoptPhotos(e.target.files || []);
+  };
+  const readPhotos = files => {
+    const n = adoptPhotos(files);
     if(!n) alert('No images were found in that folder.\n\nExpected one image per student, named by ' +
                  'code, e.g. ASC-2028-014.jpg, as written by pipeline/student_photos.py.');
-    else logAccess('photos', n + ' photos', '');
-    e.target.value = '';
-  });
-  $('fileInput').addEventListener('change', e => {
-    const f = e.target.files && e.target.files[0]; if(!f) return;
+    else logAccess('photos', n + ' photos' + (files.folder ? ' from ' + files.folder : ''), '');
+  };
+  const readData = f => {
     const fr = new FileReader();
     fr.onload = () => {
       try{
@@ -4055,10 +4158,23 @@ function init(){
               '\n\nExpected either the JSON shape documented at the top of this page’s ' +
               'script, or a CSV with one row per assessment.');
       }
-      e.target.value = '';
     };
     fr.readAsText(f);
+  };
+  $('nameInput').addEventListener('change', e => {
+    const f = e.target.files && e.target.files[0]; if(!f) return;
+    readNames(f); e.target.value = '';
   });
+  $('photoInput').addEventListener('change', e => {
+    readPhotos([...(e.target.files || [])]); e.target.value = '';
+  });
+  $('fileInput').addEventListener('change', e => {
+    const f = e.target.files && e.target.files[0]; if(!f) return;
+    readData(f); e.target.value = '';
+  });
+  confRemembered().then(k => { confKnown = k }).catch(() => {});
+  ['loadBtn', 'photoBtn', 'nameBtn'].forEach(id => { if($(id)) $(id).title =
+    'Opens the newest file in the # Confidential folder. Shift-click to choose a file yourself.' });
 
   /* charts are drawn at real pixel width, so a resize means a redraw */
   let rt = null;
