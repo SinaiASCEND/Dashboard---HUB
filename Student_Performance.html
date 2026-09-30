@@ -500,6 +500,8 @@ tr.rosterrow:focus-visible{outline:3px solid var(--s1);outline-offset:-3px}
 .matrix th.rowhd .sub{display:block;font-size:11px;color:var(--muted);font-weight:600}
 .matrix td.cell{text-align:center;padding:9px 6px;border-radius:6px;font-weight:700;
   font-variant-numeric:tabular-nums;cursor:default;min-width:92px}
+.matrix td.cell .sc{display:block;font-size:13.5px;line-height:1.2}
+.matrix td.cell .pc{display:block;font-size:11px;font-weight:600;opacity:.85;line-height:1.3}
 .matrix td.cell.na{color:var(--muted);font-weight:600;background:var(--surface-2)}
 .matrix tr.phasehd th{padding-top:14px;color:var(--magenta);text-align:left;
   font-size:10.5px;letter-spacing:.16em}
@@ -1492,6 +1494,35 @@ function hydrate(data){
     Object.entries(rec.qtypes).forEach(([kind, v]) => {
       v.percentile = rankPct(v.pct, kindPool[poolKey(s, rec) + '|' + kind] || [v.pct]);
     })));
+
+  /* --- class median SCORE on every assessment --- */
+  /* A percentile only says where the student stands in the line, not how
+     good the line is: when the class does superbly, a strong score can still
+     rank low. So every assessment also carries the class median of the raw
+     score on the same exam, in the same block and class, and the views print
+     the score and the median beside the percentile. */
+  const scorePool = {};
+  const addScore = (k, v) => { if(v != null && !isNaN(v)) (scorePool[k] = scorePool[k] || []).push(v) };
+  const medOf = k => scorePool[k] && scorePool[k].length > 1 ? median(scorePool[k]) : null;
+  students.forEach(s => (s.records||[]).forEach(rec => {
+    const k = poolKey(s, rec);
+    casList(rec).forEach(c => addScore(k + '|cas|' + (c.label || ''), c.scaled));
+    if(rec.osce) addScore(k + '|osce', rec.osce.pct);
+    if(rec.eval) addScore(k + '|eval', rec.eval.overall);
+  }));
+  students.forEach(s => (s.records||[]).forEach(rec => {
+    const k = poolKey(s, rec);
+    casList(rec).forEach(c => { c.classMedian = medOf(k + '|cas|' + (c.label || '')) });
+    if(rec.osce) rec.osce.classMedian = medOf(k + '|osce');
+    if(rec.eval) rec.eval.classMedian = medOf(k + '|eval');
+    const qp = pool[k];
+    rec.quizClassMedian = qp && qp.length > 1 ? median(qp) : null;
+    Object.entries(rec.qtypes).forEach(([kind, v]) => {
+      const kp = kindPool[k + '|' + kind];
+      v.classMedian = kp && kp.length > 1 ? median(kp) : null;
+    });
+  }));
+
   /* every view reads its list of assessment types from TYPE_META, so the
      kinds this data actually holds become panels, bars and columns */
   TYPE_META = QUIZ_KINDS.filter(k => kindsPresent.has(k[0]))
@@ -1535,7 +1566,7 @@ function hydrate(data){
     /* trajectory: one point per assessment, in academic order */
     s.timeline = recs.map(rec => {
       const p = {
-        seq: rec.seq, code: rec.code, name: rec.name, term: rec.term, phase: rec.phase,
+        seq: rec.seq, code: rec.code, name: rec.name, term: rec.term, phase: rec.phase, rec,
         quiz: rec.quizPercentile,          /* pooled: still used for the trend lines */
         cas:   isClerkshipRec(rec) ? null : casPercentile(rec),
         shelf: isClerkshipRec(rec) ? casPercentile(rec) : null,
@@ -1653,13 +1684,15 @@ function buildFlags(s){
       ' below the 10th percentile',
       why: lowNbme.map(x => x.rec.code +
         (casList(x.rec).length > 1 && x.cas.label ? ' ' + x.cas.label : '') +
-        ' (scaled ' + x.cas.scaled + ')').join(', ') + '.'});
+        ' (scaled ' + x.cas.scaled +
+        (x.cas.classMedian != null ? ', class median ' + fmtScaled(x.cas.classMedian) : '') + ')').join(', ') + '.'});
 
   const lowOsce = recs.filter(r => r.osce && r.osce.percentile != null && r.osce.percentile < CONCERN_PCTILE);
   if(lowOsce.length)
     out.push({level:'watch', what: count(lowOsce.length, 'OSCE', 'OSCEs') +
       ' below the 10th percentile',
-      why: lowOsce.map(r => r.code + ' (' + r.osce.pct + '%)').join(', ') + '.'});
+      why: lowOsce.map(r => r.code + ' (' + r.osce.pct + '%' +
+        (r.osce.classMedian != null ? ', class median ' + fmtPctScore(r.osce.classMedian) : '') + ')').join(', ') + '.'});
 
   /* Each domain is checked on its own: a student fine on one axis and sinking
      on the other is exactly who this should surface. */
@@ -3115,7 +3148,7 @@ function renderTrajectory(host, s){
 
   TYPE_META.forEach(t => {
     const pts = (s.timeline||[]).filter(p => p[t.key] != null)
-      .map(p => ({x:p.seq, y:p[t.key], code:p.code, name:p.name, term:p.term}));
+      .map(p => ({x:p.seq, y:p[t.key], code:p.code, name:p.name, term:p.term, rec:p.rec}));
     if(pts.length < 1) return;
     drew++;
     const color = cssv(t.varName);
@@ -3131,7 +3164,7 @@ function renderTrajectory(host, s){
       {label:'Class median', color:cssv('--context'), shape:'line'}
     ]);
     grid.appendChild(panel);
-    panel._draw = () => drawTrajPanel(panel, pts, refs.seqMedian[t.key] || {}, color, t.label, xRange);
+    panel._draw = () => drawTrajPanel(panel, pts, refs.seqMedian[t.key] || {}, color, t.label, xRange, t.key);
   });
 
   if(!drew){ host.appendChild(elc('div','empty','No assessments on record yet.')); return }
@@ -3148,7 +3181,7 @@ function renderTrajectory(host, s){
     'Percentile by block and assessment type');
 }
 
-function drawTrajPanel(panel, pts, medians, color, label, xRange){
+function drawTrajPanel(panel, pts, medians, color, label, xRange, key){
   const host = panel;
   const W = Math.max(210, Math.floor(panel.getBoundingClientRect().width) - 26), H = 148;
   const m = {t:10, r:38, b:24, l:30};
@@ -3202,8 +3235,12 @@ function drawTrajPanel(panel, pts, medians, color, label, xRange){
   };
   const show = (ev, p) => {
     cross.setAttribute('x1', X(p.x)); cross.setAttribute('x2', X(p.x)); cross.setAttribute('opacity', 1);
-    const rows = [{value: ord(p.y), label: label.toLowerCase(), color}];
-    if(medians[p.x] != null) rows.push({value: ord(medians[p.x]), label:'class median', color:cssv('--context')});
+    const d = p.rec ? cellData(p.rec, key) : null;
+    const rows = [];
+    if(d && d.score != null) rows.push({value: d.score, label:'score', color});
+    if(d && d.median != null) rows.push({value: d.median, label:'class median score', color:cssv('--context')});
+    rows.push({value: ord(p.y), label: label.toLowerCase() + ' percentile', color});
+    if(medians[p.x] != null) rows.push({value: ord(medians[p.x]), label:'class median percentile', color:cssv('--context')});
     tipShow(ev, p.code + ' — ' + p.name, rows);
   };
   hit.addEventListener('pointermove', ev => {
@@ -3254,15 +3291,23 @@ const matrixCols = () => TYPE_META.map(t => ({key:t.key, label:t.short || t.labe
 const PHASE_NAME = {1:'Phase 1 · Pre-clerkship modules', 2:'Phase 2 · Clerkships',
                     3:'Phase 3 · Integration & Transitions'};
 
+/* score formatting, one per kind of assessment */
+function fmtPctScore(v){ return v == null ? null : Math.round(v) + '%' }
+function fmtScaled(v){ return v == null ? null : String(Math.round(v)) }
+function fmtEval(v){ return v == null ? null : (+v).toFixed(1) + '/5' }
+
 function cellData(rec, key){
   if(key.indexOf('q:') === 0){
     const v = rec.qtypes && rec.qtypes[key.slice(2)];
     if(!v || v.percentile == null) return null;
     return {pct: v.percentile, label: key.slice(2),
+      score: fmtPctScore(v.pct), median: fmtPctScore(v.classMedian),
       detail: Math.round(v.pct) + '% correct across ' + v.n + (v.n === 1 ? ' assessment' : ' assessments')};
   }
   if(key === 'quiz' && rec.quizPercentile != null)
-    return {pct: rec.quizPercentile, detail: Math.round(rec.quizPct) + '% correct across ' +
+    return {pct: rec.quizPercentile, score: fmtPctScore(rec.quizPct),
+      median: fmtPctScore(rec.quizClassMedian),
+      detail: Math.round(rec.quizPct) + '% correct across ' +
       rec.quizzes.length + ' quizzes', label:'Module quizzes'};
   if((key === 'cas' || key === 'shelf') && nbmeKey(rec) === key && casPercentile(rec) != null){
     const list = casList(rec).filter(c => c.percentile != null);
@@ -3273,20 +3318,35 @@ function cellData(rec, key){
       (c.natlMean != null ? ' · national mean ' + c.natlMean : '') +
       (c.percentileDerived ? ' · percentile within cohort' : '');
     if(list.length === 1)
-      return {pct: list[0].percentile, detail: casDetail(list[0]), label: list[0].label};
+      return {pct: list[0].percentile, detail: casDetail(list[0]), label: list[0].label,
+        score: fmtScaled(list[0].scaled), median: fmtScaled(list[0].classMedian)};
     /* More than one proctored paper in the block: show them all rather than
        a single averaged number with no way to see what it averages. */
     return {pct: casPercentile(rec),
       detail: list.map(c => (c.label || 'exam') + ' ' + c.scaled).join(' · '),
+      score: list.map(c => fmtScaled(c.scaled)).join(' / '),
+      median: list.every(c => c.classMedian != null)
+        ? list.map(c => fmtScaled(c.classMedian)).join(' / ') : null,
       label: list.length + ' proctored exams'};
   }
   if(key === 'osce' && rec.osce && rec.osce.percentile != null)
     return {pct: rec.osce.percentile, detail: rec.osce.pct + '% · class mean ' +
-      rec.osce.cohortMean + '%', label: rec.osce.label};
+      rec.osce.cohortMean + '%', label: rec.osce.label,
+      score: fmtPctScore(rec.osce.pct), median: fmtPctScore(rec.osce.classMedian)};
   if(key === 'eval' && rec.eval && rec.eval.percentile != null)
     return {pct: rec.eval.percentile, detail: rec.eval.overall.toFixed(1) +
-      '/5 · class mean ' + rec.eval.cohortMean.toFixed(1), label: rec.eval.label};
+      '/5 · class mean ' + rec.eval.cohortMean.toFixed(1), label: rec.eval.label,
+      score: fmtEval(rec.eval.overall), median: fmtEval(rec.eval.classMedian)};
   return null;
+}
+
+/* the tooltip rows every score view shares: score, class median, percentile */
+function scoreTipRows(d, color){
+  const rows = [];
+  if(d.score != null) rows.push({value: d.score, label:'score', color});
+  if(d.median != null) rows.push({value: d.median, label:'class median score', color: cssv('--context')});
+  rows.push({value: ord(d.pct), label:'percentile in class'});
+  return rows;
 }
 
 function renderMatrix(host, s){
@@ -3331,14 +3391,16 @@ function renderMatrix(host, s){
       const bg = divergingColor(d.pct - 50);
       td.style.background = bg;
       td.style.color = inkOn(bg);
-      td.textContent = d.pct;
+      if(d.score != null){
+        td.appendChild(elc('span','sc', d.score));
+        td.appendChild(elc('span','pc', ord(d.pct) + ' pct'));
+      } else td.textContent = d.pct;
       td.tabIndex = 0;
-      td.setAttribute('aria-label', rec.code + ' ' + d.label + ': ' + ord(d.pct) +
-        ' percentile. ' + d.detail + '.');
-      hoverable(td, rec.code + ' — ' + d.label, [
-        {value: ord(d.pct), label:'percentile in class', color: bg},
-        {value: d.detail, label:''}
-      ]);
+      td.setAttribute('aria-label', rec.code + ' ' + d.label + ': ' +
+        (d.score != null ? 'score ' + d.score + ', ' : '') +
+        (d.median != null ? 'class median ' + d.median + ', ' : '') +
+        ord(d.pct) + ' percentile. ' + d.detail + '.');
+      hoverable(td, rec.code + ' — ' + d.label, scoreTipRows(d, bg).concat([{value: d.detail, label:''}]));
       tr.appendChild(td);
     });
 
@@ -3352,7 +3414,7 @@ function renderMatrix(host, s){
 
   /* scale key - the legend for a colour that carries magnitude */
   const key = elc('div','scalekey');
-  key.appendChild(elc('span', null, 'Percentile vs. the class midpoint:'));
+  key.appendChild(elc('span', null, 'Each cell: the score, then the percentile in class. Shading is the percentile vs. the class midpoint:'));
   DIVERGING.slice().reverse().forEach(b => {
     const sw = elc('span','sw'); sw.style.background = cssv(b.varName);
     sw.setAttribute('aria-hidden','true');
@@ -3366,11 +3428,12 @@ function renderMatrix(host, s){
   recs.forEach(rec => matrixCols().forEach(c => {
     const d = cellData(rec, c.key);
     if(d) rows.push(['Phase ' + rec.phase, rec.code + ' — ' + rec.name, d.label,
+      d.score == null ? '—' : d.score, d.median == null ? '—' : d.median,
       d.pct, d.detail, rec.result]);
   }));
   buildTable($('matrixTable'),
-    [{label:'Phase'},{label:'Block'},{label:'Assessment'},{label:'Percentile',num:true},
-     {label:'Underlying score'},{label:'Block result'}],
+    [{label:'Phase'},{label:'Block'},{label:'Assessment'},{label:'Score'},{label:'Class median'},
+     {label:'Percentile',num:true},{label:'Detail'},{label:'Block result'}],
     rows, 'Every assessment on record with its underlying score');
 }
 
@@ -3593,22 +3656,25 @@ function renderLog(host, s){
       const v = rec.qtypes && rec.qtypes[kind];
       rows.push([rec.seq, 'Phase ' + rec.phase, rec.code, kind + ' — ' + q.name,
         q.pct + '%', 'class mean ' + q.cohortMean + '%',
+        v && v.classMedian != null ? fmtPctScore(v.classMedian) + ' (' + kind + ' avg)' : '—',
         v && v.percentile != null ? v.percentile : '—', rec.result]);
     });
     casList(rec).forEach(c => rows.push([rec.seq, 'Phase ' + rec.phase, rec.code, c.label,
       'scaled ' + c.scaled,
       c.natlMean != null ? 'national mean ' + c.natlMean
                          : (c.cohortMean != null ? 'class mean ' + c.cohortMean : '—'),
+      c.classMedian == null ? '—' : fmtScaled(c.classMedian),
       c.percentile == null ? '—' : c.percentile, rec.result]));
     if(rec.osce) rows.push([rec.seq, 'Phase ' + rec.phase, rec.code, rec.osce.label,
-      rec.osce.pct + '%', 'class mean ' + rec.osce.cohortMean + '%', rec.osce.percentile, rec.result]);
+      rec.osce.pct + '%', 'class mean ' + rec.osce.cohortMean + '%',
+      rec.osce.classMedian == null ? '—' : fmtPctScore(rec.osce.classMedian), rec.osce.percentile, rec.result]);
     if(rec.eval) rows.push([rec.seq, 'Phase ' + rec.phase, rec.code, rec.eval.label,
       rec.eval.overall.toFixed(1) + '/5', 'class mean ' + rec.eval.cohortMean.toFixed(1),
-      rec.eval.percentile, rec.result]);
+      rec.eval.classMedian == null ? '—' : fmtEval(rec.eval.classMedian), rec.eval.percentile, rec.result]);
   });
   buildTable(host,
     [{label:'#',num:true},{label:'Phase'},{label:'Block'},{label:'Assessment'},
-     {label:'Score'},{label:'Reference'},{label:'Percentile',num:true},{label:'Block result'}],
+     {label:'Score'},{label:'Reference'},{label:'Class median'},{label:'Percentile',num:true},{label:'Block result'}],
     rows, 'Complete assessment log');
   return rows.length;
 }
@@ -3641,15 +3707,17 @@ function renderStudent(s){
   const trajBody = makeCard(host, 'Trajectory',
     'How this student has tracked over time',
     'One panel per kind of assessment, in academic order. The class median is the grey line, ' +
-    'so a gap that widens or closes is visible without doing arithmetic.', 'trajTable');
+    'so a gap that widens or closes is visible without doing arithmetic. Hover a block for ' +
+    'the actual score beside the class median score.', 'trajTable');
   chartAndTable(trajBody, 'trajChart', 'trajTable');
   renderTrajectory($('trajChart'), s);
 
   const mxBody = makeCard(host, 'Every block',
     'Performance across all three phases',
-    'Percentile within the Class of ' + s.cohort + ' for each assessment in each block. ' +
-    'Shading runs from 25+ points below the class midpoint to 25+ points above; the number ' +
-    'is printed in every cell.', 'matrixTable');
+    'Each cell prints the student’s score and, beneath it, the percentile within the Class of ' +
+    s.cohort + '. Read them together: when the class scores high, a strong score can still ' +
+    'rank low. Hover a cell for the class median score. Shading follows the percentile, from ' +
+    '25+ points below the class midpoint to 25+ points above.', 'matrixTable');
   chartAndTable(mxBody, 'matrixChart', 'matrixTable');
   renderMatrix($('matrixChart'), s);
 
