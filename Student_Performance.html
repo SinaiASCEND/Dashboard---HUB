@@ -334,7 +334,7 @@ main{padding-bottom:44px}
 .ferpa{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:10px;padding:10px 12px;
   border:1px solid var(--line);border-left:3px solid var(--magenta);background:var(--surface-2);max-width:560px}
 .ferpa[hidden]{display:none}
-#loadGate,#logNudge{margin:0 0 16px}
+#loadGate,#logNudge,#confHint{margin:0 0 16px}
 .ferpa.nudge{border-color:var(--magenta)}
 .ferpa .go{display:inline-block;padding:7px 14px;font-size:12.5px;font-weight:700;border-radius:8px;
   background:var(--magenta);color:#fff;text-decoration:none}
@@ -813,6 +813,14 @@ body.gated{overflow:hidden}
       and press Submit.</p>
     <a class="go" id="logNudgeLink" href="#" target="_blank" rel="noopener">Open the access-log form &#8599;</a>
     <button type="button" class="ghostBtn" id="logNudgeDone">Done</button>
+  </div>
+  <!-- shown until the Confidential folder has been picked once in this browser -->
+  <div class="ferpa nudge" id="confHint" hidden>
+    <p><strong>First, show this page where the files are.</strong> In the window that opens, choose
+      OneDrive &rsaquo; Curricular Affairs - Documents &rsaquo; # RPS &rsaquo; <strong># Confidential</strong>
+      and click Select. This is asked once; after that each Load button opens the newest file there by itself.</p>
+    <button type="button" id="confHintGo">Choose the folder</button>
+    <button type="button" class="ghostBtn" id="confHintCancel">Cancel</button>
   </div>
   <!-- ============ COHORT VIEW ============ -->
   <section id="cohortView" aria-label="Cohort overview">
@@ -4104,23 +4112,39 @@ function init(){
      behind the FERPA acknowledgment - the same code as the lookup, asked
      once per session. The picker opens from the form's submit, which is
      still a user gesture. */
-  const HOW_FIRST = ' The first time, pick the # Confidential folder (OneDrive › Curricular Affairs - Documents › # RPS › # Confidential); ' +
-                    'after that each button opens the newest file there by itself.';
-  const firstNote = () => confPickerOk() && !confKnown ? HOW_FIRST : '';
+  /* Until the folder has been picked once, say where to go before the picker
+     opens - a picker can't be told where to start, and it opens on Documents.
+     The picker then opens from the panel's own button, a fresh user gesture. */
+  let confThen = null;
+  const confHint = run => {
+    if(confKnown){ run(); return }
+    confThen = run;
+    $('confHint').hidden = false;
+    $('confHint').scrollIntoView({block:'nearest'});
+    $('confHintGo').focus();
+  };
+  $('confHintGo').addEventListener('click', () => {
+    $('confHint').hidden = true;
+    const run = confThen; confThen = null;
+    if(run) run();
+  });
+  $('confHintCancel').addEventListener('click', () => { $('confHint').hidden = true; confThen = null });
   /* Each button opens the newest file in the Confidential folder by itself
      (see confidentialFolder); shift-click, or a browser without folder access,
      falls back to the ordinary file picker. */
   const loadFrom = (want, use, input) => ev => {
     const plain = ev.shiftKey || !confPickerOk();
-    ferpaGate(want.why + (plain ? '' : firstNote()), async () => {
+    ferpaGate(want.why, () => {
       if(plain){ $(input).click(); return }
-      try {
-        const got = await fromConfidential(want);
-        if(got) use(got);
-      } catch(err){
-        if(err && err.name === 'AbortError') return;      /* the viewer closed the picker */
-        alert(err.message || String(err));
-      }
+      confHint(async () => {
+        try {
+          const got = await fromConfidential(want);
+          if(got) use(got);
+        } catch(err){
+          if(err && err.name === 'AbortError') return;    /* the viewer closed the picker */
+          alert(err.message || String(err));
+        }
+      });
     });
   };
   $('loadBtn').addEventListener('click', loadFrom(CONF.data, f => readData(f), 'fileInput'));
