@@ -505,6 +505,12 @@ tr.rosterrow:focus-visible{outline:3px solid var(--s1);outline-offset:-3px}
   font-variant-numeric:tabular-nums;cursor:default;min-width:92px}
 .matrix td.cell .sc{display:block;font-size:13.5px;line-height:1.2}
 .matrix td.cell .pc{display:block;font-size:11px;font-weight:600;opacity:.85;line-height:1.3}
+/* two papers in one block (Mid- and End-of-Module CAS): one line each */
+.matrix td.cell.multi{padding:6px 8px}
+.matrix td.cell .part{display:flex;align-items:baseline;justify-content:center;gap:5px;white-space:nowrap}
+.matrix td.cell .part + .part{margin-top:3px}
+.matrix td.cell .part .pn{font-size:10.5px;font-weight:700;opacity:.85;text-transform:uppercase;letter-spacing:.06em}
+.matrix td.cell .part .sc,.matrix td.cell .part .pc{display:inline}
 .matrix td.cell.na{color:var(--muted);font-weight:600;background:var(--surface-2)}
 .matrix tr.phasehd th{padding-top:14px;color:var(--magenta);text-align:left;
   font-size:10.5px;letter-spacing:.16em}
@@ -3246,8 +3252,14 @@ function drawTrajPanel(panel, pts, medians, color, label, xRange, key){
     cross.setAttribute('x1', X(p.x)); cross.setAttribute('x2', X(p.x)); cross.setAttribute('opacity', 1);
     const d = p.rec ? cellData(p.rec, key) : null;
     const rows = [];
-    if(d && d.score != null) rows.push({value: d.score, label:'score', color});
-    if(d && d.median != null) rows.push({value: d.median, label:'class median score', color:cssv('--context')});
+    if(d && d.parts) d.parts.forEach(pp => {
+      rows.push({value: pp.score, label: pp.label + (pp.pct != null ? ' · ' + ord(pp.pct) + ' pct' : ''), color});
+      if(pp.median != null) rows.push({value: pp.median, label: 'class median, ' + pp.name, color:cssv('--context')});
+    });
+    else {
+      if(d && d.score != null) rows.push({value: d.score, label:'score', color});
+      if(d && d.median != null) rows.push({value: d.median, label:'class median score', color:cssv('--context')});
+    }
     rows.push({value: ord(p.y), label: label.toLowerCase() + ' percentile', color});
     if(medians[p.x] != null) rows.push({value: ord(medians[p.x]), label:'class median percentile', color:cssv('--context')});
     tipShow(ev, p.code + ' — ' + p.name, rows);
@@ -3301,6 +3313,11 @@ const PHASE_NAME = {1:'Phase 1 · Pre-clerkship modules', 2:'Phase 2 · Clerkshi
                     3:'Phase 3 · Integration & Transitions'};
 
 /* score formatting, one per kind of assessment */
+/* 'Mid Module Exam' -> 'Mid', 'End of Module Exam' / 'Final Exam: NBME' -> 'End' */
+function paperName(label){
+  const l = String(label || '');
+  return /mid/i.test(l) ? 'Mid' : /end|final/i.test(l) ? 'End' : (l || 'Exam');
+}
 function fmtPctScore(v){ return v == null ? null : Math.round(v) + '%' }
 function fmtScaled(v){ return v == null ? null : String(Math.round(v)) }
 function fmtEval(v){ return v == null ? null : (+v).toFixed(1) + '/5' }
@@ -3332,6 +3349,10 @@ function cellData(rec, key){
     /* More than one proctored paper in the block: show them all rather than
        a single averaged number with no way to see what it averages. */
     return {pct: casPercentile(rec),
+      /* each paper keeps its own line in the cell: MCG, Anatomy and
+         Neuroscience sit a Mid-Module and an End-of-Module NBME CAS */
+      parts: list.map(c => ({name: paperName(c.label), label: c.label || 'exam',
+        score: fmtScaled(c.scaled), median: fmtScaled(c.classMedian), pct: c.percentile})),
       detail: list.map(c => (c.label || 'exam') + ' ' + c.scaled).join(' · '),
       score: list.map(c => fmtScaled(c.scaled)).join(' / '),
       median: list.every(c => c.classMedian != null)
@@ -3400,16 +3421,33 @@ function renderMatrix(host, s){
       const bg = divergingColor(d.pct - 50);
       td.style.background = bg;
       td.style.color = inkOn(bg);
-      if(d.score != null){
+      if(d.parts){
+        td.classList.add('multi');
+        d.parts.forEach(pp => {
+          const ln = elc('span','part');
+          ln.appendChild(elc('span','pn', pp.name));
+          ln.appendChild(elc('span','sc', pp.score));
+          ln.appendChild(elc('span','pc', pp.pct != null ? ord(pp.pct) : '—'));
+          td.appendChild(ln);
+        });
+      } else if(d.score != null){
         td.appendChild(elc('span','sc', d.score));
         td.appendChild(elc('span','pc', ord(d.pct) + ' pct'));
       } else td.textContent = d.pct;
       td.tabIndex = 0;
-      td.setAttribute('aria-label', rec.code + ' ' + d.label + ': ' +
+      if(d.parts) td.setAttribute('aria-label', rec.code + ' ' + d.label + ': ' + d.parts.map(pp =>
+        pp.label + ' score ' + pp.score + (pp.median != null ? ', class median ' + pp.median : '') +
+        (pp.pct != null ? ', ' + ord(pp.pct) + ' percentile' : '')).join('; ') + '.');
+      else td.setAttribute('aria-label', rec.code + ' ' + d.label + ': ' +
         (d.score != null ? 'score ' + d.score + ', ' : '') +
         (d.median != null ? 'class median ' + d.median + ', ' : '') +
         ord(d.pct) + ' percentile. ' + d.detail + '.');
-      hoverable(td, rec.code + ' — ' + d.label, scoreTipRows(d, bg).concat([{value: d.detail, label:''}]));
+      hoverable(td, rec.code + ' — ' + d.label, d.parts
+        ? [].concat(...d.parts.map(pp => [
+            {value: pp.score, label: pp.label, color: bg},
+            {value: (pp.median != null ? 'median ' + pp.median + ' · ' : '') +
+                    (pp.pct != null ? ord(pp.pct) + ' pct' : ''), label:''}]))
+        : scoreTipRows(d, bg).concat([{value: d.detail, label:''}]));
       tr.appendChild(td);
     });
 
@@ -3436,7 +3474,10 @@ function renderMatrix(host, s){
   const rows = [];
   recs.forEach(rec => matrixCols().forEach(c => {
     const d = cellData(rec, c.key);
-    if(d) rows.push(['Phase ' + rec.phase, rec.code + ' — ' + rec.name, d.label,
+    if(d && d.parts) d.parts.forEach(pp => rows.push(['Phase ' + rec.phase, rec.code + ' — ' + rec.name,
+      pp.label, pp.score, pp.median == null ? '—' : pp.median, pp.pct == null ? '—' : pp.pct,
+      'Scaled ' + pp.score, rec.result]));
+    else if(d) rows.push(['Phase ' + rec.phase, rec.code + ' — ' + rec.name, d.label,
       d.score == null ? '—' : d.score, d.median == null ? '—' : d.median,
       d.pct, d.detail, rec.result]);
   }));
@@ -3724,7 +3765,8 @@ function renderStudent(s){
   const mxBody = makeCard(host, 'Every block',
     'Performance across all three phases',
     'Each cell prints the student’s score and, beneath it, the percentile within the Class of ' +
-    s.cohort + '. Read them together: when the class scores high, a strong score can still ' +
+    s.cohort + '. A block with a Mid- and an End-of-Module NBME exam shows each on its own line. ' +
+    'Read score and percentile together: when the class scores high, a strong score can still ' +
     'rank low. Hover a cell for the class median score. Shading follows the percentile, from ' +
     '25+ points below the class midpoint to 25+ points above.', 'matrixTable');
   chartAndTable(mxBody, 'matrixChart', 'matrixTable');
