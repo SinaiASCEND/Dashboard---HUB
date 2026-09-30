@@ -377,6 +377,32 @@ const DASHBOARDS = {
     kicker: "De-identified Student Data",
     title: "Student Performance Dashboard",
     blurb: "De-identified student-level performance across all three phases, by student code."
+  },
+  /* Open to everyone (reached from the Student and Faculty landing pages);
+     carded here so the ASCEND tier lists every dashboard in one place. */
+  navigator: {
+    url: "overview/navigator.html",
+    kicker: "Curriculum Search",
+    title: "Curriculum Navigator",
+    blurb: "Find any session, learning objective, or calendar date across all three phases, and see how sessions connect to program objectives, threads, and Areas of Concentration."
+  },
+  electives: {
+    url: "overview/electives.html",
+    kicker: "Career Exploration",
+    title: "Electives and NEXUS Catalog",
+    blurb: "Electives, NEXUS Learning offerings, host institutions for away rotations, and what returning students said about them."
+  },
+  babybates: {
+    url: "overview/baby-bates.html",
+    kicker: "Physical Examination",
+    title: "Baby Bates",
+    blurb: "A pocket clinical reference for history-taking and physical examination, drawn from Bates' Guide, for clinical skills coaching and direct observation."
+  },
+  people: {
+    url: "overview/people.html",
+    kicker: "Office Resources",
+    title: "People",
+    blurb: "The Office of Curricular Affairs, the students who represent their classes in governance, and the faculty roles that are open."
   }
 };
 
@@ -386,7 +412,10 @@ const TIERS = {
   "5942bd952f12e02478b5a6aba902340a58c9c769a961f128dbb57f0b79358537": {  // ASCEND
     name: "Office of Curricular Affairs",
     sub: "Full access \u2014 all monitoring, mapping, governance, and accreditation views.",
-    dashboards: ["calendar", "phase1", "clinicalskills", "phase2", "phase3", "nbme",  "objectives", "policies", "surveys", "lcme", "governance"],
+    // Every dashboard the Hub knows, except Student Performance: that one stays
+    // hidden, reachable only by its direct URL (and the RPS code). Add a new card's key here too.
+    dashboards: ["calendar", "phase1", "clinicalskills", "phase2", "phase3", "nbme",  "objectives", "policies", "surveys", "lcme", "governance",
+                 "navigator", "electives", "babybates", "people"],
     pinned: ["phase1","phase2","phase3","governance"]
   },
   "255af8d0734e8438d7fcef7cb457da08d130e24f574065175f2ab73ed2ffb360": {  // EEC
