@@ -903,8 +903,8 @@ body.gated{overflow:hidden}
             standard in each, and either domain below the 25th percentile is a Monitor, below the
             10th an Academic concern. <strong>Standing is relative to the class</strong> &mdash; a
             share of every cohort sits below the 25th percentile by construction, so these bands
-            are a prompt to look, not a determination. A failed block, a remediation, or a clinical
-            evaluation below 3.0 is what makes a standing absolute.</p>
+            are a prompt to look, not a determination. A failed block, a remediation, a clinical
+            evaluation below 3.0, or a Surgery CAS exam below 65% correct is what makes a standing absolute.</p>
         </div>
       </div>
       <div class="cardbody">
@@ -1658,6 +1658,25 @@ function hydrate(data){
    kind rather than listed per assessment - a struggling student would otherwise
    arrive with thirty near-identical lines and the pattern would be lost in them.
    Each flag names its evidence, so the chip is never the whole story. */
+/* A clerkship's customized NBME exam (the Surgery CAS) is judged against a
+   fixed pass mark - below 65% correct is a failure - not a percentile. Each
+   paper below the mark is 'open' unless a later sitting of the same exam
+   (its retake) reached the mark, when it is 'resolved'. */
+function casBelowPass(s){
+  const open = [], resolved = [];
+  const sittings = [];
+  (s.records || []).filter(isClerkshipRec).forEach(r => casList(r).forEach(c => {
+    if(c.passMark != null && c.scaled != null) sittings.push({rec:r, cas:c, exam:examName(c.label)});
+  }));
+  sittings.sort((a, b) => (a.rec.start < b.rec.start ? -1 : a.rec.start > b.rec.start ? 1 : 0));
+  sittings.forEach((x, i) => {
+    if(x.cas.scaled >= x.cas.passMark) return;
+    const later = sittings.slice(i + 1).find(y => y.exam === x.exam && y.cas.scaled >= y.cas.passMark);
+    (later ? resolved : open).push(Object.assign({}, x, {later}));
+  });
+  return {open, resolved};
+}
+
 function buildFlags(s){
   const out = [], recs = s.records || [];
   const codes = list => list.map(r => r.code).join(', ');
@@ -1667,6 +1686,19 @@ function buildFlags(s){
   if(failed.length)
     out.push({level:'crit', what: count(failed.length, 'failed block', 'failed blocks'),
       why: codes(failed) + '. A failed block is an absolute trigger, not a relative standing.'});
+
+  const cb = casBelowPass(s);
+  if(cb.open.length)
+    out.push({level:'crit', what: count(cb.open.length, 'clerkship CAS exam', 'clerkship CAS exams') +
+      ' below ' + cb.open[0].cas.passMark + '% correct',
+      why: cb.open.map(x => x.rec.code + ' ' + x.exam + ' ' + fmtScaled(x.cas.scaled) + '%' +
+        (x.cas.classMedian != null ? ' (class median ' + fmtScaled(x.cas.classMedian) + '%)' : '')).join(', ') +
+        ' — below the pass mark, an absolute standard; no passing retake on record.'});
+  if(cb.resolved.length)
+    out.push({level:'watch', what: count(cb.resolved.length, 'clerkship CAS exam', 'clerkship CAS exams') +
+      ' below the pass mark, passed on retake',
+      why: cb.resolved.map(x => x.rec.code + ' ' + x.exam + ' ' + fmtScaled(x.cas.scaled) + '% → ' +
+        fmtScaled(x.later.cas.scaled) + '% on retake').join(', ') + '.'});
 
   const remed = recs.filter(r => r.result === 'Pass with remediation');
   if(remed.length)
@@ -1733,18 +1765,21 @@ function buildFlags(s){
 }
 
 /* Standing is judged domain by domain, never on a blended number.
-   "Academic concern": an absolute trigger - a failed block or a clinical
-   evaluation below the 3.0 expectation - or either domain in the bottom
+   "Academic concern": an absolute trigger - a failed block, a clinical
+   evaluation below the 3.0 expectation, or a clerkship CAS exam below its
+   65% pass mark with no passing retake - or either domain in the bottom
    decile of the class. "Monitor": a pass with remediation, or either domain
    below the 25th percentile. Strong performance in the other domain is real,
    and stays visible beside the flag, but does not cancel it. */
 function standingOf(s){
   const recs = s.records || [];
   const domains = [s.knowledgePct, s.skillsPct].filter(v => v != null);
+  const cb = casBelowPass(s);
   const absolute = recs.some(r => r.result === 'Fail') ||
-                   recs.some(r => r.eval && r.eval.overall != null && r.eval.overall < 3.0);
+                   recs.some(r => r.eval && r.eval.overall != null && r.eval.overall < 3.0) ||
+                   cb.open.length > 0;
   if(absolute || domains.some(v => v < CONCERN_PCTILE)) return 'concern';
-  const remediated = recs.some(r => r.result === 'Pass with remediation');
+  const remediated = recs.some(r => r.result === 'Pass with remediation') || cb.resolved.length > 0;
   if(remediated || domains.some(v => v < WATCH_PCTILE)) return 'watch';
   return 'ok';
 }
@@ -3661,7 +3696,7 @@ function renderFlags(host, s){
   host.textContent = '';
   const flags = s.flags || [];
   if(!flags.length){
-    host.appendChild(elc('div','empty','Nothing outstanding. No failed blocks, no remediations, and no assessment below the 10th percentile.'));
+    host.appendChild(elc('div','empty','Nothing outstanding. No failed blocks, no remediations, no clerkship CAS exam below its pass mark, and no assessment below the 10th percentile.'));
   } else {
     const ul = elc('ul','flags');
     flags.forEach(f => {
