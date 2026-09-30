@@ -270,6 +270,9 @@ main{padding-bottom:44px}
   background:radial-gradient(circle at 50% 38%,var(--line-2) 0 9px,transparent 10px),
              radial-gradient(ellipse at 50% 92%,var(--line-2) 0 16px,transparent 17px)}
 .rv-code{font-size:17px;font-weight:800;letter-spacing:-.01em}
+.rv-name{font-size:17px;font-weight:800;letter-spacing:-.01em;color:var(--ink)}
+.rv-name + .rv-code{font-size:12.5px;font-weight:600;color:var(--muted);letter-spacing:0;
+  font-variant-numeric:tabular-nums}
 .rv-meta{font-size:11.5px;color:var(--muted);margin-top:2px}
 .rv-big{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .rv-big div{background:var(--surface-2);border-radius:8px;padding:8px 10px}
@@ -2086,7 +2089,7 @@ function renderSkillsScatter(){
     if(marker) marker.remove();
     marker = add(g,'circle',{cx:best.x,cy:best.y,r:10,fill:'none',
       stroke:colorOf(best.s.status),'stroke-width':2});
-    tipShow(ev, best.s.id, [
+    tipShow(ev, whoOf(best.s), [
       {value: ord(kOf(best.s)),  label:'medical knowledge', color:cssv('--s1')},
       {value: ord(skOf(best.s)), label:'clinical skills',   color:cssv('--s4')},
       {value: STANDING[best.s.status].label, label:'standing',     color: colorOf(best.s.status)}
@@ -2102,10 +2105,10 @@ function renderSkillsScatter(){
   });
 
   buildTable($('skillsTable'),
-    [{label:'Student code'},{label:'Cohort',num:true},{label:'Phase',num:true},
-     {label:'Medical knowledge (pct)',num:true},{label:'Clinical skills (pct)',num:true},{label:'Standing'}],
+    nameCol().concat([{label:'Student code'},{label:'Cohort',num:true},{label:'Phase',num:true},
+     {label:'Medical knowledge (pct)',num:true},{label:'Clinical skills (pct)',num:true},{label:'Standing'}]),
     list.slice().sort((a,b)=>kOf(a)-kOf(b))
-        .map(s=>[s.id, s.cohort, s.phase, kOf(s), skOf(s), STANDING[s.status].label]),
+        .map(s=>nameCell(s).concat([s.id, s.cohort, s.phase, kOf(s), skOf(s), STANDING[s.status].label])),
     'Medical knowledge and clinical skills percentile for every student in view');
 }
 
@@ -2144,15 +2147,15 @@ function renderKnowledgeStrip(host, list){
       : sh === 'tri' ? add(svg,'path',{d:`M${x},${y-6} L${x+5.5},${y+4} L${x-5.5},${y+4} Z`,fill:c,stroke:cssv('--surface'),'stroke-width':2})
       : add(svg,'rect',{x:x-4.5,y:y-4.5,width:9,height:9,rx:1.5,fill:c,stroke:cssv('--surface'),'stroke-width':2});
     el.setAttribute('tabindex','0'); el.setAttribute('role','button');
-    el.setAttribute('aria-label', s.id + ': medical knowledge ' + ord(kOf(s)) + ' percentile, ' + STANDING[s.status].label);
+    el.setAttribute('aria-label', whoOf(s) + ': medical knowledge ' + ord(kOf(s)) + ' percentile, ' + STANDING[s.status].label);
     el.style.cursor = 'pointer';
-    hoverable(el, s.id, [{value: ord(kOf(s)), label:'medical knowledge', color:cssv('--s1')},
+    hoverable(el, whoOf(s), [{value: ord(kOf(s)), label:'medical knowledge', color:cssv('--s1')},
                          {value: STANDING[s.status].label, label:'standing', color:c}]);
     el.addEventListener('click', () => openStudent(s.id));
   });
   buildTable($('skillsTable'),
-    [{label:'Student code'},{label:'Cohort',num:true},{label:'Medical knowledge (pct)',num:true},{label:'Standing'}],
-    list.slice().sort((a,b)=>kOf(a)-kOf(b)).map(s=>[s.id, s.cohort, kOf(s), STANDING[s.status].label]),
+    nameCol().concat([{label:'Student code'},{label:'Cohort',num:true},{label:'Medical knowledge (pct)',num:true},{label:'Standing'}]),
+    list.slice().sort((a,b)=>kOf(a)-kOf(b)).map(s=>nameCell(s).concat([s.id, s.cohort, kOf(s), STANDING[s.status].label])),
     'Medical knowledge percentile for every student in view');
 }
 
@@ -2338,7 +2341,7 @@ function renderRoster(){
   list.forEach(s => {
     const tr = document.createElement('tr');
     tr.className = 'rosterrow'; tr.tabIndex = 0;
-    tr.setAttribute('aria-label', 'Open the record for student ' + s.id);
+    tr.setAttribute('aria-label', 'Open the record for ' + whoOf(s));
     const cells = [];
 
     const c1 = document.createElement('td');
@@ -2843,6 +2846,12 @@ async function fromConfidential(want){
    every student on the page, so it belongs in the Confidential library. */
 const NAMES = {};
 function nameOf(id){ return NAMES[String(id).toUpperCase()] || '' }
+/* one-line label: the name leads when a key is loaded, the code follows */
+function whoOf(s){ const n = nameOf(s.id); return n ? n + ' (' + s.id + ')' : String(s.id) }
+/* table views: a Name column appears beside the code only when names are loaded */
+function hasNames(){ return Object.keys(NAMES).length > 0 }
+function nameCol(){ return hasNames() ? [{label:'Name'}] : [] }
+function nameCell(s){ return hasNames() ? [nameOf(s.id) || '—'] : [] }
 function adoptNames(text){
   Object.keys(NAMES).forEach(k => delete NAMES[k]);
   const put = (code, name) => {
@@ -2894,7 +2903,7 @@ function photoSlot(s){
     const img = document.createElement('img');
     img.className = 'idphoto';
     img.src = url;
-    img.alt = 'Photo of student ' + s.id;
+    img.alt = 'Photo of ' + whoOf(s);
     return img;
   }
   const box = elc('div','idphoto empty', Object.keys(PHOTOS).length
@@ -2925,7 +2934,7 @@ function studentHeader(host, s){
   const row = elc('div','idcard');
   const meta = elc('div','idmeta');
   const top = elc('div','idtop');
-  top.appendChild(elc('div','kicker','Student code'));
+  top.appendChild(elc('div','kicker', nameOf(s.id) ? 'Student' : 'Student code'));
   top.appendChild(chipFor(s.status));
   meta.appendChild(top);
   /* the name appears only from the key loaded for this session */
@@ -3866,16 +3875,18 @@ function renderReview(list){
     const refs = (DATA.refs||{})[s.cohort] || {};
     const card = elc('button','rv-card ' + s.status);
     card.type = 'button';
-    card.setAttribute('aria-label', 'Open the record for student ' + s.id);
+    card.setAttribute('aria-label', 'Open the record for ' + whoOf(s));
     card.addEventListener('click', () => openStudent(s.id));
     const head = elc('div','rv-head');
     /* the photo, when the viewer has loaded the photo folder this session */
     const url = PHOTOS[String(s.id).toUpperCase()];
     const ph = url ? document.createElement('img') : elc('div','rv-photo empty');
     ph.className = 'rv-photo' + (url ? '' : ' empty');
-    if(url){ ph.src = url; ph.alt = 'Photo of student ' + s.id } else ph.setAttribute('aria-hidden','true');
+    if(url){ ph.src = url; ph.alt = 'Photo of ' + whoOf(s) } else ph.setAttribute('aria-hidden','true');
     head.appendChild(ph);
     const hl = elc('div','rv-id');
+    const rvName = nameOf(s.id);
+    if(rvName) hl.appendChild(elc('div','rv-name', rvName));
     hl.appendChild(elc('div','rv-code', s.id));
     hl.appendChild(elc('div','rv-meta', 'Class of ' + s.cohort + (s.program ? ' · ' + s.program : '') +
       (s.current ? ' · in ' + s.current.code : '')));
