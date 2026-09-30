@@ -4398,14 +4398,11 @@ return result}
 
 /* SHA-256 of the uppercased access code. The code is not stored in this file.
    To change it: uppercase it, hash it with any SHA-256 tool, replace this. */
-const GATE_HASH = 'b9b2b6f01aa767c022763ca563e0882c08635da21f2519dc7b02564aaf0aa9ba';   // RPS
-/* The ASCEND (OCA leadership) code is the hub's full-access tier and lists
-   this dashboard too, so it opens this door as well. */
-const GATE_HASHES = [GATE_HASH, '5942bd952f12e02478b5a6aba902340a58c9c769a961f128dbb57f0b79358537'];
+const GATE_HASH = 'b9b2b6f01aa767c022763ca563e0882c08635da21f2519dc7b02564aaf0aa9ba';
 
 function gateAlreadyPassed(){
   /* The hub records the tier it unlocked, on the same origin as this page. */
-  try { return GATE_HASHES.includes(sessionStorage.getItem('ascendTier')) }
+  try { return sessionStorage.getItem('ascendTier') === GATE_HASH }
   catch(e){ return false }
 }
 
@@ -4435,15 +4432,14 @@ function bootGate(){
   function attempt(){
     const code = input.value.trim().toUpperCase();
     if(!code) return;
-    const h = sha256(code);
-    if(!GATE_HASHES.includes(h)){
+    if(sha256(code) !== GATE_HASH){
       err.classList.add('show');
       tile.classList.remove('shake'); void tile.offsetWidth; tile.classList.add('shake');
       input.select();
       return;
     }
     err.classList.remove('show');
-    try { sessionStorage.setItem('ascendTier', h) } catch(e){}
+    try { sessionStorage.setItem('ascendTier', GATE_HASH) } catch(e){}
     input.value = '';
     revealDashboard();
   }

@@ -412,9 +412,10 @@ const TIERS = {
   "5942bd952f12e02478b5a6aba902340a58c9c769a961f128dbb57f0b79358537": {  // ASCEND
     name: "Office of Curricular Affairs",
     sub: "Full access \u2014 all monitoring, mapping, governance, and accreditation views.",
-    // Every dashboard the Hub knows. Add a new card's key here too.
+    // Every dashboard the Hub knows, except Student Performance: that one stays
+    // hidden, reachable only by its direct URL (and the RPS code). Add a new card's key here too.
     dashboards: ["calendar", "phase1", "clinicalskills", "phase2", "phase3", "nbme",  "objectives", "policies", "surveys", "lcme", "governance",
-                 "studentperf", "navigator", "electives", "babybates", "people"],
+                 "navigator", "electives", "babybates", "people"],
     pinned: ["phase1","phase2","phase3","governance"]
   },
   "255af8d0734e8438d7fcef7cb457da08d130e24f574065175f2ab73ed2ffb360": {  // EEC
