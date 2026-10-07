@@ -827,9 +827,10 @@ body.gated{overflow:hidden}
   </div>
   <!-- shown until the Confidential folder has been picked once in this browser -->
   <div class="ferpa nudge" id="confHint" hidden>
-    <p><strong>First, show this page where the files are.</strong> In the window that opens, choose
-      OneDrive &rsaquo; Curricular Affairs - Documents &rsaquo; # RPS &rsaquo; <strong># Confidential</strong>
-      and click Select. This is asked once; after that each Load button opens the newest file there by itself.</p>
+    <p><strong>First, show this page where the files are.</strong> In the window that opens, click
+      <strong>OneDrive - The Mount Sinai Hospital</strong> in the left sidebar, then go to Curricular Affairs - Documents
+      &rsaquo; # RPS &rsaquo; <strong># Confidential</strong> and click Select. (Selecting OneDrive, Curricular Affairs -
+      Documents or # RPS works too - the page finds # Confidential inside.) This is asked once; after that each Load button opens the newest file there by itself.</p>
     <button type="button" id="confHintGo">Choose the folder</button>
     <button type="button" class="ghostBtn" id="confHintCancel">Cancel</button>
   </div>
@@ -2836,7 +2837,9 @@ async function confEntries(dir, kind, re){
 }
 async function confFind(dir, want){
   if(want.dir){
-    for(const sub of await confEntries(dir, 'directory', want.dir)){
+    /* the viewer may have picked the dated folder itself */
+    const subs = want.dir.test(dir.name) ? [dir] : await confEntries(dir, 'directory', want.dir);
+    for(const sub of subs){
       if(want.images){
         const files = [];
         for await (const h of sub.values())
@@ -2852,32 +2855,57 @@ async function confFind(dir, want){
   const hit = (await confEntries(dir, 'file', want.file))[0];
   return hit ? hit.getFile() : null;
 }
-/* the remembered folder, re-permitted, or a fresh pick of it */
+/* # Confidential at or below a picked folder - the viewer may pick OneDrive,
+   Curricular Affairs - Documents, # RPS or # Confidential itself. Only those
+   names are walked, so a pick of the whole OneDrive stays quick. */
+const CONF_IS = /^#\s*confidential$/i;
+const CONF_PATH = /^#\s*confidential$|^#\s*rps$|^curricular affairs/i;
+async function confDescend(dir, depth){
+  if(CONF_IS.test(dir.name)) return dir;
+  if(depth <= 0) return null;
+  const subs = [];
+  for await (const h of dir.values()) if(h.kind === 'directory' && CONF_PATH.test(h.name)) subs.push(h);
+  subs.sort((a, b) => CONF_IS.test(b.name) - CONF_IS.test(a.name));
+  for(const h of subs){ const hit = await confDescend(h, depth - 1); if(hit) return hit }
+  return null;
+}
+async function confRemember(dir){
+  try { await confStore(true, st => st.put(dir, 'folder')); confKnown = true } catch(e){}
+}
+async function confForget(){
+  try { await confStore(true, st => st.delete('folder')); confKnown = false } catch(e){}
+}
+/* the remembered folder, re-permitted, or a fresh pick that opens where the
+   last one left off */
 async function confidentialFolder(){
-  let dir = null;
-  try { dir = await confStore(false, st => st.get('folder')) } catch(e){}
-  if(dir){
+  let kept = null;
+  try { kept = await confStore(false, st => st.get('folder')) } catch(e){}
+  if(kept){
     try {
-      let p = await dir.queryPermission({mode: 'read'});
-      if(p !== 'granted') p = await dir.requestPermission({mode: 'read'});
-      if(p === 'granted') return dir;
+      let p = await kept.queryPermission({mode: 'read'});
+      if(p !== 'granted') p = await kept.requestPermission({mode: 'read'});
+      if(p === 'granted') return {dir: kept, conf: CONF_IS.test(kept.name)};
     } catch(e){}
   }
-  dir = await window.showDirectoryPicker({id: 'ascend-confidential', mode: 'read'});
-  /* picked # RPS (or anything holding it) - step into # Confidential */
-  for await (const h of dir.values())
-    if(h.kind === 'directory' && /^#\s*confidential$/i.test(h.name)){ dir = h; break }
-  try { await confStore(true, st => st.put(dir, 'folder')); confKnown = true } catch(e){}
-  return dir;
+  const opts = {id: 'ascend-confidential', mode: 'read'};
+  if(kept) opts.startIn = kept;
+  const picked = await window.showDirectoryPicker(opts);
+  const conf = await confDescend(picked, 3);
+  if(conf){ await confRemember(conf); return {dir: conf, conf: true} }
+  return {dir: picked, conf: false, fresh: true};
 }
 async function fromConfidential(want){
-  const dir = await confidentialFolder();
+  const {dir, conf, fresh} = await confidentialFolder();
   const got = await confFind(dir, want);
-  if(got) return got;
-  try { await confStore(true, st => st.delete('folder')); confKnown = false } catch(e){}
+  /* some other folder that held the file is remembered too, unless it was
+     one dated folder (the next drop gets a new one) */
+  if(got){ if(fresh && !(want.dir && want.dir.test(dir.name))) await confRemember(dir); return got }
+  if(conf) throw new Error('The # Confidential folder has no ' + want.what + ' yet.\n\n' +
+    'Shift-click the button to choose the file yourself.');
+  await confForget();
   throw new Error('Could not find ' + want.what + ' in "' + dir.name + '".\n\n' +
     'Click the button again and pick the # Confidential folder (OneDrive › Curricular Affairs - Documents › ' +
-    '# RPS › # Confidential), or shift-click to choose the file yourself.');
+    '# RPS › # Confidential) - or any folder above it - or shift-click to choose the file yourself.');
 }
 
 /* Student names come from the code key the viewer picks with "Load names" -
