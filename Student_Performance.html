@@ -512,6 +512,7 @@ tr.rosterrow:focus-visible{outline:3px solid var(--s1);outline-offset:-3px}
 .matrix td.cell .part .pn{font-size:10.5px;font-weight:700;opacity:.85;text-transform:uppercase;letter-spacing:.06em}
 .matrix td.cell .part .sc,.matrix td.cell .part .pc{display:inline}
 .matrix td.cell.na{color:var(--muted);font-weight:600;background:var(--surface-2)}
+.tablewrap + .tablewrap > .matrix{margin-top:10px}
 .matrix tr.phasehd th{padding-top:14px;color:var(--magenta);text-align:left;
   font-size:10.5px;letter-spacing:.16em}
 .scalekey{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:11.5px;
@@ -3372,6 +3373,29 @@ function inkOn(bg){ return hexLum(bg) > 0.42 ? cssv('--ink') : '#ffffff' }
 
 /* one column per assessment type the data holds - the quiz family split by kind */
 const matrixCols = () => TYPE_META.map(t => ({key:t.key, label:t.short || t.label}));
+/* The columns a phase's own table shows: only the assessment types somebody in
+   the class has on record in that phase, so module quizzes do not sit as empty
+   columns beside the clerkships. Read off the whole class, not the student, so
+   a column the student has not sat yet still appears (as "—"). */
+let phaseColsCache = {students: null, by: {}};
+function phaseCols(ph){
+  const students = DATA.students || [];
+  if(phaseColsCache.students !== students) phaseColsCache = {students, by: {}};
+  if(!phaseColsCache.by[ph]){
+    const recs = [].concat(...students.map(x => (x.records||[]).filter(r => r.phase === ph)));
+    phaseColsCache.by[ph] = matrixCols().filter(c => recs.some(r => cellData(r, c.key)));
+  }
+  return phaseColsCache.by[ph];
+}
+/* Phase order for one student: the phase they are in first, then the ones
+   behind them (most recent first), then any still ahead. */
+function phaseOrder(s, phases){
+  const cur = s.phase || 1;
+  return phases.slice().sort((a, b) => {
+    const ra = a === cur ? 0 : a < cur ? 1 : 2, rb = b === cur ? 0 : b < cur ? 1 : 2;
+    return ra !== rb ? ra - rb : ra === 1 ? b - a : a - b;
+  });
+}
 const PHASE_NAME = {1:'Phase 1 · Pre-clerkship modules', 2:'Phase 2 · Clerkships',
                     3:'Phase 3 · Integration & Transitions'};
 
@@ -3444,83 +3468,89 @@ function scoreTipRows(d, color){
 
 function renderMatrix(host, s){
   host.textContent = '';
-  const recs = (s.records||[]).slice().sort((a,b)=>a.seq-b.seq);
-  if(!recs.length){ host.appendChild(elc('div','empty','No blocks on record yet.')); return }
+  const all = (s.records||[]).slice().sort((a,b)=>a.seq-b.seq);
+  if(!all.length){ host.appendChild(elc('div','empty','No blocks on record yet.')); return }
+  const phases = phaseOrder(s, [...new Set(all.map(r => r.phase))]);
 
-  const wrap = elc('div','tablewrap');
-  const t = elc('table','matrix');
-  const cap = elc('caption','sr','Percentile by block and assessment type, shaded against the 50th percentile');
-  t.appendChild(cap);
-  const thead = elc('thead'), hr = elc('tr');
-  const h0 = elc('th','rowhd','Block'); hr.appendChild(h0);
-  matrixCols().forEach(c => hr.appendChild(elc('th', null, c.label)));
-  hr.appendChild(elc('th', null, 'Result'));
-  thead.appendChild(hr); t.appendChild(thead);
+  /* one table per phase, the student's current phase first, each with only
+     the columns that phase's assessments use */
+  phases.forEach(ph => {
+    const recs = all.filter(r => r.phase === ph);
+    const cols = phaseCols(ph);
+    const wrap = elc('div','tablewrap');
+    const t = elc('table','matrix');
+    const cap = elc('caption','sr', (PHASE_NAME[ph] || 'Phase ' + ph) +
+      ': percentile by block and assessment type, shaded against the 50th percentile');
+    t.appendChild(cap);
+    const thead = elc('thead');
+    const pr = elc('tr','phasehd');
+    const pth = elc('th', null, (PHASE_NAME[ph] || ('Phase ' + ph)) +
+      (ph === s.phase ? ' · current phase' : ''));
+    pth.colSpan = cols.length + 2;
+    pr.appendChild(pth); thead.appendChild(pr);
+    const hr = elc('tr');
+    const h0 = elc('th','rowhd','Block'); hr.appendChild(h0);
+    cols.forEach(c => hr.appendChild(elc('th', null, c.label)));
+    hr.appendChild(elc('th', null, 'Result'));
+    thead.appendChild(hr); t.appendChild(thead);
 
-  const tb = elc('tbody');
-  let phase = null;
-  recs.forEach(rec => {
-    if(rec.phase !== phase){
-      phase = rec.phase;
-      const pr = elc('tr','phasehd');
-      const th = elc('th', null, PHASE_NAME[phase] || ('Phase ' + phase));
-      th.colSpan = matrixCols().length + 2;
-      pr.appendChild(th); tb.appendChild(pr);
-    }
-    const tr = elc('tr');
-    const rh = elc('th','rowhd');
-    rh.appendChild(document.createTextNode(rec.code + ' — ' + rec.name));
-    const sub = elc('span','sub', [rec.term, rec.site].filter(Boolean).join(' · '));
-    rh.appendChild(sub);
-    tr.appendChild(rh);
+    const tb = elc('tbody');
+    recs.forEach(rec => {
+      const tr = elc('tr');
+      const rh = elc('th','rowhd');
+      rh.appendChild(document.createTextNode(rec.code + ' — ' + rec.name));
+      const sub = elc('span','sub', [rec.term, rec.site].filter(Boolean).join(' · '));
+      rh.appendChild(sub);
+      tr.appendChild(rh);
 
-    matrixCols().forEach(c => {
-      const td = elc('td','cell');
-      const d = cellData(rec, c.key);
-      if(!d){ td.classList.add('na'); td.textContent = '—';
-        td.setAttribute('aria-label', rec.status === 'scheduled' ? 'not sat yet'
-          : rec.status === 'in progress' ? 'block still in progress' : 'not assessed');
-        tr.appendChild(td); return }
-      const bg = divergingColor(d.pct - 50);
-      td.style.background = bg;
-      td.style.color = inkOn(bg);
-      if(d.parts){
-        td.classList.add('multi');
-        d.parts.forEach(pp => {
-          const ln = elc('span','part');
-          ln.appendChild(elc('span','pn', pp.name));
-          ln.appendChild(elc('span','sc', pp.score));
-          ln.appendChild(elc('span','pc', pp.pct != null ? ord(pp.pct) : '—'));
-          td.appendChild(ln);
-        });
-      } else if(d.score != null){
-        td.appendChild(elc('span','sc', d.score));
-        td.appendChild(elc('span','pc', ord(d.pct) + ' pct'));
-      } else td.textContent = d.pct;
-      td.tabIndex = 0;
-      if(d.parts) td.setAttribute('aria-label', rec.code + ' ' + d.label + ': ' + d.parts.map(pp =>
-        pp.label + ' score ' + pp.score + (pp.median != null ? ', class median ' + pp.median : '') +
-        (pp.pct != null ? ', ' + ord(pp.pct) + ' percentile' : '')).join('; ') + '.');
-      else td.setAttribute('aria-label', rec.code + ' ' + d.label + ': ' +
-        (d.score != null ? 'score ' + d.score + ', ' : '') +
-        (d.median != null ? 'class median ' + d.median + ', ' : '') +
-        ord(d.pct) + ' percentile. ' + d.detail + '.');
-      hoverable(td, rec.code + ' — ' + d.label, d.parts
-        ? [].concat(...d.parts.map(pp => [
-            {value: pp.score, label: pp.label, color: bg},
-            {value: (pp.median != null ? 'median ' + pp.median + ' · ' : '') +
-                    (pp.pct != null ? ord(pp.pct) + ' pct' : ''), label:''}]))
-        : scoreTipRows(d, bg).concat([{value: d.detail, label:''}]));
-      tr.appendChild(td);
+      cols.forEach(c => {
+        const td = elc('td','cell');
+        const d = cellData(rec, c.key);
+        if(!d){ td.classList.add('na'); td.textContent = '—';
+          td.setAttribute('aria-label', rec.status === 'scheduled' ? 'not sat yet'
+            : rec.status === 'in progress' ? 'block still in progress' : 'not assessed');
+          tr.appendChild(td); return }
+        const bg = divergingColor(d.pct - 50);
+        td.style.background = bg;
+        td.style.color = inkOn(bg);
+        if(d.parts){
+          td.classList.add('multi');
+          d.parts.forEach(pp => {
+            const ln = elc('span','part');
+            ln.appendChild(elc('span','pn', pp.name));
+            ln.appendChild(elc('span','sc', pp.score));
+            ln.appendChild(elc('span','pc', pp.pct != null ? ord(pp.pct) : '—'));
+            td.appendChild(ln);
+          });
+        } else if(d.score != null){
+          td.appendChild(elc('span','sc', d.score));
+          td.appendChild(elc('span','pc', ord(d.pct) + ' pct'));
+        } else td.textContent = d.pct;
+        td.tabIndex = 0;
+        if(d.parts) td.setAttribute('aria-label', rec.code + ' ' + d.label + ': ' + d.parts.map(pp =>
+          pp.label + ' score ' + pp.score + (pp.median != null ? ', class median ' + pp.median : '') +
+          (pp.pct != null ? ', ' + ord(pp.pct) + ' percentile' : '')).join('; ') + '.');
+        else td.setAttribute('aria-label', rec.code + ' ' + d.label + ': ' +
+          (d.score != null ? 'score ' + d.score + ', ' : '') +
+          (d.median != null ? 'class median ' + d.median + ', ' : '') +
+          ord(d.pct) + ' percentile. ' + d.detail + '.');
+        hoverable(td, rec.code + ' — ' + d.label, d.parts
+          ? [].concat(...d.parts.map(pp => [
+              {value: pp.score, label: pp.label, color: bg},
+              {value: (pp.median != null ? 'median ' + pp.median + ' · ' : '') +
+                      (pp.pct != null ? ord(pp.pct) + ' pct' : ''), label:''}]))
+          : scoreTipRows(d, bg).concat([{value: d.detail, label:''}]));
+        tr.appendChild(td);
+      });
+
+      const rt = elc('td','cell');
+      rt.style.background = 'transparent';
+      rt.appendChild(resultChip(rec.result));
+      tr.appendChild(rt);
+      tb.appendChild(tr);
     });
-
-    const rt = elc('td','cell');
-    rt.style.background = 'transparent';
-    rt.appendChild(resultChip(rec.result));
-    tr.appendChild(rt);
-    tb.appendChild(tr);
+    t.appendChild(tb); wrap.appendChild(t); host.appendChild(wrap);
   });
-  t.appendChild(tb); wrap.appendChild(t); host.appendChild(wrap);
 
   /* scale key - the legend for a colour that carries magnitude */
   const key = elc('div','scalekey');
@@ -3535,7 +3565,7 @@ function renderMatrix(host, s){
 
   /* table twin with the underlying scores, not just the percentiles */
   const rows = [];
-  recs.forEach(rec => matrixCols().forEach(c => {
+  phases.forEach(ph => all.filter(r => r.phase === ph).forEach(rec => phaseCols(ph).forEach(c => {
     const d = cellData(rec, c.key);
     if(d && d.parts) d.parts.forEach(pp => rows.push(['Phase ' + rec.phase, rec.code + ' — ' + rec.name,
       pp.label, pp.score, pp.median == null ? '—' : pp.median, pp.pct == null ? '—' : pp.pct,
@@ -3543,7 +3573,7 @@ function renderMatrix(host, s){
     else if(d) rows.push(['Phase ' + rec.phase, rec.code + ' — ' + rec.name, d.label,
       d.score == null ? '—' : d.score, d.median == null ? '—' : d.median,
       d.pct, d.detail, rec.result]);
-  }));
+  })));
   buildTable($('matrixTable'),
     [{label:'Phase'},{label:'Block'},{label:'Assessment'},{label:'Score'},{label:'Class median'},
      {label:'Percentile',num:true},{label:'Detail'},{label:'Block result'}],
@@ -3827,7 +3857,8 @@ function renderStudent(s){
 
   const mxBody = makeCard(host, 'Every block',
     'Performance across all three phases',
-    'Each cell prints the student’s score and, beneath it, the percentile within the Class of ' +
+    'The phase the student is in comes first, then the earlier phases, most recent first; ' +
+    'each phase lists only the kinds of assessment it uses. Each cell prints the student’s score and, beneath it, the percentile within the Class of ' +
     s.cohort + '. A block with a Mid- and an End-of-Module NBME exam shows each on its own line. ' +
     'Read score and percentile together: when the class scores high, a strong score can still ' +
     'rank low. Hover a cell for the class median score. Shading follows the percentile, from ' +
