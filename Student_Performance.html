@@ -3933,6 +3933,14 @@ function renderGradePaths(host, s){
 const TA_CLERK = ['MED','NRL','OBG','PED','PSY','SUR','EM','FM','PAL'];
 const TA_DOMAINS = ['History taking','Physical examination','Clinical reasoning','Communication',
   'Documentation & presentation','Professionalism'];
+/* the domains onto the ACGME core competencies, through the school's MEPOs
+   (Objectives & Outcomes milestone framework): MEPOs 1-3 Patient Care,
+   19-21 Interpersonal & Communication Skills, 15-16 Professionalism;
+   Medical Knowledge is the shelf axis. Same table as differentiation.py. */
+const TA_ACGME = [['Patient Care', ['History taking','Physical examination','Clinical reasoning']],
+  ['Interpersonal & Communication Skills', ['Communication','Documentation & presentation']],
+  ['Professionalism', ['Professionalism']]];
+const TA_ACGME_LIMITED = ['Practice-Based Learning & Improvement', 'Systems-Based Practice'];
 const TA_MIN_K = 3, TA_MIN_PAIR = 10, TA_Z95 = 1.96;
 const TA_LEVEL = {above:'Distinguishably above', middle:'Within the class middle', below:'Distinguishably below'};
 RESULT_CHIP['Distinguishably above'] = 'ok';
@@ -3980,7 +3988,8 @@ function twoAxes(cohort){
   if(TA_CACHE.data !== DATA) TA_CACHE = {data: DATA, byCohort:{}};
   if(cohort in TA_CACHE.byCohort) return TA_CACHE.byCohort[cohort];
   const studs = (DATA.students||[]).filter(s => s.cohort === cohort);
-  const shelf = {}, dom = {}, overall = {}, raw = {};
+  const shelf = {}, dom = {}, overall = {}, raw = {}, comp = {};
+  TA_ACGME.forEach(g => comp[g[0]] = {});
   TA_DOMAINS.forEach(d => dom[d] = {});
   TA_CLERK.forEach(code => {
     const sh = {}, dr = {}; TA_DOMAINS.forEach(d => dr[d] = {});
@@ -3998,8 +4007,15 @@ function twoAxes(cohort){
     ids.forEach(u => { const xs = TA_DOMAINS.filter(d => u in dz[d]).map(d => dz[d][u]);
       if(xs.length) o[u] = xs.reduce((a,b)=>a+b,0)/xs.length });
     const oz = taStd(o); if(Object.keys(oz).length) overall[code] = oz;
+    TA_ACGME.forEach(([name, ds]) => {
+      const cm = {}, cid = new Set(); ds.forEach(d => Object.keys(dz[d]).forEach(u => cid.add(u)));
+      cid.forEach(u => { const xs = ds.filter(d => u in dz[d]).map(d => dz[d][u]);
+        if(xs.length) cm[u] = xs.reduce((a,b)=>a+b,0)/xs.length });
+      const cz = taStd(cm); if(Object.keys(cz).length) comp[name][code] = cz;
+    });
   });
-  const out = {knowledge: taAxis(shelf), clinical: taAxis(overall), domains:{}, raw};
+  const out = {knowledge: taAxis(shelf), clinical: taAxis(overall), domains:{}, competencies:{}, raw};
+  TA_ACGME.forEach(([name]) => { const a = taAxis(comp[name]); if(a) out.competencies[name] = a });
   TA_DOMAINS.forEach(d => { const a = taAxis(dom[d]); if(a) out.domains[d] = a });
   return (TA_CACHE.byCohort[cohort] = (out.knowledge || out.clinical) ? out : null);
 }
@@ -4028,7 +4044,10 @@ function taTable(host, cols, rows, caption){
   wrap.appendChild(t); host.appendChild(wrap);
 }
 function taRowHead(tr, name, sub){
-  const th = elc('th','rowhd'); th.appendChild(document.createTextNode(name));
+  /* a name led by spaces is a domain under its competency: indented, lighter */
+  const th = elc('th','rowhd'), nested = /^\s/.test(name);
+  th.appendChild(document.createTextNode(name.trim()));
+  if(nested){ th.style.paddingLeft = '22px'; th.style.fontWeight = '600' }
   if(sub) th.appendChild(elc('span','sub', sub)); tr.appendChild(th);
 }
 function taLevelCell(ax, id){
@@ -4046,7 +4065,7 @@ function renderTwoAxes(host, s, A){
   /* knowledge: the shelf in each clerkship, then the composite */
   const K = A.knowledge;
   if(K){
-    host.appendChild(elc('div','kicker','Knowledge · NBME clerkship exams · dependability ' + K.rel.toFixed(2) + ' (' + relWord(K.rel) + ')'));
+    host.appendChild(elc('div','kicker','Medical Knowledge (ACGME) · NBME clerkship exams · dependability ' + K.rel.toFixed(2) + ' (' + relWord(K.rel) + ')'));
     const tr = elc('tr'); taRowHead(tr, 'Shelf score', 'cell: score · class percentile');
     codes.forEach(c => { const z = K.per[c] && K.per[c][s.id], sc = A.raw[c] && A.raw[c][s.id];
       tr.appendChild(taCell(z, sc != null ? sc : null, z != null ? ord(taPct(z)) : ''));
@@ -4061,8 +4080,8 @@ function renderTwoAxes(host, s, A){
   const C = A.clinical;
   if(C){
     const ck = elc('div','kicker'); ck.style.marginTop = '18px'; host.appendChild(ck);
-    ck.textContent = ('Clinical · clinical-evaluation domains · dependability ' + C.rel.toFixed(2) +
-      ' all domains together (' + relWord(C.rel) + '); single domains ' +
+    ck.textContent = ('Clinical · clinical evaluations by ACGME competency · dependability ' + C.rel.toFixed(2) +
+      ' all together (' + relWord(C.rel) + '); single domains ' +
       Object.values(A.domains).map(a => a.rel).reduce((a,b) => [Math.min(a[0],b), Math.max(a[1],b)], [1,0]).map(x => x.toFixed(2)).join('–'));
     const rows = [];
     const addRow = (name, ax, sub) => {
@@ -4074,9 +4093,15 @@ function renderTwoAxes(host, s, A){
       if(z != null) tab.push(['Clinical', 'All clerkships', name, '', taPct(z), TA_LEVEL[ax.level(z)]]);
       rows.push(tr);
     };
-    addRow('All domains', C, 'dependability ' + C.rel.toFixed(2));
-    TA_DOMAINS.forEach(d => { if(A.domains[d]) addRow(d, A.domains[d], 'dependability ' + A.domains[d].rel.toFixed(2)) });
-    taTable(host, codes.concat(['All', 'Level']), rows, 'Clinical-evaluation domains by clerkship and across clerkships');
+    addRow('All competencies', C, 'dependability ' + C.rel.toFixed(2));
+    TA_ACGME.forEach(([name, ds]) => {
+      const ca = A.competencies[name];
+      if(ca) addRow(name, ca, 'ACGME competency · dependability ' + ca.rel.toFixed(2));
+      if(ds.length > 1) ds.forEach(d => { if(A.domains[d]) addRow('   ' + d, A.domains[d], 'domain · dependability ' + A.domains[d].rel.toFixed(2)) });
+    });
+    taTable(host, codes.concat(['All', 'Level']), rows, 'Clinical evaluations by ACGME competency, clerkship by clerkship and across clerkships');
+    host.appendChild(elc('p','why', TA_ACGME_LIMITED.join(' and ') +
+      ': limited evidence. No clinical-evaluation domain measures them (only a few clerkship items do), so no level is given.'));
   }
   const cav = elc('p','why');
   cav.style.marginTop = '12px';
@@ -4157,7 +4182,7 @@ function renderStudent(s){
     const aBody = makeCard(host, 'Across clerkships',
       'Knowledge and clinical performance, clerkship by clerkship',
       'Two axes, each placed against the Class of ' + s.cohort + ' in every clerkship this student finished: ' +
-      'knowledge from the NBME shelf exams, clinical performance from the clinical-evaluation domains. Shading ' +
+      'Medical Knowledge from the NBME shelf exams, and Patient Care, Interpersonal & Communication Skills and Professionalism (the ACGME competencies, through the school\u2019s MEPOs) from the clinical-evaluation domains. Shading ' +
       'follows the class percentile, from 25+ points below the class midpoint to 25+ above. Read the caveat beneath.',
       'axesTable');
     chartAndTable(aBody, 'axesChart', 'axesTable');
