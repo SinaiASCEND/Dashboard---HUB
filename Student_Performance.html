@@ -3375,17 +3375,24 @@ function inkOn(bg){ return hexLum(bg) > 0.42 ? cssv('--ink') : '#ffffff' }
 const matrixCols = () => TYPE_META.map(t => ({key:t.key, label:t.short || t.label}));
 /* The columns a phase's own table shows: only the assessment types somebody in
    the class has on record in that phase, so module quizzes do not sit as empty
-   columns beside the clerkships. Read off the whole class, not the student, so
-   a column the student has not sat yet still appears (as "—"). */
+   columns beside the clerkships. Read off the student's own class, not the
+   student, so a column the student has not sat yet still appears (as "—") -
+   and not off every class: the classes ran different assessments (Anatomy
+   practicals: two for the Class of 2028, one for 2029, none for 2030). A
+   repeating student's prior attempt belongs to the class they entered with,
+   so it adds its columns to that student's own table only. */
 let phaseColsCache = {students: null, by: {}};
-function phaseCols(ph){
+function phaseCols(ph, s){
   const students = DATA.students || [];
   if(phaseColsCache.students !== students) phaseColsCache = {students, by: {}};
-  if(!phaseColsCache.by[ph]){
-    const recs = [].concat(...students.map(x => (x.records||[]).filter(r => r.phase === ph)));
-    phaseColsCache.by[ph] = matrixCols().filter(c => recs.some(r => cellData(r, c.key)));
+  const k = s.cohort + '|' + ph;
+  if(!phaseColsCache.by[k]){
+    const recs = [].concat(...students.filter(x => x.cohort === s.cohort)
+      .map(x => (x.records||[]).filter(r => r.phase === ph && r.attempt !== 'prior')));
+    phaseColsCache.by[k] = new Set(matrixCols().filter(c => recs.some(r => cellData(r, c.key))).map(c => c.key));
   }
-  return phaseColsCache.by[ph];
+  const own = (s.records||[]).filter(r => r.phase === ph);
+  return matrixCols().filter(c => phaseColsCache.by[k].has(c.key) || own.some(r => cellData(r, c.key)));
 }
 /* Phase order for one student: the phase they are in first, then the ones
    behind them (most recent first), then any still ahead. */
@@ -3476,7 +3483,7 @@ function renderMatrix(host, s){
      the columns that phase's assessments use */
   phases.forEach(ph => {
     const recs = all.filter(r => r.phase === ph);
-    const cols = phaseCols(ph);
+    const cols = phaseCols(ph, s);
     const wrap = elc('div','tablewrap');
     const t = elc('table','matrix');
     const cap = elc('caption','sr', (PHASE_NAME[ph] || 'Phase ' + ph) +
@@ -3565,7 +3572,7 @@ function renderMatrix(host, s){
 
   /* table twin with the underlying scores, not just the percentiles */
   const rows = [];
-  phases.forEach(ph => all.filter(r => r.phase === ph).forEach(rec => phaseCols(ph).forEach(c => {
+  phases.forEach(ph => all.filter(r => r.phase === ph).forEach(rec => phaseCols(ph, s).forEach(c => {
     const d = cellData(rec, c.key);
     if(d && d.parts) d.parts.forEach(pp => rows.push(['Phase ' + rec.phase, rec.code + ' — ' + rec.name,
       pp.label, pp.score, pp.median == null ? '—' : pp.median, pp.pct == null ? '—' : pp.pct,
