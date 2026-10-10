@@ -399,6 +399,30 @@ details.fold > summary::before{content:'\25B8';font-size:11px;transition:transfo
 details.fold[open] > summary::before{transform:rotate(90deg)}
 details.fold > summary:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
 details.fold[open] > summary{margin-bottom:12px}
+
+/* clerkship grade paths: one fold per clerkship, its objectives as badges */
+.gpath{border-top:1px solid var(--line);padding:10px 0}
+.gpath:first-of-type{border-top:0}
+.gpath > summary{cursor:pointer;list-style:none;display:grid;gap:6px 12px;
+  grid-template-columns:minmax(150px,220px) auto 1fr;align-items:center}
+.gpath > summary::-webkit-details-marker{display:none}
+.gpath > summary:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
+.gpath .gname{font-weight:700;color:var(--ink)}
+.gpath .gname::before{content:'\25B8';display:inline-block;font-size:11px;margin-right:6px;
+  color:var(--muted);transition:transform .15s}
+.gpath[open] .gname::before{transform:rotate(90deg)}
+.gpath .gline{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;min-width:0}
+.gpath .gbadges{display:inline-flex;flex-wrap:wrap;gap:3px}
+.gpath .gsay{font-size:12.5px;color:var(--ink-2)}
+.gpath .gnote{font-size:12.5px;color:var(--muted);margin:8px 0 6px}
+.orate{display:inline-block;min-width:22px;padding:1px 5px;border-radius:4px;text-align:center;
+  font-size:11.5px;font-weight:700;line-height:18px;border:1px solid var(--line-2);color:var(--ink)}
+.orate.H{background:var(--ok-wash);border-color:rgba(12,163,12,.45)}
+.orate.P{background:var(--surface-2)}
+.orate.F{background:var(--crit-wash);border-color:rgba(208,59,59,.55)}
+.orate.U{background:transparent;border-style:dashed;color:var(--muted)}
+.orate.NA{background:transparent;color:var(--muted)}
+@media (max-width:640px){ .gpath > summary{grid-template-columns:1fr} }
 .hero .fig{font-size:56px;font-weight:700;letter-spacing:-.03em;line-height:1;color:var(--ink)}
 .hero .fig .u{font-size:17px;font-weight:600;color:var(--muted);margin-left:6px;letter-spacing:0}
 .hero .cap{font-size:13px;color:var(--ink-2);max-width:62ch}
@@ -2332,7 +2356,7 @@ function chipFor(status){
    "Scheduled" are states, not judgements, so they get the muted chip rather
    than a status colour. */
 const RESULT_CHIP = {
-  'Fail':'concern', 'Pass with remediation':'watch', 'Pass':'ok',
+  'Fail':'concern', 'Pass with remediation':'watch', 'Pass':'ok', 'Honors':'ok', 'Incomplete':'watch',
   'In progress':'neutral', 'Scheduled':'neutral'
 };
 function resultChip(result){
@@ -3829,6 +3853,73 @@ function renderLog(host, s){
   return rows.length;
 }
 
+/* ---------------- clerkship grade paths ---------------- */
+/* A legacy clerkship grades objective by objective: each objective pairs a
+   clinical-evaluation item with an assessment and is rated H, P or F on its
+   own, and the final grade is Honors when enough are H. Nearly everyone
+   earns Honors, so the letter alone says little; which objectives carried it
+   is the record. "?" is an objective whose deciding input (a direct
+   observation, Medicine's CRA) is not on file - shown, never guessed. */
+const RATING_WORD = {H:'Honors', P:'Pass', F:'Fail', '?':'Not on file', NA:'Not counted'};
+const RATING_CLS = {H:'H', P:'P', F:'F', '?':'U', NA:'NA'};
+function ratingBadge(r, name){
+  const b = elc('span', 'orate ' + (RATING_CLS[r] || 'U'), r === 'NA' ? '–' : (r || '?'));
+  b.title = (name ? name + ': ' : '') + (RATING_WORD[r] || 'Not on file');
+  return b;
+}
+function gradePathSay(rec){
+  const objs = rec.objectives, gr = rec.gradeRule || {};
+  const nH = objs.filter(o => o.rating === 'H').length;
+  const scored = objs.filter(o => o.rating !== 'NA').length;
+  let say = 'H on ' + nH + ' of ' + scored + ' objectives';
+  if(gr.need) say += ' · Honors needs ' + gr.need;
+  return say;
+}
+function gradePathNote(rec){
+  const gr = rec.gradeRule || {};
+  const letter = {Honors:'H', Pass:'P', Fail:'F'}[rec.result];
+  const open = rec.objectives.filter(o => o.rating === '?').map(o => o.name);
+  if(!letter) return 'Recorded by the clerkship as ' + rec.result +
+    ' — a grade the calculator does not produce (an incomplete or a manual entry).';
+  if(gr.byRules === letter) return 'The clerkship’s grading rules, applied to these scores, give the same grade.';
+  if(gr.byRules === '?') return 'Not on file: ' + open.join(', ') +
+    '. Without ' + (open.length === 1 ? 'it' : 'them') + ' the rules alone cannot settle the grade; the recorded grade stands.';
+  return 'The recorded grade differs from what the clerkship’s grading rules give for these scores (' +
+    (RATING_WORD[gr.byRules] || gr.byRules) + ') — an adjustment by the clerkship, or a score entered differently.';
+}
+function renderGradePaths(host, s){
+  host.textContent = '';
+  const recs = (s.records||[]).filter(r => r.objectives && r.objectives.length)
+    .sort((a,b) => a.seq - b.seq);
+  const rows = [];
+  recs.forEach(rec => {
+    const d = elc('details','gpath');
+    const sm = elc('summary');
+    sm.appendChild(elc('span','gname', rec.code + ' — ' + rec.name));
+    sm.appendChild(resultChip(rec.result));
+    const line = elc('span','gline');
+    const badges = elc('span','gbadges');
+    badges.setAttribute('aria-hidden','true');
+    rec.objectives.forEach(o => badges.appendChild(ratingBadge(o.rating, o.name)));
+    line.appendChild(badges);
+    line.appendChild(elc('span','gsay', gradePathSay(rec)));
+    sm.appendChild(line);
+    d.appendChild(sm);
+    d.appendChild(elc('p','gnote', gradePathNote(rec)));
+    const t = elc('div');
+    buildTable(t, [{label:'Objective'},{label:'Rating'},{label:'Evidence'},{label:'What earns Honors · Pass'}],
+      rec.objectives.map(o => [o.name, RATING_WORD[o.rating] || o.rating, o.evidence, o.rule]),
+      rec.name + ': objectives, ratings and the evidence behind each');
+    d.appendChild(t);
+    host.appendChild(d);
+    rec.objectives.forEach(o => rows.push([rec.code + ' — ' + rec.name, rec.result, o.name,
+      RATING_WORD[o.rating] || o.rating, o.evidence]));
+  });
+  buildTable($('gradeTable'),
+    [{label:'Clerkship'},{label:'Final grade'},{label:'Objective'},{label:'Rating'},{label:'Evidence'}],
+    rows, 'Every clerkship objective with its rating and evidence');
+}
+
 /* ---------------- assemble the student view ---------------- */
 function renderStudent(s){
   const host = $('studentView'); host.textContent = '';
@@ -3872,6 +3963,20 @@ function renderStudent(s){
     '25+ points below the class midpoint to 25+ points above.', 'matrixTable');
   chartAndTable(mxBody, 'matrixChart', 'matrixTable');
   renderMatrix($('matrixChart'), s);
+
+  /* a legacy clerkship's final grade, objective by objective */
+  if((s.records||[]).some(r => r.objectives && r.objectives.length)){
+    const gBody = makeCard(host, 'Clerkship grades',
+      'How each final grade was earned',
+      'Each clerkship grades objective by objective: an objective pairs a clinical-evaluation ' +
+      'rating with an assessment (the shelf, a direct observation, a write-up) and earns Honors, ' +
+      'Pass or Fail on its own. The final grade is Honors when enough objectives are Honors, none ' +
+      'is Fail, and the required items are done. Each square is one objective; open a clerkship ' +
+      'for the evidence and the cutoffs. A dashed square is an objective whose evidence is not on file.',
+      'gradeTable');
+    chartAndTable(gBody, 'gradeChart', 'gradeTable');
+    renderGradePaths($('gradeChart'), s);
+  }
 
   /* every clerkship NBME exam together, each with its content areas */
   if((s.records||[]).some(r => isClerkshipRec(r) && casList(r).length)){
@@ -4092,9 +4197,14 @@ function renderReview(list){
         class_photo_url,
         seq, block_code, block_name, term, site, result,
         start_date, end_date, status,
-        assessment_type   quiz | cas | osce | eval
+        assessment_type   quiz | cas | osce | eval | objective
         assessment_label, score, percentile, national_mean, cohort_mean,
         comment
+        rating, evidence, rule, grade_need, grade_by_rules
+                          an objective row: a legacy clerkship objective rated
+                          H/P/F (? = an input not on file), the evidence and
+                          rule behind it, the H's the final grade needs, and
+                          the letter the rules alone reach
         domain:<name>     any number of columns, e.g. domain:Clinical reasoning
         area:<name>       an NBME exam's content areas, e.g. area:Cardiovascular System
 
@@ -4190,6 +4300,10 @@ function csvToData(text){
     } else if(type === 'eval'){
       rec.eval = {label: get('assessment_label') || 'Clinical evaluation', overall: score,
         percentile: pct, cohortMean: num(get('cohort_mean')), domains, comment: get('comment')};
+    } else if(type === 'objective'){
+      (rec.objectives = rec.objectives || []).push({name: get('assessment_label'),
+        rating: get('rating'), evidence: get('evidence'), rule: get('rule')});
+      rec.gradeRule = {need: num(get('grade_need')), byRules: get('grade_by_rules')};
     }
   });
 
