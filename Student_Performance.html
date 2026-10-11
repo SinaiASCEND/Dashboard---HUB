@@ -274,6 +274,16 @@ main{padding-bottom:44px}
 .rv-name{font-size:17px;font-weight:800;letter-spacing:-.01em;color:var(--ink)}
 .rv-name + .rv-code{font-size:12.5px;font-weight:600;color:var(--muted);letter-spacing:0;
   font-variant-numeric:tabular-nums}
+.rv-nb{display:grid;gap:3px;max-height:220px;overflow:auto}
+.rv-nbrow{display:grid;grid-template-columns:62px minmax(0,1fr) 34px;gap:8px;align-items:center;font-size:11.5px}
+.rv-nbrow .lab{color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rv-nbrow .val{text-align:right;font-variant-numeric:tabular-nums;color:var(--ink)}
+.rv-nbrow.below .val{color:var(--crit);font-weight:700}
+.rv-nbtrack{position:relative;height:12px;background:linear-gradient(var(--line),var(--line)) center/100% 2px no-repeat}
+.rv-nbtrack i{position:absolute;top:50%;transform:translate(-50%,-50%)}
+.rv-nbtrack .md{width:2px;height:12px;background:var(--ink-2)}
+.rv-nbtrack .pm{width:2px;height:12px;background:var(--crit);opacity:.8}
+.rv-nbtrack .dot{width:9px;height:9px;border-radius:50%;background:var(--s2);box-shadow:0 0 0 1.5px var(--surface)}
+.rv-nbrow.below .dot{background:var(--crit)}
 .rv-side{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none}
 .rv-exams{display:grid;gap:2px;font-size:12px;text-align:right}
 .rv-exams div{display:flex;gap:8px;justify-content:flex-end}.rv-exams span{color:var(--muted)}.rv-exams b{color:var(--ink);font-variant-numeric:tabular-nums}
@@ -5487,6 +5497,33 @@ function renderReview(list){
     if(comps.length){
       card.appendChild(elc('div','rv-sec','ACGME competencies vs. class mean'));
       comps.forEach(([name, dv]) => card.appendChild(dvbar(name, dv)));
+    }
+    /* every NBME exam: score (dot) against the class median (tick) and the
+       pass mark (red line) - the same marks as the record's NBME card */
+    const nb = currentRecs(s.records).slice().sort((a, b) => (a.start || '') < (b.start || '') ? -1 : 1)
+      .flatMap(r => casList(r).filter(c => c.scaled != null && !/cbse/i.test(c.label || '')).map(c => ({r, c})));
+    if(nb.length){
+      card.appendChild(elc('div','rv-sec','NBME exams \u00b7 score \u25cf, class median \u2502, pass mark \u2503'));
+      const lo = 30, hi = 100, x = v => Math.max(0, Math.min(100, (v - lo) / (hi - lo) * 100));
+      const wrap = elc('div','rv-nb');
+      nb.forEach(({r, c}) => {
+        const below = c.passMark != null && c.scaled < c.passMark;
+        const row = elc('div','rv-nbrow' + (below ? ' below' : ''));
+        const retake = /retake/i.test(c.label || '');
+        const tag = r.code + (isClerkshipRec(r) ? (retake ? ' retake' : '')
+          : casList(r).length > 1 ? ' ' + (/mid/i.test(c.label || '') ? 'mid' : retake ? 'retake' : 'end') : retake ? ' retake' : '');
+        row.appendChild(elc('span','lab', tag));
+        const tr = elc('span','rv-nbtrack');
+        if(c.passMark != null){ const pm = elc('i','pm'); pm.style.left = x(c.passMark) + '%'; tr.appendChild(pm) }
+        if(c.classMedian != null){ const md = elc('i','md'); md.style.left = x(c.classMedian) + '%'; tr.appendChild(md) }
+        const dot = elc('i','dot'); dot.style.left = x(c.scaled) + '%'; tr.appendChild(dot);
+        row.appendChild(tr);
+        row.appendChild(elc('span','val', fmtScaled(c.scaled)));
+        row.title = (c.label || 'NBME exam') + ': ' + fmtScaled(c.scaled) + (c.classMedian != null ? ' \u00b7 class median ' + fmtScaled(c.classMedian) : '') +
+          (c.passMark != null ? ' \u00b7 pass mark ' + c.passMark : '');
+        wrap.appendChild(row);
+      });
+      card.appendChild(wrap);
     }
     /* knowledge by assessment type, this student's median percentile */
     const buckets = typePercentiles([s]);
