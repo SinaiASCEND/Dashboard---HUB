@@ -200,7 +200,8 @@ a.ghost{text-decoration:none;display:inline-block;line-height:normal}
 .notice .ic{flex:none;font-size:14px;line-height:1.35}
 .notice strong{color:var(--ink)}
 .notice.sample{background:var(--warn-wash);border-color:#e0ac35}
-.notice.ferpa{background:var(--surface-2)}
+.notice.ferpa{background:var(--surface-2);max-width:none;flex-wrap:nowrap;align-items:flex-start;margin-top:0;
+  border-left:3px solid var(--magenta);padding:8px 13px;line-height:1.45}
 
 /* ================= filter row ================= */
 /* One row, above everything it scopes. Every view re-renders from it. */
@@ -485,6 +486,7 @@ table.predict{min-width:720px}table.predict tr.sub th{font-weight:500;color:var(
 :root[data-theme="dark"] .rv-card.concern{border-top-color:var(--crit)}
 :root[data-theme="dark"] .rv-card.watch{border-top-color:var(--warn)}
 @media print{:root[data-theme="dark"] .card,:root[data-theme="dark"] .kpi,:root[data-theme="dark"] .rv-card{box-shadow:none}}
+.stdnote{font-size:12px;margin-top:6px}
 table.standards{min-width:0;font-size:13px}table.standards td,table.standards th{padding:7px 8px}table.standards th[scope],table.standards tbody th{text-align:left;font-weight:600}
 .summarytext{font-size:15px;line-height:1.6;max-width:80ch;margin:0 0 8px;color:var(--ink)}
 .gpath{border-top:1px solid var(--line);padding:10px 0}
@@ -645,6 +647,15 @@ tr.rosterrow:focus-visible{outline:3px solid var(--s1);outline-offset:-3px}
 .tip .tl{color:var(--muted);font-size:11.5px}
 
 /* ================= misc ================= */
+.backbar{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  margin:0 -4px 14px;padding:10px 4px;background:var(--plane);border-bottom:1px solid var(--line)}
+.backbtn{display:inline-flex;align-items:center;gap:10px;padding:9px 18px 9px 12px;border-radius:999px;cursor:pointer;
+  background:var(--magenta);color:#fff;border:0;font:inherit;box-shadow:0 2px 10px rgba(214,17,127,.35)}
+.backbtn:hover{filter:brightness(1.08)}.backbtn:focus-visible{outline:3px solid var(--s1);outline-offset:2px}
+.backbtn .arr{font-size:22px;line-height:1;font-weight:700}
+.backbtn b{display:block;font-size:15px;line-height:1.15}.backbtn small{display:block;font-size:12px;opacity:.9;font-weight:500}
+.backhint{font-size:12px;color:var(--muted)}
+@media print{.backbar{display:none}}
 .backlink{background:none;border:none;color:var(--magenta);font-weight:800;font-size:13px;
   cursor:pointer;padding:6px 0;display:inline-flex;align-items:center;gap:6px}
 .two{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:18px}
@@ -2620,41 +2631,71 @@ function subgroupLabel(){
    within-class percentile cannot show. The phase lens still applies. */
 function renderTypeStandards(host, list){
   const recs = list.flatMap(s => currentRecs(s.records).filter(inPhase));
-  const pct = (a, b) => b ? Math.round(100 * a / b) + '%' : '\u2014';
-  const f1 = v => v == null ? '\u2014' : (Math.round(v * 10) / 10).toFixed(1);
+  const f1 = v => v == null ? '—' : (Math.round(v * 10) / 10).toFixed(1);
+  /* each row on a 0-100 track: the class mean, a tick at the standard, and
+     the share below standard; clinical evaluations (1-5) map 1 -> 0, 5 -> 100 */
   const rows = [];
   const nbme = (label, pick) => {
     const sit = recs.filter(pick).flatMap(r => casList(r).filter(c => c.scaled != null && !/cbse/i.test(c.label || '')));
     if(!sit.length) return;
-    const withNat = sit.filter(c => c.natlMean != null);
-    const pm = sit.filter(c => c.passMark != null);
-    const m = mean(sit.map(c => c.scaled)), nm = withNat.length ? mean(withNat.map(c => c.natlMean)) : null,
-          own = withNat.length ? mean(withNat.map(c => c.scaled)) : null;
-    rows.push([label, sit.length, f1(m) + '%',
-      nm != null ? 'national ' + f1(nm) + '% (' + (own - nm >= 0 ? '+' : '\u2212') + f1(Math.abs(own - nm)) + ')' : (pm.length ? 'pass mark' : '\u2014'),
-      pm.length ? pct(pm.filter(c => c.scaled < c.passMark).length, pm.length) + ' below pass' : '\u2014']);
+    const withNat = sit.filter(c => c.natlMean != null), pm = sit.filter(c => c.passMark != null);
+    const m = mean(sit.map(c => c.scaled));
+    const nm = withNat.length ? mean(withNat.map(c => c.natlMean)) : null, own = withNat.length ? mean(withNat.map(c => c.scaled)) : null;
+    const pass = pm.length ? mean(pm.map(c => c.passMark)) : null;
+    rows.push({label, n: sit.length, mean: m, meanText: f1(m) + '%', ref: nm != null ? nm : pass,
+      refText: nm != null ? 'national ' + f1(nm) + '% (' + (own - nm >= 0 ? '+' : '−') + f1(Math.abs(own - nm)) + ')' : (pass != null ? 'pass ' + Math.round(pass) + '%' : '—'),
+      pass, below: pm.length ? 100 * pm.filter(c => c.scaled < c.passMark).length / pm.length : null, belowWhat: 'below pass'});
   };
   nbme('NBME module exams', r => !isClerkshipRec(r));
   nbme('NBME shelf exams', r => isClerkshipRec(r));
   const cb = recs.flatMap(r => casList(r).filter(c => /cbse/i.test(c.label || '') && c.scaled != null));
-  if(cb.length) rows.push(['NBME CBSE', cb.length, f1(mean(cb.map(c => c.scaled))) + '% EPC', 'no pass mark', '\u2014']);
+  if(cb.length){ const m = mean(cb.map(c => c.scaled)); rows.push({label:'NBME CBSE', n: cb.length, mean: m, meanText: f1(m) + '% EPC', ref: null, refText: 'no pass mark', below: null}) }
   const os = recs.filter(r => r.osce && r.osce.pct != null);
-  if(os.length){ const pm = os.filter(r => r.osce.passMark != null);
-    rows.push(['OSCE & direct observation', os.length, f1(mean(os.map(r => r.osce.pct))) + '%', pm.length ? 'pass ' + pm[0].osce.passMark + '%' : '\u2014',
-      pm.length ? pct(pm.filter(r => r.osce.pct < r.osce.passMark).length, pm.length) + ' below pass' : '\u2014']) }
+  if(os.length){ const pm = os.filter(r => r.osce.passMark != null), m = mean(os.map(r => r.osce.pct)), pass = pm.length ? pm[0].osce.passMark : null;
+    rows.push({label:'OSCE & direct observation', n: os.length, mean: m, meanText: f1(m) + '%', ref: pass, refText: pass != null ? 'pass ' + pass + '%' : '—',
+      pass, below: pm.length ? 100 * pm.filter(r => r.osce.pct < r.osce.passMark).length / pm.length : null, belowWhat: 'below pass'}) }
   const ev = recs.filter(r => r.eval && r.eval.overall != null);
-  if(ev.length) rows.push(['Clinical evaluations', ev.length, f1(mean(ev.map(r => r.eval.overall))) + ' of 5', '3.0 expected',
-    pct(ev.filter(r => r.eval.overall < 3.0).length, ev.length) + ' below 3.0']);
-  if(!rows.length){ host.appendChild(emptyDiv(unavailableMsg() || 'No assessments in this filter.')); return rows }
-  const t = elc('table','grid standards'), hr = elc('tr');
-  ['Assessment', 'n', 'Mean', 'Standard', 'Below'].forEach((h, i) => hr.appendChild(elc('th', i && i < 3 ? 'num' : null, h)));
-  const th = elc('thead'); th.appendChild(hr); t.appendChild(th);
-  const tb = elc('tbody');
-  rows.forEach(r => { const tr = elc('tr'); r.forEach((c, i) => tr.appendChild(elc(i ? 'td' : 'th', i && i < 3 ? 'num' : null, String(c)))); tb.appendChild(tr) });
-  t.appendChild(tb); const w = elc('div','tablewrap'); w.appendChild(t); host.appendChild(w);
-  host.appendChild(elc('p','why', 'Every sitting in view, first attempts and retakes alike. Choose a subgroup in the filters ' +
-    '(Standing, Career advisor, CCM, Program) to compare it with its class by percentile.'));
-  return rows;
+  if(ev.length){ const m = mean(ev.map(r => r.eval.overall)), to = v => (v - 1) / 4 * 100;
+    rows.push({label:'Clinical evaluations', n: ev.length, mean: to(m), meanText: f1(m) + ' of 5', ref: to(3), refText: '3.0 expected',
+      below: 100 * ev.filter(r => r.eval.overall < 3.0).length / ev.length, belowWhat: 'below 3.0', scale5: true}) }
+  if(!rows.length){ host.appendChild(emptyDiv(unavailableMsg() || 'No assessments in this filter.')); return [] }
+
+  const W = widthOf(host), rowH = 54, m = {t:14, r:86, b:30, l:Math.min(170, Math.max(118, W * .3))};
+  const H = m.t + rows.length * rowH + m.b, pw = W - m.l - m.r, X = v => m.l + Math.max(0, Math.min(100, v)) / 100 * pw;
+  const svg = add(host,'svg',{class:'chart',width:W,height:H,role:'img',
+    'aria-label':'The class against absolute standards: class mean, the standard as a tick, and the share below standard, for each kind of assessment.'});
+  [0,25,50,75,100].forEach(t => {
+    add(svg,'line',{x1:X(t),x2:X(t),y1:m.t-4,y2:m.t+rows.length*rowH,class:'gridline'});
+    add(svg,'text',{x:X(t),y:H-12,'text-anchor':'middle',class:'ax'}, t + (t === 100 ? '%' : ''));
+  });
+  rows.forEach((r, i) => {
+    const y = m.t + i * rowH, bh = 16, by = y + 12, col = cssv(['--s5','--s2','--s3','--s4','--s1'][i % 5]);
+    add(svg,'text',{x:m.l-12,y:by+12,'text-anchor':'end',class:'dlab'}, fitLabel(r.label, m.l-18));
+    add(svg,'text',{x:m.l-12,y:by+28,'text-anchor':'end',class:'ax'}, r.n + (r.n === 1 ? ' sitting' : ' sittings'));
+    add(svg,'rect',{x:X(0),y:by,width:pw,height:bh,rx:4,fill:cssv('--surface-2')});
+    add(svg,'path',{d: barPath(X(0), by, Math.max(2, X(r.mean)-X(0)), bh, 4, 'right'), fill: col});
+    const inside = X(r.mean) + 70 > X(100);           /* no room after the bar: write the value inside it */
+    const vt = {x: inside ? X(r.mean) - 8 : X(r.mean) + 8, y: by + 12.5, 'text-anchor': inside ? 'end' : 'start', class:'dlab'};
+    if(inside) vt.style = 'fill:#fff';
+    add(svg,'text',vt, r.meanText);
+    if(r.ref != null){
+      add(svg,'line',{x1:X(r.ref),x2:X(r.ref),y1:by-5,y2:by+bh+5,stroke:cssv('--ink'),'stroke-width':2.5});
+      add(svg,'text',{x:X(r.ref),y:by+bh+16,'text-anchor':'middle',class:'ax'}, r.refText);
+    } else add(svg,'text',{x:X(0)+4,y:by+bh+16,class:'ax'}, r.refText);
+    if(r.below != null){
+      const bad = r.below >= 10;
+      add(svg,'text',{x:W-4,y:by+12.5,'text-anchor':'end',class:'dlab',style:'fill:' + (bad ? cssv('--crit') : cssv('--ink-2'))}, Math.round(r.below) + '%');
+      add(svg,'text',{x:W-4,y:by+27,'text-anchor':'end',class:'ax'}, r.belowWhat);
+    }
+    const hit = add(svg,'rect',{x:0,y:y,width:W,height:rowH,class:'hit',tabindex:'0',role:'button',
+      'aria-label': r.label + ': class mean ' + r.meanText + ', ' + r.refText + (r.below != null ? ', ' + Math.round(r.below) + '% ' + r.belowWhat : '')});
+    hoverable(hit, r.label, [{value: r.meanText, label:'class mean', color: col}, {value: r.refText, label:'standard'},
+      {value: r.below != null ? Math.round(r.below) + '%' : '—', label: r.belowWhat || 'below standard'}, {value: r.n, label:'sittings in view'}]);
+  });
+  host.appendChild(elc('p','why stdnote', 'Bar: class mean. Tick: the standard (national mean where the exam reports one, otherwise the pass mark; ' +
+    'clinical evaluations on their 1–5 scale, ticked at 3.0). Right: share below standard, red at 10% or more. Every sitting in view, ' +
+    'first attempts and retakes alike. Choose a subgroup in the filters (Standing, Career advisor, CCM, Program) to compare it with its class by percentile.'));
+  return rows.map(r => [r.label, r.n, r.meanText, r.refText, r.below != null ? Math.round(r.below) + '% ' + r.belowWhat : '—']);
 }
 
 function renderTypeChart(){
@@ -3446,10 +3487,18 @@ function fact(dl, label, value){
 }
 
 function studentHeader(host, s){
-  const back = elc('button','backlink','← All students');
+  /* a bar that stays at the top while the record scrolls, naming the list it
+     returns to - the obvious way back, ahead of the masthead's hub link */
+  const bar = elc('div','backbar');
+  const back = elc('button','backbtn');
   back.type = 'button';
-  back.addEventListener('click', closeStudent);
-  host.appendChild(back);
+  back.appendChild(elc('span','arr','\u2190'));
+  const lab = elc('span', null); lab.appendChild(elc('b', null, 'Back to the list')); lab.appendChild(elc('small', null, listLabel()));
+  back.appendChild(lab);
+  back.addEventListener('click', () => closeStudent());
+  bar.appendChild(back);
+  bar.appendChild(elc('span','backhint', 'Your filters and place in the list are kept. Browser Back works too.'));
+  host.appendChild(bar);
 
   const body = makeCard(host, null, 'Student record', null, null);
   const card = body.parentElement;
@@ -4922,9 +4971,18 @@ function renderStudent(s){
   fold.addEventListener('toggle', setSum);
 }
 
+/* Leaving the list for a student keeps the list's place: the filters stay in
+   state, the scroll position is remembered, and a history entry is added so
+   the browser's Back button returns to the list instead of leaving the page
+   (no student code goes into the address bar). */
+let listScroll = 0, studentEntry = false;
 function openStudent(id){
   const s = (DATA.students||[]).find(x => x.id === id);
   if(!s) return;
+  if(!state.student){
+    listScroll = window.scrollY;
+    if(!studentEntry){ try { history.pushState({spStudent: true}, ''); studentEntry = true } catch(e){} }
+  }
   state.student = id;
   $('cohortView').hidden = true;
   $('studentView').hidden = false;
@@ -4937,7 +4995,10 @@ function setFiltersVisible(on){
   const f = document.querySelector('.filterbar');
   if(f) f.style.display = on ? '' : 'none';
 }
-function closeStudent(){
+function closeStudent(fromHistory){
+  /* the button steps back through history, so Back and the button agree */
+  if(fromHistory !== true && studentEntry){ history.back(); return }
+  studentEntry = false;
   state.student = null;
   setFiltersVisible(true);
   $('studentView').hidden = true;
@@ -4945,7 +5006,21 @@ function closeStudent(){
   $('cohortView').hidden = false;
   tipHide();
   renderAll();
-  window.scrollTo({top:0, behavior:'auto'});
+  requestAnimationFrame(() => window.scrollTo({top: listScroll, behavior:'auto'}));
+}
+/* leaving the page (the hub link, a reload, closing the tab) discards names,
+   photos and any data file loaded this session: ask first */
+let dataLoadedHere = false;
+window.addEventListener('beforeunload', e => {
+  if(Object.keys(NAMES).length || Object.keys(PHOTOS).length || dataLoadedHere){ e.preventDefault(); e.returnValue = '' }
+});
+window.addEventListener('popstate', () => { if(state.student) closeStudent(true); else studentEntry = false });
+/* what the list was showing, for the back button's label */
+function listLabel(){
+  const cls = state.cohort && state.cohort !== 'all' ? 'Class of ' + state.cohort : 'all classes';
+  const sub = subgroupLabel();
+  const n = filtered().length;
+  return cls + (sub ? ' \u00b7 ' + sub : '') + ' (' + n + ')';
 }
 
 function renderAll(){
@@ -5394,6 +5469,7 @@ function adoptData(obj, sourceName){
   if(!obj || !Array.isArray(obj.students) || !obj.students.length)
     throw new Error('No students found in that file.');
   DATA = hydrate(obj);
+  dataLoadedHere = true;
   state.student = null;
   state.cohort = null;          /* a new extract opens on its own newest class */
   fillCohortFilter();
