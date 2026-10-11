@@ -417,6 +417,10 @@ details.fold[open] > summary{margin-bottom:12px}
 .nbrow.below .nbdot{background:var(--crit)}
 .nbscore{font-weight:700;font-variant-numeric:tabular-nums;text-align:right}.nbrow.below .nbscore{color:var(--crit)}
 .nbpct{font-variant-numeric:tabular-nums;color:var(--ink-2);text-align:right}
+.nbprior{margin-top:16px;padding:10px 12px;border-radius:8px;background:var(--surface-2);opacity:.72}
+.nbprior-hd{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.04em;margin-bottom:4px}
+.nbprior .nbdot,.nbprior .nbrow.below .nbdot{background:var(--muted)}
+.nbprior .nbrow.below .nbscore{color:var(--ink-2)}
 td.belowcell{color:var(--crit);font-weight:700}
 @media (max-width:640px){.nbrow{grid-template-columns:1fr 54px 56px}.nbtrack{grid-column:1 / -1;order:5}}
 .summarytext{font-size:15px;line-height:1.6;max-width:80ch;margin:0 0 8px;color:var(--ink)}
@@ -1444,6 +1448,11 @@ function casPcts(rec){ return casList(rec).map(c => c.percentile).filter(v => v 
    another. They are never pooled: different tests, different stakes. */
 function isClerkshipRec(rec){ return rec.kind === 'clerkship' || rec.phase === 2 }
 function nbmeKey(rec){ return isClerkshipRec(rec) ? 'shelf' : 'cas' }
+/* A student repeating a phase keeps the earlier attempt on record (rec.attempt
+   'prior'); it is shown in the background and does not count toward the
+   current standing, flags or percentiles. */
+const isPrior = r => !!r && r.attempt === 'prior';
+const currentRecs = recs => (recs || []).filter(r => !isPrior(r));
 function examName(label){ return String(label || '').replace(/\s*\(retake\)\s*$/i, '') }
 /* knowledge and skills percentile from a set of records - the whole record,
    or one phase of it. The two are never blended into one number: a student
@@ -1611,7 +1620,8 @@ function hydrate(data){
     if(s.phase == null)
       s.phase = s.current ? s.current.phase
               : (recs.filter(r => r.status === 'completed').slice(-1)[0] || {phase:1}).phase;
-    const all = standings(recs);
+    const live = currentRecs(recs);
+    const all = standings(live);
     s.knowledgePct = all.knowledge;
     s.skillsPct    = all.skills;
     s.nbmePct      = all.nbme;
@@ -1621,7 +1631,7 @@ function hydrate(data){
        only that phase's assessments */
     s.byPhase = {};
     [1, 2, 3].forEach(ph => {
-      const st = standings(recs.filter(r => r.phase === ph));
+      const st = standings(live.filter(r => r.phase === ph));
       if(st.n) s.byPhase[ph] = st;
     });
 
@@ -1629,7 +1639,7 @@ function hydrate(data){
     const dom = {};
     SKILL_DOMAINS.forEach(d => {
       const vals = [];
-      recs.forEach(rec => {
+      live.forEach(rec => {
         if(rec.osce && rec.osce.domains && rec.osce.domains[d] != null) vals.push(rec.osce.domains[d]);
         if(rec.eval && rec.eval.domains && rec.eval.domains[d] != null) vals.push(evalTo100(rec.eval.domains[d]));
       });
@@ -1731,7 +1741,7 @@ function hydrate(data){
 function casBelowPass(s){
   const open = [], resolved = [];
   const sittings = [];
-  (s.records || []).forEach(r => casList(r).forEach(c => {
+  currentRecs(s.records).forEach(r => casList(r).forEach(c => {
     /* a retake is the same exam in the same block: Phase 1 papers share generic
        names ("Mid Module Exam"), so the block code is part of the key */
     if(c.passMark != null && c.scaled != null) sittings.push({rec:r, cas:c, exam:examName(c.label), key:r.code + '|' + examName(c.label)});
@@ -1746,7 +1756,16 @@ function casBelowPass(s){
 }
 
 function buildFlags(s){
-  const out = [], recs = s.records || [];
+  const out = [], recs = currentRecs(s.records);
+  const prior = (s.records || []).filter(isPrior);
+  if(prior.length){
+    const pb = prior.reduce((n, r) => n + casList(r).filter(c => c.passMark != null && c.scaled != null && c.scaled < c.passMark).length, 0);
+    out.push({level:'info', what:'Repeating a phase: the earlier attempt is not counted',
+      why: prior.length + ' block' + (prior.length === 1 ? '' : 's') + ' from the earlier attempt' +
+        (s.enteredWith ? ' with the Class of ' + s.enteredWith : '') + ' stay on record (marked *) but do not count toward ' +
+        'the current standing, flags or percentiles' + (pb ? '; ' + pb + ' NBME exam' + (pb === 1 ? ' was' : 's were') +
+        ' below the pass mark in that attempt' : '') + '.'});
+  }
   const codes = list => list.map(r => r.code).join(', ');
   const count = (n, one, many) => n + ' ' + (n === 1 ? one : many);
 
@@ -1821,7 +1840,7 @@ function buildFlags(s){
           ord(s.skillsPct) + ' — worth naming in the next coaching conversation.'});
 
   /* a sustained downward drift matters more than any single low score */
-  const seqPts = (s.timeline||[]).map(t => mean([t.quiz,t.cas,t.osce,t.eval].filter(v=>v!=null)))
+  const seqPts = (s.timeline||[]).filter(t => !isPrior(t.rec)).map(t => mean([t.quiz,t.cas,t.osce,t.eval].filter(v=>v!=null)))
                                  .filter(v=>v!=null);
   if(seqPts.length >= 6){
     const early = mean(seqPts.slice(0,3)), late = mean(seqPts.slice(-3));
@@ -1842,7 +1861,7 @@ function buildFlags(s){
    below the 25th percentile. Strong performance in the other domain is real,
    and stays visible beside the flag, but does not cancel it. */
 function standingOf(s){
-  const recs = s.records || [];
+  const recs = currentRecs(s.records);
   const domains = [s.knowledgePct, s.skillsPct].filter(v => v != null);
   const cb = casBelowPass(s);
   /* NBME exams below the pass mark with no passing retake: a clerkship exam is
@@ -4181,14 +4200,15 @@ function renderTwoAxes(host, s, A){
 function renderNbme(host, s){
   host.textContent = '';
   const rows = [];
+  const priorRows = [];
   (s.records||[]).slice().sort((a,b) => (a.start||'') < (b.start||'') ? -1 : (a.start||'') > (b.start||'') ? 1 : a.seq - b.seq)
-    .forEach(r => casList(r).forEach(c => { if(c.scaled != null) rows.push({r, c}) }));
-  if(!rows.length){ host.appendChild(elc('div','empty','No NBME exams on record yet.')); return }
+    .forEach(r => casList(r).forEach(c => { if(c.scaled != null) (isPrior(r) ? priorRows : rows).push({r, c}) }));
+  if(!rows.length && !priorRows.length){ host.appendChild(elc('div','empty','No NBME exams on record yet.')); return }
   const cb = casBelowPass(s);
   const head = elc('div','nbhead');
   const big = elc('div','nbbig');
   big.appendChild(elc('b', null, s.nbmePct == null ? '\u2014' : ord(s.nbmePct)));
-  big.appendChild(elc('span', null, 'class percentile across ' + rows.length + (rows.length === 1 ? ' NBME exam' : ' NBME exams')));
+  big.appendChild(elc('span', null, 'class percentile across ' + rows.length + (rows.length === 1 ? ' NBME exam' : ' NBME exams') + (priorRows.length ? ' in the current attempt' : '')));
   head.appendChild(big);
   const bl = elc('div','nbbig' + (cb.open.length ? ' warn' : ''));
   bl.appendChild(elc('b', null, String(cb.open.length)));
@@ -4197,12 +4217,11 @@ function renderNbme(host, s){
   head.appendChild(bl);
   host.appendChild(head);
   const lo = 30, hi = 100, x = v => Math.max(0, Math.min(100, (v - lo) / (hi - lo) * 100));
-  const list = elc('div','nblist');
-  rows.forEach(({r, c}) => {
+  const drawRows = (list, rowsIn) => rowsIn.forEach(({r, c}) => {
     const row = elc('div','nbrow' + (c.passMark != null && c.scaled < c.passMark ? ' below' : ''));
     const lab = elc('div','nblab');
     lab.appendChild(elc('b', null, r.code));
-    lab.appendChild(elc('span', null, (c.label || 'NBME exam').replace(/^NBME\s*/i, '') + (r.name && r.name !== r.code ? ' \u00b7 ' + r.name : '')));
+    lab.appendChild(elc('span', null, (c.label || 'NBME exam').replace(/^NBME\s*/i, '') + (r.name && r.name !== r.code ? ' \u00b7 ' + r.name.replace(/\*$/, '') : '')));
     row.appendChild(lab);
     const tr = elc('div','nbtrack');
     if(c.passMark != null){ const pm = elc('i','nbpass'); pm.style.left = x(c.passMark) + '%'; pm.title = 'Pass mark ' + c.passMark + '%'; tr.appendChild(pm) }
@@ -4219,10 +4238,19 @@ function renderNbme(host, s){
   const hd = elc('div','nbrow nbcolhd');
   ['Exam', 'Score (dot) \u00b7 class median (tick) \u00b7 pass mark (line)', 'Score', 'Class pct'].forEach(t => hd.appendChild(elc('div', null, t)));
   host.appendChild(hd);
+  const list = elc('div','nblist');
+  if(rows.length) drawRows(list, rows); else list.appendChild(elc('div','empty','No NBME exams in the current attempt yet.'));
   host.appendChild(list);
+  if(priorRows.length){
+    const pr = elc('div','nbprior');
+    pr.appendChild(elc('div','nbprior-hd', 'Earlier attempt' + (s.enteredWith ? ' \u00b7 with the Class of ' + s.enteredWith : '') +
+      ' \u00b7 kept on record, not counted in the current standing (percentiles against that class)'));
+    const pl = elc('div','nblist'); drawRows(pl, priorRows); pr.appendChild(pl);
+    host.appendChild(pr);
+  }
   buildTable($('nbmeTable'),
     [{label:'Block'},{label:'Exam'},{label:'Block starts'},{label:'Score',num:true},{label:'Pass mark',num:true},{label:'Class median',num:true},{label:'Class percentile',num:true}],
-    rows.map(({r, c}) => [r.code, c.label || '', r.start ? fmtDate(r.start) : '', fmtScaled(c.scaled),
+    rows.concat(priorRows).map(({r, c}) => [r.code + (isPrior(r) ? ' (earlier attempt)' : ''), c.label || '', r.start ? fmtDate(r.start) : '', fmtScaled(c.scaled),
       c.passMark == null ? '' : c.passMark, c.classMedian == null ? '' : fmtScaled(c.classMedian), c.percentile == null ? '' : c.percentile]),
     'Every NBME exam on record');
 }
