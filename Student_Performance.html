@@ -274,6 +274,10 @@ main{padding-bottom:44px}
 .rv-name{font-size:17px;font-weight:800;letter-spacing:-.01em;color:var(--ink)}
 .rv-name + .rv-code{font-size:12.5px;font-weight:600;color:var(--muted);letter-spacing:0;
   font-variant-numeric:tabular-nums}
+.rv-side{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none}
+.rv-exams{display:grid;gap:2px;font-size:12px;text-align:right}
+.rv-exams div{display:flex;gap:8px;justify-content:flex-end}.rv-exams span{color:var(--muted)}.rv-exams b{color:var(--ink);font-variant-numeric:tabular-nums}
+.rv-exams .bad b{color:var(--crit)}
 .rv-meta{font-size:11.5px;color:var(--muted);margin-top:2px}
 .rv-big{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .rv-big div{background:var(--surface-2);border-radius:8px;padding:8px 10px}
@@ -412,6 +416,13 @@ details.fold[open] > summary{margin-bottom:12px}
 .nblab{display:flex;flex-direction:column;min-width:0}.nblab b{font-size:13px}.nblab span{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .nbtrack{position:relative;height:18px;background:linear-gradient(var(--line),var(--line)) center/100% 2px no-repeat}
 .nbtrack i{position:absolute;top:50%;transform:translate(-50%,-50%)}
+.nbrow.clickable{cursor:pointer}.nbrow.clickable:hover{background:var(--surface-2)}.nbrow.open{background:var(--surface-2)}
+.nbrow.clickable:focus-visible{outline:2px solid var(--s1);outline-offset:-2px}
+.nbmore{display:block;font-size:11px;color:var(--magenta);font-weight:700;margin-top:2px}
+.nbareas{padding:8px 0 14px;border-top:1px dashed var(--line)}
+.nbkey{display:flex;flex-wrap:wrap;gap:6px 20px;align-items:center;margin:4px 0 10px;font-size:12.5px;color:var(--ink-2)}
+.nbk{display:inline-flex;align-items:center;gap:8px}.nbk.hint{color:var(--muted);margin-left:auto}
+.nbsw{position:relative;width:18px;height:18px;display:inline-block}.nbsw i{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}
 .nbpass{width:2px;height:18px;background:var(--crit);opacity:.75}
 .nbmed{width:2px;height:12px;background:var(--muted)}
 .nbdot{width:12px;height:12px;border-radius:50%;background:var(--s2);box-shadow:0 0 0 2px var(--surface)}
@@ -426,7 +437,7 @@ td.belowcell{color:var(--crit);font-weight:700}
 @media (max-width:640px){.nbrow{grid-template-columns:1fr 54px 56px}.nbtrack{grid-column:1 / -1;order:5}}
 .onepager{display:grid;gap:22px}
 .opsec h4{margin:0 0 4px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}
-.op-lede{margin:0 0 10px;font-size:13px;color:var(--ink-2);max-width:80ch}
+.op-lede{margin:0 0 10px;font-size:13px;color:var(--ink-2);max-width:none}
 .opgrades{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
 .opg{border:1px solid var(--line);border-radius:6px;padding:7px 9px;display:flex;flex-direction:column;min-width:0}
 .opg .c{font-size:11px;color:var(--muted);font-weight:700}.opg .n{font-size:12px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -450,7 +461,7 @@ table.opgrid{border-collapse:collapse;width:100%;min-width:680px;font-size:13px}
 .opgrid thead th{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
 .opgrid tbody th{text-align:left;font-weight:600}.opgrid tr.grp th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding-top:10px}
 .opm{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:4px;font-size:11px;font-weight:700}
-.opm.H{background:var(--ink);color:var(--surface)}.opm.P{background:var(--line);color:var(--ink)}.opm.F{background:var(--crit);color:#fff}
+.opm.H{background:var(--ink);color:var(--surface)}.opm.P{background:#f4c96b;color:#3a2a00}.opm.F{background:var(--crit);color:#fff}
 .opm.Q{border:1.5px dashed var(--ink);color:var(--ink)}.opm.N{background:var(--surface-2);color:var(--muted)}
 .opev{font-weight:700}.opev.no{color:var(--muted);font-weight:500}
 .oprate{display:flex;align-items:center;gap:6px;min-width:120px}.opbar{flex:1;height:7px;background:var(--surface-2);border-radius:4px;position:relative;overflow:hidden}
@@ -488,7 +499,31 @@ table.predict{min-width:720px}table.predict tr.sub th{font-weight:500;color:var(
 @media print{:root[data-theme="dark"] .card,:root[data-theme="dark"] .kpi,:root[data-theme="dark"] .rv-card{box-shadow:none}}
 .stdnote{font-size:12px;margin-top:6px}
 table.standards{min-width:0;font-size:13px}table.standards td,table.standards th{padding:7px 8px}table.standards th[scope],table.standards tbody th{text-align:left;font-weight:600}
-.summarytext{font-size:15px;line-height:1.6;max-width:80ch;margin:0 0 8px;color:var(--ink)}
+.acgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.acpanel{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--surface-2)}
+.achd{margin-bottom:8px}.acname{font-weight:800;font-size:14px;color:var(--ink)}
+.acbig{display:flex;align-items:baseline;gap:8px;margin-top:4px}.acbig b{font-size:26px;font-weight:800;line-height:1}
+.acbig span{font-size:12px;color:var(--muted)}.acsub{font-size:12px;color:var(--ink-2);margin-top:2px}
+.acbig.neg b,.acdd.neg{color:var(--crit)}.acbig.pos b,.acdd.pos{color:var(--s1)}.acbig.flat b,.acdd.flat{color:var(--ink)}
+.acrow{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(50px,1fr) auto 38px;gap:8px;align-items:center;font-size:12.5px;padding:5px 0;border-top:1px solid var(--line)}
+.acd{color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.actrack{position:relative;height:8px;background:var(--surface);border-radius:4px}
+.actrack::after{content:"";position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:var(--line-2)}
+.actrack i{position:absolute;top:0;bottom:0;border-radius:4px;background:var(--ink-2)}
+.actrack i.neg{background:var(--crit)}.actrack i.pos{background:var(--s1)}
+.acv{color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}.acdd{text-align:right;font-variant-numeric:tabular-nums}
+.hpath{display:grid;gap:6px}
+.hrow{display:grid;grid-template-columns:minmax(120px,190px) minmax(0,1fr) 190px 34px;gap:12px;align-items:center;padding:4px 0;border-top:1px solid var(--line)}
+.hlab b{font-size:13px;margin-right:8px;color:var(--ink)}.hlab span{font-size:12px;color:var(--ink-2)}
+.hsq{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.hsq i{width:18px;height:18px;border-radius:4px;display:inline-block}
+.hsq i.H{background:var(--ink)}.hsq i.P{background:#f4c96b}.hsq i.F{background:var(--crit)}.hsq i.N{border:1.5px solid var(--line-2)}.hsq i.Q{border:1.5px dashed var(--ink-2);color:var(--ink-2);font-size:11px;font-style:normal;font-weight:800;text-align:center;line-height:15px}
+.hneed{width:3px;height:26px;background:var(--magenta);border-radius:2px;margin:0 3px}
+.hcount{font-size:12px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.hgrade{font-weight:800;font-size:15px;text-align:center;border:1px solid var(--line-2);border-radius:6px;padding:2px 0}
+.hgrade.H{background:var(--ink);color:var(--surface)}
+@media (max-width:640px){.hrow{grid-template-columns:1fr auto}.hsq{grid-column:1/-1}.hcount{grid-column:1}}
+.summarytext{font-size:15px;line-height:1.6;max-width:none;margin:0 0 8px;color:var(--ink)}
 .gpath{border-top:1px solid var(--line);padding:10px 0}
 .gpath:first-of-type{border-top:0}
 .gpath > summary{cursor:pointer;list-style:none;display:grid;gap:6px 12px;
@@ -4228,22 +4263,48 @@ function divergingBars(chartId, tableId, items, opts){
 
 function renderSkillDomains(s){
   const refs = (DATA.refs||{})[s.cohort] || {domains:{}};
-  /* by ACGME competency, each followed by the domains it is made of */
-  const row = (label, v, r) => (v == null || r == null) ? {label, delta:null} :
-    {label, delta: v - r, studentText: v + ' / 100', refText: r + ' / 100', detail: v + ' against a class mean of ' + r};
-  const items = [];
+  const host = $('domainChart'); host.textContent = '';
+  /* one panel per ACGME competency: the competency's score against the class
+     mean, then every domain that makes it up with its own score and mean */
+  const sign = d => (d > 0 ? '+' : d < 0 ? '−' : '±') + Math.abs(d);
+  const tone = d => d <= -5 ? 'neg' : d >= 5 ? 'pos' : 'flat';
+  const grid = elc('div','acgrid'), tab = [];
   SKILL_ACGME.forEach(([name, ds]) => {
     const own = ds.filter(d => s.skillDomains && s.skillDomains[d] != null && refs.domains && refs.domains[d] != null);
     if(!own.length) return;
-    items.push(row(name, acgmeScore(s.skillDomains, own), acgmeScore(refs.domains, own)));
-    if(ds.length > 1) own.forEach(d => items.push(row('\u2003' + d, s.skillDomains[d], refs.domains[d])));
+    const v = acgmeScore(s.skillDomains, own), r = acgmeScore(refs.domains, own), dv = v - r;
+    const p = elc('div','acpanel');
+    const hd = elc('div','achd');
+    hd.appendChild(elc('div','acname', name));
+    const big = elc('div','acbig ' + tone(dv)); big.appendChild(elc('b', null, sign(dv))); big.appendChild(elc('span', null, 'vs class mean'));
+    hd.appendChild(big);
+    hd.appendChild(elc('div','acsub', 'This student ' + v + ' · class mean ' + r + ' (0–100)'));
+    p.appendChild(hd);
+    tab.push([name, v, r, sign(dv)]);
+    if(ds.length > 1 || own[0] !== name){
+      own.forEach(d => {
+        const a = s.skillDomains[d], b = refs.domains[d], dd = a - b;
+        const row = elc('div','acrow');
+        row.appendChild(elc('span','acd', d));
+        const tr = elc('span','actrack');
+        const f = elc('i', tone(dd)); f.style.width = Math.max(3, Math.min(50, Math.abs(dd) * 5)) + '%';
+        f.style[dd < 0 ? 'right' : 'left'] = '50%'; tr.appendChild(f); row.appendChild(tr);
+        row.appendChild(elc('span','acv', a + ' vs ' + b));
+        row.appendChild(elc('b','acdd ' + tone(dd), sign(dd)));
+        p.appendChild(row);
+        tab.push([' ' + d, a, b, sign(dd)]);
+      });
+    }
+    grid.appendChild(p);
   });
-  divergingBars('domainChart','domainTable', items, {
-    refName:'class mean', unit:'points', rowLabel:'ACGME competency \u00b7 domain',
-    axisLabel:'Points above or below the class mean', axisLabelShort:'vs. class mean',
-    ariaLabel:'Clinical skills domains compared with the class mean',
-    emptyText:'No OSCE or clinical evaluation domain scores on record yet.'
-  });
+  if(!grid.children.length){ host.appendChild(emptyDiv('No OSCE or clinical evaluation domain scores on record yet.')); }
+  else {
+    host.appendChild(grid);
+    host.appendChild(elc('p','why', 'Scores on a 0–100 scale (OSCE checklist percent and clinical-evaluation ratings rescaled). ' +
+      'Bars run left of the centre line when below the class mean and right when above (10 points = full half); red or blue once the gap is 5 points or more.'));
+  }
+  buildTable($('domainTable'), [{label:'ACGME competency · domain'},{label:'This student',num:true},{label:'Class mean',num:true},{label:'Difference',num:true}],
+    tab, 'Clinical skills by ACGME competency against the class mean');
 }
 
 /* ---------------- clerkship NBME exams by content area ---------------- */
@@ -4588,13 +4649,16 @@ function renderNbme(host, s){
   head.appendChild(big);
   const bl = elc('div','nbbig' + (cb.open.length ? ' warn' : ''));
   bl.appendChild(elc('b', null, String(cb.open.length)));
-  bl.appendChild(elc('span', null, (cb.open.length === 1 ? 'exam' : 'exams') + ' below the 65% pass mark with no passing retake' +
+  bl.appendChild(elc('span', null, (cb.open.length === 1 ? 'exam' : 'exams') + ' below its pass mark with no passing retake' +
     (cb.resolved.length ? ' \u00b7 ' + cb.resolved.length + ' passed on retake' : '')));
   head.appendChild(bl);
   host.appendChild(head);
   const lo = 30, hi = 100, x = v => Math.max(0, Math.min(100, (v - lo) / (hi - lo) * 100));
+  const refs = ((DATA.refs||{})[s.cohort] || {}).examAreas || {};
+  let nx = 0;
   const drawRows = (list, rowsIn) => rowsIn.forEach(({r, c}) => {
-    const row = elc('div','nbrow' + (c.passMark != null && c.scaled < c.passMark ? ' below' : ''));
+    const hasAreas = c.areas && Object.keys(c.areas).length;
+    const row = elc('div','nbrow' + (c.passMark != null && c.scaled < c.passMark ? ' below' : '') + (hasAreas ? ' clickable' : ''));
     const lab = elc('div','nblab');
     lab.appendChild(elc('b', null, r.code));
     lab.appendChild(elc('span', null, (c.label || 'NBME exam').replace(/^NBME\s*/i, '') + (r.name && r.name !== r.code ? ' \u00b7 ' + r.name.replace(/\*$/, '') : '')));
@@ -4606,13 +4670,48 @@ function renderNbme(host, s){
     row.appendChild(tr);
     row.appendChild(elc('div','nbscore', fmtScaled(c.scaled) + (c.passMark != null && c.scaled < c.passMark ? ' \u2193' : '')));
     row.appendChild(elc('div','nbpct', c.percentile == null ? '\u2014' : ord(c.percentile)));
+    /* click (or Enter) opens the exam's content areas beneath the row */
+    if(hasAreas){
+      row.setAttribute('role','button'); row.tabIndex = 0; row.setAttribute('aria-expanded','false');
+      lab.appendChild(elc('span','nbmore','Content areas \u25be'));
+      const box = elc('div','nbareas'); box.hidden = true;
+      const id = 'nbx' + (nx++);
+      const toggle = () => {
+        const open = box.hidden;
+        box.hidden = !open; row.setAttribute('aria-expanded', open ? 'true' : 'false'); row.classList.toggle('open', open);
+        if(open && !box.dataset.drawn){
+          const ch = elc('div'); const tb = elc('div'); tb.id = id; tb.hidden = true;
+          box.appendChild(ch); box.appendChild(tb);
+          barPanels(ch, id, [{title: c.label || 'NBME exam', code: r.code,
+            sub: r.code + ' \u00b7 ' + fmtRange(r.start, r.end) + ' \u00b7 total ' + fmtScaled(c.scaled) + (c.cohortMean != null ? ' (class mean ' + c.cohortMean + ')' : ''),
+            parts: Object.entries(c.areas), ref: refs[examName(c.label)] || {}}],
+            {varName:'--s5', partName:'content area', partLabel:'Content area', itemName:'Exam', unitShort:'Percent correct',
+             unitLong:'equated percent correct', emptyText:'No content-area breakdown in this score report.', caption:'Content areas'});
+          box.appendChild(elc('p','why', 'Bar: this student\u2019s equated percent correct in each content area. Tick: the class mean for that area on the same exam.'));
+          box.dataset.drawn = '1';
+        }
+      };
+      row.setAttribute('aria-label', r.code + ' ' + (c.label || '') + ': ' + fmtScaled(c.scaled) +
+        (c.passMark != null ? ', pass mark ' + c.passMark : '') + (c.classMedian != null ? ', class median ' + fmtScaled(c.classMedian) : '') +
+        '. Press to show content areas.');
+      row.addEventListener('click', toggle);
+      row.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); toggle() } });
+      list.appendChild(row); list.appendChild(box);
+      return;
+    }
     row.setAttribute('aria-label', r.code + ' ' + (c.label || '') + ': ' + fmtScaled(c.scaled) +
       (c.passMark != null ? ', pass mark ' + c.passMark : '') + (c.classMedian != null ? ', class median ' + fmtScaled(c.classMedian) : '') +
       (c.percentile != null ? ', ' + ord(c.percentile) + ' percentile' : ''));
     list.appendChild(row);
   });
+  /* the key, drawn with the same marks the rows use */
+  const key = elc('div','nbkey');
+  const k = (cls, text) => { const d = elc('span','nbk'); const sw = elc('span','nbsw'); sw.appendChild(elc('i', cls)); d.appendChild(sw); d.appendChild(document.createTextNode(text)); key.appendChild(d) };
+  k('nbdot', 'This student\u2019s score'); k('nbmed', 'Class median'); k('nbpass', 'Pass mark');
+  key.appendChild(elc('span','nbk hint', 'Click an exam to see its content areas'));
+  host.appendChild(key);
   const hd = elc('div','nbrow nbcolhd');
-  ['Exam', 'Score (dot) \u00b7 class median (tick) \u00b7 pass mark (line)', 'Score', 'Class pct'].forEach(t => hd.appendChild(elc('div', null, t)));
+  ['Exam', 'Score on a 30\u2013100% scale', 'Score', 'Class pct'].forEach(t => hd.appendChild(elc('div', null, t)));
   host.appendChild(hd);
   const list = elc('div','nblist');
   if(rows.length) drawRows(list, rows); else list.appendChild(elc('div','empty','No NBME exams in the current attempt yet.'));
@@ -4631,6 +4730,34 @@ function renderNbme(host, s){
     'Every NBME exam on record');
 }
 
+
+/* The paragraphs carry no overall class ranking (decided 2026-10-11): the
+   "overall standing ... tier of the class" sentence is dropped, and so is any
+   note about it - whichever data file is loaded. */
+function summaryClean(t){
+  return String(t || '').replace(/\s*On knowledge and clinical evaluations combined,[^.]*overall standing was in the [a-z]+ tier of the class\./g, '').trim();
+}
+/* objectives met at the Honors standard / those that can carry Honors (pass/
+   fail-only and Honors-not-on-file left out) - the count the strip shows */
+function honorsCount(s){
+  let h = 0, k = 0;
+  OP_CODES.forEach(c => { const r = opRec(s, c); ((r && r.objectives) || []).forEach(o => {
+    if(o.rating === 'NA' || /^Pass\/fail/i.test(o.rule || '')) return;
+    if(['H','P','F'].includes(o.rating)){ k++; if(o.rating === 'H') h++ } }) });
+  return k ? [h, k] : null;
+}
+/* the paragraph's count follows the record, so it always matches the strip */
+function summaryCount(t, s){
+  const c = honorsCount(s);
+  return c ? t.replace(/(Honors standard on )\d+( of )\d+/, '$1' + c[0] + '$2' + c[1]) : t;
+}
+function summaryNote(n){
+  n = String(n || '');
+  if(/knowledge and overall-standing sentences are left out/i.test(n))
+    return n.replace(/The knowledge and overall-standing sentences are left out because both are/i, 'The knowledge sentence is left out because it is');
+  if(/overall-standing sentence is left out/i.test(n)) return '';
+  return n;
+}
 
 /* ---------------- Phase 2 one-pager (legacy clerkship classes) ---------------- */
 /* The "Overall clinical performance in Phase 2" profile: grades, overall
@@ -4800,12 +4927,56 @@ function renderOnePager(host, s, text){
     sec.appendChild(elc('p','why', 'Practice-Based Learning & Improvement and Systems-Based Practice: limited evidence (no clinical-evaluation domain measures them), so no graph.'));
     page.appendChild(sec);
   }
+  /* How Honors was earned: one row per clerkship, one square per competency
+     objective (Honors / Pass / not on file), the clerkship's Honors
+     requirement as a line, and the grade - for a reader who has seconds */
+  {
+    const rowsH = OP_CODES.map((c, i) => ({c, name: OP_NAMES[i], r: opRec(s, c)})).filter(x => x.r && x.r.objectives && x.r.objectives.length);
+    if(rowsH.length){
+      const sec = elc('div','opsec');
+      sec.appendChild(elc('h4', null, 'How Honors was earned'));
+      let hTot = 0, nTot = 0;
+      const box = elc('div','hpath');
+      rowsH.forEach(({c, name, r}) => {
+        /* objectives that can carry Honors; pass/fail-only ones are counted apart */
+        const all = r.objectives.filter(o => o.rating !== 'NA');
+        const pf = all.filter(o => /^Pass\/fail/i.test(o.rule || ''));
+        const objs = all.filter(o => !/^Pass\/fail/i.test(o.rule || ''));
+        const need = (r.gradeRule || {}).need;
+        const order = {H:0, P:1, F:2, 'H/P':3, '?':4};
+        const sorted = objs.slice().sort((a, b) => (order[a.rating] ?? 5) - (order[b.rating] ?? 5));
+        const h = objs.filter(o => o.rating === 'H').length, known = objs.filter(o => ['H','P','F'].includes(o.rating)).length;
+        hTot += h; nTot += known;
+        const row = elc('div','hrow');
+        const lab = elc('div','hlab'); lab.appendChild(elc('b', null, c)); lab.appendChild(elc('span', null, name)); row.appendChild(lab);
+        const sq = elc('div','hsq');
+        sorted.forEach((o, k) => {
+          const cls = o.rating === 'H' ? 'H' : o.rating === 'P' ? 'P' : o.rating === 'F' ? 'F' : o.rating === 'H/P' ? 'Q' : 'N';
+          const d = elc('i', cls, cls === 'Q' ? '?' : null);
+          d.title = o.name + ': ' + ({H:'Honors standard', P:'Pass standard', F:'not met', Q:'passed; the Honors evidence is not on file', N:'not on file'})[cls];
+          sq.appendChild(d);
+          if(need && k === need - 1) sq.appendChild(elc('span','hneed'));
+        });
+        row.appendChild(sq);
+        row.appendChild(elc('div','hcount', h + ' of ' + known + (need ? ' · ' + need + ' needed' : '') +
+          (pf.length ? ' · +' + pf.filter(o => o.rating === 'P' || o.rating === 'H').length + ' pass/fail met' : '')));
+        row.appendChild(elc('div','hgrade' + (r.result === 'Honors' ? ' H' : ''), r.result === 'Honors' ? 'H' : r.result === 'Pass' ? 'P' : (r.result || '—')));
+        box.appendChild(row);
+      });
+      sec.appendChild(elc('p','op-lede', 'Each square is one competency objective of the clerkship’s criterion-based grade, met at the Honors standard (solid), ' +
+        'the Pass standard (amber), passed with the Honors evidence not on file (?), or not on file (outline). The line marks how many ' +
+        'Honors objectives the clerkship requires for an Honors grade; requirements graded pass/fail only are counted beside each row. ' +
+        hTot + ' of ' + nTot + ' objectives were met at the Honors standard.'));
+      sec.appendChild(box);
+      page.appendChild(sec);
+    }
+  }
   /* paragraph */
   if(text){
     const sec = elc('div','opsec');
     sec.appendChild(elc('h4', null, 'Summary paragraph · ' + ((s.summary && s.summary.status) || 'Draft for review')));
     sec.appendChild(elc('p','summarytext', text));
-    if(s.summary && s.summary.note) sec.appendChild(elc('p','why', s.summary.note));
+    if(s.summary && summaryNote(s.summary.note)) sec.appendChild(elc('p','why', summaryNote(s.summary.note)));
     page.appendChild(sec);
   }
   host.appendChild(page);
@@ -4823,7 +4994,7 @@ function renderStudent(s){
   /* the Class of 2027's summary paragraph: stored with the name replaced by
      {NAME} / {FIRST}; filled from the names loaded this session, else the code */
   const nm0 = nameOf(s.id), first0 = nm0 ? String(nm0).split(' ')[0] : s.id;
-  const text0 = s.summary && s.summary.text ? s.summary.text.split('{NAME}').join(nm0 || s.id).split('{FIRST}').join(first0) : '';
+  const text0 = s.summary && s.summary.text ? summaryCount(summaryClean(s.summary.text), s).split('{NAME}').join(nm0 || s.id).split('{FIRST}').join(first0) : '';
   if(opClass(s.cohort) && (s.records||[]).some(r => r.objectives && r.objectives.length)){
     const oBody = makeCard(host, 'Overall clinical performance in Phase 2',
       'One-page profile' + (nm0 ? ' \u00b7 ' + nm0 : ''),
@@ -4841,7 +5012,7 @@ function renderStudent(s){
     const sBody = makeCard(host, 'Overall clinical performance in Phase 2',
       'Summary paragraph \u00b7 ' + (s.summary.status || 'Draft for review'), 'A draft for review.', null);
     sBody.appendChild(elc('p','summarytext', text0));
-    if(s.summary.note) sBody.appendChild(elc('p','why', s.summary.note));
+    if(summaryNote(s.summary.note)) sBody.appendChild(elc('p','why', summaryNote(s.summary.note)));
   }
 
   if((s.records||[]).some(r => casList(r).some(c => c.scaled != null))){
@@ -4920,8 +5091,8 @@ function renderStudent(s){
     renderTwoAxes($('axesChart'), s, axes);
   }
 
-  /* every clerkship NBME exam together, each with its content areas */
-  if((s.records||[]).some(r => isClerkshipRec(r) && casList(r).length)){
+  /* content areas now open from each exam row in the NBME card */
+  if(false){
     const shBody = makeCard(host, 'Clerkship NBME exams',
       'Subject exams, content area by content area',
       'Every clerkship NBME exam on record, in the order sat. Each bar is this student’s ' +
@@ -4946,9 +5117,8 @@ function renderStudent(s){
      content-area report to profile, so no card pretends to one. */
   const dBody = makeCard(host, 'Clinical skills by ACGME competency',
     'Where the bedside strengths and gaps are',
-    'OSCE domain scores and clinical-evaluation ratings pooled onto one 0–100 scale and grouped into the ACGME ' +
-    'competencies (Patient Care, Interpersonal & Communication Skills, Professionalism), each compared with the class mean; ' +
-    'the domains that make up each competency are listed beneath it. Medical Knowledge is the NBME side.', 'domainTable');
+    'One panel per ACGME competency: the competency against the class mean, then each domain that makes it up. ' +
+    'Medical Knowledge is the NBME side.', 'domainTable');
   chartAndTable(dBody, 'domainChart', 'domainTable');
   renderSkillDomains(s);
 
@@ -5287,7 +5457,17 @@ function renderReview(list){
     if(s.careerAdvisor || s.ccm)
       hl.appendChild(elc('div','rv-meta', [s.careerAdvisor && 'Advisor ' + s.careerAdvisor, s.ccm && 'CCM ' + s.ccm]
         .filter(Boolean).join(' · ')));
-    head.appendChild(hl); head.appendChild(chipFor(s.status)); card.appendChild(head);
+    head.appendChild(hl);
+    /* right: standing, then the licensing exams on record beneath it */
+    const side = elc('div','rv-side'); side.appendChild(chipFor(s.status));
+    const ex = elc('div','rv-exams');
+    const cbx = cbseOf(s), us = usmleOf(s);
+    const line = (k, v, bad) => { const d = elc('div', bad ? 'bad' : null); d.appendChild(elc('span', null, k)); d.appendChild(elc('b', null, v)); ex.appendChild(d) };
+    if(cbx) line('CBSE', Math.round(cbx.cas.scaled) + (cbx.prior ? '*' : ''), false);
+    if(us.STEP1) line('Step 1', us.STEP1.result === 'Pass with remediation' ? 'Pass (retake)' : us.STEP1.result, us.STEP1.result !== 'Pass');
+    if(us.STEP2CK) line('Step 2', us.STEP2CK.scores.length ? String(us.STEP2CK.scores[us.STEP2CK.scores.length - 1]) : us.STEP2CK.result, us.STEP2CK.result !== 'Pass');
+    if(ex.children.length) side.appendChild(ex);
+    head.appendChild(side); card.appendChild(head);
 
     const big = elc('div','rv-big');
     [['Medical knowledge', kOf(s)], ['Clinical skills', skOf(s)]].forEach(([l, v]) => {
