@@ -801,9 +801,7 @@ body.gated{overflow:hidden}
       <div class="mastside">
         <img class="mastlogo" id="mastLogo" alt="ASCEND Curriculum" src="">
         <div class="mastactions">
-          <button class="ghost" id="loadBtn" type="button">Load data file</button>
-          <button class="ghost" id="photoBtn" type="button">Load photos</button>
-          <button class="ghost" id="nameBtn" type="button">Load names</button>
+          <button class="ghost" id="loadAllBtn" type="button">Load data, names &amp; photos</button>
           <a class="ghost" id="logBtn" href="https://forms.cloud.microsoft/Pages/DesignPageV2.aspx?subpage=design&amp;id=YZ3odw9XsEO55GNPRi40uOOTNvWX3itIuGr2h3RZNNZUM0tRSzZXSzE0QUhYNkUyVUVGREg1VDVJTi4u"
              target="_blank" rel="noopener noreferrer"
              title="Opens the access-log form in Microsoft Forms (View responses). Only the form's owner in the Office of Curricular Affairs can open it.">Access log &#8599;</a>
@@ -820,7 +818,7 @@ body.gated{overflow:hidden}
     <div class="notice sample" id="sampleNotice">
       <span class="ic" aria-hidden="true">&#9888;</span>
       <span><strong>Sample data.</strong> These are computer-generated, coded students, not real records.
-        Use <em>Load data file</em> to replace them with a registrar or assessment export
+        Use <em>Load data, names &amp; photos</em> to replace them with the Office&rsquo;s build
         (JSON or CSV &mdash; the expected shape is in the comment block at the top of this
         file&rsquo;s script).</span>
     </div>
@@ -1080,9 +1078,9 @@ body.gated{overflow:hidden}
 </footer>
 
 <div class="tip" id="tip" aria-hidden="true"></div>
-<input type="file" id="fileInput" accept=".json,.csv,application/json,text/csv" hidden>
-<input type="file" id="photoInput" accept="image/*" webkitdirectory multiple hidden>
-<input type="file" id="nameInput" accept=".csv,.json,.txt,text/csv,application/json,text/plain" hidden>
+<!-- the fallback for a browser without folder access, or a shift-click: the
+     viewer picks # Confidential (or one dated folder) with an ordinary picker -->
+<input type="file" id="allInput" webkitdirectory multiple hidden>
 <script>
 /* ============================================================================
    ASCEND STUDENT PERFORMANCE DASHBOARD
@@ -1118,7 +1116,7 @@ body.gated{overflow:hidden}
    name field - the page will not render one. A face identifies a person
    outright, so no portrait travels in the data either: a photo is shown only
    when the viewer loads the Office's photo folder (one <code>.jpg per
-   student, Confidential only) with "Load photos", held in memory for that
+   student, Confidential only) with "Load data, names & photos", held in memory for that
    session and never written anywhere.
 
    Student = {
@@ -3132,7 +3130,7 @@ function bootLoadGate(){
   });
 }
 
-/* Student photos live in a folder the viewer picks with "Load photos" - one
+/* Student photos live in a folder "Load data, names & photos" reads - one
    image per file, named by the code (ASC-2028-014.jpg). They are held as
    in-memory object URLs for this session only: the page carries none, the
    loaded data carries none, and nothing is written anywhere. Pairing a face
@@ -3149,8 +3147,6 @@ function adoptPhotos(files){
     if(!code) return;
     PHOTOS[code] = URL.createObjectURL(f); n++;
   });
-  const b = $('photoBtn');
-  if(b) b.textContent = n ? 'Photos loaded (' + n + ')' : 'Load photos';
   renderAll();
   return n;
 }
@@ -3278,7 +3274,7 @@ async function fromConfidential(want){
     '# RPS › # Confidential) - or any folder above it - or shift-click to choose the file yourself.');
 }
 
-/* Student names come from the code key the viewer picks with "Load names" -
+/* Student names come from the code key "Load data, names & photos" reads -
    a CSV (student_code,name - or first_name/last_name) or a JSON map of code to
    name. Like the photos it is held in memory for this session only: nothing is
    written anywhere, and closing the page forgets it. The key re-identifies
@@ -3331,8 +3327,6 @@ function adoptNames(text){
     }
   }
   const n = Object.keys(NAMES).length;
-  const b = $('nameBtn');
-  if(b) b.textContent = n ? 'Names loaded (' + n + ')' : 'Load names';
   renderAll();
   return n;
 }
@@ -3347,7 +3341,7 @@ function photoSlot(s){
   }
   const box = elc('div','idphoto empty', Object.keys(PHOTOS).length
     ? 'No photo for this code in the loaded folder'
-    : 'No photo loaded \u2014 use Load photos');
+    : 'No photo loaded \u2014 use Load data, names & photos');
   box.setAttribute('role','img');
   box.setAttribute('aria-label','No photo loaded for ' + s.id);
   return box;
@@ -4693,7 +4687,7 @@ function renderStudent(s){
       'Grades, the ACGME competencies met at the Honors standard with class context, ' +
       'overall performance across the ACGME competencies and each competency against the class, and the summary paragraph. An Honors is an Honors: nothing here changes or qualifies ' +
       'a clerkship grade. The evidence for every square and number is in the cards below. ' +
-      (nm0 ? '' : 'Load names to see the student\u2019s name in place of the code. ') + 'A draft for review.', null);
+      (nm0 ? '' : 'Load data, names & photos to see the student\u2019s name in place of the code. ') + 'A draft for review.', null);
     const pb = elc('button','ghost opprint','Print one-pager'); pb.type = 'button';
     pb.addEventListener('click', () => { document.body.classList.add('print-onepager'); window.print();
       setTimeout(() => document.body.classList.remove('print-onepager'), 500) });
@@ -5450,76 +5444,96 @@ function init(){
     if(run) run();
   });
   $('confHintCancel').addEventListener('click', () => { $('confHint').hidden = true; confThen = null });
-  /* Each button opens the newest file in the Confidential folder by itself
-     (see confidentialFolder); shift-click, or a browser without folder access,
-     falls back to the ordinary file picker. */
-  const loadFrom = (want, use, input) => ev => {
-    const plain = ev.shiftKey || !confPickerOk();
-    ferpaGate(want.why, () => {
-      if(plain){ $(input).click(); return }
-      confHint(async () => {
-        try {
-          const got = await fromConfidential(want);
-          if(got) use(got);
-        } catch(err){
-          if(err && err.name === 'AbortError') return;    /* the viewer closed the picker */
-          alert(err.message || String(err));
-        }
-      });
-    });
-  };
-  $('loadBtn').addEventListener('click', loadFrom(CONF.data, f => readData(f), 'fileInput'));
-  /* a folder of <code>.jpg photos, kept in memory for this session only */
-  $('photoBtn').addEventListener('click', loadFrom(CONF.photos, files => readPhotos(files), 'photoInput'));
-  /* the code key, kept in memory for this session only */
-  $('nameBtn').addEventListener('click', loadFrom(CONF.names, f => readNames(f), 'nameInput'));
-  const readNames = f => {
-    const fr = new FileReader();
-    fr.onload = () => {
-      let n = 0;
-      try{ n = adoptNames(String(fr.result)) }
-      catch(err){ alert('That file could not be read as a name key.\n\n' + err.message); return }
-      if(!n) alert('No names were found in that file.\n\nExpected a CSV with student_code and name ' +
-                   'columns (or first_name and last_name), or a JSON object mapping each code to a name.');
-      else logAccess('names', f.name, '');
-    };
-    fr.readAsText(f);
-  };
-  const readPhotos = files => {
-    const n = adoptPhotos(files);
-    if(!n) alert('No images were found in that folder.\n\nExpected one image per student, named by ' +
-                 'code, e.g. ASC-2028-014.jpg, as written by pipeline/student_photos.py.');
-    else logAccess('photos', n + ' photos' + (files.folder ? ' from ' + files.folder : ''), '');
-  };
-  const readData = f => {
-    const fr = new FileReader();
-    fr.onload = () => {
-      try{
-        const txt = String(fr.result);
-        adoptData(/\.csv$/i.test(f.name) ? csvToData(txt) : JSON.parse(txt), f.name);
-        logAccess('data', f.name, (DATA.meta && DATA.meta.asOf) || '');
-      }catch(err){
-        alert('That file could not be read as student data.\n\n' + err.message +
-              '\n\nExpected either the JSON shape documented at the top of this page’s ' +
-              'script, or a CSV with one row per assessment.');
+  /* One button loads everything: the newest data file, the name key and the
+     photo folder, all from # Confidential (see confidentialFolder) - one FERPA
+     gate and, once the folder is remembered, no picker at all. Shift-click, or a
+     browser without folder access, picks the folder with an ordinary picker. */
+  const LOAD_ALL_WHY = 'Loading brings coded education records into this browser and pairs a name and a ' +
+    'photo with each code, which re-identifies the students. Continue only with a legitimate educational interest.';
+  const loadAll = async find => {
+    const done = [], missing = [];
+    const step = async (want, use) => {
+      try {
+        const got = await find(want);
+        if(!got || (Array.isArray(got) && !got.length)){ missing.push(want.what); return }
+        const said = await use(got);
+        if(said) done.push(said); else missing.push(want.what + ' (nothing usable in it)');
+      } catch(err){
+        if(err && err.name === 'AbortError') throw err;
+        missing.push(want.what + ' (' + (err.message || err) + ')');
       }
     };
-    fr.readAsText(f);
+    await step(CONF.data, async f => {
+      const txt = await f.text();
+      adoptData(/\.csv$/i.test(f.name) ? csvToData(txt) : JSON.parse(txt), f.name);
+      logAccess('data', f.name, (DATA.meta && DATA.meta.asOf) || '');
+      return 'data ' + ((DATA.meta && DATA.meta.asOf) || f.name);
+    });
+    await step(CONF.names, async f => {
+      const n = adoptNames(await f.text());
+      if(n) logAccess('names', f.name, '');
+      return n ? n + ' names' : null;
+    });
+    await step(CONF.photos, async files => {
+      const n = adoptPhotos(files);
+      if(n) logAccess('photos', n + ' photos' + (files.folder ? ' from ' + files.folder : ''), '');
+      return n ? n + ' photos' : null;
+    });
+    const b = $('loadAllBtn');
+    if(b && done.length) b.textContent = 'Loaded: ' + done.join(' · ');
+    if(missing.length) alert((done.length ? 'Loaded ' + done.join(', ') + '.\n\n' : '') + 'Not found:\n• ' +
+      missing.join('\n• ') + '\n\nThe # Confidential folder should hold a "Student Performance Dashboard <date>" ' +
+      'folder, an ASCEND_Names_Key_for_Dashboard_<date>.csv file and a "Student Photos <date>" folder.');
   };
-  $('nameInput').addEventListener('change', e => {
-    const f = e.target.files && e.target.files[0]; if(!f) return;
-    readNames(f); e.target.value = '';
+  /* the folder-access route: one remembered folder for all three */
+  const loadAllFromFolder = async () => {
+    const {dir, fresh} = await confidentialFolder();
+    let any = false;
+    await loadAll(async want => { const got = await confFind(dir, want); if(got) any = true; return got });
+    if(fresh && any) await confRemember(dir);
+  };
+  /* the ordinary-picker route: the same newest-dated choice, made from the
+     picked folder's file list (paths relative to the folder picked) */
+  const listFind = (files, want) => {
+    const segs = f => (f.webkitRelativePath || f.name).split('/');
+    const dirOf = f => segs(f).slice(0, -1);
+    if(want.dir){
+      const byDir = {};
+      files.forEach(f => { const d = dirOf(f); const i = d.findIndex(x => want.dir.test(x));
+        if(i < 0 || i !== d.length - 1) return;      /* directly inside the dated folder */
+        const k = d.slice(0, i + 1).join('/'); (byDir[k] = byDir[k] || []).push(f) });
+      const keys = Object.keys(byDir).sort((x, y) => y.split('/').pop().localeCompare(x.split('/').pop()));
+      for(const k of keys){
+        const fs = byDir[k];
+        if(want.images){
+          const img = fs.filter(f => /\.(jpe?g|png|gif|webp|heic)$/i.test(f.name));
+          if(img.length){ img.folder = k.split('/').pop(); return img }
+        } else {
+          const hit = fs.filter(f => want.file.test(f.name))[0] || fs.filter(f => want.alsoFile.test(f.name))[0];
+          if(hit) return hit;
+        }
+      }
+      return null;
+    }
+    return files.filter(f => want.file.test(f.name)).sort((x, y) => y.name.localeCompare(x.name))[0] || null;
+  };
+  $('loadAllBtn').addEventListener('click', ev => {
+    const plain = ev.shiftKey || !confPickerOk();
+    ferpaGate(LOAD_ALL_WHY, () => {
+      if(plain){ $('allInput').click(); return }
+      confHint(async () => {
+        try { await loadAllFromFolder() }
+        catch(err){ if(!(err && err.name === 'AbortError')) alert(err.message || String(err)) }
+      });
+    });
   });
-  $('photoInput').addEventListener('change', e => {
-    readPhotos([...(e.target.files || [])]); e.target.value = '';
-  });
-  $('fileInput').addEventListener('change', e => {
-    const f = e.target.files && e.target.files[0]; if(!f) return;
-    readData(f); e.target.value = '';
+  $('allInput').addEventListener('change', e => {
+    const files = [...(e.target.files || [])]; e.target.value = '';
+    if(files.length) loadAll(async want => listFind(files, want)).catch(err => alert(err.message || String(err)));
   });
   confRemembered().then(k => { confKnown = k }).catch(() => {});
-  ['loadBtn', 'photoBtn', 'nameBtn'].forEach(id => { if($(id)) $(id).title =
-    'Opens the newest file in the # Confidential folder. Shift-click to choose a file yourself.' });
+  if($('loadAllBtn')) $('loadAllBtn').title =
+    'Loads the newest data file, name key and photo folder from # Confidential. Shift-click to pick the folder yourself.';
 
   /* charts are drawn at real pixel width, so a resize means a redraw */
   let rt = null;
@@ -5619,8 +5633,8 @@ document.addEventListener('DOMContentLoaded', bootGate);
 </script>
 <script src="https://sinaiascend.github.io/Dashboard---HUB/ascend-mast.js" data-title="Student Performance Dashboard" data-site="De-identified student data · all phases" data-hide="header.mast"></script>
 <script>
-/* The shared masthead hides this page's own header, which is where the Load data
-   file, Load photos, Access log, Dark mode and Print buttons lived. Move that
+/* The shared masthead hides this page's own header, which is where the Load data,
+   names & photos, Access log, Dark mode and Print buttons lived. Move that
    button group into the shared masthead's utility row so it stays reachable. */
 (function(){
   function move(){
