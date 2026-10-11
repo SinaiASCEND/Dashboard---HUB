@@ -22,6 +22,9 @@
   if (!document.querySelector('link[href$="ascend-mast.css"]')) {
     var css = document.createElement("link"); css.rel = "stylesheet"; css.href = HUB + "ascend-mast.css"; document.head.appendChild(css);
   }
+  if (!window.__ascendStats) {                    // site stats, see ascend-stats.js
+    var st0 = document.createElement("script"); st0.async = true; st0.src = HUB + "ascend-stats.js"; document.head.appendChild(st0);
+  }
   if (d.hide) { var st = document.createElement("style"); st.textContent = d.hide + "{display:none!important}"; document.head.appendChild(st); }
   function render() {
     if (document.getElementById("ascend-masthead")) return;
