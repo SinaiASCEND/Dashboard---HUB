@@ -543,6 +543,8 @@ tr.rosterrow:focus-visible{outline:3px solid var(--s1);outline-offset:-3px}
 .namecell{display:flex;flex-direction:column;gap:2px}
 .namecell .nm{font-weight:700;color:var(--ink)}
 .namecell .sid{font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+#offTable tbody tr{cursor:pointer}#offTable tbody tr:focus-visible{outline:2px solid var(--accent,currentColor);outline-offset:-2px}
+#offTable td.offwhy{white-space:normal;min-width:280px;max-width:520px}#offTable td.offwhy div+div{margin-top:4px}
 .opencell{color:var(--magenta);font-weight:800;font-size:12px;white-space:nowrap}
 
 /* the table twin every chart ships with */
@@ -992,6 +994,29 @@ body.gated{overflow:hidden}
       </div>
     </div>
 
+    <!-- students not moving with their class: they belong to it and are counted
+         in its standings, but their record has a gap the class's does not -->
+    <div class="card" id="offCard">
+      <div class="cardhd">
+        <div>
+          <div class="kicker">Progression</div>
+          <h2 id="offTitle">Off schedule</h2>
+          <p class="why">Students in the current filter who are not moving with their class: no Year 3 clinical
+            evaluation on file (Class of 2027), no Step 1 on record after the class&rsquo;s Step 1 window,
+            a failed Step 1 not yet passed, or repeating a phase. They stay in their class&rsquo;s roster and
+            standings; this list says why their record looks different. The reason is what the data shows,
+            not a decision &mdash; an MD-PhD in the PhD phase is off schedule by design.</p>
+        </div>
+      </div>
+      <div class="cardbody">
+        <div class="tablewrap"><table class="grid" id="offTable">
+          <thead><tr><th>Student</th><th>Class</th><th>Programme</th><th>Why</th><th>Standing</th></tr></thead>
+          <tbody id="offBody"></tbody>
+        </table></div>
+        <div class="empty" id="offEmpty" hidden>No student in this filter is off schedule.</div>
+      </div>
+    </div>
+
     <div class="card">
       <div class="cardhd">
         <div>
@@ -1035,7 +1060,8 @@ body.gated{overflow:hidden}
             shown beneath as a comparator. A Phase 1 NBME failure is a first sitting below 65; Step 1 is
             &ldquo;on schedule&rdquo; when sat by the end of the class&rsquo;s Dedicated Study Block (legacy Class of
             2027: by 30 June 2025), and &ldquo;late&rdquo; otherwise &mdash; including no Step 1 on record, which
-            delays Phase 2 entry. A shelf failure is a first attempt below its Clerkship Information Sheet pass
+            delays Phase 2 entry. A student with no Step 1 on record who is already in clerkships is left out of the
+            timing rows: their result is missing from the USMLE match, not late. A shelf failure is a first attempt below its Clerkship Information Sheet pass
             mark. Small groups: read the direction, not the decimals.</p>
         </div>
       </div>
@@ -1077,7 +1103,11 @@ body.gated{overflow:hidden}
                    // where the code-to-student key actually lives. {code} is
                    // substituted if present; without it the code is copied to
                    // the clipboard and the document is opened to paste into.
-                   "lookupUrl": "https://sso.example.edu/key?code={code}" },
+                   "lookupUrl": "https://sso.example.edu/key?code={code}",
+                   // optional, confidential builds only: class-level aggregates
+                   // of the legacy cohort analysis (no student rows) for the
+                   // "Earlier classes" panel of the predictor card
+                   "legacyCohorts": { "groups": [...], "quartiles": [...], ... } },
      "students": [ Student, ... ]
    }
 
@@ -1102,6 +1132,8 @@ body.gated{overflow:hidden}
                                   //   Optional; omitted when the extract has not
                                   //   been joined to the advising roster.
      advisingGroup,               // advising group code
+     offSchedule,                 // optional: {reason, kind} - why the record has a gap
+                                  //   the class's does not (Off schedule card)
      enteredWith,                 // optional: the class the student entered with,
                                   //   when they now progress with a later one
                                   //   (repeating a phase). Blocks of the earlier
@@ -4841,8 +4873,57 @@ function renderAll(){
   renderSkillsScatter();
   renderTypeChart();
   renderReview(list);
+  renderOffSchedule(list);
   renderRoster();
   renderPredictors();
+}
+
+/* ---------------- off schedule ---------------- */
+/* Why a student is not moving with their class, from what the record shows:
+   the build's own reason (a Class of 2027 roster student with no Year 3
+   evaluation on file), no Step 1 once the class's Step 1 window has closed,
+   a failed Step 1 not yet passed, or a repeated phase. */
+function offScheduleReasons(s){
+  const out = [], recs = currentRecs(s.records);
+  if(s.offSchedule && s.offSchedule.reason) out.push(s.offSchedule.reason);
+  const s1 = recs.find(r => r.code === 'STEP1');
+  const dsb = recs.find(r => r.code === 'DSB');
+  const due = (dsb && dsb.end) || STEP1_ON_SCHEDULE[s.cohort];
+  /* a clerkship evaluation or shelf on file means the student went on to
+     Phase 2, so a missing Step 1 there is a matching gap, not a delay */
+  const inClerkships = recs.some(r => isClerkshipRec(r) && (r.eval || casList(r).length));
+  if(!s1 && due && due <= asOfDate() && !inClerkships)
+    out.push('No Step 1 on record; the class’s Step 1 window closed ' + due);
+  if(s1 && s1.result === 'Fail') out.push('Step 1 failed, no passing attempt on record');
+  if(s.enteredWith || (s.records || []).some(isPrior))
+    out.push('Repeating a phase' + (s.enteredWith ? ' (entered with the Class of ' + s.enteredWith + ')' : ''));
+  return out;
+}
+function renderOffSchedule(list){
+  const body = $('offBody'); if(!body) return;
+  body.textContent = '';
+  const rows = list.map(s => ({s, why: offScheduleReasons(s)})).filter(x => x.why.length)
+    .sort((a, b) => a.s.cohort - b.s.cohort || String(a.s.id).localeCompare(String(b.s.id)));
+  $('offTitle').textContent = rows.length ? rows.length + (rows.length === 1 ? ' student' : ' students') + ' off schedule' : 'Off schedule';
+  $('offEmpty').hidden = rows.length > 0;
+  $('offTable').hidden = !rows.length;
+  rows.forEach(({s, why}) => {
+    const tr = elc('tr', 'clickable');
+    tr.tabIndex = 0;
+    tr.setAttribute('aria-label', 'Open the record for ' + whoOf(s));
+    tr.addEventListener('click', () => openStudent(s.id));
+    tr.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openStudent(s.id) } });
+    const who = elc('td'), nc = elc('div', 'namecell');
+    const n = nameOf(s.id);
+    if(n) nc.appendChild(elc('span', 'nm', n));
+    nc.appendChild(elc('span', 'sid', s.id));
+    who.appendChild(nc); tr.appendChild(who);
+    tr.appendChild(elc('td', 'num', String(s.cohort)));
+    tr.appendChild(elc('td', null, s.program || '—'));
+    const w = elc('td', 'offwhy'); why.forEach(t => w.appendChild(elc('div', null, t))); tr.appendChild(w);
+    const st = elc('td'); st.appendChild(chipFor(s.status)); tr.appendChild(st);
+    body.appendChild(tr);
+  });
 }
 
 /* ---------------- across classes: what Phase 1 NBME results predict ---------------- */
@@ -4870,9 +4951,12 @@ function predictorRows(){
     const shelves = recs.filter(r => isClerkshipRec(r) && SHELF_CIS_PASS[r.code] != null).map(r => {
       const c = casList(r).find(c => c.scaled != null && !/retake/i.test(c.label || ''));
       return c ? {code: r.code, v: c.scaled, fail: c.scaled < SHELF_CIS_PASS[r.code]} : null }).filter(Boolean);
+    /* no Step 1 on record but already in clerkships: the result is missing
+       from the USMLE match, not late - left out of the timing rows */
+    const inClerkships = recs.some(r => isClerkshipRec(r) && (r.eval || casList(r).length));
     out.push({s, p1, fails, group: !p1 ? null : fails === 0 ? 0 : fails === 1 ? 1 : sems.size === 1 ? 2 : 3,
       /* only once the class's Step 1 window has closed: before that, not late */
-      timing: !due || due > asOfDate() ? null : !s1 ? 'none' : s1.start <= due ? 'on' : 'late', s1fail: !!(s1 && s1.result !== 'Pass'), shelves});
+      timing: !due || due > asOfDate() ? null : !s1 ? (inClerkships ? null : 'none') : s1.start <= due ? 'on' : 'late', s1fail: !!(s1 && s1.result !== 'Pass'), shelves});
   });
   /* shelf z within class and clerkship */
   const pool = {};
@@ -4928,6 +5012,45 @@ function renderPredictors(){
   if(body2.length) table('Step 1 timing against shelves', ['Step 1', 'Students', 'Step 1 late or not on record', 'Failed Step 1', 'Any shelf failed (1st attempt)', 'Mean shelf (class z)'], body2);
   host.appendChild(elc('p','why', 'The legacy Class of 2027 had no Phase 1 NBME exams, so it appears only here, as a comparator for the second link. ' +
     '\u201cNo Step 1 on record\u201d can also mean a roster name the USMLE match has not resolved yet.'));
+  renderLegacyCohorts(host, table, pct);
+}
+
+/* 3. Earlier classes: the legacy cohort analysis, class-level aggregates the
+   confidential build carries as meta.legacyCohorts - never student rows, and
+   never part of the public page. */
+function renderLegacyCohorts(host, table, pct){
+  const L = DATA.meta && DATA.meta.legacyCohorts;
+  host.appendChild(elc('h3','predh', 'Earlier classes \u00b7 legacy curriculum'));
+  if(!L || !L.groups){
+    host.appendChild(elc('p','why', 'Shown when the confidential build is loaded: the legacy Classes of 2023\u20132027 ' +
+      '(preclinical courses against Step 1, Step 2 CK and shelves), as class-level figures only.'));
+    return;
+  }
+  const f1 = v => v == null ? '\u2014' : String(v);
+  const sg = v => v == null ? '\u2014' : (v >= 0 ? '+' : '') + v.toFixed(2);
+  const share = v => v == null ? '\u2014' : Math.round(100 * v) + '%';
+  table('Legacy classes: end of Year 2 standing against later outcomes',
+    ['End of Year 2 standing', 'Students', 'Step 1 delayed or failed', 'Step 2 CK mean', 'Step 2 CK bottom quartile',
+     'Step 2 CK failed (1st attempt)', 'Mean shelf (z)', 'Any shelf >1 SD low'],
+    L.groups.map(g => ({cells: [g.group, String(g.n), g.step1N ? pct(g.step1Bad, g.step1N) + ' (' + g.step1Bad + ' of ' + g.step1N + ')' : '\u2014',
+      f1(g.step2Mean), share(g.step2Q1), g.step2N ? g.step2Fail + ' of ' + g.step2N : '\u2014', sg(g.shelfZ), share(g.shelfAnyLow)]})));
+  if(L.quartiles) table('Legacy classes: preclinical quartile against Step 2 CK and Step 1',
+    ['Preclinical quartile (within class)', 'With Step 2 CK', 'Step 2 CK (class z)', 'Step 2 CK bottom quartile', 'Step 2 CK failed', 'Step 1 delayed or failed'],
+    L.quartiles.map(q => ({cells: [q.quartile, String(q.step2N), sg(q.step2Z), share(q.step2Q1), String(q.step2Fail), share(q.step1Bad)]})));
+  const P = L.step2Pooled || {}, C = L.ccse2027 || {}, S = L.shelves || {}, A = L.academicStatus || {};
+  const lines = [];
+  if(P.r != null) lines.push('Preclinical performance against Step 2 CK: r = ' + P.r + ' within class (n ' + P.n + '), about ' +
+    P.pointsPerSd + ' points per SD; ' + P.failures + ' first-attempt failures, AUC ' + P.failAuc + '.');
+  if(L.step2ByClass) lines.push('By class: ' + L.step2ByClass.map(c => c.cohort + ' r ' + c.r).join(', ') + '.');
+  if(C.r != null) lines.push('Class of 2027 CCSE against Step 2 CK: r = ' + C.r + '; it explains ' + share(C.r2Ccse) +
+    ' of the variation, preclinical grades ' + share(C.r2Preclinical) + ', both ' + share(C.r2Both) + ' (n ' + C.n + ').');
+  if(S['2024'] || S['2027']) lines.push('Preclinical against mean shelf: ' + Object.entries(S).map(([k, v]) => 'Class of ' + k + ' r ' + v.r).join(', ') + '.');
+  if(A.n) lines.push(A.n + ' students carry a recorded academic status (Step 1 deferral list): median preclinical rank at the ' +
+    ord(Math.round(A.medianRank)) + ' percentile, Step 2 CK ' + sg(A.step2Z) + ' SD from their class.');
+  lines.forEach(t => host.appendChild(elc('p','why', t)));
+  const D = L.definitions || {};
+  host.appendChild(elc('p','why', [D.standing, D.preclinical, D.step1Bad, D.shelf].filter(Boolean).join(' ') +
+    (L.source ? ' Source: ' + L.source + '.' : '')));
 }
 
 /* ---------------- review cards ---------------- */
