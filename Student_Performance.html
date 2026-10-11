@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -200,7 +200,8 @@ a.ghost{text-decoration:none;display:inline-block;line-height:normal}
 .notice .ic{flex:none;font-size:14px;line-height:1.35}
 .notice strong{color:var(--ink)}
 .notice.sample{background:var(--warn-wash);border-color:#e0ac35}
-.notice.ferpa{background:var(--surface-2)}
+.notice.ferpa{background:var(--surface-2);max-width:none;flex-wrap:nowrap;align-items:flex-start;margin-top:0;
+  border-left:3px solid var(--magenta);padding:8px 13px;line-height:1.45}
 
 /* ================= filter row ================= */
 /* One row, above everything it scopes. Every view re-renders from it. */
@@ -273,6 +274,10 @@ main{padding-bottom:44px}
 .rv-name{font-size:17px;font-weight:800;letter-spacing:-.01em;color:var(--ink)}
 .rv-name + .rv-code{font-size:12.5px;font-weight:600;color:var(--muted);letter-spacing:0;
   font-variant-numeric:tabular-nums}
+.rv-side{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none}
+.rv-exams{display:grid;gap:2px;font-size:12px;text-align:right}
+.rv-exams div{display:flex;gap:8px;justify-content:flex-end}.rv-exams span{color:var(--muted)}.rv-exams b{color:var(--ink);font-variant-numeric:tabular-nums}
+.rv-exams .bad b{color:var(--crit)}
 .rv-meta{font-size:11.5px;color:var(--muted);margin-top:2px}
 .rv-big{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .rv-big div{background:var(--surface-2);border-radius:8px;padding:8px 10px}
@@ -399,6 +404,148 @@ details.fold > summary::before{content:'\25B8';font-size:11px;transition:transfo
 details.fold[open] > summary::before{transform:rotate(90deg)}
 details.fold > summary:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
 details.fold[open] > summary{margin-bottom:12px}
+
+/* clerkship grade paths: one fold per clerkship, its objectives as badges */
+.nbhead{display:flex;flex-wrap:wrap;gap:12px 28px;margin:0 0 14px}
+.nbbig{display:flex;align-items:baseline;gap:10px}
+.nbbig b{font-size:30px;font-weight:800;line-height:1;color:var(--ink);font-variant-numeric:tabular-nums}
+.nbbig span{font-size:13px;color:var(--ink-2);max-width:30ch}
+.nbbig.warn b{color:var(--crit)}
+.nbrow{display:grid;grid-template-columns:minmax(150px,230px) minmax(0,1fr) 54px 64px;gap:12px;align-items:center;padding:6px 0;border-top:1px solid var(--line)}
+.nbcolhd{border-top:0;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.nblab{display:flex;flex-direction:column;min-width:0}.nblab b{font-size:13px}.nblab span{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nbtrack{position:relative;height:18px;background:linear-gradient(var(--line),var(--line)) center/100% 2px no-repeat}
+.nbtrack i{position:absolute;top:50%;transform:translate(-50%,-50%)}
+.nbrow.clickable{cursor:pointer}.nbrow.clickable:hover{background:var(--surface-2)}.nbrow.open{background:var(--surface-2)}
+.nbrow.clickable:focus-visible{outline:2px solid var(--s1);outline-offset:-2px}
+.nbmore{display:block;font-size:11px;color:var(--magenta);font-weight:700;margin-top:2px}
+.nbareas{padding:8px 0 14px;border-top:1px dashed var(--line)}
+.nbkey{display:flex;flex-wrap:wrap;gap:6px 20px;align-items:center;margin:4px 0 10px;font-size:12.5px;color:var(--ink-2)}
+.nbk{display:inline-flex;align-items:center;gap:8px}.nbk.hint{color:var(--muted);margin-left:auto}
+.nbsw{position:relative;width:18px;height:18px;display:inline-block}.nbsw i{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}
+.nbpass{width:2px;height:18px;background:var(--crit);opacity:.75}
+.nbmed{width:2px;height:12px;background:var(--muted)}
+.nbdot{width:12px;height:12px;border-radius:50%;background:var(--s2);box-shadow:0 0 0 2px var(--surface)}
+.nbrow.below .nbdot{background:var(--crit)}
+.nbscore{font-weight:700;font-variant-numeric:tabular-nums;text-align:right}.nbrow.below .nbscore{color:var(--crit)}
+.nbpct{font-variant-numeric:tabular-nums;color:var(--ink-2);text-align:right}
+.nbprior{margin-top:16px;padding:10px 12px;border-radius:8px;background:var(--surface-2);opacity:.72}
+.nbprior-hd{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.04em;margin-bottom:4px}
+.nbprior .nbdot,.nbprior .nbrow.below .nbdot{background:var(--muted)}
+.nbprior .nbrow.below .nbscore{color:var(--ink-2)}
+td.belowcell{color:var(--crit);font-weight:700}
+@media (max-width:640px){.nbrow{grid-template-columns:1fr 54px 56px}.nbtrack{grid-column:1 / -1;order:5}}
+.onepager{display:grid;gap:22px}
+.opsec h4{margin:0 0 4px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}
+.op-lede{margin:0 0 10px;font-size:13px;color:var(--ink-2);max-width:none}
+.opgrades{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+.opg{border:1px solid var(--line);border-radius:6px;padding:7px 9px;display:flex;flex-direction:column;min-width:0}
+.opg .c{font-size:11px;color:var(--muted);font-weight:700}.opg .n{font-size:12px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.opg .l{font-size:17px;font-weight:800;color:var(--ink)}
+.oprow{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:16px 24px;align-items:start}
+.opsvg{width:100%;height:auto;display:block}
+.opz.lo{fill:var(--surface-2);opacity:.6}.opz.mid{fill:var(--surface-2)}.opz.hi{fill:rgba(49,121,198,.12)}
+.opcurve{fill:var(--line);opacity:.8;stroke:var(--ink-2);stroke-width:1.2}
+.opband{fill:rgba(49,121,198,.18)}.opmark{stroke:#d6117f;stroke-width:2.5}.opmarkdot{fill:#d6117f}
+.opaxis{stroke:var(--line);stroke-width:1.5}.optick{stroke:var(--muted)}
+.oplab{font-size:12px;fill:var(--muted)}.opzlab{font-size:12px;font-weight:600;fill:var(--ink-2)}.opmarklab{font-size:12px;font-weight:700;fill:#d6117f}
+.optiers{display:grid;grid-template-columns:19fr 60fr 21fr;gap:4px;font-size:12px;color:var(--ink-2)}
+.optiers div{border-top:3px solid var(--line);padding-top:4px;min-width:0}.optiers div.on{border-top-color:#d6117f;color:var(--ink)}
+.optiers b{display:block;color:var(--ink)}
+.opside{border-left:3px solid var(--ink);padding-left:12px}.opside .big{font-size:26px;font-weight:800;line-height:1.1}
+.opside p{margin:6px 0 0;font-size:12.5px;color:var(--ink-2)}
+.opshelves{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;margin-top:8px;font-size:12px;color:var(--ink-2);text-align:center}
+.opshelves div{border-top:2px solid var(--line);padding-top:3px}.opshelves b{display:block;color:var(--ink)}
+table.opgrid{border-collapse:collapse;width:100%;min-width:680px;font-size:13px}
+.opgrid th,.opgrid td{border-bottom:1px solid var(--line);padding:5px 6px;text-align:center}
+.opgrid thead th{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.opgrid tbody th{text-align:left;font-weight:600}.opgrid tr.grp th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding-top:10px}
+.opm{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:4px;font-size:11px;font-weight:700}
+.opm.H{background:var(--ink);color:var(--surface)}.opm.P{background:#f4c96b;color:#3a2a00}.opm.F{background:var(--crit);color:#fff}
+.opm.Q{border:1.5px dashed var(--ink);color:var(--ink)}.opm.N{background:var(--surface-2);color:var(--muted)}
+.opev{font-weight:700}.opev.no{color:var(--muted);font-weight:500}
+.oprate{display:flex;align-items:center;gap:6px;min-width:120px}.opbar{flex:1;height:7px;background:var(--surface-2);border-radius:4px;position:relative;overflow:hidden}
+.opbar i{position:absolute;inset:0 auto 0 0;background:var(--s2)}.oprate b{font-size:12px;color:var(--ink-2);min-width:32px;text-align:right}
+.opprint{margin-left:auto}
+.opbreak{margin:18px 0 8px;font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.opcomp{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 26px}
+.opc{border-top:2px solid var(--line);padding-top:8px;min-width:0}
+.opchd{display:flex;justify-content:space-between;align-items:baseline;gap:8px}.opchd b{font-size:14px}
+.opcpct{font-size:22px;font-weight:800;color:var(--ink)}
+.opcsub{font-size:11.5px;color:var(--muted);margin:2px 0 4px}
+.opclv{font-size:12px;color:var(--ink-2);margin-top:2px}.opclv.up{color:var(--ok, #1a7f37);font-weight:700}.opclv.dn{color:var(--crit);font-weight:700}
+@media (max-width:760px){.opcomp{grid-template-columns:1fr}}
+@media (max-width:640px){.oprow{grid-template-columns:1fr}.opgrades,.opshelves{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media print{ body.print-onepager *{visibility:hidden} body.print-onepager .onepager-card, body.print-onepager .onepager-card *{visibility:visible}
+  body.print-onepager .onepager-card{position:absolute;left:0;top:0;width:100%;border:0;box-shadow:none} body.print-onepager .opprint{display:none} }
+.usmle{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0 4px}
+.ustile{border:1px solid var(--line);border-left:4px solid var(--ink);border-radius:6px;padding:8px 14px;min-width:200px;display:flex;flex-direction:column}
+.ustile .un{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.ustile b{font-size:28px;font-weight:800;line-height:1.15;color:var(--ink);font-variant-numeric:tabular-nums}
+.ustile .us{font-size:12px;color:var(--ink-2);max-width:42ch}
+.ustile.bad{border-left-color:var(--crit)}.ustile.bad b{color:var(--crit)}
+.predh{font-size:13px;letter-spacing:.06em;text-transform:uppercase;margin:6px 0 8px;color:var(--ink)}
+table.predict{min-width:720px}table.predict tr.sub th{font-weight:500;color:var(--ink-2);padding-left:22px}table.predict tr.sub td{color:var(--ink-2)}
+
+/* Dark mode: every card carries a soft luminous edge so neighbouring cards
+   read as separate panels on the dark plane. */
+:root[data-theme="dark"]{--glow-edge:rgba(120,170,255,.34);--glow-halo:rgba(70,130,255,.16)}
+:root[data-theme="dark"] .card,:root[data-theme="dark"] .kpi,:root[data-theme="dark"] .rv-card{
+  border-color:var(--glow-edge);
+  box-shadow:0 0 0 1px rgba(120,170,255,.08),0 0 16px var(--glow-halo),inset 0 1px 0 rgba(255,255,255,.04)}
+:root[data-theme="dark"] .rv-card:hover{box-shadow:0 0 0 1px rgba(120,170,255,.18),0 0 22px rgba(70,130,255,.26)}
+:root[data-theme="dark"] .rv-card.concern{border-top-color:var(--crit)}
+:root[data-theme="dark"] .rv-card.watch{border-top-color:var(--warn)}
+@media print{:root[data-theme="dark"] .card,:root[data-theme="dark"] .kpi,:root[data-theme="dark"] .rv-card{box-shadow:none}}
+.stdnote{font-size:12px;margin-top:6px}
+table.standards{min-width:0;font-size:13px}table.standards td,table.standards th{padding:7px 8px}table.standards th[scope],table.standards tbody th{text-align:left;font-weight:600}
+.acgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.acpanel{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--surface-2)}
+.achd{margin-bottom:8px}.acname{font-weight:800;font-size:14px;color:var(--ink)}
+.acbig{display:flex;align-items:baseline;gap:8px;margin-top:4px}.acbig b{font-size:26px;font-weight:800;line-height:1}
+.acbig span{font-size:12px;color:var(--muted)}.acsub{font-size:12px;color:var(--ink-2);margin-top:2px}
+.acbig.neg b,.acdd.neg{color:var(--crit)}.acbig.pos b,.acdd.pos{color:var(--s1)}.acbig.flat b,.acdd.flat{color:var(--ink)}
+.acrow{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(50px,1fr) auto 38px;gap:8px;align-items:center;font-size:12.5px;padding:5px 0;border-top:1px solid var(--line)}
+.acd{color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.actrack{position:relative;height:8px;background:var(--surface);border-radius:4px}
+.actrack::after{content:"";position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:var(--line-2)}
+.actrack i{position:absolute;top:0;bottom:0;border-radius:4px;background:var(--ink-2)}
+.actrack i.neg{background:var(--crit)}.actrack i.pos{background:var(--s1)}
+.acv{color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}.acdd{text-align:right;font-variant-numeric:tabular-nums}
+.hpath{display:grid;gap:6px}
+.hrow{display:grid;grid-template-columns:minmax(120px,190px) minmax(0,1fr) 190px 34px;gap:12px;align-items:center;padding:4px 0;border-top:1px solid var(--line)}
+.hlab b{font-size:13px;margin-right:8px;color:var(--ink)}.hlab span{font-size:12px;color:var(--ink-2)}
+.hsq{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.hsq i{width:18px;height:18px;border-radius:4px;display:inline-block}
+.hsq i.H{background:var(--ink)}.hsq i.P{background:#f4c96b}.hsq i.F{background:var(--crit)}.hsq i.N{border:1.5px solid var(--line-2)}.hsq i.Q{border:1.5px dashed var(--ink-2);color:var(--ink-2);font-size:11px;font-style:normal;font-weight:800;text-align:center;line-height:15px}
+.hneed{width:3px;height:26px;background:var(--magenta);border-radius:2px;margin:0 3px}
+.hcount{font-size:12px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.hgrade{font-weight:800;font-size:15px;text-align:center;border:1px solid var(--line-2);border-radius:6px;padding:2px 0}
+.hgrade.H{background:var(--ink);color:var(--surface)}
+@media (max-width:640px){.hrow{grid-template-columns:1fr auto}.hsq{grid-column:1/-1}.hcount{grid-column:1}}
+.summarytext{font-size:15px;line-height:1.6;max-width:none;margin:0 0 8px;color:var(--ink)}
+.gpath{border-top:1px solid var(--line);padding:10px 0}
+.gpath:first-of-type{border-top:0}
+.gpath > summary{cursor:pointer;list-style:none;display:grid;gap:6px 12px;
+  grid-template-columns:minmax(150px,220px) auto 1fr;align-items:center}
+.gpath > summary::-webkit-details-marker{display:none}
+.gpath > summary:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
+.gpath .gname{font-weight:700;color:var(--ink)}
+.gpath .gname::before{content:'\25B8';display:inline-block;font-size:11px;margin-right:6px;
+  color:var(--muted);transition:transform .15s}
+.gpath[open] .gname::before{transform:rotate(90deg)}
+.gpath .gline{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;min-width:0}
+.gpath .gbadges{display:inline-flex;flex-wrap:wrap;gap:3px}
+.gpath .gsay{font-size:12.5px;color:var(--ink-2)}
+.gpath .gnote{font-size:12.5px;color:var(--muted);margin:8px 0 6px}
+.orate{display:inline-block;min-width:22px;padding:1px 5px;border-radius:4px;text-align:center;
+  font-size:11.5px;font-weight:700;line-height:18px;border:1px solid var(--line-2);color:var(--ink)}
+.orate.H{background:var(--ok-wash);border-color:rgba(12,163,12,.45)}
+.orate.P{background:var(--surface-2)}
+.orate.F{background:var(--crit-wash);border-color:rgba(208,59,59,.55)}
+.orate.U{background:transparent;border-style:dashed;color:var(--muted)}
+.orate.NA{background:transparent;color:var(--muted)}
+@media (max-width:640px){ .gpath > summary{grid-template-columns:1fr} }
 .hero .fig{font-size:56px;font-weight:700;letter-spacing:-.03em;line-height:1;color:var(--ink)}
 .hero .fig .u{font-size:17px;font-weight:600;color:var(--muted);margin-left:6px;letter-spacing:0}
 .hero .cap{font-size:13px;color:var(--ink-2);max-width:62ch}
@@ -445,6 +592,8 @@ tr.rosterrow:focus-visible{outline:3px solid var(--s1);outline-offset:-3px}
 .namecell{display:flex;flex-direction:column;gap:2px}
 .namecell .nm{font-weight:700;color:var(--ink)}
 .namecell .sid{font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+#offTable tbody tr{cursor:pointer}#offTable tbody tr:focus-visible{outline:2px solid var(--accent,currentColor);outline-offset:-2px}
+#offTable td.offwhy{white-space:normal;min-width:280px;max-width:520px}#offTable td.offwhy div+div{margin-top:4px}
 .opencell{color:var(--magenta);font-weight:800;font-size:12px;white-space:nowrap}
 
 /* the table twin every chart ships with */
@@ -533,6 +682,15 @@ tr.rosterrow:focus-visible{outline:3px solid var(--s1);outline-offset:-3px}
 .tip .tl{color:var(--muted);font-size:11.5px}
 
 /* ================= misc ================= */
+.backbar{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  margin:0 -4px 14px;padding:10px 4px;background:var(--plane);border-bottom:1px solid var(--line)}
+.backbtn{display:inline-flex;align-items:center;gap:10px;padding:9px 18px 9px 12px;border-radius:999px;cursor:pointer;
+  background:var(--magenta);color:#fff;border:0;font:inherit;box-shadow:0 2px 10px rgba(214,17,127,.35)}
+.backbtn:hover{filter:brightness(1.08)}.backbtn:focus-visible{outline:3px solid var(--s1);outline-offset:2px}
+.backbtn .arr{font-size:22px;line-height:1;font-weight:700}
+.backbtn b{display:block;font-size:15px;line-height:1.15}.backbtn small{display:block;font-size:12px;opacity:.9;font-weight:500}
+.backhint{font-size:12px;color:var(--muted)}
+@media print{.backbar{display:none}}
 .backlink{background:none;border:none;color:var(--magenta);font-weight:800;font-size:13px;
   cursor:pointer;padding:6px 0;display:inline-flex;align-items:center;gap:6px}
 .two{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:18px}
@@ -701,9 +859,7 @@ body.gated{overflow:hidden}
       <div class="mastside">
         <img class="mastlogo" id="mastLogo" alt="ASCEND Curriculum" src="">
         <div class="mastactions">
-          <button class="ghost" id="loadBtn" type="button">Load data file</button>
-          <button class="ghost" id="photoBtn" type="button">Load photos</button>
-          <button class="ghost" id="nameBtn" type="button">Load names</button>
+          <button class="ghost" id="loadAllBtn" type="button">Load data, names &amp; photos</button>
           <a class="ghost" id="logBtn" href="https://forms.cloud.microsoft/Pages/DesignPageV2.aspx?subpage=design&amp;id=YZ3odw9XsEO55GNPRi40uOOTNvWX3itIuGr2h3RZNNZUM0tRSzZXSzE0QUhYNkUyVUVGREg1VDVJTi4u"
              target="_blank" rel="noopener noreferrer"
              title="Opens the access-log form in Microsoft Forms (View responses). Only the form's owner in the Office of Curricular Affairs can open it.">Access log &#8599;</a>
@@ -720,7 +876,7 @@ body.gated{overflow:hidden}
     <div class="notice sample" id="sampleNotice">
       <span class="ic" aria-hidden="true">&#9888;</span>
       <span><strong>Sample data.</strong> These are computer-generated, coded students, not real records.
-        Use <em>Load data file</em> to replace them with a registrar or assessment export
+        Use <em>Load data, names &amp; photos</em> to replace them with the Office&rsquo;s build
         (JSON or CSV &mdash; the expected shape is in the comment block at the top of this
         file&rsquo;s script).</span>
     </div>
@@ -861,8 +1017,8 @@ body.gated{overflow:hidden}
         <div class="cardhd">
           <div>
             <div class="kicker">Assessment types</div>
-            <h2>Class median by assessment type</h2>
-            <p class="why">Median percentile for each kind of assessment in the current filter,
+            <h2 id="typeTitle">Class median by assessment type</h2>
+            <p class="why" id="typeWhy">Median percentile for each kind of assessment in the current filter,
               against the expected 50th-percentile reference.</p>
           </div>
           <button class="tv" type="button" data-tv="typeTable" aria-pressed="false">Table view</button>
@@ -894,6 +1050,29 @@ body.gated{overflow:hidden}
       </div>
     </div>
 
+    <!-- students not moving with their class: they belong to it and are counted
+         in its standings, but their record has a gap the class's does not -->
+    <div class="card" id="offCard">
+      <div class="cardhd">
+        <div>
+          <div class="kicker">Progression</div>
+          <h2 id="offTitle">Off schedule</h2>
+          <p class="why">Students in the current filter who are not moving with their class: no Year 3 clinical
+            evaluation on file (Class of 2027), no Step 1 on record after the class&rsquo;s Step 1 window,
+            a failed Step 1 not yet passed, or repeating a phase. They stay in their class&rsquo;s roster and
+            standings; this list says why their record looks different. The reason is what the data shows,
+            not a decision &mdash; an MD-PhD in the PhD phase is off schedule by design.</p>
+        </div>
+      </div>
+      <div class="cardbody">
+        <div class="tablewrap"><table class="grid" id="offTable">
+          <thead><tr><th>Student</th><th>Class</th><th>Programme</th><th>Why</th><th>Standing</th></tr></thead>
+          <tbody id="offBody"></tbody>
+        </table></div>
+        <div class="empty" id="offEmpty" hidden>No student in this filter is off schedule.</div>
+      </div>
+    </div>
+
     <div class="card">
       <div class="cardhd">
         <div>
@@ -905,8 +1084,15 @@ body.gated{overflow:hidden}
             standard in each, and either domain below the 25th percentile is a Monitor, below the
             10th an Academic concern. <strong>Standing is relative to the class</strong> &mdash; a
             share of every cohort sits below the 25th percentile by construction, so these bands
-            are a prompt to look, not a determination. A failed block, a remediation, a clinical
-            evaluation below 3.0, or a Surgery CAS exam below 65% correct is what makes a standing absolute.</p>
+            are a prompt to look, not a determination. In the knowledge standing each NBME exam
+            counts three times as much as a module's quiz set. A failed block, a remediation, a clinical
+            evaluation below 3.0, or two or more Phase 1 NBME exams below 65 is what makes a standing absolute.
+            One Phase 1 NBME exam below 65 is a Monitor, and a passing retake of the same Phase 1 exam turns a
+            concern into a Monitor. <strong>Clerkships (Class of 2027)</strong>: an Academic concern is any shelf below
+            its Clerkship Information Sheet pass mark (5th percentile; Surgery&rsquo;s CAS follows the shelf), even if
+            the retake passed; a clerkship grade below Honors; overall performance across the ACGME competencies
+            below the class middle; or a DO Week overall score below the 70% pass mark of the clerkship direct
+            observations. An Incomplete is a Monitor.</p>
         </div>
       </div>
       <div class="cardbody">
@@ -918,6 +1104,24 @@ body.gated{overflow:hidden}
         </div>
         <div class="empty" id="rosterEmpty" hidden>No students match these filters.</div>
       </div>
+    </div>
+
+    <!-- across classes: not filtered to a class, every loaded class pooled -->
+    <div class="card" id="predictCard">
+      <div class="cardhd">
+        <div>
+          <div class="kicker">Across classes &middot; all loaded data pooled</div>
+          <h2>What Phase 1 NBME results predict</h2>
+          <p class="why">Not tied to the class filter: every class with the data is pooled, and each class is
+            shown beneath as a comparator. A Phase 1 NBME failure is a first sitting below 65; Step 1 is
+            &ldquo;on schedule&rdquo; when sat by the end of the class&rsquo;s Dedicated Study Block (legacy Class of
+            2027: by 30 June 2025), and &ldquo;late&rdquo; otherwise &mdash; including no Step 1 on record, which
+            delays Phase 2 entry. A student with no Step 1 on record who is already in clerkships is left out of the
+            timing rows: their result is missing from the USMLE match, not late. A shelf failure is a first attempt below its Clerkship Information Sheet pass
+            mark. Small groups: read the direction, not the decimals.</p>
+        </div>
+      </div>
+      <div class="cardbody" id="predictBody"></div>
     </div>
   </section>
 
@@ -932,9 +1136,9 @@ body.gated{overflow:hidden}
 </footer>
 
 <div class="tip" id="tip" aria-hidden="true"></div>
-<input type="file" id="fileInput" accept=".json,.csv,application/json,text/csv" hidden>
-<input type="file" id="photoInput" accept="image/*" webkitdirectory multiple hidden>
-<input type="file" id="nameInput" accept=".csv,.json,.txt,text/csv,application/json,text/plain" hidden>
+<!-- the fallback for a browser without folder access, or a shift-click: the
+     viewer picks # Confidential (or one dated folder) with an ordinary picker -->
+<input type="file" id="allInput" webkitdirectory multiple hidden>
 <script>
 /* ============================================================================
    ASCEND STUDENT PERFORMANCE DASHBOARD
@@ -955,7 +1159,11 @@ body.gated{overflow:hidden}
                    // where the code-to-student key actually lives. {code} is
                    // substituted if present; without it the code is copied to
                    // the clipboard and the document is opened to paste into.
-                   "lookupUrl": "https://sso.example.edu/key?code={code}" },
+                   "lookupUrl": "https://sso.example.edu/key?code={code}",
+                   // optional, confidential builds only: class-level aggregates
+                   // of the legacy cohort analysis (no student rows) for the
+                   // "Earlier classes" panel of the predictor card
+                   "legacyCohorts": { "groups": [...], "quartiles": [...], ... } },
      "students": [ Student, ... ]
    }
 
@@ -966,7 +1174,7 @@ body.gated{overflow:hidden}
    name field - the page will not render one. A face identifies a person
    outright, so no portrait travels in the data either: a photo is shown only
    when the viewer loads the Office's photo folder (one <code>.jpg per
-   student, Confidential only) with "Load photos", held in memory for that
+   student, Confidential only) with "Load data, names & photos", held in memory for that
    session and never written anywhere.
 
    Student = {
@@ -980,6 +1188,8 @@ body.gated{overflow:hidden}
                                   //   Optional; omitted when the extract has not
                                   //   been joined to the advising roster.
      advisingGroup,               // advising group code
+     offSchedule,                 // optional: {reason, kind} - why the record has a gap
+                                  //   the class's does not (Off schedule card)
      enteredWith,                 // optional: the class the student entered with,
                                   //   when they now progress with a later one
                                   //   (repeating a phase). Blocks of the earlier
@@ -1088,6 +1298,18 @@ const SITES = ['Mount Sinai Hospital','Mount Sinai Morningside','Mount Sinai Wes
 const SKILL_DOMAINS = ['History taking','Physical examination','Communication',
   'Clinical reasoning','Documentation & presentation','Professionalism',
   'Patient education & counseling'];
+/* the domains shown as ACGME competencies - the same grouping as the
+   clerkship analysis (TA_ACGME) and the Phase 2 paragraphs; the Phase 1 OSCE's
+   patient education & counseling is Patient Care ("counsel and educate
+   patients and families"). Medical Knowledge is the knowledge side. */
+const SKILL_ACGME = [['Patient Care', ['History taking','Physical examination','Clinical reasoning','Patient education & counseling']],
+  ['Interpersonal & Communication Skills', ['Communication','Documentation & presentation']],
+  ['Professionalism', ['Professionalism']]];
+/* a competency's score: the mean of its domains on record (student or class mean) */
+function acgmeScore(domains, ds){
+  const v = ds.map(d => domains && domains[d]).filter(x => x != null);
+  return v.length ? Math.round(v.reduce((a, b) => a + b, 0) / v.length) : null;
+}
 
 /* NBME content areas, as reported on CAS / shelf score reports. */
 const CONTENT_AREAS = ['Cardiovascular','Respiratory','Gastrointestinal','Renal & Urinary',
@@ -1097,6 +1319,12 @@ const CONTENT_AREAS = ['Cardiovascular','Respiratory','Gastrointestinal','Renal 
 
 /* Percentile checkpoints used across the page. */
 const CONCERN_PCTILE = 10, WATCH_PCTILE = 25;
+/* NBME exams weigh more than quiz sets in the knowledge standing: each NBME
+   exam counts CAS_WEIGHT times, each module's quiz set once. */
+const CAS_WEIGHT = 3;
+/* Phase 1 NBME exams below the pass mark with no passing retake: one is a
+   Monitor, this many or more an Academic concern */
+const P1_NBME_CONCERN = 2;
 
 /* ASCEND mark, shared with the hub gate. */
 const ASCEND_LOGO = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABEwAAAMlCAMAAABeg5aUAAADAFBMVEUdIyIGndsqLVwJjtAJXIsPL2cYKWQLUHAXTl8PT20NZKEIbqAPVohtA2kGGB8AAKoLkMyUB2+zBYggHGQIgrpyCVWgAF7/AP9ZCTcMOoAJhbgGQlymBnqDCWIAWf+qAAC/AL8FJj4YYyL/AKpVAKoTET4A/wBVVap/f/9/AP9qagBmaWgAv78MgrkAmf9eCz5VVVWqqqr/AH/AB43nAa3//wD///8AAAAAmf4AqOwAR4whHnEAZ6kAdrgAh8kAVZgAl9gKOoMSM30YLXkAXaDMAJgA//8AAH4Af38AfsAAPn4AAFQAf78jIHd/f39RU1VydHUAVaoAAP8dG2UAf/8Jg9IFhbkAVVUbLoEOV44bJWcEBg0ZF1YIjeINaawXVXgQFDoXFU0Aqv8Av/8ZF1EPRnELe8gNZ6cBs/YLecUER3QONVUGZZUxAAAPFy0Mc7kWFkgDAjoOWpQMFTMODTQFNmkLc7cOO2YHOVEQFjAMDCkaGEoLJjIAZswNSHUBPj4HeLIQDjgPKUwIKEsPFhMNDCnZAKITKUgIKEkGNVAiHWcFOlkXF0u/AH8VFkgOYpv/AAALKEoQVngeGmIMFjoLJ1W1BIkNJTcQEDg/AH8HJTk9AD0BCg8GU3oHRm0FJTkNbLEhG1kIKVgOTYQGV4wKR20QVoYBZZgJZpIDRogLSGt+AAAMNk4JJTcZGUcKWI8AqqoLKUoINlIIR20Ld8MRDjsAmcwKVXdTAAANOGoAP78RKmYRNVAMZJIDNFoOYpcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYQlyAAAAwHRSTlMW5RWiqadhoxleZOYuClUDbZ7q0ZtSBAEd19bUzHADAwSeBwMDwgEDAgIClQR5BUEDAwKk/wEBAP7+/v7+/v3+/v7+/v7+AQIC/gQDBP4DtpUDAf0D1PMD/lCEL/H0jhRrzwMEqjHKcv2y9Cn5BxetjgdqUXjLky1tLi8wGQVLBc2KJ6wRS/4XkLClyE0EcW4BcCvJjcybLKkEbwRG9M+PqVnvS9SQNQXRy24CTlEbkANSkK+WpAXPA08E0BiQ8VOf1aooAACN2ElEQVR42u29iX8U15X424gdY+dNMpNkkvnN/tvfvl2VUHcLgbsbLfNetyQ6REskIRBoRcgIBGKJEAECYbHhKSEGe9jDEtYYbGPzr7261S2pqruWu5x7q7r7nM/vM78klqur7vK955x7lhhBQYmoZMnhHfdJGw5EhUgMhwAlsiw522UkDpv/PwrCBAVFXDKEdBn1RmIeaYIwQUGRkHSKsqS+3uiaQJogTFBQhCWXGt9PWWLSZK+lpaAgTFBQRGSQTBZYgjRBmKCgSLGkb4klJk0mx1M5HBOECQoKv+y2s8SkyZckhYOCMEFB4ZavyHC9Q4w+pAnCBAWFW46Tg/Wl0kc6cWAQJigo0iyprx82/3cUhAkKCru0kV31bnIZaYIwQUHhYsmJXsOVJruQJggTFBRmyZI9HiyhNMGkP4QJCgorS0YTXiyp7z2BNEGYoKAwsmTWmyX1RmIPacFBQpigoARKhkx0ebOE0mQUk/4QJigowSxJje/1YwlNIZ5DmiBMUFACJJcan/RnCSb9IUxQUBgkRfYHscSiSQppgjBBQfGRQfJlMEtMmnzwNpXG0UKYoKB4SaczUdiHJvsx6Q9hgoLiKV+RvnpGMfrIbhwwhAkKiqu4J/chTRAmKCi8Ng4HS6wUYixIgDBBQSkXr0RhbzmINEGYoKC4sOR+r8FNE0whRpigoDilxSdR2FvuYNIfwgQFxSG+icLeTtjezUgThAkKioMlZ7v4WUJpginECBMUlBUJShT2SyHGnuYIExSUFZaQvWIsoSnEZ/FOB2GCgmJJermjsBBNMIUYYYKCUpAUmRRnCaXJOEnjKCJMUFAYE4Ux6Q9hgoLiK8yJwj40mUS3CcIEpeZlN3uisA9NXmPSH8IEpeb1koP1AGLMIE0QJig1LcdhWGKlEH+Fw4kwQalZ4U8UxoIECBMUFDeWnOgFgwkWJECYoNSsZMiehAEHk/pdGFiPMEGpScmSw6AsMXrvYygswgSlJlkyD8oSkyY75lI5HFiECUrN2TixLmCW1A+3oGaCMEGpPZYQaJb07sJhRZig1JzkmLqA8pUi2INF1xAmKLUnkonCbqnDs8gShAlK7clucL1kP8F7YYQJSi2ypA+WJfUzWCAJYYJSkywZBmbJMBnEO2GECUrNSScZBr/GwZRhhAlK7QlcovBSfXq8xkGYoNSiQCYKL1WnR5YgTFCQJXiNgzBBQRGRDNnTCwqTPrzGQZig1KK0CHUU9r3GwdQ+hAlKDUoWliV4jYMwQalZG2cCMrnPSJzA2moIE5TaZIl4R2HXa5xRvMZBmNSa5NBHSEchNQ7Kkv3UBYOCMKkxluCNA3zRgRlC8ri2ECa1pt3P7d2FCnlKtqNw6ZVwKo1rC2FSg56C3j21HlmVgkwUNuoPkkFcWgiTGpO05XU0EvO1TRPQogNG4g5e4yBMatZTYOxdqGW/SSe5DFlUbRRZgjCpRe2+WJ7Q2FvDRj5oorCxf4LTA5XD5B2ESVVp98ZkzZr5DyCT+4zJt/wWIyoyCJOq8hQYfTUa+w2bKNxHUnz2YoZMnMDEYoRJxWv3jpJiJk3+viZZApkovIlbv0uR/fV4NY8wqXSWbCrZCZfN/63WBLKjsEhmH41vMepPIE0QJlWm3e+qOesdMlHY6DrMzYRifEsvlnZEmFSZp6C31vRtyERhY+8E9+gtea2MxGH0myBMqspTQENhW2qKJXCJwsYkf4HGr8iz5UC3UaQJwqRCtfs9rtp9bZ2QaQKY3CdQoPG4LVbO6JrDzECESUWyZN7DU0DXdK2EwqbhOgobtM8W4WbJLsfIY/I2wqQSWTK3w/C0/MdrJRR2ECxRmF7jcLOk1GtV00HICJOK9RRM+Xgdjf1vayMUFi5RmPbZ6uRnyf0yr8sV7CKKMKk07d7X62jMmPus+gUuUdjYO8d/CZYlh3tLf994XRMjjzCpIpaMn/LfRTURWH8cLFFYqM+We3xLzaY0IEwqVbsP9joerPrgNcCiAyJ9trLkrKuliTRBmFSUds/idTxY5YH1bWWpBFr7bPnEtwxjCjHCpMo8BdUdCttGTvQCuV5FMhDSKbLaqFWOI0yqhyXDjHed1ZwsQsN/DRiWfC2iSPgXwn+PaToIkwqQ44wsqe7w7hYwlnTNi2z8QV+vlYEFCRAmFcGSXRyH7lyV0gQsUdjYPy6SybSbzPj/fC8WJECYRF+738UVPVGd4d0Zj4sUXX22dpM+hhg4bAaIMIk2S+5waffmwZvKVSFLCBBLRK5x6J30cE3bmAiT2vQUGJPVd02ZTr0FKTpg9B4UigjpZCqEb3RNIE0QJhH2FPCXJzT6qi68G6ijsJH4VAi0rF4rTCFGmESZJYsi2n1flekmQEUHaJ8tER8pu9eKeqzSuGwRJtXkKaiuEKrAixT2bJwWoVlgj5UzJqvRY4UwqQqWiHoKqinowWRJiNc41GuV4PJYYQoxwiRykkuNC3sKqijoYTdzyB5wn60lS5MvvgWT/hAmVeYpqJ6qsMdBWGKYlp+QxpAls5yWJtIEYRJBlsh4CozE2aqgSRt5H1pmn6ileRlTiBEmEdPu5UqKGV1ian3UWHIHJBtH7BqHZFJCXqvLmEKMMIkUS74zpC8vKv5igRYdMECuccS4Khrfgkl/CJMoeQoOQuyhCr9YaPHoE8TbZ2tc0OIT9lr13kGaIEwiIp0ALKl8VyBQonCfqL0nbmkavfeRJgiTiGj3u+pBpKJpkodJFD5IBHuAyMTK0TJVmKaDMIkCS+7AlCekObIV6wrMkHF5lgj12VrSDmXupDGFGGESEU9BL1gv3V2Vek0J0p3c6NojzhI5S9NIzCJNECahswSopFhFXyykU+PyyX3G3gnRrz8ubWkae8cxhRhhEqp4dycXNt4rUTdJAXQUNiaJqHIA4bWiN9JpXNAIkxC1+4kuQJaYS3rV/QoMXtsN0Z28T7i6CFB8y+Q49jRHmFS2p6BkSV+uPEMHoKMwzcYZFNzKMPEtlmo0iGsaYRKO5IBKitn3VAU2m/tKPrmPXuOIhuyBFcKvxqJ3CJNKkUGYkmL2O4WNlbecj8t3ATUSm4UZmiWLYF4rpAnCJCRJwZQUA8hwC1MeyDs/jb3zwt8NVwi/0iN9ECbIEud9wvNKGwWAixT63VlxlsB6rbCnOcIkDE9BXz2s9FVgsXTePkEe350X/Pl0ipwC9oBvQpogTLR7CoZh1ZL69xVYg6BFoLdHuS4gfiObgvZaWXGDGAqLMNEpneQysOv10wrM8stKs0TmGkeBpVmolYQwQZhUlqegxAU5V4Fx9HkyL+n8pB1/OyVY0gfNEiNxAqPqESa6WQK6jL8kFdhFOy/t/DS65iUYCm1pFu/TMHANYaLVUwCYKFyprlfRiqsl1zgtkWLJZCVCHWFS0SwZhU3u21WJp2E6NS57kTLzWPgah3qtdoG7S/qw+TDCRLPXEZYlXZWaKCybSvBM4hoH3Gsl6wtGQZgIaPewicISRTxCZoncRYpRL6WPtZHN4O6SPRhhgjDRzBLYkMsZUpE3kdJ9ghJ3ZLbuNwDxLeX+GywqjTDRKTkCmShsSEVshSidks5Pmo3zQMbShGYJdZdgeAnCRCtLQEMuaRvMiryIlO0TJHeNY+76s8AlqSoV6giTCpZBiJJiK1b64crUrNtk+wTNvJVRAzJkAZgliU/RXYIw0SxfQYZcVqyVLn2R0ifVVxk8UVgudA4FYSLmdRw2QK30fGWy5H6vlElxWcq2gy9v93oc3SUIE+2egmFAK/1yhVrpz+XCf6mfSCqjEby83TBJYaQawkQ3S96D5pNVZitQyZA96id6IPP7wInCFRp+jDCpbIEMuazI+oxFh4XURYp0iN5u2EThivWBI0wqmyV3QPPJvqlQlkiF/xqTku6J3bDl7ehEIEsQJtp30X24MKlKdb1KX6T0SbonoEtSYaQawiQMT8FhqKIDNCklJbKPw09Cy6XIakPiww9Kuidku5OXvw9GqiFM9LMErKOwYD5ZhoyHH1c1KNOdnGbjyPmcIS1N2SJvKAgTUe3+JFTIpbH6zyJWuqkZdW0K27zfLXORYiQOS+5d2lEYMlt7Vu5aCQVhIuYpAAvfnnksYqUX7mN3hUuT3eS1IbV35d7+G9jydpPoLkGY6Jd0Ci58+7KQBzJPJsw3oGd7iDUFpfoEGdJ7F7QkFU3sw5pqCBP9Aha+LZokvHSHYiRGwztN5YoOSNdDBPRaYaQawiQ8lgCFb9MAKRGvwUoyitE1EdZ5Kld0YFj2KsrUzXbAsURwIvK4GRAmkp4CoJBL4SRh2x2KsXc8nMvMBxIXKVQhk7w2yZBxuERh8WxtvPxBmESCJcIBUo7ENnMjhBFu0kZ2CTs/AWqrwiYKC05EihxGly3CRMrrOAzk8RNNEi6hmTEZgrVP+wSJ2xRnZS+hcoNwLDF6N4m1dKaB/Lsw9h5hIuEpuAzker0jyICyZBSjT3u6sUyfIMkCjcUxAEsUFs7WpvNg9N5BmiBMxLX7kEt5ud2hXDYZp1OkLlJmrki7jCFZsldwIgoaqtF7GBv+IUzCZYmwx8/9DuWg1vNRKlF4WMymcO5juERh0e6fS0lB9HIeaYIwEWEJUPi2cJLwAw+a6bTdJRKFQVrkfQWW3CceqbYyD0bXO/TCIkwEPAUgvVmMXuHcVE/NqHePthUtEf5rJDabKJAm+qbQI9Xs80BDffK4ORAmnJ4CkPBtuqMGRfeRVzIKDazXRBPxkD2jq0VegXoAVt5OvKZaG/naNg/GXgzER5jwSZ7MQST3CXv8/LvWGV1zes7HlHCfIOoo+kaeJVCJwuI11Uo1VJMmWAUFYaLHU+BYwq+F89v871A0nY/iIXvGzLj8C35D9iRCDhl0mYeQAgcRJhUqUInC4vlt+YA7FOOUhvNRIvy3D+D1WqAShY36TaKv43aXZXyJNEGYsEouNQ4QckkLkIhGqwZrRhpWtHDInlUQEcBr9Q6IJeI11dznweiT9ywjTGpEQBKFZXJSWDQj5aGwwonCNMxUPidOshC+vbidcHsNr3kwhjHpD2HCyBKAkEuZDjFsiW3GGqW6iXDIHm0KBMESqJJUYsXtAubhMtIEYaLWU2BfwhIdYlg7YB5UGFjfRu6IJQpT3/BzAK8VTNEBQ7C4XaCGelBzUgPCpBIFJlFYpoFtiplm6kJhM6KJwtJ9tjh0M7ZaKsLqm/+pginECJMggejNQoMtxbVg9q51Rv0JACXA3fkpGv7bB9IGfFA4vqVESxoVVyCC5gFpgjDxlwcQLOk6LKEDc92hKKoKK5ooTHMHIMqtAJWkkur++VXQPPTex6Q/hIm/pyDEJOGCZjTMpcbPKwiFzQpepNCCH50wLAk3Us2ah02BX4ul1xAmfiz5Wr43y4xMV4c2Ts3I6IIPhc0LXqQAFGgs6mYQXiuj/r1E4BxLgiElOdIEYeIuAOHb4vUZi1YW7x0KfI3pdIqcEmKJxGW4kyUQRQfkun8+ILt6Weg5gUl/CBMP7V46fFu0Nc7yebiZWzMyrSrYkAfBixRj/zjIOd1G3oO4XmXIxjoPoXULQJhEXPJkUZolXaMyh7NYMooxAxoKK5oo3AdjbwGVt5OyNdnvskyCSpeSQ5hUnwCEXEpWTxa+j4UM7ha9SBmGqZr/jUQhfJhINT4NFVOIESZKWEKPw7zMGwiXUDkIRhMxloAUaCzsY4Du5JK2Jt88GJMYWI8wgfE62jfUe6nqySbNxBPboAKoOskz7c5OB0sAOgpL2pp5zlMlhN4jCJNoy6BsorDshpIqoQLV0UXsUpbWfQNhGUh5O2prSjiC0/waKtIEYQLhKbD59eelNpRkMooBUmNazPkpuXuBdDOb80bGESzUPXAYk/4QJnAsoR1ZpDaUrGZkAATWt5ETIV7j0ERh6eQ+y3kjc73SKTQPB9FvgjCR0u7hjkOIrnVG14Lknm4Tu0gB6LMFoZvBxODuJq+F3mEXeYAEQZgQ+Y7C4h1Z4DQj+QAqoT5BcvnRJbqZPEuksqKk5gFTiBEm4p4CyJSUTpD+6OZWkkCaUPgv2DUODE9n3sqZep3iGmrvHkwhRphIJwrLp6QcB+qAaXwpTpOsyEWKeEP2MvlKmiVWFet0WPNA+6IhTWodJm3kvlzI5WvZu4zjcB0whS8pM2RcgCVQ1zhSOoEtUk1OSZLrHmgksAtxrcMkSw7LhFxKJglDWFkO2SR2SSkW5DIDVv1A3s6jNdXaQp0HTCGudZhk5bqTyx+H9D62Fw4mgpeUg48FLkSfgbUBA+go/CWRtDLapJOCsAtxbcMkQ1pkwqRofcbOUGkGc63QyX8hKn+DBaqbDcvuY4h5wC7EtQwTyZBLWmL0G1mWjMKyhF4r8PJNIMgF8BpHXjezwJaLwDwYk48xhbhGYSKbKNwn7X/Mk7PALDG3+eZUipMlffwq2ShYXIW0TgBQLTIP1D3QPF6QJjUJk7RUyKVBQz/TsjRb6AJmiVUricv+ELhIkazbAqsT0JcZlJ2HcaB5wBTiGoWJVG8W2k93UJ5m8Cyp7zvZyccS/uCKLwlYSXxTJ5DUzeT1wzRIn/rl18Ge5rUHE6mQSwg9P516OwnNEtq4hkuOCzg/YfpsgViaEPphLjUOOQ/Y07z2YCKVWkddr9J6PlAHzNLrJS59if8ixejdBHaNI1fExdIP78i/DPQ8YApxrcFErs8TRNZ9J0zXOmcY2TifvpThLjpAzTu4vZJ6LLWPZYvIyGuoHrfzWYRJDYlMojA1JeSz7uHXsNE7zOnLyHL3CaKqD1x6bEquiIsxCRDOD9U90DZE91MZhEntSKdEmBRM37pOkK51pe/Fp/LzX6RA9dlaYsmMVCbDMIAfGHwe6OUSXg/XEExkQi6NvWcB9hNUorBNuJt08ycKG5PjgBq8nG4GUxAfeh5gCIcwqSSW3BFP7oNQrYXuY4NNHL73Egj/7YNMPpErb0ev0zpDPVXc3+oERtTXFEwyMr1ZhiH2k2wJFddFzHmrkea/lL0Mqb/LJQpL11RbZgmk48pYPYc3OTUFE4nwbaAihVQzCtnEoYFafM5PwAKNAPbFDAEpxr+5F9TE6SN4j1NTMMmTs6JhpwBJwgWaAXStcyziZ/yLmLcaPozbGca+ACgio2AeaDkKNHFqCiYZ8ZQuY/8CxFUGdKIwDdziXsS8zk9j7xxkxWSpRGEjcR8iAQZ4HozV79DEqS2YyIRv94FcZUhoRh6IE7it5WbJJKgC3yKTKAwSqUbn4R3oPMyMYw3Y2oKJePi2lQSSgVjDU3tBg9WGBbb5cd5ALdBrHMmiA/tBmA7TPXBFWXpPMFKtxmAiHHJJDWKIjJS0ZGIbiJ3OfTE9DBqGlSeLwvvYgLlOk04KKlWWRtHEqTWY7BYtOgAT1SBbQsVlES8KvBan8xOgzi2YbgZVLBJ4HmYItuCqNZgIh1zSqIZvIN5AMhnFxfrIirCkl4slX4OyRMZrBXalBDkPVtWHPPKjtmAinobRB7RadsuUY3I1cTICLOG6EDW63oGeujI6AUykmsUSuHngT4lCmFS+iCYK00h1mPgB0ERhQTu9hZMlk8CXFDI6AVRM2FeQ8zA5jiZOzcFENOSSFvCAKeu5GzRBtU/olOYNrpgBbgWTEt7H8t0/FcyDIXSZhjCpcBFNh4FrpwuZ3EcdkSK7PMt1kQJRE7F0H4sWHQCKVIOdByOxGcsN1B5MaMilyDI2Jt8CqfkPIFkiGNef53J+UmLBlloXTxSGKfwgo6Gq9OEgTCqLJYK9H8GitUCT3QWvItN8LAEt0CinExgzUNYE3DygiVObMBEMuYSpv2PJoKBm5HUVKUI4vosUyD5bSyzZJbFtM2DzAJgSlUNs1BpMsmReiCUwScJUWriLrSp4K64+QZB9tpbsvDui2xbM3GoB6+xsnMLSJbUIE8FEYWP1n6GOZshk90lRO52v4uoMdCAWLR5i6KWn2zzAsMQqXYJ5fbUHE9GQSzAz3dyV81DdJ3svi74VX5AL9DWOOE+NSTAvZ6dEUlCZrkQwr6/2YCKa0jUMlgaaJws7gFjStUfUifMV+Y7j3N0FHdQpaGkCRqrx3mUpyNTKIkwqXITCtwFdr4AdhSUOaZ5UAnqNcxx2EjoFi4fQ9oFQXk64ROHXb4WmIVVDMSnVCZNBkfBtQDOd5KASVGWuIts4LmXhr3GEy9sZiT1gWMsNwnQnNxIHxXTWTnK4dly2VQkToXQY0GAkMJYkTgjbHm0cXUCNveDuAFGdALTlF9A8CJ8zX5m64UFojQ9holE6hXo/9gG2muokr2FYslq8AC1X+O8kuG0vrJtBtvxKAc2DqKVJA2+pL6oNYVKxLBkWsCYuA95kACUKS0VbfsNzIToMf00xKJgofBnwVWDmQbx0yVLwb63QJFaFLNkkZE3AWbZAXbGtopGigOMIrqCbBbw2h1gRFxpgOgi4EoZBTBzR0iXLQfy9e2rjSjlWfSzZJbBe5gFZ8pUAzVx9OGfFXyrLXg3f6D2hgiUzQtHHkPNwHKbogPBl2kpxOyNxuCaC3aoNJtTraHBvWwK4nWASVOUaxXFUYacHbxs8S4ZFWAJVJxNuHiQszTby6bLPykiM1kK8SZXBJCMSOt0HGUQOk6BqJZQJq8bp1DjrRQro3YnkPp6J3DxYl2liES/O4F+jK1YDFWOrCyYCaRhG/XvR9eKhGQEkqNKWUxL6fuoK60WKMakgRPO4yD62IgYjNg9Crc6WVqIz+FfB3TvCRDFL3q3iZUkCtJsuUHJf37iMvs9xKdunYIkL6QTg87BZeh5kLtPKA/ZMmlR9T+JqgkmeP+QSqOvkyhoGSHYXjrZcZgmj89MA7rMloRMYe/8MOQ8QRQdkWpK7pZmaSmC1V0KpIpgIJAobr0G1/Cw5C8CSrsNS7mDm4Ar4Ao2FfSyim82AzkMeYB5kLtPcA/ZMmuxGmFSG5ATCt4dBtfy8YDJKSUKZXFQ/c3AFZCqSnaej3PvYAI1UE08KKjUAhW9zPTr0GH1VTpPqgUnqMWfIJWSSsKBm5PJOkr2wmSuuGl0KrnGEig5AdXRekrT8PAi2OiuKZ3E7Y1N106RqYMKdhkEjiSBPZohEYVkTh935qeQaR0gngM5XBugoTF9JfBr87MzhqqZJtcCEO+QSvGPBIEAnW9n6YuwXKSqucYR0M9o98BvIlwDoKCzVknw3WePz6KpOIa4SmPD3fpx5C3syy3eytVwHWTmWsF6kHFRxs5BLCRQP+Q647Kx0Z2fJluRBQfzVnPRXHTDhT+mCq88oqBkBJpQtyTeMFynUI6CiYM8gt31BNy4s1aTnQXIaOgN7W1cxTaoCJrzh25Z/DdjKkk52lza7WC9SgOPDJHQzeX66zEOol2ltgUmeRu+eqqVJrCpYsotzDY9GpmvdsolzUNYhyhrkYuxdVLKa+XlqnJoA7/h1UNLEGZayulYShf1ZnkWYRFR4w7fhm8XKs6TrvqyqxHqRAt9nS9TSBCxBD8USSU2pjcnOrN4U4sqHSYY3fHsGeg3LJ6jKd4lhvkgB77PF5nd0j+VPR2seJKeBNZnC2DFbnSnEFQ+TFr6QS2pPRGwNQ/TCTqfIKaZReKYm3YxbJ6AlmYAdN23kjkxyn/Q0ZEkLY5CN0TVVlSnElQ4TzpBLWicEfA3vkUp2NxL3pW80cmxBLgr6bAnylEbnATtuvpHrAirdkjxD5pgD9qo0hThW6SyZ4OmbJ1knxF0zkktQlaiZsSJsFykUW0p6uDzgKYSvKP5WJCmoJK9Pahr4AvZoCnEaYRIxfwlXyCVdwy3RWsMgXki24AoFfbaWeMqrE2wCj7/NSnZ2lm1JztsliNIEYRIplnDOIHwMuWSisEzNjBX5iim4gl7jKLlEyJLDXHoJTbCENrZ4bAyPlE+pachxB+wZX1Zfmk5Fw4QrpQs+2lI6UdhY/Q7A7jgeGHRZuMZ5rOYKgTdRmN6/QhtbaSLT2RnA+N3NnxBUhQUJYhXNEo4ZVBH3KdcV25DWrYvOT6aLlGFFRnqGTPDp93unwI2tdEqio7A1Dd/IskQkAHq42pL+KhgmXDNo7D0L7zCQSlC1dGt5q+sB20XKJjXXODxNNRRFqtF5GBefByMh78D5SjCIv9poEqsNltSrKN8hx5K9IDH9beR+cJ8g2IaFJbrZKR4PeO9lBQrSoESiMES9OfHOgVWW9FexMOGbwWcKynekpJL7ZsYhFhJTorCyaxxOr1WhDQ2BZ4nEPLyWT62Q6RxYXTSJVSxLDvIZFCo0IwkTZxNICQSmi2nasuW5KpbwJPwriFSTmwcrr092GqQCoHs3VxNNKhQmPEUHVFwf0Dd4Vh+mbl1gCcNFipoCjSJ+x8lxBSmGEl1ApYtkFlhyQir8uZq6EFcmTHhOA2N/twL6SyWovh4H0fYzZIHhIqVPWSs5Tp1AyYvIzMMkQPZ4G9mTqJekSRZhEqI850mHea3iYH4grttSEwdkV6UZglysvEZl2uFwPZepqeA+SdzGgEivFAn+LVeP5qom6a8SYcKRDmOA12csskS4ky2Y0ZVOjQdepKgq0FhgyWX9hl25jdErOg33AeAm0tmj/E2qpgtxBcKEowenmqZ15hoW72Q7CVWZieEiRY3HU0AnMPZPqXiRNuHOziDplUBd14zVKs47hAmblXyWdQYVnYe8ySjQunXRYTETzJIJlSzhGIM+JT5g4c7OQNOQkQrid2RNVUcKccXBhCMdht5jZFSsYVHdFrCAMkNvD4XXOOZz2X0FCupRyc2D1UJQ/oXSZHwvBEusmRpEmOiXNEdq3YwSlkgkqMIVn2W5lFV3jcPHksR9JRltwh2Fjf0gRW1yAN2+ll9ppioKElQaTJhTulQkCVtrOCWo2wKaOAzhv5bnWZ3XqmUVe1GxeSW2lvA8QNlcg9Jd16ouhbjCYMI8g6rSUdIpQd3WCiUHgltwoJYiz7OAbqbI1hKdB7mW5Jy6IY98p+zaDWHioZewhm8bXWrOQyLaFRvm+mDZ+RlK0C+/10pNUpTEPIDV7ewEZkl9/eXKD6yvKJgwnwaqmsOIJgobkPcZlCVGAEvOqluZHEVc1CRFScwDUHqlTKKwX9JfJ8JEm/w98wyq8j0K6rYw1RmLEpworKxAY8HSZC4eouhmXngeLDcayLo4roAllCZZhIkmYZ1BumYGSZRYsn8WblNlgwO1+lSGVO5mti/gOyfa5iHE9EqIrmuuJ877VCfCRI90Ms6gOn+BmG4LVJ1xmSWBwRWXldxiLe/j1wa7eqjmpBXUC8Bij1WwxKA5ZDmCMNEiLD2hCy42VWGfgizpBTRxgoMrjN47Ki8Z2b1WSmqqFefhssg0XIbqiyrbdc39BNxFKj97OFYxLGHs8zQzrmhSxM4jmAL0KywJcH6qKJstohMYvZtVvYfQPADGHmelE4Vd1JIZAhY3gDCR9zoWZViVv0BsDdf3PQZ8n8CLFFURYtws2avsOokvKQjcxJHtula9aknFwIQxpUvdVaRYorCROAiZEJoLCq5QdiNeEPYiLpPK3kNkHiBjj2EShcvVEkIQJrpYwhRyqe4qUqyjMFAB+mUJDK7oI2r6bPHqZsrUQ6FiRFZLciD3DVSisNMAq5Zaa5UAE8aQS3VXkYK67Qzs+wQWHRhWmsnOWojICqoh0ZkHyNjjjFTXNXel6XH1lJSuAJiwzuDMY1WEz5PZLkPAxAHVEwKCKxTVRbTpBGz7WKF6KDIPRv13cAd/GjBRuCCr95BUJ0GYaBOmNAxD4bksotuCVD53Oj83hZHYyKsTGPvHlZ20AvMAezGfgkwULnbaGCQEYRIxllC7WNELCHUUBjZxzIf5s0Rdny0+v2OfOgeAwDzQi3m43bobliX1qw9XS73GSoEJ0wzSvaTqXE4PcneyBYyQYnN+0j5bKtuvsHqtFNWQsSQn0FG47y2gJxi26ICRGCbV1Rw0+jBhmkGqWytD/CC3nQwYIbXCEj/npzGj9kKAUSdQGzHHPQ9AneGXBDRR2KjfP1plakn0YcI2gyr30m6uDpiWgN8qZQICuIetcpbKhLFAodLCB/zzQC/mByFX4kFIteRg1aklkYcJS+9HK0k4p24N9/Geh8PQaPN3ftJ6zWq9eIw6waRK9YjfxoD1Wj0ATO4z1ZJZMpghCBOdwhImZfSqvMbYzZtUZpk4OWCWvPNjicoCjRyWpsJINUsv+I4T6QdBXwcyUdiKnq8+tSTiMGFiialbDypcw7y67SR4tyn/RGGVfbZ4WJJQGuXC252cIn036Eq8X29AqSWvJyAabSBMOGfw68CQS2NS5TUG73kEmQSywhI/56e6ggtcXivoxAFZvWAS9uhvgUsUrpqkvsqCCVM6jFLduo3c4TqPrGAXYO+N/0WK2gKNzLoZfY1v1LLECBHpcInCVgmkKqg1UGkwYZhBxRHkvJ1sjckJ8OM5l3rr5/zsU93zuo3JvlCdYMhVjIi2JE/BrsSzQMl9Va2WRBgmDDOouBBQCx9LQJNAlsXvUlb9NQ6jB/yg0gRD3nmAvpjn6uzhP1B9hHQSgjDRLPngGYTMBpXXbcGaOzE7PxX7PFl1M8VI5+xODu+1yqWAOgpXU62BioIJy2nQN65yarJkvovrPFRxqeTLkq49qo85Fq+Vag8wn41hATYHzJL9Boi3ZLi6kvoqBibpwOQ+K0k4o5JmMS47WYnzwu8ixeiaUx2rwKSbfan2tOWzMYz9c9CAHYQpOkDRnxIcqM7nCBOVM6iyAE+RZnuNkE0cctwnYM6YVK4yZxi8VoqRzpsoDJ+yLJBM4RUV3SbO006EiYTXcSao/eVhpQOcTr3l0G0VBVkc93N+Kr/GYdEJVCOdQUN17Nj34GT7CiZRWCapr43sqpguxBGESWDIpcL6jEs049FtZ5S8je9FyrDKPlsFlgTrBLTuw3ESlXlQgfTdEInCckl9tIFj/UHF41y9MOkM7P3Yp1jF50kqo7EuKpQEn4sUegSrVnxzwTqBcqTzzINB+yVlwOdAniVG/f55CYWpeJe1qzJoEoseS4bDK8DDzxJFBpdPALfqu9ii1yqwJJXaSDVOlqhA+nGAogPUEpS4xFluBrurIiydqMEkKEyK1jpVnSTLcR5NqjmdfS5SFPfZYrU0exW7S7iKESlBOkCisFE/+WeZgL48mSjYmkbvnkqgScRgElQ2QnWtU67zyHLSq/CD5r37BKnPxmFiSdenipHOpRe8VoB03sQseLWEpMlyvBylSRZhwjmD/h2F6VbKRIYlqsLG/C5S1F/j0DuMAJ3AOLWg+qB8wDwPVsFd8DER6rpW6saRS+pLp8gpYwVM89GnSaRg8k1QqreGxLZdYZs4tAKjJ0ueKU2DYbUvZpRrR+zzoAbp8onC8kl9zmgrGqWYR5hwzKDvaWDUb1J9I2pqRoy6rYLqjEXxvkgx6lUXVSuwJMDSrL+snGis3QMp0lX06cnLJgpbt0ty0fOl8XJGlwaltGpgkiWLvixJ7FG9lb5h1m3pyyjKtPDs9KTlGifYa6U+v5DdxlBRjYoAdCenZRAk36vcb2Xa+OrV0iqBiX95wnpj72wkklGKMY3KYiw8nZ9Gl4ZrnECdQMdbMM8DvdpTALa0ZNEBy1vSKbsMht08hqkcwoTpQPbt/aghGYU5QVXReRjAktU6EthNncC/6MB+9bo2+zyoKUKRluxOTq+6ZKfquKvfitIEYcI0g6cM/+2rPBllgXEN05QURSdEJ3nm8aMzRIP/LbB4iIbLJNaOwsqQLted3OgdfiuNOK9imUafBqdZ5cPEN1FYh53OfB4Z+48qc114Jwr36bCXfeJbloKPlZfkyDDOA2xLchafFZvsPSxca8Bma3r5rUyafIUwCdTuZ/xYcli5nZ5jTFA1VGYGeSUKG/Xvdei3AYnCGsoxcczD/ndqXkaqo7BUrQEbS3waawxHuCBBLCIs6TN0m8YcmlGJjqRKRfA6kKifUcMKCtAJjP0LGhzArDZG37iaevjHybCEXrLfVEukjdGAu6yD0aVJLBos2eRXzGtcvecxxXYeGftn1U0lPZDCSSFYsvN8dYIZHQ5gtmJEqlK1vRyfOtUSWnTA328V3RTiKMDEfwYva+gWz6bbGko3VNaj6ICxX0+wkq9OYNVUS5OIzEPXqCLfTad4cp8hVQLJ/gotqwLGILIpxLEosORgqK5XhmQUldUZl1ky73ogGZNvtSRlBHitTui4RmCbB0XVqEghuU84qW8TSMHoTHC8HO2unUGYcHkK9BTzKhwGTCzpUtkC0zO4ok9P2KO/10pLvBybjQHdktzJkl5htWQW5KBJs8TL0VDoFoSJx2lghFbMq/AGTAmqfSpbYHoEV1h5MHq8VsP+KY0ZHSthFwvSleUxcHb7cuzu9zALlbHorZEYjWQKcdgw+cZvBvt0+PweMK3h3k0qXTceQS56jDwSVHjhOx3xcoyJwkry+oosEUwUNihsQa74cqx3WUZiLoo0CRkmPiGXGpKEi2u4N2QTxyu4gv7qAz0s2eV7c6IDaL7BFRryGLx8VhpqDdj0Q9bY22imEMdCZsm8d6lTHfn25DmTbvtarbnlHuRirJ7Q47b391od1hLXkA1KClJr4pg786hQQk6hBBKUrTnDUYxfwyVnRcEk41OeUI/Pj0W3tUp55ZWyxG0RaUhtXGKJd6KwsX9KC9BYEoVVetBEu5MbXSfAZokv9jaKBQliobLEcwa1lDoNLKGiJ4rc40Dq06TI+ib39ekBWpa8Y+keqOxdzF0p0lHYKoEEtTZ44+XMw2YQYbLiKfDuCd2nxeeXWar+HUZ1xhWWDLvnYOjJNvcrhE/3r47TjyFR2EjcUehBE0sUNvbeh+ObXzNYz6S/FMKkyJLBcY8Z1OXzy6xU//arUaj2bHbNNtfkMCJWgUJvr9UJPWkgaYZOpPAtyR08F0gUNnr7AI8ZkcYaJk06ESbFGZw0wqrPWFjDPpqRrc6NWqwdd2fJYU35Fz4Bl5q8VkzzoNbcSokkChv79wDaofROUUA3Go5Wmk4sPJZ4lRTbO6dnEQ8G28mqTRz3A4kWIteTfeGXKPx6XFMoQ+A8qM1joP1oDX61ZBhyadBoK6FwuWjRJBY1ltTrusRIBV3EqStAb2OJy0WKJudzgNdqWFcgQ2AxItrDUKE6L9QFFCapb0kkmvREKoU4JJh4pcMY2i4xOoO71p1Q7eCii8g1j01TBIFnERddXivCciHap1Q9PO5b/kKHWiLXpCdKKcThwKTNYwY1tLBdWcNBNvFUONXwh6XawPGNwYwRXk01tnlQV7pE1PFp1E+eBbW6AoplBqcQt9U0TLzSYegi1qO1Bem2SqMallkSK1tEevpsBXmtJomuBRo4D4qxFtSP1t2BAzo6GbnGGtRZn6lhmHiFXOpJEi68QdAaVlid0WcR6emztWznhRupxjAP6kqXLNmZnInCRv3+Cdh4F9nGGhZNsjULE8+OwjO6FnGQbqs2qsGHJbpuY310AqP+oLY47YDCZmpakjt0w8OcLOnaBU23lFDsrfOlFiNCE/0w8Qjf1lQYsMCSO/W+PY01HM25VHnIHjUvdBW98bQ01fU9dZkHX71AZV5fcSXyJQoXkvrSwCz5UpIl9LprIho9zWP6WeI6g/piPoMu9a2oBuVUc7tI0ZNDsKybGR7XsLp0o28CbAzVnpsMp+MTsNZAsN+KkybRKEigGyYePaEVFwxh0Iw0RTUsL6Lyi5RhfWmgnonC2izNoHlQ7wFn7RyooNYAMEsik0KsGSZe5Qn13R/467aWidMSAkuoPqQt0aLN3Wtl1D/Td8IFzIOaluQOx+c4j+PT6LoDDzeZxhpRTCHWC5OcxzWYPgXfv/q3FeeifjuVh+xpS6rz81rpi1QL6uysoe/aII/j0zpjwOdHKPbW6w1fRyCFWCtMcq4zqPP+wP9SX1NZsfJFpKnP1pKl6e616tqjkyU+86AjyCdFXnOwxBwa+BdqA2RJNHqaa4WJO0s0xlYEXOrPjOvp6FB6kWKc0neNQ71WrsWrtQX5BM2DVbpE8eHC46ww2fZWwdA8EG6s4ZlNNVhDMHEN39YZW+Fb/dvofR9SRwdTRdXnjPfyO2p0vfoXIzL2q/eA7+ZxVqzeo8L0bSObew1QmITfhTimkyUup4G+FFnif6mvq3JyG7nfG1aCLvHqzEI7W6VyJArzoCPIp5PdwIBO6lsSiURhbw1qV8jBa/pg4p4orPH+wF+3ndGj5ZcFcNMloFE9HbwyaYRXUy1wHrR4wHkcn/sPK3kf4cYa3igxEjP3U6nagImbu0lfknBxDXufPwf1QK0sUVhjsF5BJ3CzNHWVowqeh70awo3YE4VVqSUsHYV5UdK7aS5s/6s2mHS6FB0wEps1Hso+uq22i4wsOVbCEp3XOF46waROd4mvjaFDPWTuTm7U759XoyZJJgq7vGnXMNU6c7UBE7e+eTSlQN9G8tNtdYXMZciUcxEZq6d02jhfuViahlaXDb3EOOh5i6NDPaQBe4zZuAcVLQvpROFylIybrxo2SnTBpM0tHUbr/YF3gqqG6oxeBxK9xtGoE7jdYWhrZxxoY+jxgGcZHZ9G/esJVRfU8onCTpS8f0ui0UJHC0xcXNeaD0TvIjjUxNHjtyk/kPq0ZlS42Rd0Bx/XyhLP7oGvdewIVsengloDyzIo1KTHCyWrdxESlW5cOmDiUp6QBiYN6lzDexJGuCZOWXCFFfgbsk6gMSfKkudeNoZVuiSrYSUyOT4LSX2KzAao5L6CV+eOua4iUhpJC0w6yWzpDOoK6vDWjPQFbnuxRLt9cac3zKIHvjaG0XVfx2AwOj5V1BpQwBKj9/WeKKFEB0xcZlDzgdjp1cnWSNzXFqtVsohosT2d8YqZ8uIh1sW8Tq9dJznroRfoWQ9sjk8ltQZsYzBcrSjRABO3GdTqevUqoaIlN3VZjjuDKzSHdrjpBBpL0C/xzD1RWJt6yOT4VFJrwLYMYFhiJPrOmsjLEFJLMMmVzSBt36vT7+iVjKLTxCldRIbe0A63RGFjtV6cedoYVmW7nBaWBDs+LbVEHWJFOgq7Rah1DU9EDyXqYVKWKKw5dNsjGaXwHtqY1knel/oqMlr3cbluplc79JkHXeohi7NCTa0BG0tO1MtXfI1IhJp+mJTNIA2Y1noguiaj6KrOWJTS6s2X9d7llXcUtqp36z3Y3OfB0NZX46ugrmvUDaG2eWCbaEfhkrASEokINe0wKWfJfno/qHMNexTB6dNYQaSN3C/xe2r1VaTLOgpbloXedeZejEhP8e6CbhjsrFi9R6nCyN2kxw0leyMUVqIXJuUzqPku0lzDfV5rWNvB3OLozqKzFpSHr0Bj9e6AeTDVQz0bI7jogJEYVnullCWjqwxJlOzfRQjJElKDMClNh6G5uXqh6q7bajVxSi5SjL2LmnvD7i4tHqJdO/S0MWZov4sw7Ey3WgOjas+XvGyisImS+1G7C9YHk9J0GJok3Kl5DQ97VGd8rpEl9uAKrbWgPPyOurVDDxvDSLzXpR66pZnqVUukE4WjGFaiESal12DG3neaz+TjLmUPzFnZpNP3WBJcMaO7W1IpS7SWoPezMbSULlmaA3/Hp3nmn1W8JuQShQ0TJS1RvAvWBZNS17Xu0Aq3ws3WGtYaeVpyIA3rDTl1sTS1e2w85qG+T1sQdFCFRKsyltp3yQ2+FU/uM4wELXwUeZSog0nW6brWXTWDeAUIzWgN5M+lyGrDrhTs1r2PN4UW87syD3fCq2xHXNNMS2oNzEE3EC4TrsYa7mEl0UeJMpiUzKDWfnVLOkF50QGda9gSe8heCEpBGU/79N8FZMjX5fPQdVibrZUnszuMcGoN2GzNGUMKJdEMK9EEk6yzJ7TmJOGiZpQIcw0XD6SVRWR06XYZlRYPsWoe6D7g3OZBY9kH6rPy67qmstbAsnwlmihsomQTIdp1yWjBpCQdJgTlOkvela/h15rnxX4g6b/GoX5Hh3bYu0t/B0mXedBX2a5gZ/p2cNyl4VV2Cyb3GfX735PoRqhpgkmp6/rLcd37yOVS31rDeb0ssQVXfPlW931sid9Rs+fZex50diElqXGfbl9Kaw0sS6dYF9AKCCvRAZNcyu66pknCJK33o9xKqHR9rZnxu8llxzWO5jEoKVAYgmbkUcpmQaN66Ns5sOu+jiHpFEoUNnonAcNKPvxxxcLEMYNW41jNazidGi/TbffrNj1tB1IYBkbG6bXSf5lG3IIrtJZ9COj21Teu43QRKjpQjFCDUiSvmDipUJg40jBCcL26llAZ1n0u2xYRLXZwXDtL7DylXRtCML3Lk4Joqcq0RpZ8Z4RTa8C2DE708oeVzLwjgK7yD8lP/4b8uCJh4jgNdBcstmSwPLHthO691EY2Ll2Iau6ztaSb7TfCq6nmNQ/7z+p8D++qZso69QX4rRgvcBZAw0o+JH/84cd/Q35XgTBxzmAIcQ1uZQ+mdO/mDPl0mSX7NRY7WNYJHttZsncqjNvFskB+zavBp0IirTWQ1++3YkPJOOxltWng/N3HH+uhCTBMOm1eR9q+QLfb0W0NazdxHInCM+P6eerUCfpCyVovDa7QW/bBx1mhTS0xeXWWiyXFsBLQuJfHP1n4q9+YMPnh32jwm8SAWXIwtPqMS+fR5XAqjHocSH2h8NQW30Ir7oYQil2qF2jM6/NnifJaAzb1lCu5T00/rX8hFks+/s0PP1RPkxjsDN5xVODRr1yXJrsb++e0v0WGTCwvovchOD7t8S26u/OssORgWHl9xZXoniisroFwud+KiyXFwkd/T9SwhOomP1XuhY2BzuBKOgx1vbaEsIZ3lYUl6U9GWVpE9Fo8DN1sOMyaaq7zkNCcE+Xh+DR37KIuPS3N01HY6FUTofa7FZaYuklMtW4CCBNHGkZfCHENlm5rhFFh1LGIli5SwtLNbF6rL8MgOi1sdifUnCiPRGG6HrS9yOBj5qIDRu+MmsJHdpaYNPm7ccU0iamYQVqAKIRS/G1ksyOxbfV8CMfycqIwvUT5JoQx2BRaRw27jWGEGDBYGrCnsdaA3dY0mMNKDqspMfBj8h8+tstv/k5x9FoMbgZjSzMYRgUeF92270oIW2n30kWKMRnCNY6pEywHSYVRU614qjiK3tLbtHw4dmaZWvJc3zJgKzqgsvDRj8nffPxxCU1iP3lcATCxlSc0uubCiGtw6rZWCHsYLFk6kPrC+PmMqZsZoUaqlc2D1ry+orOinCUGTRnXpywzdhRWWvjod2UsMWnyV+Qn0YdJ2nYahHIkm4efXbcNaSutsGQ4DK3AphOEEKm3NA/2RGGqn2l+DTfHp55aAzaWHGRHiaLCRx+Sv/nhx5ppAgMT+2kwHEpcQ96p286MhxP0eXBZpd4dBktWdALTxgsle91hY1gZ49nQWWLQ5aCR7Q9YWLLUmk/RO3xIPnRhiUWTf4w4TFa8jr13QjHUS9bwplA8j0sBc2FkNxJ7eTsjhJIH5RqqFbaoezG4OD5papZOpLEkChcj1JQdeD8mP/3hbz52lb9SF1gPApPlROGQthHVjFYu4oy94XgLlhaRsXciDLUo7PiW8nkIoXp1OUusWCOdozHoUny4PKzkhNLCRx96s+Tjj/+DsuC1GOQMGnsXwjHUB+1d6ybDqZq5dJGiv6dHgSXLlqbRNR9W2VDbPBhh5AR9VZJMoa/WwLJ841b0trRayadqa6h9SMb/zpMllCa/iyxMVkqK9YXUCNVWuFl7AfoVvaS4iEIK7lixNCdDa0frmIcQAgbLEoVNe++KXrBmg4oOaGjN9yEhP/RhiboUYnmYrLiuh7XXZyzTbfXfRC4vomJyn/Y+W0tj8NoIr6ba0kpYmYcwAgbbyjo47t+j+TYgQxZ9m/QYvbTwkdomOI9/Evs7X5YoSyGWhslx2w1GOIW0vyLPwjZxllhCz+NQvBVLPA1vFpzz0PdWfxy/aWdqbiBcJnnf5D56Fzyhvp/WTxxB9O40+VCJ30QWJkvpMNT1ejyUNbySjBJG6ZKlA8kKrjASh0NmSUgO8MI8DIcaMNhG7ju7BGmrNWBbBj4soSgZ1xA5x8ASVTSJyc5g0eu4P6xeQStWFi03niLhsMRaRKF5Ppd8BeHNAv3dg6Gamn9f0o+2d5P2scj5JAoXUaK+Nd/vyF99zCA//KkCS0cOJi02r2M+lDX8YOVSPywTZylkL5QCjXZLMzQHOHEkCs+EMQ8lQfz1+8/qV45S9jvFEpTsVRpWsiL/yMaSj3/zQwUpxDG5GbRc10ZYXkerHFPhPArPxFk+kPrehgPUYnwLvccKJ1KtYGPUGyEGDGbJWXsQf2JXCEDzTO4z0XaH6Cl+8LuSRGEfmihIIY5JzaDlujYSm8My1LNLui0NtgxrJxUPpLCCTpdYkrgfXifJ5QtRauKEkEiQIVNdtgDo1ws6O2qU+K3CbM3nltznSZO/Ij+5EhmYmDMYqqfAptsakxOhOR6tRRTeLcog+bTXihc8G16D6xUb48tQTM20M4h/F3z5w2D5yj1RWFnhIzf5MQdLLJr8S1RgsuQpCCdJ2K7bWsGWLeGxhC7gr0OC2ZJu9jq0WVhJCgojr69gZ650FC40ENZvc7s31jB6X4+qvwsW0UuUJP3FxGew0JulL7QYKfNnC2uYHkXp0FgyXCi93hbSPi7oBMOhzYJtHro2h3ObNrjS21pzrQGbrXnQrfBR31l9KCE/Jf/LDz8OlSbCMLF6s4TRRXd5DRc7CmvuE1d6IJmLyDgVlmJU0M2M3hPhuUuWk4JCq6CycoliqahhjIRLovDSXbA2xv+UfPjD33zMKbApxDHhGZwxwqvmVXiDwqX+THgmTjFkbyase6SCThDqLCzNg3WLE8oorDg+ddcasC2DO72Gaw01ffaWb6KwX9Lfj0OHScHrGE6uvU0z0t4nzo0lw2EZWQWdwJgML1LNMQ+DoUQHLAfeGr16SyDZme4soG0VPnqrV0eyOgqLCGRPczGYfGX1efoyvBgpk2ZUtzX2zod4KFtV2HvDS4Yp6AQhRqqtzMP+ubADoGkVm3AGorSxRjFCTeuq+JAsiOglwDQRggl1XRuhOv2+KgQI9ZEQukmsLKI9CaP3fmg0o4WIQo1UI8sdhUMD2lIAtLUaw8FZSUfhQliJ5uG4wpSQ4xEKC5dCLAIT6ro2et+H5nol5H+27lBon7h8iCwZ7aLuirBMjEFzH9NYvd3hoaRgY4TS68xuZxZqDYR0smWcBbStN0lpJuvjn8REWVLoQvzT0GBCT4Mw01OLl/rG3sMh3mFQinWFdoFRtDSNU3NhukssG8MI0dRsIyfqrcIPoakltgJ3BbfNYZPy2pU0cb2kQBOoLsQxgRm8H2p6Kl3Dm8w1FK7f0bpImQnPXUF1gjB/v/AOuwq3sSFZu99Yjk9TGTgcmhM+t9wM1ip8dFZjWMmK/KMUSwBpwg2TLDlcb4Tq9LN0295NIXpsrPDf1cZweLFypk4QrtOKFC9EE+HNQ4tVkMpIXA7xVFkuOmDUJzZNhIIS5kRhv6S/P4L4TWLcLJnvrQ/V6UdLqIRWnXHpQBok+81RCO0VqKUZVlG3JfkV1QtCDHHJFhyfk3MhxgbsLsbLqe2n5S/sicLKU4g5YdJJ5urr74S5ir+hmtFMqCaOVb25PsS9TFnSVRdSZTu7hhriPFiOTyuTIrxTpRgvZ6Jk03hIKCnrTi5KkwWALsQxzhlc6AovSbiwhkd7tbfCLkfqZCK8axzLa7VaYxduTw01RDsrbSUKT06EUGvAzpKQwkrsLPmbjyEEpG9ojI8lZ/euDjF6nW7js4lVe0K8lC5s5r4wE/5NliReh+t6NX/8XajzkKbOiq5Qag0sS+FOsX7/LhLeZPzYtaOwIE3+RSdM0mTDqZlQlYIM2bBjdcgmjrlw+sKM/c2SzfHhkHGaIZv3hjkPuRRZTa+ROnPhjYEVIdG7/1P9YSUr8iEYS6ykv3/UCBOyeU1o9RkLa4g8+CDk61C6kQ4+CzXhf/MHu0KNVKPzsPmDTeHOw5ch1Rqw6cib6utnNoeJEtHkPm+a/EQbTDIb7m0MVynIbHgWVj7ZyjtkNj4K80RM7Vn/abiu16V5CFE3/NWzPhLqdR7pTO3asXo0nLvgZZb85MMf/p+/AZS/+uP/rk0zeVcXrtOPkLq6kE0cU87WhWtjjG4IWTWj8zAa7jyMnghbP83FNh4OFyU08PU//B//H6j8lFzRBZNwY6SWPAbhSyrk389EYAyyNT4HVAajMBFRklhlvW4OZyyHLxEJnuYj8A4f/g5U/qW2YIKCgoKaCQoKCsIEBQUFBWGCgoKCMEFBQUGYoKCgIExQUFBQECYoKCgIExQUFIQJCgoKwgSHgEo675SKevlMPp+l8pyK9Z/y+TTOKQrCROs2zKRSniljqVQmk4n0pkyb7+/zj+n74wpHQZgolVzOsQmvXPnoC6d0l+zKqCUYpm3v/7b/i/PrTVkzSYX+p1fnv5i2IxPVFJSKgUmKT8LlyEpjhH8gX1x48/DUqVWrViWanJJYtepnpx6+uXV+9u340pZMRYMotg/oP//mg5+tWrWz8M6GJcUP2Llqlfn+F278w/Lbg79GhAR0feZ0b4kc+A5j+tVcLpIwqSCzhv7f8Vis7uqthyZECjtwn7uY/8T8g1U/e/jm/HwsZvv3w/+Aqbobtx6uKgDE+cbO/2a+ftfDn189OxGNt68UvbWWPrYT0JYHgcmGX/HIhrAAZu2lkxs23hrbaduGhpfYmbJz7OdPHsxZZ0TYq3xuw5NbH9D3D3j95T8wofPByMZfAb8935yrlQ0bfF91juthm98BjM47rtf/b0GP+2cVg3Z2bs6m+eSiAZOJn+/kk1cLqXBIMvfpp+vHljBisMoyUZLrP91geVDCU0o2bDY/YBXXBywpKcn1G0bhHChvTyV2RkYSb7p9LARyLs71sIeLsl1f28hME8cvjm0IKPbU/UbBYI+ZMvLz9Zvvf7pncaG4wnIhwyRPPo0bXLLvgye622VkaPO9utGfF0hiCIm1I2+er6PP01+00PJ51G0solDsC5puXq0bB4LhlVWCL6FC9o197r2iUuQ855SvIQ/kBmc3Wc3xi/t2+sMkTz76QOFgN8XHRi6Mbji5ULhqyIQJkyx5xDlX+1a911uYOm9uxIUNBZ1EVlbtvLnxV+Yzn2s1rCm83u35eXyV7MLZuX7PWXPJ5GsLJnzvum/nVXJSI0yMnZ+GCJPCk1clPrh5fvOvLKA8z4cGEzJ3k/v93yxoRsnoiZtNwipJ6divir/Zs6CzDKll39wzWbhvn/zbN409GgVo9lLNmsm+yZNtNQOTJVPY0lFu3tu8SIesJRyYZMin/Ad+/FNtW7HFRMmGy2OrYGHe9HDThC6cmL/SvfFNHPD9P7i8gZDBLMLE63FNj+Ra4PLC5H7YMLHprmPr31MmtOVDgEmKvBR45Y3jndq0kifr4wb4XOxb9XBjt46uyy0WShKgX7DPiD/baOIkjzDxel5M6qSoYJiYSkrT2Hd0bQssD2kzJzYm8MI353Qd6k9mFKCkcHw9NDdkW1rpB9BA140Pm/btA18xO2eemCobwsRD1kt59SoZJtbqSIxteiqAk5jsdn3aJPChOzdosBEyKfL0u537lM3DvqY1R9S2cTfVkiNrEkq+YN+++HdPJd6+umGyLz4qc2NX4TCx7gs/WPOE21MvCZPcyVtCB/8r9WGG5k7cqEgrWTnfv+tW1yfTtNFia9TB0DR21osbalWumexbczbzn2oXJtby2DljnpXPNcKEkJ1Crzq2QXUoacqcgqZ9qr3gxgcb1V0Hj9/7mVoYNj18gpqJx9A8kVBNqgEmFk7WPOW6ZpCDSYa8FFtUTb9Sa+ekCbm301A/BaZ5uaZbMirBaw/cOKUahuZyWS/49lUOE/OREpZ4dcCEro/EmlkOW0dSM/m3N4I79ta4SpacJN23mvZpGvCxaRlPpqfreL0WGK56OCv09tUOE2PVeXHduVpgYh03txaYbR1JmPzDzwQ/84OfqrwRJosPm/ZpG+9TG6FtNnNtrVFuoy29/VPUTFxX6D/nUjUPE3pTfOojwpisFJNb8y8F9+y+pml1TpMsGT1l7NNJb1jHSdo0cT7Q9QHm278c589sq36YGK/eomZStHV0aCZZ8lBwze8z3ijTS56T0bih92K+af24bKapffWTezv3aYRh0xv+aN7IwaQVGib7di6Klg+qKphY9343mFZITG7Ziy+prsfKaPIyoX28V70Bi65PkY/eNOldLKsexngjTv4hWjDp9oWJ4Ls+FD0goHNzPg8XJjR/ZH1MsWbSklov7JnY1/RPau5zMuTIzjCG/k03jG6SIU/H9L/9z3iv6msAJvuabggu0WqDiUXWxWDPSUzqDJ2UeTslTpOWkFhiwNhtmc7HG+NhvH38aTVrJoLP/aD7eSRg8lEEYGLEXwZWwpGASTr1VGLf7lulonpjnmzoCmu015NBeZaQ9U0hrZWPuOBeUT4TQZjsa3olFrlWlTAxEs+CAqYldnQb+U5m4Tedb80rYEk8tMFuWi9ruGVSb79rCmnd7Itf5SkwVlEwEV2m+342L2S7gsNkLBKD3bRm3D/CUQImclaOYfy1/EleFvc6+jDMwd4oR5McIWtWhff68SMc4WtXVhnVDxPRCo5VChPDmJz2fdOYhBZwVUoL2Jd4Cu00ael+E+oaNw/3/yQB55ScqictO0+w5/1FCiaGMpiYQ5KNAkwiM9DTftd+4jD5H2WXvmmRwhYX2kBe7gwX4TdlymA8D81fsuxw3MB8Q1wjMDHWdD9AmNivGbp9log4TFLkA1mlCfY+J0M+/VnYVuU98VzTltBZYs4Ic3ZbxGDSrQomiVcCpmsVw4ReWubBYXKSHJH1dcZveC8BoZP9YehDvfOJqNukhTxKhP76TevnGBth1ApM6Iy2IkycukkaGiYpskl66X4HWVkoE4XdaDwUVE2y5NHOCKwU5hupmoGJcZffdDVhYlQtTFbd9aSJKEzyqZj8F54CtHPyqdFTUdiN94RUkxZ5PQ9MtcoiTBwjwl+qvqphYukmsDDJkI3yekD8CJwLto0cbIrCSMc/EmhxlSdPP4jISjn1KyZDp1YcsFTZ7E4phklQR7/PI6WZGDStFRQmKbIe4MXWgNk5eTI6ZkSBJqbtJuD/774Zlc3Z9Ga80mDSZCQVaiZG08YrbeFqJp9HY2kvDzeNXgOESZ68GDPqpd9qbDoHFAWbGpe8C6lfEtlvij/lLoSYevzdKunRhJF6I/GSxfiMFkwCzZxVUjP6hHNGKUzqqxYmBd2kEw4mz8n7JoCFu3MjUOqwpZgIb8dVzm9papJKE+B2Kz+nJmM0WGLUrzI+mKs+zWSVzCpddfm/DSJMHNtl50s3B4WombOw3qhvqpcV4zsgF2wn2Sj2NkvgaLLJ0v9A/zH/A40POA+yLHkSN+TH0vFREv+qaegw9CExYQL6ylKfGwyTJpnBpGdelhcmTexvzwST+uiI+S5U/24BgknBQyEvxtgNkNLuaTJ7U+x9ihzZGR8bKcjNsXii8A/o/60XeeYmLtUkTbpvQoylTerrpSZl5zTDa68CfmepNw6GidRwGiP8PhOOx8dZYBItqTfWxKA0kyxVBCDeKQETapIhn+7kfp96ixiJxMNb50c3bNgQq6NyMla3YcPo+TenTKIY9UI4MZKzPHXLnv/fsmNZX/w/RU1LelKaHjK8fw3BxFymJ2KZ0GDSGkGYNBmJy7E2EJikycRIPcw7PVwAsXNi94S0kqb4m5cLrnWDHy9eeLizSWjH1HNlh2XST+KyY7ni62kyyow2EdXkXDBNKggmp6UPvvpkjKcWQQ3ApMktriMmpgg8iNcreyURuG0YE9DUEqfWF8JvUpnUSu3gXG4p0OLp+lMJkVk01i/wvPtNSYXTVKAS8Z2rVv315Jo1k6tXd8V3JpoMQ2p+HnZ3Ikwc8uj/yqiCSVNFwsQc9JOlgBWCSWr8Edg7fQdQ1SRD9iS4x6Ip/mrcWmvuYjVN6X4VF1GRx0aZL6lSZL2cTtIUj0+uOf+FLSjx8y9erZmMJ5rEFRQjERjH+zhqMEmrhcnYbCaHMHHK+rkshM8kdhNsHYwtymf7pcZfcv/wzjWxwJqW5lhNr9kp8FWbSSfbm+fI07jE4DV98NffvSxqV6nOrCmpVIGOn9/767GEME6MU7EsLEyWgnkM68603ijG81j/g/Xfiv9z8b8V/7J+5c+s/23pz5b/x8L/biQ/99dMAOQWx71jZ23AJF6aehETUgQ27AR7o8R7gFCTBW64xV8SFvvK/JNHYyIrj3Uk3yXF7ZudY99ZZaAHsycdLo68yRTz/5u+tyYueCbXB6omj1dxPTkRVyq3uv10PxCY7LxROTBhCJ4BudK5W+ckrJBmMn4eUlmShkmObOA93k+dYGx52NpGnvDv97F5to9KxV6Jr+6Hj8wtNJhxv1pvbaG+9o1r4oI35kFeEz6YGKeOqJSN876G5OkExDodI7nwYMK1+eMz/4OP/E9rkkka/gAAlMR655gIwUTA3ekzSU94G0CVn+9PE9y/+SvWp7eQp9w0SbAVGcrkZkWNnMQb2pK0zW/k8hnz2Hh0V2wn7Xzk/wWcMFlNQhMgmNQnXjKfeiHD5GZQItjnT04cvLw+GZffuzHHm8dEFIHFBCBMTDvnueyCucD3QvEb7CyhNHnBDc+XjBb2G9FZpChpSQe/Olm4J7Rm6tf4fwEvTFo2tyiUvAbNpGmMOXs4ZJgkR9uybd6y9NzpjZtuyvLklbTP5MotUD/Om1npXnh8e9LUzlJ8ms8R3kEfmWChcu6GmO8pcStGGG/Uzb96IaScxDf6/sLbLp71Xb8asgxWKJqJKWtYw4fC1kzmAjZU/mRLxpqP7k8f3ZRyf8YX7T8lApN/iIPCJL5H1msy/pDr0GXKZLNLG9nI+U0ftDDx6q7YgD3iaGxszvXEepHd5B+b/LaLywVTDTCpj/czGuRtEYfJkp+eWgSLn66XGZ43cppJmkzDwiSxS7wKc3Fl7wTcJq6fvMjpNtm5OXi7p8kNoYE0dQYuL1OWnFwjsF6Ss34353wwqQ7NxNw5qZBg0qQAJnQJ5s0PGt04Jj5A8e50WgImGfImAQoTjo/3uhnmgkmcP7mwhTzi41XiSfC66xRTTMae8GZaZ0hM4PTxt3Me1yJMAkw/O0zqKwImlCfmT598KXyjkrBfxgqYOeOnYFnSFN8gZedkCJfroV6k8mzq5Bq+MT4frGWKKSbJp/z+6gyZE6CJr2epJmHSxJhJVkkwMXFi2gWjwgpCPCYBkzz5Ig4Mk8Sj1k4pmHzBpTasEQjgbyMH+VSTkXE1isnYU5FcpjSJ8a+W5KKPNVWbMEmwlQuvLJhYDrjYy7iwapIVhkmK2cphn8KxX7EHBLm90S2e1ZJYI3AVnU5183lNkkED25rujzdxrvIEZYlQ/RdzcT3kXiZ+JYGu1CJMWMcfHCZJrpUi4DbI0OAxsWGKz3aKmzmz5h5gkaaxnWx/mGjaOSpTcM2CSYJVaCC9wNneRr5rYv+RBA3n8Ze/J2s43nrp3TeK+qrzZLaxiev3aBBBxg8mHM8KHSYJIGn6bi7DBhOeWWWBCcfzhHyQLWTxocg4Ne1cv7yfeGFyMneeDSZNTY9OMVKnKXF+XB9Mdgq1OG4hL+M8MInPBShbqcVTfFNnHk5BYan+Z89L3mVyc9H752oVJnGWqsWVCBPzuOm+tZN7oMxVuZIUGuOeGsYD1Rz2u6yT2DT2WGq98CBVzMyhds5DHpgk6vxh0kbu8S5xp+ece0+lYnc5VZP4ZiiYNP11mDA5BweTRNOaDSkGmPx15cHEtN+618ebBPi6vCw5YdKamm5k1DeST1/uZH2hnU+lLocfcn39GqEKKm1khgcmOz/0h0nn7EPueRsjMn7qLBmNc/7gI+8frFWYJBJHgoluwoTnF4FhkhANtcgT8kpgqJqWMy9ivFvqHqMqZP7ELLvWdOvfiC6YND0UctBYThMOX90NX5hkyCPeQ6ApfkQuUjjz7hXnMhlZIAiTskOyLnAaKhQmJJ86u15gRMZuFKvJxHhnZg3rd70n/9sp5hc6RfTBZOxqSuBG5CTZOBZvbIzHrf/TuPz/xRuX/t/yP6D/b+wLX5gMku+4J+2NZGhflmzkVE2S854/WbuaSeLeXLXCxFzk8w8F3CaXi7PLB5M0OTfGqJg0HiF/vMluFdyQ2Sl8Zk5CqIGnKTd4amwEPGtxjHfSGrtTkilMqYk3fD/qkzX1uKJgAipjZ4NUE06YNEYGJqTFPHD4abKmaA7zweQ5WcP6A3fNJ59mdpokbsmo8HwwaWp8AtKsR8biMK0c7gNRuojUc27V5IkPTBKVA5OdsDS59S4A65ULE7KBnOenyVixKjwfTFKfsx6oTcPkKzLPvnal7Jy7vAZDtxBNTnJU2DgZsMC5bdMx+UINrWTxJt+PXqgOnwkwTHYeCfC6VTBMTAP8Lv+IbCxMLxdMWsg9VjzEN5q2xMkxdo36pXC9NRqTyymviEzIrbTkyZMk7ys/+l/lS+U+H38G5YG9UsOaSSIZ89cSKxkmabLIrTQ33YxZuhoXTNrYrRyr7+fCz3kubLPCq+UW99lya4HkMqHBJEvec6/fzQB1t1vICb6FMrbBC7o1DRMfja3iYWJu2/Xc49VYKL0a4zpQb4yxs2HQHKEn7K91qjslvFou8K+W5AtCUpnQ1vc9zteNX4XofJgnH/FpRPHNXgo9J0xmQoVJHBomjfO+RxFfTFJiLBgmfPqkXEmPbOwh94AUSq/ywCRD1jNbOc/MEc2QX7FPY/yVaGu/DLkusFoa7y2a45YPY3nnySKvlZMcB/ll3hvpuHfSVE3DJDESoJnMJCoXJhmBAbvFfZuTYrZyEskjprqUI+84HH4PRZP9aMUyIcv30SIhJATtJEs+5X3hl1MgLZnbyGU+mHzh+SgumCSqDSb+AYSVDRNCxm/yjkehxQQHTE6Sq8xWTqGwTo6c53ifG8IXtgtiq2XnzV2jJAT1hN/K4eg3GuA04byS/t6zXO7PKgUmGRUwSYz57VdemOwJgEm3Xpik+E/nQjp7TM2xVoiJy/McwaZlJNrC/O0pwSWx4+aRPdaCy7bqW91pMjvC+Z4/B/rpk+RIcidPq7yRmNe6rHGYxP266MDChOiGCSH/zH3ZaGkPHDBJLTBbOY2FKJYMGWW/HE6sEfYxvn0occTc2vjEWgAtJ7Wt7j1jnCv3hFSKn0OO3Dp/gVV+fv7GAmomHutmMVW1MDEtCt4hG6FhUDGOU+0J8x5IFu6d02SO4wwWt3Me35I6ZMZevT/RrQ8oGbKZN0dmlIR3j+1xm3OqxmHid2EA6zPRD5MMqRvjZSsFIjtMnnNEbW4qrp1O8ohjetYLtvbLkQuyy2Vs5PKjG4WF0KLahZLiLlN0C/DX0xkeSSNMfGIr0lUKE5JbOM/L1s1cMOGIxY4vVQTLch3CdxdFnRDTAMslPrZmeBkoSjWUBU6Xyc6Nso2FUDNRIG88Z6XiYdJJ9vCOGU0xYIZJltxnfH48kZwuFjjIUwLtYGb9IzEXbI5fK3N56QJQ7n53r78wnqoueTJklNO9NbaB5KMGk8cVBJMv4uxrMLGTcZXvWDkydcAkrhUmaTLPdzu8I/HzWZJnhkmKsJfWWWl6Tf+tHTtYX+iZaKjJwsgO6YNmR/E942NffveqEF+RSWXSChb3hjgf5kZihFQ6TFJfpWBFDUx2JBpZT7944uFiZ6Y6YVKIXtjBA5OxEyTLuk7zZD5J91uwxBPxe8saBq2PwPav0X8x+VTsCE6RJ8y/4il0fZhSBMrDNa/OdS9rPrAuk3PxHXGeFztIUlGECc8nzIT3pgWYMK/BU0fMudnJ9FHmOn/gCROOwWGCCcfzAGBiBXXw7J54fDM7TLLkBOMWiNNrmfzySz1lHgjz+cJ2zq/GpGGyPCpLQGmMn7p7YfrxOPjy/p4HJubfvo+ey4TChOMbEvFTwPLBCdZBsWDC/K6JU3NvGP86bp3G0jCJQ8NkBwhMFm+aZyvHttn5nmRYYZJbuJXYwRbo5Cj/nlpYbw4EY4hU4pbwGdzM/COMUlRVGh++ubD47qQ5ADkoi2duhOtFEskn0XOZWDBhH0sF8ewHWc+dAkyYR7ux+1GcdcUmbrmHRlGYcIxOcJzJzQTPygWACek07Ry+ZfqKpGKsM7IhyfpUxw18huxi3uY7aEBFXgykG6FhUnwjy/YZG/niSuFrICwe5pEsjudId/RcJnwwgZ+bHaw9xLlhMjYdG2GGicdbVAFMsuQ936xRzx4zTJ6wPjsxds4WfNZCjoztYF9yu8Q0+jSJ3YwrEsv0aTx19/zswluqakn6ZHNkA+csPRNqzREpmMBPirlSOGDCPuCJxn5yj/34G3GtfxcuTOIwMDkxxrVMd9ycZ74aXhhhtlUelvybb9hHYsetBVGt7NGOHXGFPKEWz9iFp+/mZHnCDRNToc8gTHTBZMdYP4klE8yv4eo1qQKY5Mn0CN8Mjx1mhEmanGXn1C3H+LaRgxxzmdwjtnPyNHhD9QLeQQ2eq6OzFF7CXowMucG5bR4JJ0AiTPg1k7FpYqom7A4ttxaqfDCJRxEmVlAH35zsYYRJhlxlnZAdjV84/B48do75G6KNpjo5VoDMGqY8OfIp5UlWdMIu8P1k8kbYtfTd5Eq4MIk3csGER02YJp3dSXb6nH9MqhImphLAqeqfYDVzYsw3EDs+KEVc990E10CI3mXd1ba8G0fW0Uzj50LqyTjfZc6OkY8ieJljwmRHuDDZqA4mZ8nLRuavG3uSzqiHyQ7tMGkhjxr5puQlG0xyZIH9waXXu23kGc8i2SCommTMj9e2vnfEk+t3mUMn0hrwLefN8JoIhqxVN0zSneQux9YdJ9UIk5PkapJvii8wwiT9kn2Wz5V8SQt5yeMXfim6dzLkllarvXHk3lNLJeLVTDhvhjeFl9ZSqzDJ86gmjUdSuSqESZ58xPer8ZEYo5nDvgHGykBt2jkcb3VzTvjrRx9qXeCmevLsKr+xMzHG9zOXESYaYRIf+8jciSke1STpopn08cAkGUWY0IrPnDBZZIFJmkyzWzkjV0r/9UGyhmeVTIuOBHX16l7TyTVHCOdlS4z7ZrgFYaIVJq3mCrzK4TC4V5q9ZcJkR8XDhPMjzM8YZYFJJn2BeWgbb5TlxZ0k53g2+QXhu4sWcqFR+6oeW3OVEyd879j4KKIwiYcLkxOsw5IiX/CMeOEyMkc4PFvJj/JptTAZCQUmlzkP1j0xpul4yL635sqTbFOxhzzvJPz5GfL0VgjrOnmvm911wqXlWQN6BGGiFSbnCzDhUU1elZTohYdJXD9MWshBBTDJ8Kz/my4PfE6+5JnNG1Oi399KFpNhrOy7Jk4YKz7n+Ja2OUVXoxhmUu0w4bt0G7vqpEGVwGQjpw79KQNMsuQV+1PPu1zG5Ml5jtdq/P6dxH3WhruhLO27VwlpZYPJNT7HjtXODGGiGya5/BGOf8sZ9F0tMOF1QW6OscwGh5XjXkc9xqMwjP1KPBklT0ZDoUl87FaMUTM5zcf7m9OkNYow+aDKNRPC4zUpcQdXCUyucqr592MMpz2H/9S9wiDXTRudzpzEEIwmw1ndyavjDHOY43USR7IAASGPqx0mGfKC42BOfiSjmRyOIkxowzZwzaSF52bXPeQsw2XnxKVqnuZD8puYysmFhWA/LCdMGhEmoWkm4xxJVI2OLjpVApMb8JpJqvtunHU2Gr0K0M2OsT6jsTE+NiszGCZNbjXGG8NY4LcWSQ3BpDFElHDAJENh0sj+4CWY0C4CzIs27ijiY8KEZ3RYYNKoHSbcP9t4IhasmLw0QcAm8ZFFr2G5y/oM8ymNF6QKmrWShQtjcfbfAxPT1BkNWuIWTHieGWGYhCjcMGF/8LJmkjL1afZ/7+7ccydM2P9VJphwCCRMeKbkXCBMnpP1zI+Me3k7+LZQ/KHcIKTJ45djjWEsdnqRizCpEpjkyehN9qXfuNKSAWHiecz3J5kfObbHw2mQITfGOCZ07IbkaKTI4t2QaHLO329CYdKIMJEXLpg0isCEdJJ1PDP/dPnajQ8mjdAwaZ6DmWPOnw2GCc3sZ1/4i5476UqS57Vuyabdm69xPhkKTsZe+tKkWmByJWSYjHHA5IYgTDKpxVscX/lqOdiEFyZ7wDWTaMIkS9awq3qHvO90x3n2UPyu/EikyJNQlJN4ctGPJgiTyoGJ+QtP2BXqePLFkg82ZJhEVTM5SZ7eZH+aX215nhltDDIW2CJOuu8lG8OgyVOftYEwiTZMGsdsMLGCv9nl3tLybyPfIUzcdiS7ldPY8MITATmygWtjvwJoYpc2CfYqDJyMzHovjuqBSWMNwCRvqrfsGyr5pPhOCBP3mVhgtxrjr/zGZK6ZSzWZzf2z/GiYU3vjWQg4uVXn6fOpFpiQmoCJlaDCcQQuZGoZJk9iAbvxCcde9KtXkyFHuGByHiTxPv/cxEkIxs55z9WBMKkomJDO2Vtc1zJZNTBp1A8T2jmHb04+DYIJh5WTfOqT30rjCfnsnE6QNX/SfMyTRyOal7o5FCkv2+s0p80UyU4XocMkqQomSSdM8uQFx7q9FcsVYPKsseJhQitK882Jfz2TTG6W4zNeLfju/wk+O6cfag+dNA+LxSPNetWTkVjOK3zvGt+bRLSeSUXBZEwcJuavcPhgx15YWGgh92oRJv65OXkuK8e/WCmnnWMPKJRW2EycxPacHxnTuNi9Y4H7ESaVBBOSWrzLc4gQhIlXrMZLjrscf308T/ZwvRtou5i8qTONz19tTmrjSXLWy8zhhUk0a8DWDkxOkpfsMzZ2lS7bqoBJC3nEuVJ9zZwMGeWxcvx3f5qMfs/1asAVxugKmWp50ZzUZO94JkgscL4AwkQOJmlyIykDE5IlHD7YkQlSPTDhO3r9q9NnyH1Au4TW6A3JzimuKgq7hYlzI1pwMuYVuvaWUzs6iDCRhEm/HEzy5AsO1eSL6oHJwUZAmBCeHOxATSJNNvPl53TDt8XMUWXh3ehp095RbvCMnCUgmsnBSDbhCv1q+JEqzeR0WeRlZpxHNRGAyeEowqSNFyYjfjBJk0WOj2DwcXDe5zxRdyRPvHt64U+KDZ7kUw8fLOc99atIhplcecg3GOByQh9MaA1jnn8/bcKE56xqiCRMBvnut82f9evoR6tgsj/qGfkmSC3gDLF4BBBS7/FhVB6TLw7dVQmUC+6/znPMWRparApgsmY8Ng4qb8eZrVt5mKTJefad0HC0OmBCFjgXavOE30qd4PCYJr8I9JdmOO9zRmYVboai0tD9T6/uNigCiseFztvv+R7T8CKSd8N8MHlGUmG9KIRmwqNOJs+TDYQr6jqSMDlJnnKq0KdJzGe71XGMyJ+CPRxpMstn55xQ7HpM56x3nj79ao0KoCSvu97nXDm9ne8xkWzpd+UuJ0weVDJMcjwxF3dnH4QMkwkQmBzh3BPn/GAycY7jaSxpvjmesBVT1or3z2G/MS78xOfn7q0Bv+X5k/sgTFfD3TA3TNrCg0k/gGZCDrH7hs+TKoAJVyaNJV97wyRNRpvZj1DTygluFZXltXPmtfSfSp9ssfIAYkc2PSsCZft2ENXErcp+jiwmG7kefw8oTQlhIg6THHnK+pDtjQ1Pcy8rHiadfDdS1p1UzNvDMcq86Lc33mWxiVu57JzttM5nVteSO9liFRefPvLoFZiG4nHI5blgsr2xOQZTHxgaJtsrCCbbZSctE3vJ+JDtVKU+x/OTLDDZrhkmlk+C68xLjvqYOQsXtie3M0ryFZNFQpsHbGeWZOOFBa2rrqXFIuLTE5suUKDQV9guIx6lbN+N8D1l5IV82TklMOH4hlBhciPJ/q5eMEmTuZFGpuVgbsHkExMm7GuHCSYc8j0ATPLkRUMj3zJd9IRJjmPNJ+kMsBgkWXKCa3s2jOreRq0tBf/EixMvrTxjOZi4l7KdaOZ7TFKjgsYuNQYT8388kmRdvI33rnH85PaRCMKEd6tub/yeeMIkbRqJrAdz0jOtrWxCno7wnPbJFxpcsOVvWQDK03Vri/qJoCQbG/pdGXs6yTUI6gJudMEkGTZMmMc76QkTQhtFJlkn/nYDxxSPjAbDJKkZJp3kEd/SbzzvDRMSu8AOk+232FqNp7NkLdewXJgIaQXmre07fWJdszUKQuaO+W+edwkRyXBgurA0m2cj6DSpOZjQMknMH9yQBIXJLe0wId0XOH7T/MvGE6TTEyYnKVvZIpu3J88xv+OJJPNjqWwIQzVZUlCs4+jrC9YXigh1JbW4XZPxPS8Ea48JJhyfwBAfrRgm7HPmqZl0zq21Ng7DQ7bzrBkGM+cWz2BDwCRPRhu2cw1bcg/JxrxcJuc4RiM5GzvLJHOxIw1cG+lcqBsmn6UO1MOnR5LbhXDSuMbFQEmTsyN8MEkeAbVzMjySRpgsH68FIx08yyiKMMmSIzxL3vzTkSck76WZXGlWMGxLP8z+p80TIR/Aabqy5ihORGDyJ/eHXuB72PbvFyKnmJC722sNJjQZWMmmiCBMyMT3nF/6/SJp9TRzuDQIHk8CH3gWw3cX0ImevSCinGwf+dz1eS84n9MwCmjtzY3OjzLLfAxh4tjV4cDkENfPysMkQw7zfsQ505pxXyzp9GlVigknTE4/zoV/ClOeXRVQTrY3fOHqgd3DOwpXwWBinq4NIzwyV/kw6YeCSQs5omJbgMNEWpFNzb3kXaK0wFPMw2VyKwosoQN9JRpafYbMNgvA5JwLTGidGM4HwVl7nWQNl5e+4ayHasgFk+3PwssvAoSJ+RFrawEmNEKPk5rWjZSHGjvdEA2YbE9OR+Ra9CT56BD/+79020Q5XqdJEtDa6+bz/nqWsq0omPCIH0zy5KmCjRF8NawZJqmpc7zfYJlWrjDJ5s4noyIXSI5EhCbdzdxvv9ZtE+XJ17zPuX4yB/QRNxr4dCIQM6daYEKy5CX8Ejc1k3S0fCZnuVf6EZo5EnPXhaNi5SSTt6CdHxIb8Sr3seQBkycNvOsNqNxaC+9m+J4gTBxz1z0CD5PRaMGEpkjzyh46au6LdHokMjBpuBGZ8M9Wwq2wuZbYpxmZ3M7yszkYmNzjm9nr4wgTp+/sZdXDhBDu5dm86AWTFrI2GR055G1QtpInh7jkqZzN1Eo4NYrtr1w3USdZx73gWkAudFKEb10mX3jVlribrE6YNJwOCjdurnKYpAm3x2R7oYFlLNJ3OZad0+1zzq7jyppJXpd1TV3gHOQ1rpsoS77mtXOSL2P/SX5j5ekNN5d4XjTUKkzSvF6nioNJTsCSKyS2xwCcdIrtHO/ZPcnrfJAstWuuywYImLQK2DkNENdatOUj3696+gbvAoyDLpg0AMLElOsN1QyTLL8xnyyW3Im5PS1KVk4y+cqzbCE3TEbeSd4NzYHARGiIDwFsrFyM08r5fh5hUv7A5iqGCb1m4P6C8wVjOOZybE43RwomI9NelZdOkhd8H96wQfJ4j/ENzXaPOtvmi3OrkgCqSQs5wrlQrnuuy9qFSY531QHAJKkLJlNkWuC6al1hemMAK061nfPSayXmyVO+zd1wQ1IzWfge4GrYcoTyqyYj0hE3ue4L3ABDmLg88UKkYXJbHCbmqS0QmtlcPO5jLir4vUixhK7ErNen8ypR38vGa1yH4WALWcdNbHOZy6kmee4jtcHbLKxhmORyiyNaYUK0wYQIuTiW+ifEIm/lmIN9w3N+OZmdHJFsdjbOCRMvzaQ1x++CTY70y7X+SE3wrhQfh/WfuB5UVTChjW4bqhIm2YnzAh/WsNQmLgZxZqoWry3Jby3IOh7Gb3MNjreFJuCCbUgeWtCsmFwnPjBpqFmYpMlcs2aYNGiBCTnHv/cbks1LwRtlMOlcWJtsiBxMOqGuOi/IrUxOn4lr1vCK05x3nBvOS5RcS5OJ73l/74W3m6aWYUJSrVcbqg4meTJ1ZERk7y+f9bHye4bmZEO0JDlyNXfSEyZ8j2qQ00zmuAaHGiZeTcc7ySvucaZwyoorJlfpE3h+rvms92j9iWsgwoYJxxCfZiq4O/c93C5pZoEJx2CLwSRLYhcakiK7c3ppxGJlj/y6IXKSXOexh6ybJ77tKOfFnOD6uRUF0O3Vz/FPXbK5n0yJ+ulfjPD+nF/AcG3DxDIZIwqThtsC1rB55k03i23OFbuhzMyZuJCMHkwOTec8hmCaU49KjsyKWwq59DW+H/uTT9fUFOcSKdJkmpwVe/lu/rXyxCcfqKJg0gANE/Opp6sIJq3m7JwTs0iSDVeXte9YKXGfjDREUDxdsN3cQ3BaZl0f4hvoNT5WSd5UTQTk0KzQ+6fIBe6fGpmvPZg0MMIkT+bB3AFhwyRtzs2L88IH/cqBWQKTjGk3RFBMVSrjeSnC+7Cnnn6MoEFPTUMxsDDWh4Qmb9ozvcBPTvP/1HW/KLk/NdQ0TETPgujBpNVcTdNrm4Xf/tzKeMVKBn7x+yjCpKH5qfsUt5CX/M+aFQzXaOU+3U/7catVcDk29/O6fVqFWNLg2zC91mFCUouHogoTdges1clFBiUN9gohsZLDck9DNMXjjD9J+vkH4rqPJ8PXR3WOf9v7i9gkNp/jZUn3BZGf8W0gXfMwaSFXR7TBpEEFTNKW4tkvgxKqmLR6wCQHp7sBy6HunJcbk/9hp8VYwu3uvuVPLfHRPk84TLUWQT/9Ol9zihcmZysFJv/E2ou1hZyvUJikW/P5gj7Rv/aWHBGb7aZwrDSyL6IwGbnqfrbRPjACNOnmtnSmBK5D1gZWRxMd7uZp0plmVEvIVaFfafa1cvhg0rCGkKqDSavoZap6mGTy3g1flx/6+T8duiX9AU/tr14Ck/mGqMo6L5gIne7XeWlimgrXBTQg/x/J0TgywQV4zvr3g3cS6T4vdvac9ychH0wOdauVz6e0mznUB3s+mjDxfdZ4d/f0tdPn1x5qBkBhs+PRMWmfvy47J+Yx4rNCfjDz3OXI6E8LhfSMdAc/+bb4gFwaJ/719q1/dk7UTfjC35L6E+d4K5YnngjghwnzMZOaPRRFmIz8yVdGmptHoHalM9XNCZO65sjCpOGJ++LOkrVidtNpQth6X6TNP1oQMRUOBeIqTV6Ij/jIoasLS+/n+tKETPQLP35tQOD+n6K1Or729PAqhEkrzOELDRN9UpIIGnMM+3R0WdJwzt2b2UpEN0zzOeqoyrUG352Rp81iQx2o+0gYOtYnnC7cuOTy+WWkpNNF59rU7GlxUjVfDXDxVi1MvuAwgKemDtUyTJpnnS/u0EyuXI8wTLzCQzLiQ918btRyfOfzrS6Pbm3NW4fz2Re3RV+YQcYvyI3K7XOH512894sbrt6WUWbXLgRExiFMCsdvcw3D5GqJbRkDuVzQIh63C1K6ZvPtq/PFPZ9qMeVkQcz/VNxLs/PnRAflNttd/6z0oJsfcXh+fnYhtmBK9+z8/Itz1yUf2nwj6O4ZYVLQLK/XLkyuL+Q8zZwc+T3XEBySFc53P72Q88rPkTzbv/563kWLmJ3/+msJQ6Ghn8nDK2norDg4v79dkGYIL/3awCCzSoLJVo4Hbf2C755vorlWYdI8X3q6x4TfWbr1Au+R3LzoPs05eTdYc/Pt6+fWfb3u6ouCfP31OvNwl1smzWzlZnO5iegZl83TqXSNwqSZEyYAYZ6VCZPm8sivmPAJf5rUpSWkNcvNgKtekQ/dYOZZ8aIRxmHMJhkyGzXrcuu54FgLhElRFm7XJkxc4nFidt8D16DLtnHhz23wDhOOYHjMtgnW8TlJ+iNGk28Z9lMFwYTLSdp8jQ8mAD7YioTJodnyl47ZrAWuV14rli0nZee0uA96DlA1AVNx+tnHIR8xGDKdEwiTpci1d6drECaHFl2U15iosXBdur9cJ3e42SUPl2buceTyE28THpgsRmq1nGbxHCNMlmdP1kytQJg0u6bKLcMkn+O6ueAvquFm52zl3KELnnHj5rtvjdBgb72Y5mi/ZyUkR+b1t3WnGab2b6M03ltDhAnJLJyTW3zN88EwidTibtjqXq4wZtcTtjJLA0QbbWsLcUhZxJ1twRxo3hol4SxykKduk2i8OTVyWORvG6I03kEw4fh8bpi0ktltDVIjHgiTb6M12Fuvu1eniNmj0jkeeB2AJVkuftGPGPJ8Vux0lIbbk3reWtq1qNDkHNurVylMtvLDxDwKDsitlgqDiedRGVtezVy7kce/6LODznHuoGZVpwOwXI3lucF6OhI0abgeWIOlAmGyVSlMCJlYKzMawT6TKMGkofn6RABMUuRbkF3NJ7FDnDCZ9XY7XI2OoSOmtl2PwqvfZi2Q+7eROiu3hgqTk+TittrRTK4veL1uTGwvXgdhiWnncG9TL79mNnY1KqO9bVbIOT0RAZo0T7M2+UKYlNwl1ApMTk95vm1saTS4tnVzP0dlIT+in+ZUJw6N+zwuIm6TwOx9b92kOfxXZ7XPECZgemUlwaTZT41YMnM+57NyYjBmTu7Mt5zfcs1n3LuvR4Qlwj0Dr1fOqyNMnMfi02aVMIkMS3yvKWNCKsL1BRiYtAjYOWlFliuUnBPqkVUMlwmVJs3nOKKaESYlGVbievG2ioFJ8wESDJNOzk0NY+VYrWh47Ryfy4aTpD98mtzuFh+aVrIQIk2auYJjECZlcYdVD5Pmfv/TJlZYxNNcu7D5rHT467Jpwrn9fef6JOd3qGDJUckBCY0mpl6S4XjPQwiT0rt981+uaphs6w8Ymlgx4INvx0wAoUTgPmetn4swdJpcPyqN2XPNYbGESxAmJT+TnhVdepUBk+Zvp4NOm9hSkAnPgB8AsnLo7r/GuXe+9e0fMRUuTW53C7YxXpEUuar9C5qb+fwlEYTJurBhYv6+aEpHRcCEGsFBAxOzduAljvXbTL3PrVCqSY53VTb7h3ubNLkdpo0jPzAtpP9681bN6knzVS4bB2Hi6vG6rQomYd/ymUv7EkNfmJi1fH+5laPfEY2SJJB2Dk+zJWrnZP2nlN4Q093YrFPogF/vBnElnSTd9G5N47tv3XaV+80P6R3foE9Y57kqLJhwzKMwTPh+yPaTLJpJiENL1+LpoyxBAzGrQDrPy27dyn2K+e79a3wzsHXbtP9sTxXcDvrH/BwBUtjMLyioirpe/fo0f5hd5GCSDxsm5i+dblYDk+tbw0MJPSVfEKbA6JgVC8yzn7c218FZOYX7HL5j9FxA5XTz5Q5s26oZJ1u3gbHEkunruoC4devp7sBa9AgTppOR+mAFls6xCMOEqq3djP60GHVbnOOzco5C7poc70htDS4EltO4F1cO9zQgYbPk6KVtW/VQ8KoQBasVJtskYJIml0RePsIw2dp8++oiYdVbY4UgE57nn5Ov/uqYgGucqsm2/kCdy5ybc9s0ek22nZsgsGIu6OnbyoFo2sO3p8U0KoSJq9zmn7KIaibWT24bmiXsTo2YSZ11fL/ygjkZjFE4j2Bz4dQxuB1mb+ujdz+BHhOqXi1c2qZcvTo9J3jNX0kw2aYLJvS3qkcz2bptaN78JvbhiNEeVly/wFzxgnnTfMt5mJ5mW//HDmgxFLZuo93D0wRczFG+eH2b0ne/fWlClIIIE499XxUwoYfYttPzhG9hx1r5jvBtEols3nYO5+69yGLEmaMwO0CfrHQ/bm2+fpEolEu3zdffpuYTLAqKSkXBpFkXTNJkdpsSmGzTPKDbtl07RnjPyFievDD/TQ5ZJ+D6D7zP4XoDk2dZpok1tZPr5kbcpkiat/5i27b+mBK1ZFk5mbi0zcIJsGzduu369IJEJPO3W7dFSAJhwvwgSc2EljbnXUZMMNE3lPT9B2bnCL8vLUamBpq5vpy5FhezjN/+Bd/nskbNmYMxPj1QHB8Fw77t2yFCYI2+ciOQkKFvob/AfNy318alKBgtmDT7w4RnfcvCZJbzaIwSTH5hnjHbvr1+bcJcGzn+xREj83zL8DRYXs7KfrnG+9HrWIFGB2Tq9LZt8JPR/AsTJQsKtRI7Tq59C/kJJrqv9xPJV/+2uSphsk3WZ5InF7nfPhowoXq2SZL+8aVVJwATzm+/Cm7lpMkE7244wH5dZY3KgbXWFtoGuR/XXhMdcxH55PS3QF9gQvD0UflX/3YbwsT153ILA5UHk1+Ya+vbtWsPfE6IxNKITfRw/WrPtAK1Pnab89tvc5Vspn86fRqOJ+bIXz89TTRoJfYvACEiXTO0WlZO+tW//UWkaPLC0yfPC5N+yQWeJ8d4V3MgTE7/QhlEKEa23V679lw/kQKJtY+nrQeyytYDgHk5K8rD0C/4ZNtFvhlvpZPV/0sInpg//u0vL9FFqg0l1pag3zst9wXmq6/9ZT+Ql8fUiiMkW/1hwvEgWc3E6snFuZpZNBPgASsuiW/X/nLtLw/0dxfXmOSXx2Z/ySV1CmBCyMQ5rpdYt477TjN9kobt9l893SPDE/NfHThnDX2LVpQUAvHolXz/utO3hb6AOkoskgD5z6/+Mkqydt5vdfE86Zx0SnyaHONbzgcCw6cvQY/XuQOXLl3qn17pBJs9CXDCxEjNSKvl7Dlzad1Qj8j5bv4bPQfWXbJIMhXmF0xfXTfA/+rn1lnxMC2tBAVlWVItLS1TUMs5RupaOKRO0YHM9RItdXWCPzNVcB73H/jl2p6i24nZWXT6lwc+sV51KnwidptH1QDLB/zib2nQwC9/eekMAYZgnm/KFEsd1Oqqg7heSPO9fHAEZiv8YJ88eXKqFfhkidUailuLQOmevrTO1FF6GA71gQPrrl4qFIpumYrAF7Rkix9w9cBAj/d7m2/eM2S+edEijsKro1S1xGrxo6daWoqJz93TFy+uW3f1wAETK46N2WP+96EDJm8uXjxTrDrbcrI1Ql/wnwv/4aj1AesOHDC5UpQB879cXbfuxcWL08U3/88tU2jdoCBM1GkoUw5rqbubzF5ckunp2W5b4epUXRR349TJJaIsfUFBSjT8KdRIUBAmmpjS0pLNud+up7KmbRntQz1tfUBLzv4Fuc6M9eJTrWlc4CgIk3A2pk1wOFBQECYoKCgIExQUFIQJCgoKwgQFBQUFYYKCgoIwQUFBQZigoKCgIExQUFAQJigoKAgTFBQUhAkKCgoKwgQFBQVhgoKCgjBBQUFBmKCgoKAgTFBQUBAmKCgoCBMUFBSECQoKCgrCBAUFBWGCgoKCMEFBQUFBmKCgoCBMUFBQECYoKCgIExQUFBSECQoKCsIEBQUFYYKCgoIwQUFBQUGYoKCgIExQUFAQJigoKCgIExQUFIQJCgoKwgQFBQVhgoKCgoIwQUFBQZigoKAgTFBQUBAmKCgoKAgTFBQUhAkKCgrCBAUFBWGCgoKCgjBBQUFBmKCgoCBMUFBQUBAmKCgoCBMUFBSECQoKCsIEBQUFBWGCgoKCMEFBQUGYoKCgIExQUFBQECYoKCgIExQUFIQJCgoKwgQFBQUFYYKCgoIwQUFBQZigoKCgIExQUFAQJigoKAgTFd/w/6CgVLh8hDCJgKTIR//9/0VBqWj57wgTFBQUlGqCyb+hoFS4/DPCBAUFBQVhgoKCgjBBQUFBmKCgoCBMUFBQUBAmKCgoCBMUFBSECQoKCsIEBQUFBWGCgoKCMEFBQUGYoKCgIExQUFBQECYoKCgIExQUFIQJCgoKCsIEBQUFYYKCgoIwQUFBQZigoKCgIExQUFAQJigoKAgTFBQUhAkKCgoKwgQFBQVhgoKCgjBBQUFBmKCgoKAgTFBQUBAmKCgoCBMUFBQUhAkKCgrCBAUFBWGCgoKCMEFBQUFBmKCgoCBMUFBQECYoKCgIExQUFBSECQoKCsIEBQUFYYKCgoIwQUFBQUGYoKCgIExQUFAQJigoKCgIExQUFIQJCgoKwgQFBQVhgoKCgoIwQUFBQZigoKAgTFBQUBAmKCgoKAgTFBQUhAkKCgrCBAUFBQVhgoKCgjBBQUFBmKCgoCBMKkhaW6eotLbiRCsaWxxalBqASWtrzvbf0lyrvnVFpP6m9A/LhPub1DyL/1/1+a/yP8v8ahLfIPY6nNPj+Zdp2dlDmOiTtAWS7jP9B0y59smZbvpfc+lIvmuuFey9cunWtJ6hNcf2Ezq2/dPdhf81TVBQM6lCocv9zNBvf/tZT8cWUzo6ej777W+HzhT/SbB0f7IiZzz+5syvl//k10f9Hjb960+85Ux3N2Hn3NFPPvF9VnG3c3/jJ+znovXw/qHf/qhjaWw7Pvvt0K+7mX/X/rNHGf5myvdhtrGdEFoqK//+rz/x+JPZXwe/cemSKArTKAT8KcIkZDk69KOOLe3t7VuWhP7njs+GGFE01LEiPceI21br7rH9zQFvSOXIQIeP9PR89tmPhs4wvdcfycUtvs/qMB/F+CxCfm//N49yoOSTgcLYtjuGduAaC6rT5Kh93Ibc/o006bf/Tb8PpH5t/8Npwm0qpMkntif0zLr9VNq+Grb0dHs+7A+OZVN44hmvIekp+9NPGGGMMNGrlZwZoKt9S6nQRT/QzXKCDtj+rQ43mLSSMz02UvlC6kflb2J/J2sv/mjgDAtM/j34UVu2/Giom0UDs31j+5ajzCg58Jk5tm6/3vHZgQWGJxyz/zsD7n/ze/vf+IDa+Yf9/LsxTa7Zn+AKE/Nosc20D3b/QH5bNjADHj/bXzqG7R2/Jq0IkwhqJR0+W26LueTTIDDZwgiTz/wIYFt3Z4IwFwAT2ysPMaj89m9kg4n5dv09fr/b0x/0CWny5+C9Rv7ihEnaR7uy/WW/iGbya/vrHHP/KRtMtpgwaeWASc+Eh7ZaPmcIk6hJK1m41hG0a4+SKMLExFzAVmSGiXmA9iuACZkdCPrhoQBS1xpMzIFNs60JhEnU5EMyMcSw0z6JJky2DMzCaCYWmf6choVJjkz3BI/twFHfPVFzMPm9q5H2SQfCJPruktkBpu12LUAbDwkmW/wdoVwwMTchKExyJFDlK/ChGzUT+4y6qs8uJx7CJGo2znQP427rJ1NRhInr2hODiambxNJwMMk5XJW+et9RhIlNXH/V5Q8RJpGSKRY9fGnq/FdeaDDZ4nd3wQmTLdO++hcXTFpZWWJd0eQQJsviZlJ3dyBMoi4T5TZO+5JwnZ8hwqTjKJhmsmVgAkozmXKz8j3H1geItQeTobJntroajAiTaH3JUPlcfvZbS9aWqSzm/m+NAkzKtuKQ994JjDMpN+bSQJpJ2T0OjVMrjO1nZaZlxyxqJisrkM1lgjCJlsPkQJkDYqh/yRv4+YHS3dAx7eM2UQaTnqEDThnqcYYvtW+ZZdVMBkoedWCgVHvomYDRTMqWf7v548v6e/+BHqZQrZqESXtHd7n7ye2WAGESJZbM9pQYMgdoUOkP0lToX1waKFVN0tph4vKHZw6ULC1vlakEJuXXNf1DJTj5M+M3+sOklfSX0uKStRWp/MD8D0cPMDgKalQz6ShdZ63kkx7UTCItuVjJ4dkzTciHUzarv0xV98nlUAeT1h9M2eUP/0ZIt+PN23/k6XEohcmUU+hMXnJa47+G0EzKOL1lyNSeppYHpfUP5u/2sKkmtQeT9rUlD50qV6ERJpGSNJkuC3P9Q2vJn3QPsPoJFWompb/ZWkccam/7AKuZc6DMTpvKkUtOoi6AwORAqe5Ueti2ll6kHUWYeB0O/0rWtiNMIi0TA6XRX1Plm4I4VnzPMc9lqhEmdEXP2vdEzydeqyoQJqVJclt6puRh0kqOOYat4wApf8GpEpj/3mNoaw8mWzpK57N7AGESaSOHnCm9T5hy2xbOFV/nOX1aYULSjhyAjmtenmEGmJiPd+x8AJjkStTyIQYfrWesSc3ApKPDwwk2ZTdFOxAmUfyKgZI7UY+Jcey0S552jl6YtJJ1W4IgwQqTEkjIwyRd4jEZmGL4M5c7jBqDSU+HB1jrbEZjh+1WHWESHSunxP/nvv5y6U8cf7ZAIgKTix1QMMnZb17aQWDSz5iIMOBU2tO1DJP2nmVOtPeUlKoZaC//I4RJhKwcx5rYctFz/dU5PAqzXn9XuTBJ2w0+CJiQqR6n/ZL2cq1cbA++4K4ZmAzZHCP2ibIvnPa1QwiTCMpASaxWmsUc8g43DxMm5qqCg0lMFiZpcqyDKUC31VFDzXy52obJgSH3y+Ep231b+9pLCJMIir00om+hv4m6osTqYgskijAxtWLx25yS7F75q+GckxE/8vnOqak62+DWts+k/cBf3L3R/0psABk6gDCJnpzpcK4J2WnRDpN2kDiTsncfILIwKamzOiA5sLVj5nzUYY+fXPl3ulf8JB1/QTMncpJ2po70TEg/US9McvYgGZ8wfyaYHGXN9GOEicNlsuUvkiXUa8cB2/1bu9PkD8tWjk0J7ehGmETQ/zrAGNkaSZi0OsJWOzz9rwwwmSq5/AbIzZkoKZCAMGG7Gu5ea1NTyH8p/s2HNiun/UcEYRJFl4l99a3zr6IWLZi0/pGQftuWaP/MG4UBMGmd+oNz4fsXNBGCyYLkwNYQTGxFS2zNduzhr0MIkyhKh/NiuDW6MPnBD9I/WBHrnzsz+A94v30pTByPshorTzuzHc9I1zNJO0OLexAmzDA52mEPj/xDUXO0Hxz9CJMISrd9TXVEGialb95fUmjFrwhsQAmCM7Q4iuMadyEnq5mURPDI+l9rCCZHbQNsKsv/av1JnS01wbRyCN7mRE1ayScdzlC0yMJky5bfOqW0PR4tnMAKk46SR/U4i5kE3bwwmjlDzvw9hIkITIa6l9hse9YAQc0kgjD5tQMm3fKPVAeT9hIpK//GDpMtvo+iVW5zADAZYK2PgjBxmjn2I66nUNbPsWo6riFMog+To1GGiW9d955LvguKp6B0+8BswKWWCEzOIEzYYUIcOaV/tH7uom1ddSNMECaKYNK+ZWAarD1ox4GjQWuTDSbjAl1EESaFVdhTGq7wA3v4aw9BmCBM1MCkY+DiAlTj8p6hYyRwaYrAZBZhwqGZ/MVhc9JH2y+GB8hPECYIExUwsTqNB8THsMKEtizOpQkITNDMEYfJ0ZJ4BUdxro4z5L8gTBAmasycgemgt2I3cw7M8n0jK0w+QZhwwGTBZudQmEzZc7A6/owwiSZMSsq/tlYiTKziqkAwoYpODgImOefV8DXZTIVagknu7X8sLXZpe1LPAvmvCJPISdqZNBzloLUAGQKDCW1b3goCk784Nz/ChBkm5hpZCSLqoVWJj/bYlbx0DmESRamUcHqr0vCSuPYGzbHDpKPD8axSmgTtLUaYfILh9MIwsU/9MVLnqPM3S1oRJpGUSkn029Lz6xUZGvrtZ6UM6OfQTAZWHrXWfFZJLO2Wnjr/1cmYm3MUYSIOkyF7pIkDJrROBsIk+jA5IJkmT/Tl5nRfK+ky2MMBkxIXS3dJy9+gUgwiWcPSgSY1BpMzzk894Jw8hEkknSZDzBuStNokBJhMpaeKPz41NZUu6w3qu1tLYbLyIeazfmAuXUd3p/aeWQIBkx5nPH2abWwRJiUkNmfDPpR15k8hTCIp/R1Buz8ymolTWzANsmsdrC7OgHom6dJecf7jwAiThQFID2ytwcTWy6LOXpq74xjCJLLiON4v+R2fZ2wSPkxoiLWjYd5nPGbOVOlLdTM2GeOAibML4o98H2kb2qMIE+sF7fcCttLcViszhEk05TOHneNTrfDXPTZh6puzRXHZxlYnuiRgQkhJKSMAM6dk93f4bO2pAdvQDtV2E64CTNJk1j5dn9jJkkaYRFOc/R22bPFOmDP1zuV+au1bjrHApL1OLUwcK462uU5LwMRRAtYbljyayQRbEy7aYMc2tJ5NuI4xwGTAqWe26oLJdCBM2jk1E9vg9dgNRuuAQphEU7qdkemed8OlHf1YNpobTBztp2VhcqzHEWoiAZOSwmh1ADBJk/52lrKSJU24hry2hoNNP2KAyUWlMLnmvJh3M+JszSmWbmmYYWK7GuiwNWMuNFBAmERTxhkbl0+zmAHOaveuroc/ODwd7etInTBMSGmrGwmYOLUcb82LCyazPUz12xbs91LeW8MOk/Yt7n/juOn/d6UwcRTpc/s2Z9lWv2PDBSZp+4JbaXJR9OohTCIpjqozhZYM7gu+RIHOeTzNEUPu1ocnTewXJ3IwSTtaXQzImTmOg38awszJ/fFAe3CUbiuZte+5DsbfdblqLsmO2KJSMylRad1mus5eg4QfJrYbnJ7Sb0KYRFSc4RBbBo667LQflLhWvK9Onct5uuzvnFYOVV6mxGHS6iDhZ1GDSWtJt2Hzd8vrG7SWPM+n/uy1Lf7oTJc0jp5V6IA1VVp7Y9kt063lH3a0h1EHdTVzbD3MOkrLFCNMouqC7S+pWuhWaegTR8nlHu+OUgtbfHcG3TrtzDWsg2FS126vWQ4HE9/UYeYSajniVE06hhZcPtfJ6Ws+ftoSg3TKz6wIKIstD5MScpW7VxccN/d+x4YbTHLkWnlu5pJ6gzCJrJQEpg+UFBujwc09JevCc9vGekrO4pJHTTh6XbX75+dxaSayMHG0Bv4983j5wcS0YHqcO2JowqGcpHPkqHPLbfExSB16TntPHUk7HzXrLMDtGzRkh0l7f9pHPEE5VHpuTDnItuD8537HhhtMStzSjoqwCJOoStmstffQmLR0Mbo7Z+klzr/wNsZzji1ZzL9belS67LSy9ZKNFkwGQGBiftylkuN1iN6D2SLnZ0tJ7muQOh72Wcmjup3/uOOinwXpgIlI5aaSREbaa8gx0xPOmW5fW2yAwwqTEvf1cq36VoRJtOVAWXkQe+2y6QH2dP+yJbaFFlVdkqMXB8oaVLRKwcS24Np/5P0gJpj8BR4m5icPlNCkx17LbfZa6YY547d9+0sfZRvb2Usl2YoD3cxmzkC/u3xC/4/nBy70lBa8s2VGHytdNH4RdK4+k5KGrYWf6EYzJ9qSttwFJRM3cGndxWPHjl1cd6mnrH67r58jVrp7tgxcrLMe9e/ljxryVUw4YfJZtxxMPgm4nRCBSSuZ7igbv4GL/24OyMWL64Z6eIo8pcuMJhMn/15nPepi+aMu+Y7t7zsYS0X53ML0lykOxUXz7xeHSp8y0J0jfDApvWcsOHH/gDCJuqHjolG2F0oIlZcO8uvpa6kmZbtn6VFlzwpQTBiuhuE0E2dvYCiYkA/Lt5w5DO0eZZl6iJ+fw3kTbh/bLWXPMndvmkDAxIdvJf6xwivQ1ynra+bFbz+YmDZsRzkg0wiTiMuUMyQtoHxzUNGTA1vY16l/MabgoDXb7WN7xxk5mBxVARNznV9iHo8e/xr26Vyph8WnLG7RVakQJjlnPlPAomkl3JrJ0Z7y8WlFmERfN+nvYCySOhRUvj03McD4qIHugEUQDJPuAUdyTquMmTNl34t/hoKJuSmY6XotgNPO+LYABPiPLYRmko4NsVLSv0mau88kXXKxTtfAh+gzqQSaTLMdegMTQTOXLnc6eqyw2SAdJxgmjkV1TQ4mjspof/a5s+Zs1cesm1wL3BRUhWxnnCaiHCa59AQbTX500X+m3WEyVeY0WXYDIUwiLR+S2SG2lRU4cWw0afePV2ODSdpx9TokCZMeB0zSUDAxX3y6h2E8+hnKJ7U6A9O8njUQ2IIeAibmEC0Msekl/jPtpZk47Zz2FSsQYRJ1v0mgqdNO288zzJu5CoLX2EAwS4Jh0krWObTgtAxMFpzx9GCaiWWeDAWyZJqxFNuZYBVyaCGwmC8ITMxfmToQZB/TLwuoU+5xNVxi57SvJf8VYVIxcmwoaP+zGk3kUk+Qf5BhBTDA5KIjfjwnAxNHSOcAmM+EbUCGZhmLeadNMPmDoOciCX4WDExY4DYUfGp4wmSd40lrlz8LYVIBjpPySAb7Gp3gKV5/9Jrno9q3sLQHZ4SJbY929HsdgSwwydmvtNr9WlPww8Qa2kveZ7h5eDNviFYrIsz7UZeYkA8HEzLR3+NjcLHM9B/I2nZ7ls+ysuysUHxtedoQJhVBk2MXXRZqezHakmPOTOwccz2M281HXSRsKv1AsAN2wVHMq5tFM2n30kwm7Lvd52ZlwB5GcZRZoyDHDvS4QqDn4jHCwWnzLydcgtRWHsUyTb9nc+RS8AfMlTmUsxd7rNiSdmcITHvH0EUm1lLNpN1WkW1ZulfK+zlm1w6TdsE8RYSJBpxQCDiPrY6eoWOzhLOnDv3rhWOXBpzP6hk4MD1LWJ81fWk5stvzvJ2w/c1Fv+PTJl4rfHrlUX7n+1H7s7gGZNbkiXNsewYuHTsqMrazFw/09JTM0sVjC6xje7SfUS4x4eBonYk350z3DDHPtGnPXFqeRkeszezK7PY72tPP2l5xqgo2XjXChBT6thyrO3btPw5Y8pfpY8cmljgj8KgJ81nTBTlWVzdLhB5VPaSmY3vm94Wh/Y/95thY/yAt9KipWfPfP2MN7RnzP02sDLruD0sXZ7quONMX6+qOWVs8nSYoLPL/A5fHi821IrT5AAAAAElFTkSuQmCC";
@@ -1392,6 +1620,11 @@ function casPcts(rec){ return casList(rec).map(c => c.percentile).filter(v => v 
    another. They are never pooled: different tests, different stakes. */
 function isClerkshipRec(rec){ return rec.kind === 'clerkship' || rec.phase === 2 }
 function nbmeKey(rec){ return isClerkshipRec(rec) ? 'shelf' : 'cas' }
+/* A student repeating a phase keeps the earlier attempt on record (rec.attempt
+   'prior'); it is shown in the background and does not count toward the
+   current standing, flags or percentiles. */
+const isPrior = r => !!r && r.attempt === 'prior';
+const currentRecs = recs => (recs || []).filter(r => !isPrior(r));
 function examName(label){ return String(label || '').replace(/\s*\(retake\)\s*$/i, '') }
 /* knowledge and skills percentile from a set of records - the whole record,
    or one phase of it. The two are never blended into one number: a student
@@ -1401,15 +1634,23 @@ function standings(recs){
   const know = [], skill = [];
   recs.forEach(rec => {
     /* Each proctored exam counts in its own right. Averaging them first
-       would let one weak sitting be hidden by a strong one. */
-    casPcts(rec).forEach(p => know.push(p));
+       would let one weak sitting be hidden by a strong one. An NBME exam
+       counts CAS_WEIGHT times, a module's quiz set once. */
+    casPcts(rec).forEach(p => { for(let i = 0; i < CAS_WEIGHT; i++) know.push(p) });
     if(rec.quizPercentile != null) know.push(rec.quizPercentile);
     if(rec.osce && rec.osce.percentile != null) skill.push(rec.osce.percentile);
     if(rec.eval && rec.eval.percentile != null) skill.push(rec.eval.percentile);
   });
   const k = know.length ? Math.round(mean(know)) : null;
   const sk = skill.length ? Math.round(mean(skill)) : null;
-  return {knowledge: k, skills: sk, n: know.length + skill.length};
+  /* the NBME exams alone - the best single indicator of medical knowledge */
+  const nb = []; let below = 0;
+  recs.forEach(rec => casList(rec).forEach(c => {
+    if(c.percentile != null) nb.push(c.percentile);
+    if(c.passMark != null && c.scaled != null && c.scaled < c.passMark) below++;
+  }));
+  return {knowledge: k, skills: sk, nbme: nb.length ? Math.round(mean(nb)) : null, nbmeN: nb.length,
+          nbmeBelow: below, n: know.length + skill.length};
 }
 /* One number per block, for the trajectory: a block plots one point, so two
    proctored exams in the same block average. Every individual result stays
@@ -1423,6 +1664,7 @@ function poolKey(s, rec){ return rec.pool || (s.cohort + '|' + rec.code) }
 
 function hydrate(data){
   const students = data.students || [];
+  TA_LOADING = students;
 
   /* --- a block can sit more than one proctored exam --- */
   /* Phase 1 modules that hold BOTH a Mid Module and an End of Module NBME
@@ -1551,14 +1793,18 @@ function hydrate(data){
     if(s.phase == null)
       s.phase = s.current ? s.current.phase
               : (recs.filter(r => r.status === 'completed').slice(-1)[0] || {phase:1}).phase;
-    const all = standings(recs);
+    const live = currentRecs(recs);
+    const all = standings(live);
     s.knowledgePct = all.knowledge;
     s.skillsPct    = all.skills;
+    s.nbmePct      = all.nbme;
+    s.nbmeN        = all.nbmeN;
+    s.nbmeBelow    = all.nbmeBelow;
     /* the same, phase by phase: the class view filtered to a phase reads
        only that phase's assessments */
     s.byPhase = {};
     [1, 2, 3].forEach(ph => {
-      const st = standings(recs.filter(r => r.phase === ph));
+      const st = standings(live.filter(r => r.phase === ph));
       if(st.n) s.byPhase[ph] = st;
     });
 
@@ -1566,7 +1812,7 @@ function hydrate(data){
     const dom = {};
     SKILL_DOMAINS.forEach(d => {
       const vals = [];
-      recs.forEach(rec => {
+      live.forEach(rec => {
         if(rec.osce && rec.osce.domains && rec.osce.domains[d] != null) vals.push(rec.osce.domains[d]);
         if(rec.eval && rec.eval.domains && rec.eval.domains[d] != null) vals.push(evalTo100(rec.eval.domains[d]));
       });
@@ -1660,27 +1906,73 @@ function hydrate(data){
    kind rather than listed per assessment - a struggling student would otherwise
    arrive with thirty near-identical lines and the pattern would be lost in them.
    Each flag names its evidence, so the chip is never the whole story. */
-/* A clerkship's customized NBME exam (the Surgery CAS) is judged against a
-   fixed pass mark - below 65% correct is a failure - not a percentile. Each
-   paper below the mark is 'open' unless a later sitting of the same exam
-   (its retake) reached the mark, when it is 'resolved'. */
+/* Every NBME exam that carries a pass mark - Phase 1 module CAS exams and the
+   clerkships' customized exams - is judged against it (below 65% correct is a
+   failure), not only against the class. Each paper below the mark is 'open'
+   unless a later sitting of the same exam (its retake) reached the mark, when
+   it is 'resolved'. */
 function casBelowPass(s){
   const open = [], resolved = [];
   const sittings = [];
-  (s.records || []).filter(isClerkshipRec).forEach(r => casList(r).forEach(c => {
-    if(c.passMark != null && c.scaled != null) sittings.push({rec:r, cas:c, exam:examName(c.label)});
+  currentRecs(s.records).forEach(r => casList(r).forEach(c => {
+    /* a retake is the same exam in the same block: Phase 1 papers share generic
+       names ("Mid Module Exam"), so the block code is part of the key */
+    if(c.passMark != null && c.scaled != null) sittings.push({rec:r, cas:c, exam:examName(c.label), key:r.code + '|' + examName(c.label)});
   }));
   sittings.sort((a, b) => (a.rec.start < b.rec.start ? -1 : a.rec.start > b.rec.start ? 1 : 0));
   sittings.forEach((x, i) => {
     if(x.cas.scaled >= x.cas.passMark) return;
-    const later = sittings.slice(i + 1).find(y => y.exam === x.exam && y.cas.scaled >= y.cas.passMark);
+    const later = sittings.slice(i + 1).find(y => y.key === x.key && y.cas.scaled >= y.cas.passMark);
     (later ? resolved : open).push(Object.assign({}, x, {later}));
   });
   return {open, resolved};
 }
 
+/* Clerkship Academic concern rules for the objective-graded (legacy)
+   clerkships, decided 2026-10-10. Each returns the flag that explains it:
+   - a clerkship grade below Honors (Pass, Pass with remediation, Grade C, Fail);
+     an Incomplete is a Monitor until a grade is recorded
+   - overall performance across the ACGME competencies below the class middle
+     (the one-pager's level: beyond 1.96 SEM)
+   - the DO Week overall score below the clerkship direct-observation pass mark
+   A shelf below its CIS pass mark is in casBelowPass: for a clerkship it is a
+   concern even when the retake passed. */
+const CK_BELOW_HONORS = ['Pass', 'Pass with remediation', 'Grade C', 'Fail'];
+function clerkshipConcerns(s){
+  const out = [], recs = currentRecs(s.records);
+  const graded = recs.filter(r => r.kind === 'clerkship' && r.objectives && r.objectives.length);
+  const below = graded.filter(r => CK_BELOW_HONORS.includes(r.result));
+  if(below.length)
+    out.push({level:'crit', what: below.length + ' clerkship grade' + (below.length === 1 ? '' : 's') + ' below Honors',
+      why: below.map(r => r.code + ' ' + r.result).join(', ') + ' \u2014 in a class where nearly every student earns Honors, a grade below it is an Academic concern.'});
+  const inc = graded.filter(r => r.result === 'Incomplete');
+  if(inc.length)
+    out.push({level:'watch', what: inc.length + ' clerkship' + (inc.length === 1 ? '' : 's') + ' Incomplete',
+      why: inc.map(r => r.code).join(', ') + ' \u2014 no final grade yet; reviewed again when it is recorded.'});
+  if(graded.length){
+    const A = twoAxes(s.cohort, TA_LOADING), O = A && A.overall, z = O && O.z[s.id];
+    if(z != null && O.level(z) === 'below')
+      out.push({level:'crit', what: 'Overall performance across the ACGME competencies below the class middle',
+        why: ord(taPct(z)) + ' percentile; the 95% band (' + ord(taPct(z - O.cut)) + '\u2013' + ord(taPct(z + O.cut)) +
+             ') lies below the class average. Medical Knowledge, Patient Care, ICS and Professionalism with equal weight.'});
+  }
+  recs.filter(r => r.code === 'DOWEEK' && r.osce && r.osce.pct != null && r.osce.passMark != null && r.osce.pct < r.osce.passMark)
+    .forEach(r => out.push({level:'crit', what: 'DO Week overall score below ' + r.osce.passMark + '%',
+      why: r.osce.pct + '% across the DO Week encounters, below the ' + r.osce.passMark + '% pass mark the clerkship direct observations use.'}));
+  return out;
+}
+
 function buildFlags(s){
-  const out = [], recs = s.records || [];
+  const out = [], recs = currentRecs(s.records);
+  const prior = (s.records || []).filter(isPrior);
+  if(prior.length){
+    const pb = prior.reduce((n, r) => n + casList(r).filter(c => c.passMark != null && c.scaled != null && c.scaled < c.passMark).length, 0);
+    out.push({level:'info', what:'Repeating a phase: the earlier attempt is not counted',
+      why: prior.length + ' block' + (prior.length === 1 ? '' : 's') + ' from the earlier attempt' +
+        (s.enteredWith ? ' with the Class of ' + s.enteredWith : '') + ' stay on record (marked *) but do not count toward ' +
+        'the current standing, flags or percentiles' + (pb ? '; ' + pb + ' NBME exam' + (pb === 1 ? ' was' : 's were') +
+        ' below the pass mark in that attempt' : '') + '.'});
+  }
   const codes = list => list.map(r => r.code).join(', ');
   const count = (n, one, many) => n + ' ' + (n === 1 ? one : many);
 
@@ -1690,17 +1982,20 @@ function buildFlags(s){
       why: codes(failed) + '. A failed block is an absolute trigger, not a relative standing.'});
 
   const cb = casBelowPass(s);
+  const p1n = cb.open.filter(x => !isClerkshipRec(x.rec)).length, ckn = cb.open.length - p1n;
   if(cb.open.length)
-    out.push({level:'crit', what: count(cb.open.length, 'clerkship CAS exam', 'clerkship CAS exams') +
+    out.push({level: (ckn > 0 || p1n >= P1_NBME_CONCERN) ? 'crit' : 'watch', what: count(cb.open.length, 'NBME exam', 'NBME exams') +
       ' below ' + cb.open[0].cas.passMark + '% correct',
       why: cb.open.map(x => x.rec.code + ' ' + x.exam + ' ' + fmtScaled(x.cas.scaled) + '%' +
         (x.cas.classMedian != null ? ' (class median ' + fmtScaled(x.cas.classMedian) + '%)' : '')).join(', ') +
         ' — below the pass mark, an absolute standard; no passing retake on record.'});
   if(cb.resolved.length)
-    out.push({level:'watch', what: count(cb.resolved.length, 'clerkship CAS exam', 'clerkship CAS exams') +
+    out.push({level: cb.resolved.some(x => isClerkshipRec(x.rec)) ? 'crit' : 'watch', what: count(cb.resolved.length, 'NBME exam', 'NBME exams') +
       ' below the pass mark, passed on retake',
       why: cb.resolved.map(x => x.rec.code + ' ' + x.exam + ' ' + fmtScaled(x.cas.scaled) + '% → ' +
-        fmtScaled(x.later.cas.scaled) + '% on retake').join(', ') + '.'});
+        fmtScaled(x.later.cas.scaled) + '% on retake').join(', ') +
+      (cb.resolved.some(x => isClerkshipRec(x.rec)) ? '. A failed clerkship shelf is an Academic concern even when the retake passed.' : '.')});
+  clerkshipConcerns(s).forEach(f => out.push(f));
 
   const remed = recs.filter(r => r.result === 'Pass with remediation');
   if(remed.length)
@@ -1746,7 +2041,7 @@ function buildFlags(s){
       why: 'Pooled across ' + source + ' — a pattern across the record, not one bad block.'});
   };
   axis(s.skillsPct, 'Clinical skills', 'every OSCE and clinical evaluation on record');
-  axis(s.knowledgePct, 'Medical knowledge', 'every NBME assessment and module quiz on record');
+  axis(s.knowledgePct, 'Medical knowledge', 'every NBME exam (each weighted ' + CAS_WEIGHT + '\u00d7) and module quiz set on record');
 
   if(s.knowledgePct != null && s.skillsPct != null && Math.abs(s.knowledgePct - s.skillsPct) >= 35)
     out.push({level:'info', what:'Knowledge and clinical skills diverge',
@@ -1754,7 +2049,7 @@ function buildFlags(s){
           ord(s.skillsPct) + ' — worth naming in the next coaching conversation.'});
 
   /* a sustained downward drift matters more than any single low score */
-  const seqPts = (s.timeline||[]).map(t => mean([t.quiz,t.cas,t.osce,t.eval].filter(v=>v!=null)))
+  const seqPts = (s.timeline||[]).filter(t => !isPrior(t.rec)).map(t => mean([t.quiz,t.cas,t.osce,t.eval].filter(v=>v!=null)))
                                  .filter(v=>v!=null);
   if(seqPts.length >= 6){
     const early = mean(seqPts.slice(0,3)), late = mean(seqPts.slice(-3));
@@ -1768,20 +2063,27 @@ function buildFlags(s){
 
 /* Standing is judged domain by domain, never on a blended number.
    "Academic concern": an absolute trigger - a failed block, a clinical
-   evaluation below the 3.0 expectation, or a clerkship CAS exam below its
-   65% pass mark with no passing retake - or either domain in the bottom
+   evaluation below the 3.0 expectation, a clerkship NBME exam below its 65%
+   pass mark with no passing retake, or two or more Phase 1 NBME exams below it
+   (one is a Monitor) - or either domain in the bottom
    decile of the class. "Monitor": a pass with remediation, or either domain
    below the 25th percentile. Strong performance in the other domain is real,
    and stays visible beside the flag, but does not cancel it. */
 function standingOf(s){
-  const recs = s.records || [];
+  const recs = currentRecs(s.records);
   const domains = [s.knowledgePct, s.skillsPct].filter(v => v != null);
   const cb = casBelowPass(s);
-  const absolute = recs.some(r => r.result === 'Fail') ||
+  /* NBME exams below the pass mark with no passing retake: a clerkship exam is
+     an Academic concern; in Phase 1 one is a Monitor and two or more a concern */
+  const ckOpen = cb.open.filter(x => isClerkshipRec(x.rec)), p1Open = cb.open.length - ckOpen.length;
+  /* a clerkship shelf below its pass mark is a concern even after a passing retake */
+  const ckAny = ckOpen.length + cb.resolved.filter(x => isClerkshipRec(x.rec)).length;
+  const ckc = clerkshipConcerns(s);
+  const absolute = recs.some(r => r.result === 'Fail') || ckAny > 0 || ckc.some(f => f.level === 'crit') ||
                    recs.some(r => r.eval && r.eval.overall != null && r.eval.overall < 3.0) ||
-                   cb.open.length > 0;
+                   ckOpen.length > 0 || p1Open >= P1_NBME_CONCERN;
   if(absolute || domains.some(v => v < CONCERN_PCTILE)) return 'concern';
-  const remediated = recs.some(r => r.result === 'Pass with remediation') || cb.resolved.length > 0;
+  const remediated = recs.some(r => r.result === 'Pass with remediation') || cb.resolved.length > 0 || p1Open > 0 || ckc.length > 0;
   if(remediated || domains.some(v => v < WATCH_PCTILE)) return 'watch';
   return 'ok';
 }
@@ -1941,6 +2243,125 @@ let TYPE_META = [{key:'q:Quiz', label:'Quiz', short:'Quiz', varName:'--s1'}].con
 /* ============================================================================
    STATE + COHORT VIEW
    ============================================================================ */
+/* Knowledge (the NBME clerkship exams) and clinical performance (the
+   clinical-evaluation domains), each standardised within the class and
+   clerkship and averaged over the clerkships a student finished (3+).
+   An axis is only as useful as it agrees with itself from one clerkship to
+   the next: its dependability is that agreement stepped up to the number of
+   clerkships (Spearman-Brown). A student is set above or below the class
+   middle only beyond 1.96 standard errors of measurement. The same method
+   builds the Phase 2 "Telling students apart" view
+   (ascend-student-data-tools pipeline/differentiation.py) - change both. */
+const TA_CLERK = ['MED','NRL','OBG','PED','PSY','SUR','EM','FM','PAL'];
+const TA_DOMAINS = ['History taking','Physical examination','Clinical reasoning','Communication',
+  'Documentation & presentation','Professionalism'];
+/* the domains onto the ACGME core competencies, through the school's MEPOs
+   (Objectives & Outcomes milestone framework): MEPOs 1-3 Patient Care,
+   19-21 Interpersonal & Communication Skills, 15-16 Professionalism;
+   Medical Knowledge is the shelf axis. Same table as differentiation.py. */
+const TA_ACGME = [['Patient Care', ['History taking','Physical examination','Clinical reasoning']],
+  ['Interpersonal & Communication Skills', ['Communication','Documentation & presentation']],
+  ['Professionalism', ['Professionalism']]];
+const TA_ACGME_LIMITED = ['Practice-Based Learning & Improvement', 'Systems-Based Practice'];
+const TA_MIN_K = 3, TA_MIN_PAIR = 10, TA_Z95 = 1.96;
+const TA_LEVEL = {above:'Distinguishably above', middle:'Within the class middle', below:'Distinguishably below'};
+let TA_CACHE = {data:null, byCohort:{}};
+let TA_LOADING = null;   /* the students hydrate() is building, for rules that need the class */
+
+function taShelf(rec){
+  const c = (rec.cas||[]).find(c => !/retake/i.test(c.label||'') && c.scaled != null);
+  return c ? c.scaled : null;
+}
+function taStd(m){
+  const ks = Object.keys(m); if(ks.length < TA_MIN_PAIR) return {};
+  const xs = ks.map(k => m[k]), mu = xs.reduce((a,b)=>a+b,0) / xs.length;
+  const sd = Math.sqrt(xs.reduce((a,x)=>a+(x-mu)*(x-mu),0) / xs.length);
+  if(!sd) return {};
+  const o = {}; ks.forEach(k => o[k] = (m[k]-mu)/sd); return o;
+}
+function taCorr(a, b){
+  const ks = Object.keys(a).filter(k => k in b); if(ks.length < TA_MIN_PAIR) return null;
+  const x = ks.map(k=>a[k]), y = ks.map(k=>b[k]);
+  const mx = x.reduce((p,q)=>p+q,0)/x.length, my = y.reduce((p,q)=>p+q,0)/y.length;
+  let sxy = 0, sx = 0, sy = 0;
+  x.forEach((v,i) => { sxy += (v-mx)*(y[i]-my); sx += (v-mx)*(v-mx); sy += (y[i]-my)*(y[i]-my) });
+  return sx && sy ? sxy / Math.sqrt(sx*sy) : null;
+}
+function taAxis(per){
+  const codes = Object.keys(per).filter(c => Object.keys(per[c]).length >= TA_MIN_PAIR);
+  const rs = [];
+  codes.forEach((a,i) => codes.slice(i+1).forEach(b => { const r = taCorr(per[a], per[b]); if(r != null) rs.push(r) }));
+  const comp = {}, ks = [];
+  const ids = new Set(); codes.forEach(c => Object.keys(per[c]).forEach(u => ids.add(u)));
+  ids.forEach(u => { const zs = codes.filter(c => u in per[c]).map(c => per[c][u]);
+    if(zs.length >= TA_MIN_K){ comp[u] = zs.reduce((a,b)=>a+b,0)/zs.length; ks.push(zs.length) } });
+  if(Object.keys(comp).length < TA_MIN_PAIR || !rs.length) return null;
+  ks.sort((a,b)=>a-b);
+  const k = ks.length % 2 ? ks[(ks.length-1)/2] : (ks[ks.length/2-1] + ks[ks.length/2]) / 2;
+  const rbar = rs.reduce((a,b)=>a+b,0) / rs.length;
+  const rel = rbar > -1/(k-1) ? Math.max(0, k*rbar / (1 + (k-1)*rbar)) : 0;
+  const z = taStd(comp), cut = TA_Z95 * Math.sqrt(1 - rel);
+  const level = v => v >= cut ? 'above' : v <= -cut ? 'below' : 'middle';
+  const levels = {above:0, middle:0, below:0}; Object.values(z).forEach(v => levels[level(v)]++);
+  return {per, z, cut, rel, meanR: rbar, k, n: Object.keys(z).length, levels, level};
+}
+/* students: the class being loaded (hydrate() runs before DATA is set),
+   else the loaded data */
+function twoAxes(cohort, students){
+  const all = students || (DATA && DATA.students) || [];
+  if(TA_CACHE.data !== all) TA_CACHE = {data: all, byCohort:{}};
+  if(cohort in TA_CACHE.byCohort) return TA_CACHE.byCohort[cohort];
+  const studs = all.filter(s => s.cohort === cohort);
+  const shelf = {}, dom = {}, overall = {}, raw = {}, comp = {};
+  TA_ACGME.forEach(g => comp[g[0]] = {});
+  TA_DOMAINS.forEach(d => dom[d] = {});
+  TA_CLERK.forEach(code => {
+    const sh = {}, dr = {}; TA_DOMAINS.forEach(d => dr[d] = {});
+    studs.forEach(s => {
+      const r = (s.records||[]).find(r => r.kind === 'clerkship' && r.code === code && r.attempt !== 'prior');
+      if(!r) return;
+      const v = taShelf(r); if(v != null) sh[s.id] = v;
+      const ds = (r.eval && r.eval.domains) || {};
+      TA_DOMAINS.forEach(d => { if(ds[d] != null) dr[d][s.id] = ds[d] });
+    });
+    raw[code] = sh;
+    const z = taStd(sh); if(Object.keys(z).length) shelf[code] = z;
+    const dz = {}; TA_DOMAINS.forEach(d => { dz[d] = taStd(dr[d]); if(Object.keys(dz[d]).length) dom[d][code] = dz[d] });
+    const o = {}, ids = new Set(); TA_DOMAINS.forEach(d => Object.keys(dz[d]).forEach(u => ids.add(u)));
+    ids.forEach(u => { const xs = TA_DOMAINS.filter(d => u in dz[d]).map(d => dz[d][u]);
+      if(xs.length) o[u] = xs.reduce((a,b)=>a+b,0)/xs.length });
+    const oz = taStd(o); if(Object.keys(oz).length) overall[code] = oz;
+    TA_ACGME.forEach(([name, ds]) => {
+      const cm = {}, cid = new Set(); ds.forEach(d => Object.keys(dz[d]).forEach(u => cid.add(u)));
+      cid.forEach(u => { const xs = ds.filter(d => u in dz[d]).map(d => dz[d][u]);
+        if(xs.length) cm[u] = xs.reduce((a,b)=>a+b,0)/xs.length });
+      const cz = taStd(cm); if(Object.keys(cz).length) comp[name][code] = cz;
+    });
+  });
+  /* overall performance across the ACGME competencies: the four measurable ones
+     (Medical Knowledge = the shelf, Patient Care, ICS, Professionalism), equal
+     weight, averaged within each clerkship (3 of the 4 at least),
+     restandardised, then carried across clerkships like every other axis */
+  const allFour = {};
+  TA_CLERK.forEach(code => {
+    const parts = [shelf[code]].concat(TA_ACGME.map(([name]) => comp[name][code])).filter(Boolean);
+    if(parts.length < 4) return;
+    const m = {}, ids = new Set(); parts.forEach(p => Object.keys(p).forEach(u => ids.add(u)));
+    ids.forEach(u => { const xs = parts.filter(p => u in p).map(p => p[u]); if(xs.length >= 3) m[u] = xs.reduce((a,b)=>a+b,0)/xs.length });
+    const z = taStd(m); if(Object.keys(z).length) allFour[code] = z;
+  });
+  const out = {knowledge: taAxis(shelf), clinical: taAxis(overall), overall: taAxis(allFour), domains:{}, competencies:{}, raw};
+  TA_ACGME.forEach(([name]) => { const a = taAxis(comp[name]); if(a) out.competencies[name] = a });
+  TA_DOMAINS.forEach(d => { const a = taAxis(dom[d]); if(a) out.domains[d] = a });
+  return (TA_CACHE.byCohort[cohort] = (out.knowledge || out.clinical) ? out : null);
+}
+/* standard normal CDF, for showing a standing as a class percentile */
+function taPct(z){
+  const t = 1 / (1 + 0.2316419 * Math.abs(z));
+  const p = 0.3989423 * Math.exp(-z*z/2) * t * (0.3193815 + t*(-0.3565638 + t*(1.781478 + t*(-1.821256 + t*1.330274))));
+  return Math.min(99, Math.max(1, Math.round(100 * (z > 0 ? 1 - p : p))));
+}
+
 let DATA = hydrate(buildSampleData());
 const state = {
   cohort:null, program:'all', advisor:'all', ccm:'all', phase:'all', standing:'all', emphasis:'knowledge', q:'',
@@ -1956,10 +2377,14 @@ const $ = id => document.getElementById(id);
 const NO_STANDING = {knowledge:null, skills:null};
 function stand(s){
   if(state.phase === 'all')
-    return {knowledge:s.knowledgePct, skills:s.skillsPct};
+    return {knowledge:s.knowledgePct, skills:s.skillsPct, nbme:s.nbmePct, nbmeBelow:s.nbmeBelow};
   return (s.byPhase && s.byPhase[state.phase]) || NO_STANDING;
 }
 const kOf = s => stand(s).knowledge, skOf = s => stand(s).skills;
+/* overall performance across the four ACGME competencies, as a class
+   percentile - clerkship classes only */
+const ovOf = s => { const A = twoAxes(s.cohort), O = A && A.overall; return O && O.z[s.id] != null ? taPct(O.z[s.id]) : null };
+const nbOf = s => stand(s).nbme, belowOf = s => stand(s).nbmeBelow || 0;
 function inPhase(rec){ return state.phase === 'all' || String(rec.phase) === state.phase }
 
 function filtered(){
@@ -2225,9 +2650,106 @@ function typePercentiles(list){
   }));
   return buckets;
 }
+/* The subgroup the filter picks out, if any. Percentiles are within each
+   student's class, so a whole class always sits near the 50th: the
+   percentile bars only say something once the filter narrows the class. */
+function subgroupLabel(){
+  const parts = [];
+  if(state.standing !== 'all') parts.push((STANDING[state.standing] || {}).label || state.standing);
+  if(state.advisor !== 'all') parts.push('career advisor ' + state.advisor);
+  if(state.ccm !== 'all') parts.push('CCM ' + state.ccm);
+  if(state.program !== 'all') parts.push(state.program || 'no program');
+  if(state.q.trim()) parts.push('matching \u201c' + state.q.trim() + '\u201d');
+  return parts.join(' \u00b7 ');
+}
+/* Whole-class view: the class against absolute standards, which a
+   within-class percentile cannot show. The phase lens still applies. */
+function renderTypeStandards(host, list){
+  const recs = list.flatMap(s => currentRecs(s.records).filter(inPhase));
+  const f1 = v => v == null ? '—' : (Math.round(v * 10) / 10).toFixed(1);
+  /* each row on a 0-100 track: the class mean, a tick at the standard, and
+     the share below standard; clinical evaluations (1-5) map 1 -> 0, 5 -> 100 */
+  const rows = [];
+  const nbme = (label, pick) => {
+    const sit = recs.filter(pick).flatMap(r => casList(r).filter(c => c.scaled != null && !/cbse/i.test(c.label || '')));
+    if(!sit.length) return;
+    const withNat = sit.filter(c => c.natlMean != null), pm = sit.filter(c => c.passMark != null);
+    const m = mean(sit.map(c => c.scaled));
+    const nm = withNat.length ? mean(withNat.map(c => c.natlMean)) : null, own = withNat.length ? mean(withNat.map(c => c.scaled)) : null;
+    const pass = pm.length ? mean(pm.map(c => c.passMark)) : null;
+    rows.push({label, n: sit.length, mean: m, meanText: f1(m) + '%', ref: nm != null ? nm : pass,
+      refText: nm != null ? 'national ' + f1(nm) + '% (' + (own - nm >= 0 ? '+' : '−') + f1(Math.abs(own - nm)) + ')' : (pass != null ? 'pass ' + Math.round(pass) + '%' : '—'),
+      pass, below: pm.length ? 100 * pm.filter(c => c.scaled < c.passMark).length / pm.length : null, belowWhat: 'below pass'});
+  };
+  nbme('NBME module exams', r => !isClerkshipRec(r));
+  nbme('NBME shelf exams', r => isClerkshipRec(r));
+  const cb = recs.flatMap(r => casList(r).filter(c => /cbse/i.test(c.label || '') && c.scaled != null));
+  if(cb.length){ const m = mean(cb.map(c => c.scaled)); rows.push({label:'NBME CBSE', n: cb.length, mean: m, meanText: f1(m) + '% EPC', ref: null, refText: 'no pass mark', below: null}) }
+  const os = recs.filter(r => r.osce && r.osce.pct != null);
+  if(os.length){ const pm = os.filter(r => r.osce.passMark != null), m = mean(os.map(r => r.osce.pct)), pass = pm.length ? pm[0].osce.passMark : null;
+    rows.push({label:'OSCE & direct observation', n: os.length, mean: m, meanText: f1(m) + '%', ref: pass, refText: pass != null ? 'pass ' + pass + '%' : '—',
+      pass, below: pm.length ? 100 * pm.filter(r => r.osce.pct < r.osce.passMark).length / pm.length : null, belowWhat: 'below pass'}) }
+  const ev = recs.filter(r => r.eval && r.eval.overall != null);
+  if(ev.length){ const m = mean(ev.map(r => r.eval.overall)), to = v => (v - 1) / 4 * 100;
+    rows.push({label:'Clinical evaluations', n: ev.length, mean: to(m), meanText: f1(m) + ' of 5', ref: to(3), refText: '3.0 expected',
+      below: 100 * ev.filter(r => r.eval.overall < 3.0).length / ev.length, belowWhat: 'below 3.0', scale5: true}) }
+  if(!rows.length){ host.appendChild(emptyDiv(unavailableMsg() || 'No assessments in this filter.')); return [] }
+
+  const W = widthOf(host), rowH = 54, m = {t:14, r:86, b:30, l:Math.min(170, Math.max(118, W * .3))};
+  const H = m.t + rows.length * rowH + m.b, pw = W - m.l - m.r, X = v => m.l + Math.max(0, Math.min(100, v)) / 100 * pw;
+  const svg = add(host,'svg',{class:'chart',width:W,height:H,role:'img',
+    'aria-label':'The class against absolute standards: class mean, the standard as a tick, and the share below standard, for each kind of assessment.'});
+  [0,25,50,75,100].forEach(t => {
+    add(svg,'line',{x1:X(t),x2:X(t),y1:m.t-4,y2:m.t+rows.length*rowH,class:'gridline'});
+    add(svg,'text',{x:X(t),y:H-12,'text-anchor':'middle',class:'ax'}, t + (t === 100 ? '%' : ''));
+  });
+  rows.forEach((r, i) => {
+    const y = m.t + i * rowH, bh = 16, by = y + 12, col = cssv(['--s5','--s2','--s3','--s4','--s1'][i % 5]);
+    add(svg,'text',{x:m.l-12,y:by+12,'text-anchor':'end',class:'dlab'}, fitLabel(r.label, m.l-18));
+    add(svg,'text',{x:m.l-12,y:by+28,'text-anchor':'end',class:'ax'}, r.n + (r.n === 1 ? ' sitting' : ' sittings'));
+    add(svg,'rect',{x:X(0),y:by,width:pw,height:bh,rx:4,fill:cssv('--surface-2')});
+    add(svg,'path',{d: barPath(X(0), by, Math.max(2, X(r.mean)-X(0)), bh, 4, 'right'), fill: col});
+    const inside = X(r.mean) + 70 > X(100);           /* no room after the bar: write the value inside it */
+    const vt = {x: inside ? X(r.mean) - 8 : X(r.mean) + 8, y: by + 12.5, 'text-anchor': inside ? 'end' : 'start', class:'dlab'};
+    if(inside) vt.style = 'fill:#fff';
+    add(svg,'text',vt, r.meanText);
+    if(r.ref != null){
+      add(svg,'line',{x1:X(r.ref),x2:X(r.ref),y1:by-5,y2:by+bh+5,stroke:cssv('--ink'),'stroke-width':2.5});
+      add(svg,'text',{x:X(r.ref),y:by+bh+16,'text-anchor':'middle',class:'ax'}, r.refText);
+    } else add(svg,'text',{x:X(0)+4,y:by+bh+16,class:'ax'}, r.refText);
+    if(r.below != null){
+      const bad = r.below >= 10;
+      add(svg,'text',{x:W-4,y:by+12.5,'text-anchor':'end',class:'dlab',style:'fill:' + (bad ? cssv('--crit') : cssv('--ink-2'))}, Math.round(r.below) + '%');
+      add(svg,'text',{x:W-4,y:by+27,'text-anchor':'end',class:'ax'}, r.belowWhat);
+    }
+    const hit = add(svg,'rect',{x:0,y:y,width:W,height:rowH,class:'hit',tabindex:'0',role:'button',
+      'aria-label': r.label + ': class mean ' + r.meanText + ', ' + r.refText + (r.below != null ? ', ' + Math.round(r.below) + '% ' + r.belowWhat : '')});
+    hoverable(hit, r.label, [{value: r.meanText, label:'class mean', color: col}, {value: r.refText, label:'standard'},
+      {value: r.below != null ? Math.round(r.below) + '%' : '—', label: r.belowWhat || 'below standard'}, {value: r.n, label:'sittings in view'}]);
+  });
+  host.appendChild(elc('p','why stdnote', 'Bar: class mean. Tick: the standard (national mean where the exam reports one, otherwise the pass mark; ' +
+    'clinical evaluations on their 1–5 scale, ticked at 3.0). Right: share below standard, red at 10% or more. Every sitting in view, ' +
+    'first attempts and retakes alike. Choose a subgroup in the filters (Standing, Career advisor, CCM, Program) to compare it with its class by percentile.'));
+  return rows.map(r => [r.label, r.n, r.meanText, r.refText, r.below != null ? Math.round(r.below) + '% ' + r.belowWhat : '—']);
+}
+
 function renderTypeChart(){
   const host = $('typeChart'); host.textContent = '';
   const list = filtered();
+  const sub = subgroupLabel();
+  const cohortName = state.cohort === 'all' ? 'their classes' : 'the Class of ' + state.cohort;
+  if(!sub){
+    $('typeTitle').textContent = 'How the class did against the standards';
+    $('typeWhy').textContent = 'A whole class always sits near the 50th percentile of itself, so this view uses absolute ' +
+      'standards instead: the national mean, the pass marks and the 3.0 expectation.';
+    const rows = renderTypeStandards(host, list);
+    buildTable($('typeTable'), [{label:'Assessment'},{label:'Sittings',num:true},{label:'Class mean'},{label:'Standard'},{label:'Below standard'}],
+      rows, 'The class against absolute standards');
+    return;
+  }
+  $('typeTitle').textContent = 'This group against its class, by assessment type';
+  $('typeWhy').textContent = sub + ' (' + list.length + ' student' + (list.length === 1 ? '' : 's') + ') against ' + cohortName +
+    ': the group\u2019s median percentile for each kind of assessment. The class as a whole sits at the 50th by definition.';
   const buckets = typePercentiles(list);
   let rows = TYPE_META.filter(t => !SUMMARY_HIDE.has(t.key)).map(t => ({...t, n: buckets[t.key].length,
     med: median(buckets[t.key]), color: cssv(t.varName)})).filter(r => r.n);
@@ -2293,8 +2815,11 @@ const ROSTER_COLS = [
   {key:'cohort',    label:'Cohort',  num:true},
   {key:'phase',     label:'Phase',   num:true},
   {key:'done',      label:'Blocks done', num:true},
+  {key:'nbme',      label:'NBME exams'},
+  {key:'below',     label:'NBME below 65', num:true},
   {key:'knowledge', label:'Medical knowledge'},
   {key:'skills',    label:'Clinical skills'},
+  {key:'overall',   label:'Overall (ACGME)'},
   {key:'standing',  label:'Standing'},
   {key:'open',      label:''}
 ];
@@ -2303,8 +2828,11 @@ const SORT_VAL = {
   cohort: s => s.cohort,
   phase: s => s.phase,
   done: s => s.completed,
+  nbme: s => nbOf(s) == null ? -1 : nbOf(s),
+  below: s => belowOf(s),
   knowledge: s => kOf(s) == null ? -1 : kOf(s),
   skills: s => skOf(s) == null ? -1 : skOf(s),
+  overall: s => ovOf(s) == null ? -1 : ovOf(s),
   standing: s => ({concern:0, watch:1, ok:2})[s.status]
 };
 function meterCell(v){
@@ -2332,9 +2860,11 @@ function chipFor(status){
    "Scheduled" are states, not judgements, so they get the muted chip rather
    than a status colour. */
 const RESULT_CHIP = {
-  'Fail':'concern', 'Pass with remediation':'watch', 'Pass':'ok',
+  'Fail':'concern', 'Pass with remediation':'watch', 'Pass':'ok', 'Honors':'ok', 'Incomplete':'watch',
   'In progress':'neutral', 'Scheduled':'neutral'
 };
+RESULT_CHIP['Distinguishably above'] = 'ok';
+RESULT_CHIP['Distinguishably below'] = 'watch';
 function resultChip(result){
   const cls = RESULT_CHIP[result] || 'neutral';
   if(cls === 'neutral'){
@@ -2403,8 +2933,12 @@ function renderRoster(){
     const c2 = document.createElement('td'); c2.className = 'num'; c2.textContent = s.cohort; cells.push(c2);
     const c3 = document.createElement('td'); c3.className = 'num'; c3.textContent = s.phase; cells.push(c3);
     const c4 = document.createElement('td'); c4.className = 'num'; c4.textContent = s.completed; cells.push(c4);
+    const cn = document.createElement('td'); cn.appendChild(meterCell(nbOf(s))); cells.push(cn);
+    const cb = document.createElement('td'); cb.className = 'num' + (belowOf(s) ? ' belowcell' : '');
+    cb.textContent = belowOf(s) ? String(belowOf(s)) : '\u2013'; cells.push(cb);
     const c5 = document.createElement('td'); c5.appendChild(meterCell(kOf(s))); cells.push(c5);
     const c6 = document.createElement('td'); c6.appendChild(meterCell(skOf(s))); cells.push(c6);
+    const c7 = document.createElement('td'); c7.appendChild(meterCell(ovOf(s))); cells.push(c7);
     const c8 = document.createElement('td'); c8.appendChild(chipFor(s.status)); cells.push(c8);
     const c9 = document.createElement('td'); c9.className = 'opencell'; c9.textContent = 'Open →'; cells.push(c9);
 
@@ -2763,7 +3297,7 @@ function bootLoadGate(){
   });
 }
 
-/* Student photos live in a folder the viewer picks with "Load photos" - one
+/* Student photos live in a folder "Load data, names & photos" reads - one
    image per file, named by the code (ASC-2028-014.jpg). They are held as
    in-memory object URLs for this session only: the page carries none, the
    loaded data carries none, and nothing is written anywhere. Pairing a face
@@ -2780,8 +3314,6 @@ function adoptPhotos(files){
     if(!code) return;
     PHOTOS[code] = URL.createObjectURL(f); n++;
   });
-  const b = $('photoBtn');
-  if(b) b.textContent = n ? 'Photos loaded (' + n + ')' : 'Load photos';
   renderAll();
   return n;
 }
@@ -2909,7 +3441,7 @@ async function fromConfidential(want){
     '# RPS › # Confidential) - or any folder above it - or shift-click to choose the file yourself.');
 }
 
-/* Student names come from the code key the viewer picks with "Load names" -
+/* Student names come from the code key "Load data, names & photos" reads -
    a CSV (student_code,name - or first_name/last_name) or a JSON map of code to
    name. Like the photos it is held in memory for this session only: nothing is
    written anywhere, and closing the page forgets it. The key re-identifies
@@ -2962,8 +3494,6 @@ function adoptNames(text){
     }
   }
   const n = Object.keys(NAMES).length;
-  const b = $('nameBtn');
-  if(b) b.textContent = n ? 'Names loaded (' + n + ')' : 'Load names';
   renderAll();
   return n;
 }
@@ -2978,7 +3508,7 @@ function photoSlot(s){
   }
   const box = elc('div','idphoto empty', Object.keys(PHOTOS).length
     ? 'No photo for this code in the loaded folder'
-    : 'No photo loaded \u2014 use Load photos');
+    : 'No photo loaded \u2014 use Load data, names & photos');
   box.setAttribute('role','img');
   box.setAttribute('aria-label','No photo loaded for ' + s.id);
   return box;
@@ -2992,10 +3522,18 @@ function fact(dl, label, value){
 }
 
 function studentHeader(host, s){
-  const back = elc('button','backlink','← All students');
+  /* a bar that stays at the top while the record scrolls, naming the list it
+     returns to - the obvious way back, ahead of the masthead's hub link */
+  const bar = elc('div','backbar');
+  const back = elc('button','backbtn');
   back.type = 'button';
-  back.addEventListener('click', closeStudent);
-  host.appendChild(back);
+  back.appendChild(elc('span','arr','\u2190'));
+  const lab = elc('span', null); lab.appendChild(elc('b', null, 'Back to the list')); lab.appendChild(elc('small', null, listLabel()));
+  back.appendChild(lab);
+  back.addEventListener('click', () => closeStudent());
+  bar.appendChild(back);
+  bar.appendChild(elc('span','backhint', 'Your filters and place in the list are kept. Browser Back works too.'));
+  host.appendChild(bar);
 
   const body = makeCard(host, null, 'Student record', null, null);
   const card = body.parentElement;
@@ -3030,6 +3568,7 @@ function studentHeader(host, s){
   if(s.advisingGroup) fact(dl, 'Advising group', s.advisingGroup);
   fact(dl, 'Blocks completed', s.completed + (s.upcoming ? ' of ' + (s.completed + s.upcoming) : ''));
   meta.appendChild(dl);
+  usmleStrip(meta, s);
 
   const now = elc('div','schedrow');
   if(s.current){
@@ -3049,6 +3588,77 @@ function studentHeader(host, s){
   row.appendChild(photoSlot(s));
   row.appendChild(meta);
   body.appendChild(row);
+}
+
+/* ---------------- USMLE, at the top of the record ---------------- */
+/* The licensing records carry the result; the 3-digit Step 2 CK score (and
+   every retake's) and the class mean of first attempts ride in the subtitle,
+   e.g. "USMLE · Jun 12, 2026 Pass · score 251 · class mean 254 (n 97)". */
+function usmleOf(s){
+  const out = {};
+  (s.records || []).filter(r => r.kind === 'licensing' && !isPrior(r)).forEach(r => {
+    const t = r.term || '';
+    out[r.code] = {rec: r, result: r.result, scores: [...t.matchAll(/score (\d{3})/g)].map(m => +m[1]),
+      tries: (t.match(/attempt/g) || []).length || 1, classMean: +((t.match(/class mean (\d+)/) || [])[1]) || null,
+      date: r.end || r.start};
+  });
+  return out;
+}
+/* a first-attempt score's percentile within the student's class */
+function step2Pct(s, score){
+  const pool = (DATA.students || []).filter(o => o.cohort === s.cohort)
+    .map(o => (usmleOf(o).STEP2CK || {}).scores).filter(v => v && v.length).map(v => v[0]);
+  if(pool.length < 5) return null;
+  return Math.round(100 * (pool.filter(v => v < score).length + (pool.filter(v => v === score).length - 1) / 2) / pool.length);
+}
+/* the NBME Comprehensive Basic Science Exam (CBSE), sat at the end of Phase 1
+   before Step 1: equated percent correct, ranked within the class. A repeated
+   phase's earlier sitting is shown, marked, when it is the only one. */
+function cbseOf(s){
+  const find = prior => { for(const r of (s.records || []).filter(r => isPrior(r) === prior))
+    for(const c of casList(r)) if(/cbse/i.test(c.label || '') && c.scaled != null) return {rec: r, cas: c, prior}; return null };
+  return find(false) || find(true);
+}
+function cbsePct(s, v){
+  const pool = (DATA.students || []).filter(o => o.cohort === s.cohort).map(o => cbseOf(o)).filter(x => x && !x.prior).map(x => x.cas.scaled);
+  if(pool.length < 5) return null;
+  return Math.round(100 * (pool.filter(x => x < v).length + (pool.filter(x => x === v).length - 1) / 2) / pool.length);
+}
+function usmleStrip(host, s){
+  const u = usmleOf(s), cb = cbseOf(s);
+  if(!u.STEP1 && !u.STEP2CK && !cb && s.cohort > 2028) return;
+  const strip = elc('div','usmle');
+  const tile = (name, big, sub, bad) => { const d = elc('div','ustile' + (bad ? ' bad' : '')); d.appendChild(elc('span','un', name));
+    d.appendChild(elc('b', null, big)); if(sub) d.appendChild(elc('span','us', sub)); strip.appendChild(d) };
+  const resWord = x => x.result === 'Pass with remediation' ? 'Pass on retake' : x.result;
+  if(cb){
+    const pc = cb.prior ? null : cbsePct(s, cb.cas.scaled);
+    tile('NBME CBSE', String(Math.round(cb.cas.scaled)),
+      'equated percent correct \u00b7 ' + fmtDate(cb.rec.end || cb.rec.start) +
+      (pc != null ? ' \u00b7 ' + ord(pc) + ' percentile in the class' : '') +
+      (cb.cas.cohortMean != null ? ' \u00b7 class mean ' + Math.round(cb.cas.cohortMean) : '') +
+      (cb.prior ? ' \u00b7 earlier attempt' + (s.enteredWith ? ' with the Class of ' + s.enteredWith : '') : ''), false);
+  } else if(s.cohort >= 2028 && s.phase > 1){
+    tile('NBME CBSE', 'Not on record', 'No CBSE score on file', false);
+  }
+  const s1 = u.STEP1;
+  tile('USMLE Step 1', s1 ? resWord(s1) : 'Not on record',
+       s1 ? fmtDate(s1.date) + (s1.tries > 1 ? ' \u00b7 ' + s1.tries + ' attempts' : '') + ' \u00b7 pass/fail' : 'No result in the score roster',
+       s1 && s1.result !== 'Pass');
+  const s2 = u.STEP2CK;
+  if(s2 && s2.scores.length){
+    const pc = step2Pct(s, s2.scores[0]);
+    tile('USMLE Step 2 CK', String(s2.scores[s2.scores.length - 1]),
+      resWord(s2) + ' \u00b7 ' + fmtDate(s2.date) +
+      (s2.scores.length > 1 ? ' \u00b7 first attempt ' + s2.scores[0] : '') +
+      (pc != null ? ' \u00b7 ' + ord(pc) + ' percentile in the class' : '') +
+      (s2.classMean ? ' \u00b7 class mean ' + s2.classMean : ''), s2.result !== 'Pass');
+  } else if(s2){
+    tile('USMLE Step 2 CK', resWord(s2), fmtDate(s2.date) + ' \u00b7 score not reported', s2.result !== 'Pass');
+  } else if(s.cohort <= 2027){
+    tile('USMLE Step 2 CK', 'Not on record', 'No result in the score roster yet', false);
+  }
+  host.appendChild(strip);
 }
 
 /* ---------------- rotation schedule ---------------- */
@@ -3653,19 +4263,48 @@ function divergingBars(chartId, tableId, items, opts){
 
 function renderSkillDomains(s){
   const refs = (DATA.refs||{})[s.cohort] || {domains:{}};
-  const items = SKILL_DOMAINS.map(d => {
-    const v = s.skillDomains ? s.skillDomains[d] : null;
-    const r = refs.domains ? refs.domains[d] : null;
-    if(v == null || r == null) return {label:d, delta:null};
-    return {label:d, delta: v - r, studentText: v + ' / 100', refText: r + ' / 100',
-      detail: v + ' against a class mean of ' + r};
+  const host = $('domainChart'); host.textContent = '';
+  /* one panel per ACGME competency: the competency's score against the class
+     mean, then every domain that makes it up with its own score and mean */
+  const sign = d => (d > 0 ? '+' : d < 0 ? '−' : '±') + Math.abs(d);
+  const tone = d => d <= -5 ? 'neg' : d >= 5 ? 'pos' : 'flat';
+  const grid = elc('div','acgrid'), tab = [];
+  SKILL_ACGME.forEach(([name, ds]) => {
+    const own = ds.filter(d => s.skillDomains && s.skillDomains[d] != null && refs.domains && refs.domains[d] != null);
+    if(!own.length) return;
+    const v = acgmeScore(s.skillDomains, own), r = acgmeScore(refs.domains, own), dv = v - r;
+    const p = elc('div','acpanel');
+    const hd = elc('div','achd');
+    hd.appendChild(elc('div','acname', name));
+    const big = elc('div','acbig ' + tone(dv)); big.appendChild(elc('b', null, sign(dv))); big.appendChild(elc('span', null, 'vs class mean'));
+    hd.appendChild(big);
+    hd.appendChild(elc('div','acsub', 'This student ' + v + ' · class mean ' + r + ' (0–100)'));
+    p.appendChild(hd);
+    tab.push([name, v, r, sign(dv)]);
+    if(ds.length > 1 || own[0] !== name){
+      own.forEach(d => {
+        const a = s.skillDomains[d], b = refs.domains[d], dd = a - b;
+        const row = elc('div','acrow');
+        row.appendChild(elc('span','acd', d));
+        const tr = elc('span','actrack');
+        const f = elc('i', tone(dd)); f.style.width = Math.max(3, Math.min(50, Math.abs(dd) * 5)) + '%';
+        f.style[dd < 0 ? 'right' : 'left'] = '50%'; tr.appendChild(f); row.appendChild(tr);
+        row.appendChild(elc('span','acv', a + ' vs ' + b));
+        row.appendChild(elc('b','acdd ' + tone(dd), sign(dd)));
+        p.appendChild(row);
+        tab.push([' ' + d, a, b, sign(dd)]);
+      });
+    }
+    grid.appendChild(p);
   });
-  divergingBars('domainChart','domainTable', items, {
-    refName:'class mean', unit:'points', rowLabel:'Clinical skills domain',
-    axisLabel:'Points above or below the class mean', axisLabelShort:'vs. class mean',
-    ariaLabel:'Clinical skills domains compared with the class mean',
-    emptyText:'No OSCE or clinical evaluation domain scores on record yet.'
-  });
+  if(!grid.children.length){ host.appendChild(emptyDiv('No OSCE or clinical evaluation domain scores on record yet.')); }
+  else {
+    host.appendChild(grid);
+    host.appendChild(elc('p','why', 'Scores on a 0–100 scale (OSCE checklist percent and clinical-evaluation ratings rescaled). ' +
+      'Bars run left of the centre line when below the class mean and right when above (10 points = full half); red or blue once the gap is 5 points or more.'));
+  }
+  buildTable($('domainTable'), [{label:'ACGME competency · domain'},{label:'This student',num:true},{label:'Class mean',num:true},{label:'Difference',num:true}],
+    tab, 'Clinical skills by ACGME competency against the class mean');
 }
 
 /* ---------------- clerkship NBME exams by content area ---------------- */
@@ -3761,7 +4400,7 @@ function renderFlags(host, s){
   host.textContent = '';
   const flags = s.flags || [];
   if(!flags.length){
-    host.appendChild(elc('div','empty','Nothing outstanding. No failed blocks, no remediations, no clerkship CAS exam below its pass mark, and no assessment below the 10th percentile.'));
+    host.appendChild(elc('div','empty','Nothing outstanding. No failed blocks, no remediations, no NBME exam below its pass mark, and no assessment below the 10th percentile.'));
   } else {
     const ul = elc('ul','flags');
     flags.forEach(f => {
@@ -3829,6 +4468,521 @@ function renderLog(host, s){
   return rows.length;
 }
 
+/* ---------------- clerkship grade paths ---------------- */
+/* A legacy clerkship grades objective by objective: each objective pairs a
+   clinical-evaluation item with an assessment and is rated H, P or F on its
+   own, and the final grade is Honors when enough are H. Nearly everyone
+   earns Honors, so the letter alone says little; which objectives carried it
+   is the record. "?" is an objective whose deciding input (a direct
+   observation, Medicine's CRA) is not on file - shown, never guessed. */
+const RATING_WORD = {H:'Honors', P:'Pass', F:'Fail', '?':'Not on file', 'H/P':'Honors or Pass (Honors level not on file)', NA:'Not counted'};
+const RATING_CLS = {H:'H', P:'P', F:'F', '?':'U', 'H/P':'U', NA:'NA'};
+function ratingBadge(r, name){
+  const b = elc('span', 'orate ' + (RATING_CLS[r] || 'U'), r === 'NA' ? '–' : r === 'H/P' ? 'H?' : (r || '?'));
+  b.title = (name ? name + ': ' : '') + (RATING_WORD[r] || 'Not on file');
+  return b;
+}
+function gradePathSay(rec){
+  const objs = rec.objectives, gr = rec.gradeRule || {};
+  const nH = objs.filter(o => o.rating === 'H').length;
+  const scored = objs.filter(o => o.rating !== 'NA').length;
+  let say = 'H on ' + nH + ' of ' + scored + ' objectives';
+  if(gr.need) say += ' · Honors needs ' + gr.need;
+  return say;
+}
+function gradePathNote(rec){
+  const gr = rec.gradeRule || {};
+  const letter = {Honors:'H', Pass:'P', Fail:'F'}[rec.result];
+  const open = rec.objectives.filter(o => o.rating === '?' || o.rating === 'H/P').map(o => o.name);
+  if(!letter) return 'Recorded by the clerkship as ' + rec.result +
+    ' — a grade the calculator does not produce (an incomplete or a manual entry).';
+  if(gr.byRules === letter) return 'The clerkship’s grading rules, applied to these scores, give the same grade.';
+  if(gr.byRules === '?') return 'Not on file: ' + open.join(', ') +
+    '. Without ' + (open.length === 1 ? 'it' : 'them') + ' the rules alone cannot settle the grade; the recorded grade stands.';
+  return 'The recorded grade differs from what the clerkship’s grading rules give for these scores (' +
+    (RATING_WORD[gr.byRules] || gr.byRules) + ') — an adjustment by the clerkship, or a score entered differently.';
+}
+function renderGradePaths(host, s){
+  host.textContent = '';
+  const recs = (s.records||[]).filter(r => r.objectives && r.objectives.length)
+    .sort((a,b) => a.seq - b.seq);
+  const rows = [];
+  recs.forEach(rec => {
+    const d = elc('details','gpath');
+    const sm = elc('summary');
+    sm.appendChild(elc('span','gname', rec.code + ' — ' + rec.name));
+    sm.appendChild(resultChip(rec.result));
+    const line = elc('span','gline');
+    const badges = elc('span','gbadges');
+    badges.setAttribute('aria-hidden','true');
+    rec.objectives.forEach(o => badges.appendChild(ratingBadge(o.rating, o.name)));
+    line.appendChild(badges);
+    line.appendChild(elc('span','gsay', gradePathSay(rec)));
+    sm.appendChild(line);
+    d.appendChild(sm);
+    d.appendChild(elc('p','gnote', gradePathNote(rec)));
+    const t = elc('div');
+    buildTable(t, [{label:'Objective'},{label:'Rating'},{label:'Evidence'},{label:'What earns Honors · Pass'}],
+      rec.objectives.map(o => [o.name, RATING_WORD[o.rating] || o.rating, o.evidence, o.rule]),
+      rec.name + ': objectives, ratings and the evidence behind each');
+    d.appendChild(t);
+    host.appendChild(d);
+    rec.objectives.forEach(o => rows.push([rec.code + ' — ' + rec.name, rec.result, o.name,
+      RATING_WORD[o.rating] || o.rating, o.evidence]));
+  });
+  buildTable($('gradeTable'),
+    [{label:'Clerkship'},{label:'Final grade'},{label:'Objective'},{label:'Rating'},{label:'Evidence'}],
+    rows, 'Every clerkship objective with its rating and evidence');
+}
+
+/* ---------------- two axes across clerkships ---------------- */
+function taCell(z, top, sub){
+  const td = elc('td','cell');
+  if(z == null){ td.classList.add('na'); td.textContent = '—'; return td }
+  const p = taPct(z), bg = divergingColor(p - 50);
+  td.style.background = bg; td.style.color = inkOn(bg);
+  td.appendChild(elc('span','sc', top != null ? String(top) : ord(p)));
+  if(sub) td.appendChild(elc('span','pc', sub));
+  return td;
+}
+function taTable(host, cols, rows, caption){
+  const wrap = elc('div','tablewrap'), t = elc('table','matrix');
+  t.appendChild(elc('caption','sr', caption));
+  const hr = elc('tr'); hr.appendChild(elc('th','rowhd',''));
+  cols.forEach(c => hr.appendChild(elc('th', null, c)));
+  const th = elc('thead'); th.appendChild(hr); t.appendChild(th);
+  const tb = elc('tbody'); rows.forEach(r => tb.appendChild(r)); t.appendChild(tb);
+  wrap.appendChild(t); host.appendChild(wrap);
+}
+function taRowHead(tr, name, sub){
+  /* a name led by spaces is a domain under its competency: indented, lighter */
+  const th = elc('th','rowhd'), nested = /^\s/.test(name);
+  th.appendChild(document.createTextNode(name.trim()));
+  if(nested){ th.style.paddingLeft = '22px'; th.style.fontWeight = '600' }
+  if(sub) th.appendChild(elc('span','sub', sub)); tr.appendChild(th);
+}
+function taLevelCell(ax, id){
+  const td = elc('td','cell'); td.style.background = 'transparent';
+  if(!ax || !(id in ax.z)){ td.textContent = '—'; td.classList.add('na'); return td }
+  td.appendChild(resultChip(TA_LEVEL[ax.level(ax.z[id])]));
+  return td;
+}
+function relWord(r){ return r >= .8 ? 'dependable for an individual student' : r >= .6 ? 'usable for broad groups' : 'too noisy to rank an individual' }
+
+function renderTwoAxes(host, s, A){
+  host.textContent = '';
+  const codes = TA_CLERK.filter(c => (s.records||[]).some(r => r.kind === 'clerkship' && r.code === c && r.attempt !== 'prior'));
+  const tab = [];
+  /* knowledge: the shelf in each clerkship, then the composite */
+  const K = A.knowledge;
+  if(K){
+    host.appendChild(elc('div','kicker','Medical Knowledge (ACGME) · NBME clerkship exams · dependability ' + K.rel.toFixed(2) + ' (' + relWord(K.rel) + ')'));
+    const tr = elc('tr'); taRowHead(tr, 'Shelf score', 'cell: score · class percentile');
+    codes.forEach(c => { const z = K.per[c] && K.per[c][s.id], sc = A.raw[c] && A.raw[c][s.id];
+      tr.appendChild(taCell(z, sc != null ? sc : null, z != null ? ord(taPct(z)) : ''));
+      if(z != null) tab.push(['Knowledge', c, 'Shelf', sc, taPct(z)]) });
+    const kz = K.z[s.id];
+    tr.appendChild(taCell(kz, null, kz != null ? 'across ' + codes.filter(c => K.per[c] && s.id in K.per[c]).length : ''));
+    tr.appendChild(taLevelCell(K, s.id));
+    if(kz != null) tab.push(['Knowledge', 'All clerkships', 'Shelf composite', '', taPct(kz), TA_LEVEL[K.level(kz)]]);
+    taTable(host, codes.concat(['All', 'Level']), [tr], 'Shelf score by clerkship and across clerkships');
+  }
+  /* clinical: every domain by clerkship, then all domains together */
+  const C = A.clinical;
+  if(C){
+    const ck = elc('div','kicker'); ck.style.marginTop = '18px'; host.appendChild(ck);
+    ck.textContent = ('Clinical · clinical evaluations by ACGME competency · dependability ' + C.rel.toFixed(2) +
+      ' all together (' + relWord(C.rel) + '); single domains ' +
+      Object.values(A.domains).map(a => a.rel).reduce((a,b) => [Math.min(a[0],b), Math.max(a[1],b)], [1,0]).map(x => x.toFixed(2)).join('–'));
+    const rows = [];
+    const addRow = (name, ax, sub) => {
+      const tr = elc('tr'); taRowHead(tr, name, sub);
+      codes.forEach(c => { const z = ax.per[c] && ax.per[c][s.id]; tr.appendChild(taCell(z, null, ''));
+        if(z != null) tab.push(['Clinical', c, name, '', taPct(z)]) });
+      const z = ax.z[s.id]; tr.appendChild(taCell(z, null, ''));
+      tr.appendChild(taLevelCell(ax, s.id));
+      if(z != null) tab.push(['Clinical', 'All clerkships', name, '', taPct(z), TA_LEVEL[ax.level(z)]]);
+      rows.push(tr);
+    };
+    addRow('All competencies', C, 'dependability ' + C.rel.toFixed(2));
+    TA_ACGME.forEach(([name, ds]) => {
+      const ca = A.competencies[name];
+      if(ca) addRow(name, ca, 'ACGME competency · dependability ' + ca.rel.toFixed(2));
+      if(ds.length > 1) ds.forEach(d => { if(A.domains[d]) addRow('   ' + d, A.domains[d], 'domain · dependability ' + A.domains[d].rel.toFixed(2)) });
+    });
+    taTable(host, codes.concat(['All', 'Level']), rows, 'Clinical evaluations by ACGME competency, clerkship by clerkship and across clerkships');
+    host.appendChild(elc('p','why', TA_ACGME_LIMITED.join(' and ') +
+      ': limited evidence. No clinical-evaluation domain measures them (only a few clerkship items do), so no level is given.'));
+  }
+  const cav = elc('p','why');
+  cav.style.marginTop = '12px';
+  cav.textContent = 'Caveat. Each cell is this student’s class percentile in that clerkship; “All” is the standing across ' +
+    'clerkships, and the level says whether it differs from the class middle by more than measurement error allows (95%). ' +
+    'The shelf exams agree with themselves from one clerkship to the next, so the knowledge level can be trusted for an ' +
+    'individual. The clinical ratings mostly reflect one overall impression of the student, which changes with the clerkship ' +
+    'and its evaluators: read the clinical level as a broad signal, and the single domains as context for a conversation, ' +
+    'never as a ranking.';
+  host.appendChild(cav);
+  buildTable($('axesTable'),
+    [{label:'Axis'},{label:'Clerkship'},{label:'Measure'},{label:'Score'},{label:'Class percentile',num:true},{label:'Level'}],
+    tab.map(r => [r[0], r[1], r[2], r[3] == null ? '' : r[3], r[4], r[5] || '']),
+    'Knowledge and clinical standing by clerkship and across clerkships');
+}
+
+/* ---------------- NBME exams, first ---------------- */
+/* Every NBME exam on record, in the order sat: the student's score (equated
+   percent correct) against the 65% pass mark where the exam has one, the class
+   median, and the class percentile. The NBME exams are the most dependable
+   measure of medical knowledge on this page, so they lead. */
+function renderNbme(host, s){
+  host.textContent = '';
+  const rows = [];
+  const priorRows = [];
+  (s.records||[]).slice().sort((a,b) => (a.start||'') < (b.start||'') ? -1 : (a.start||'') > (b.start||'') ? 1 : a.seq - b.seq)
+    .forEach(r => casList(r).forEach(c => { if(c.scaled != null) (isPrior(r) ? priorRows : rows).push({r, c}) }));
+  if(!rows.length && !priorRows.length){ host.appendChild(elc('div','empty','No NBME exams on record yet.')); return }
+  const cb = casBelowPass(s);
+  const head = elc('div','nbhead');
+  const big = elc('div','nbbig');
+  big.appendChild(elc('b', null, s.nbmePct == null ? '\u2014' : ord(s.nbmePct)));
+  big.appendChild(elc('span', null, 'class percentile across ' + rows.length + (rows.length === 1 ? ' NBME exam' : ' NBME exams') + (priorRows.length ? ' in the current attempt' : '')));
+  head.appendChild(big);
+  const bl = elc('div','nbbig' + (cb.open.length ? ' warn' : ''));
+  bl.appendChild(elc('b', null, String(cb.open.length)));
+  bl.appendChild(elc('span', null, (cb.open.length === 1 ? 'exam' : 'exams') + ' below its pass mark with no passing retake' +
+    (cb.resolved.length ? ' \u00b7 ' + cb.resolved.length + ' passed on retake' : '')));
+  head.appendChild(bl);
+  host.appendChild(head);
+  const lo = 30, hi = 100, x = v => Math.max(0, Math.min(100, (v - lo) / (hi - lo) * 100));
+  const refs = ((DATA.refs||{})[s.cohort] || {}).examAreas || {};
+  let nx = 0;
+  const drawRows = (list, rowsIn) => rowsIn.forEach(({r, c}) => {
+    const hasAreas = c.areas && Object.keys(c.areas).length;
+    const row = elc('div','nbrow' + (c.passMark != null && c.scaled < c.passMark ? ' below' : '') + (hasAreas ? ' clickable' : ''));
+    const lab = elc('div','nblab');
+    lab.appendChild(elc('b', null, r.code));
+    lab.appendChild(elc('span', null, (c.label || 'NBME exam').replace(/^NBME\s*/i, '') + (r.name && r.name !== r.code ? ' \u00b7 ' + r.name.replace(/\*$/, '') : '')));
+    row.appendChild(lab);
+    const tr = elc('div','nbtrack');
+    if(c.passMark != null){ const pm = elc('i','nbpass'); pm.style.left = x(c.passMark) + '%'; pm.title = 'Pass mark ' + c.passMark + '%'; tr.appendChild(pm) }
+    if(c.classMedian != null){ const md = elc('i','nbmed'); md.style.left = x(c.classMedian) + '%'; md.title = 'Class median ' + fmtScaled(c.classMedian); tr.appendChild(md) }
+    const dot = elc('i','nbdot'); dot.style.left = x(c.scaled) + '%'; tr.appendChild(dot);
+    row.appendChild(tr);
+    row.appendChild(elc('div','nbscore', fmtScaled(c.scaled) + (c.passMark != null && c.scaled < c.passMark ? ' \u2193' : '')));
+    row.appendChild(elc('div','nbpct', c.percentile == null ? '\u2014' : ord(c.percentile)));
+    /* click (or Enter) opens the exam's content areas beneath the row */
+    if(hasAreas){
+      row.setAttribute('role','button'); row.tabIndex = 0; row.setAttribute('aria-expanded','false');
+      lab.appendChild(elc('span','nbmore','Content areas \u25be'));
+      const box = elc('div','nbareas'); box.hidden = true;
+      const id = 'nbx' + (nx++);
+      const toggle = () => {
+        const open = box.hidden;
+        box.hidden = !open; row.setAttribute('aria-expanded', open ? 'true' : 'false'); row.classList.toggle('open', open);
+        if(open && !box.dataset.drawn){
+          const ch = elc('div'); const tb = elc('div'); tb.id = id; tb.hidden = true;
+          box.appendChild(ch); box.appendChild(tb);
+          barPanels(ch, id, [{title: c.label || 'NBME exam', code: r.code,
+            sub: r.code + ' \u00b7 ' + fmtRange(r.start, r.end) + ' \u00b7 total ' + fmtScaled(c.scaled) + (c.cohortMean != null ? ' (class mean ' + c.cohortMean + ')' : ''),
+            parts: Object.entries(c.areas), ref: refs[examName(c.label)] || {}}],
+            {varName:'--s5', partName:'content area', partLabel:'Content area', itemName:'Exam', unitShort:'Percent correct',
+             unitLong:'equated percent correct', emptyText:'No content-area breakdown in this score report.', caption:'Content areas'});
+          box.appendChild(elc('p','why', 'Bar: this student\u2019s equated percent correct in each content area. Tick: the class mean for that area on the same exam.'));
+          box.dataset.drawn = '1';
+        }
+      };
+      row.setAttribute('aria-label', r.code + ' ' + (c.label || '') + ': ' + fmtScaled(c.scaled) +
+        (c.passMark != null ? ', pass mark ' + c.passMark : '') + (c.classMedian != null ? ', class median ' + fmtScaled(c.classMedian) : '') +
+        '. Press to show content areas.');
+      row.addEventListener('click', toggle);
+      row.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); toggle() } });
+      list.appendChild(row); list.appendChild(box);
+      return;
+    }
+    row.setAttribute('aria-label', r.code + ' ' + (c.label || '') + ': ' + fmtScaled(c.scaled) +
+      (c.passMark != null ? ', pass mark ' + c.passMark : '') + (c.classMedian != null ? ', class median ' + fmtScaled(c.classMedian) : '') +
+      (c.percentile != null ? ', ' + ord(c.percentile) + ' percentile' : ''));
+    list.appendChild(row);
+  });
+  /* the key, drawn with the same marks the rows use */
+  const key = elc('div','nbkey');
+  const k = (cls, text) => { const d = elc('span','nbk'); const sw = elc('span','nbsw'); sw.appendChild(elc('i', cls)); d.appendChild(sw); d.appendChild(document.createTextNode(text)); key.appendChild(d) };
+  k('nbdot', 'This student\u2019s score'); k('nbmed', 'Class median'); k('nbpass', 'Pass mark');
+  key.appendChild(elc('span','nbk hint', 'Click an exam to see its content areas'));
+  host.appendChild(key);
+  const hd = elc('div','nbrow nbcolhd');
+  ['Exam', 'Score on a 30\u2013100% scale', 'Score', 'Class pct'].forEach(t => hd.appendChild(elc('div', null, t)));
+  host.appendChild(hd);
+  const list = elc('div','nblist');
+  if(rows.length) drawRows(list, rows); else list.appendChild(elc('div','empty','No NBME exams in the current attempt yet.'));
+  host.appendChild(list);
+  if(priorRows.length){
+    const pr = elc('div','nbprior');
+    pr.appendChild(elc('div','nbprior-hd', 'Earlier attempt' + (s.enteredWith ? ' \u00b7 with the Class of ' + s.enteredWith : '') +
+      ' \u00b7 kept on record, not counted in the current standing (percentiles against that class)'));
+    const pl = elc('div','nblist'); drawRows(pl, priorRows); pr.appendChild(pl);
+    host.appendChild(pr);
+  }
+  buildTable($('nbmeTable'),
+    [{label:'Block'},{label:'Exam'},{label:'Block starts'},{label:'Score',num:true},{label:'Pass mark',num:true},{label:'Class median',num:true},{label:'Class percentile',num:true}],
+    rows.concat(priorRows).map(({r, c}) => [r.code + (isPrior(r) ? ' (earlier attempt)' : ''), c.label || '', r.start ? fmtDate(r.start) : '', fmtScaled(c.scaled),
+      c.passMark == null ? '' : c.passMark, c.classMedian == null ? '' : fmtScaled(c.classMedian), c.percentile == null ? '' : c.percentile]),
+    'Every NBME exam on record');
+}
+
+
+/* The paragraphs carry no overall class ranking (decided 2026-10-11): the
+   "overall standing ... tier of the class" sentence is dropped, and so is any
+   note about it - whichever data file is loaded. */
+function summaryClean(t){
+  return String(t || '').replace(/\s*On knowledge and clinical evaluations combined,[^.]*overall standing was in the [a-z]+ tier of the class\./g, '').trim();
+}
+/* objectives met at the Honors standard / those that can carry Honors (pass/
+   fail-only and Honors-not-on-file left out) - the count the strip shows */
+function honorsCount(s){
+  let h = 0, k = 0;
+  OP_CODES.forEach(c => { const r = opRec(s, c); ((r && r.objectives) || []).forEach(o => {
+    if(o.rating === 'NA' || /^Pass\/fail/i.test(o.rule || '')) return;
+    if(['H','P','F'].includes(o.rating)){ k++; if(o.rating === 'H') h++ } }) });
+  return k ? [h, k] : null;
+}
+/* the paragraph's count follows the record, so it always matches the strip */
+function summaryCount(t, s){
+  const c = honorsCount(s);
+  return c ? t.replace(/(Honors standard on )\d+( of )\d+/, '$1' + c[0] + '$2' + c[1]) : t;
+}
+function summaryNote(n){
+  n = String(n || '');
+  if(/knowledge and overall-standing sentences are left out/i.test(n))
+    return n.replace(/The knowledge and overall-standing sentences are left out because both are/i, 'The knowledge sentence is left out because it is');
+  if(/overall-standing sentence is left out/i.test(n)) return '';
+  return n;
+}
+
+/* ---------------- Phase 2 one-pager (legacy clerkship classes) ---------------- */
+/* The "Overall clinical performance in Phase 2" profile: grades, overall
+   standing tier, competency grid with class shares, Medical Knowledge against
+   the class, and the summary paragraph. Same method as the confidential
+   profiles file (build_profiles.py): objectives grouped by competency area;
+   the ACGME competencies and their equal-weight overall from twoAxes();
+   levels at 1.96 SEM. */
+const OP_CODES = ['MED','NRL','OBG','PED','PSY','SUR'];
+const OP_NAMES = ['Medicine','Neurology','OB/GYN','Pediatrics','Psychiatry','Surgery-Anesthesiology'];
+const OP_GROUP = {
+  MED:{'Medical knowledge':'mk','Assessment & management plan':'dx','History taking':'hx','Physical exam':'pe','Presentations':'pres','Differential diagnosis':'dx','Patients & families':'pf','Initiative & reliability':'team'},
+  NRL:{'Neurologic knowledge':'mk','Rapport':'pf','Differential diagnosis':'dx','History taking':'hx','Neurologic exam':'pe','Diagnostic & management plan':'dx','Communicating findings':'pres','Teamwork & professionalism':'team'},
+  OBG:{'Differential diagnosis & plan':'dx',"Women's health interview":'hx','Rapport':'pf','Teamwork':'team','Basic skills & GU exam':'pe'},
+  PED:{'Medical knowledge':'mk','History taking':'hx','Physical exam':'pe','Oral communication':'pres','Written communication':'pres','Differential diagnosis':'dx','Plan & follow-up':'dx','Culture & social determinants':'pf'},
+  PSY:{'Recognizing psychiatric illness':'mk','Psychiatric assessment':'hx','Diagnosis':'dx','Therapeutic alliance':'pf','Oral & written presentation':'pres','Treatment plan':'dx','Teamwork':'team'},
+  SUR:{'Differential diagnosis':'dx','Management plan':'dx','Perioperative plan':'dx','Perioperative team':'team','Medical knowledge':'mk','History taking':'hx','Physical exam':'pe','Oral & written presentation':'pres','Interpersonal skills':'pf'}
+};
+const OP_AREAS = [['Medical Knowledge'], ['Medical Knowledge','mk'], ['Patient Care'], ['History taking','hx'], ['Physical examination','pe'],
+  ['Clinical reasoning','dx'], ['Interpersonal & Communication Skills'], ['Case presentation','pres'], ['Patients and families','pf'],
+  ['Professionalism'], ['Teamwork and reliability','team']];
+let OP_CACHE = {data:null, byCohort:{}};
+const opRec = (s, c) => (s.records||[]).find(r => r.kind === 'clerkship' && r.code === c && !isPrior(r));
+function opSquare(ratings){
+  const known = ratings.filter(r => r === 'H' || r === 'P' || r === 'F');
+  if(!ratings.length) return 'N';
+  if(known.includes('F')) return 'F';
+  if(known.includes('P')) return 'P';
+  if(known.length) return 'H';
+  return ratings.includes('H/P') ? 'Q' : 'N';
+}
+function opGrid(s){
+  const g = {};
+  OP_AREAS.forEach(([, a]) => { if(!a) return;
+    g[a] = OP_CODES.map(c => { const r = opRec(s, c);
+      return opSquare(((r && r.objectives) || []).filter(o => OP_GROUP[c][o.name] === a && o.rating !== 'NA').map(o => o.rating)) }).join('');
+  });
+  return g;
+}
+const opEvery = row => { const on = row.split('').filter(v => 'HPF'.includes(v)); return on.length >= 4 && on.every(v => v === 'H') };
+function opClass(cohort){
+  if(OP_CACHE.data !== DATA) OP_CACHE = {data: DATA, byCohort:{}};
+  if(cohort in OP_CACHE.byCohort) return OP_CACHE.byCohort[cohort];
+  const studs = (DATA.students||[]).filter(s => s.cohort === cohort && OP_CODES.some(c => { const r = opRec(s, c); return r && r.objectives && r.objectives.length }));
+  if(!studs.length) return (OP_CACHE.byCohort[cohort] = null);
+  const grids = {}; studs.forEach(s => grids[s.id] = opGrid(s));
+  const rate = {}; OP_AREAS.forEach(([, a]) => { if(a) rate[a] = Math.round(100 * studs.filter(s => opEvery(grids[s.id][a])).length / studs.length) });
+  const out = {grids, rate, n: studs.length, mk: (twoAxes(cohort) || {}).knowledge || null};
+  return (OP_CACHE.byCohort[cohort] = out);
+}
+function opStrip(svg, z, cut, names, label){
+  const NSv = 'http://www.w3.org/2000/svg', L = 20, Rr = 620, base = 104, top = 22;
+  svg.textContent = '';
+  const x = v => L + (Math.max(-3, Math.min(3, v)) + 3) / 6 * (Rr - L);
+  const el = (t, a) => { const e = document.createElementNS(NSv, t); for(const k in a) e.setAttribute(k, a[k]); svg.appendChild(e); return e };
+  el('rect', {x:x(-3), y:top, width:x(-cut)-x(-3), height:base-top, class:'opz lo'});
+  el('rect', {x:x(-cut), y:top, width:x(cut)-x(-cut), height:base-top, class:'opz mid'});
+  el('rect', {x:x(cut), y:top, width:x(3)-x(cut), height:base-top, class:'opz hi'});
+  let d = ''; for(let v = -3; v <= 3.001; v += 0.05) d += (d ? 'L' : 'M') + x(v).toFixed(1) + ' ' + (base - Math.exp(-v*v/2) * (base-top-8)).toFixed(1);
+  el('path', {d: d + 'L' + x(3) + ' ' + base + 'L' + x(-3) + ' ' + base + 'Z', class:'opcurve'});
+  el('rect', {x:x(z-cut), y:top, width:x(z+cut)-x(z-cut), height:base-top, class:'opband'});
+  el('line', {x1:x(z), x2:x(z), y1:top-6, y2:base, class:'opmark'});
+  el('circle', {cx:x(z), cy:top-6, r:5, class:'opmarkdot'});
+  el('line', {x1:L, x2:Rr, y1:base, y2:base, class:'opaxis'});
+  const lab = (t, xx, y, anchor, cls) => { const e = el('text', {x:xx, y, 'text-anchor':anchor || 'middle', class: cls || 'oplab'}); e.textContent = t };
+  [[-2,'2nd'],[-1,'16th'],[0,'50th'],[1,'84th'],[2,'98th']].forEach(([v, t]) => { el('line', {x1:x(v), x2:x(v), y1:base, y2:base+5, class:'optick'}); lab(t, x(v), base+18) });
+  lab('class percentile', x(3), base+36, 'end');
+  const mid = (x(-cut)+x(cut))/2, mx = x(z);
+  lab(names[0], (x(-3)+x(-cut))/2, top+14, 'middle', 'opzlab');
+  lab(names[1], Math.abs(mid - mx) < 60 ? mid - 60 : mid, top+14, 'middle', 'opzlab');
+  lab(names[2], Math.min((x(cut)+x(3))/2, x(3) - 40), top+44, 'middle', 'opzlab');
+  lab(label, mx + 158 > Rr ? mx - 8 : mx + 8, top-2, mx + 158 > Rr ? 'end' : 'start', 'opmarklab');
+}
+const OP_RANGE = {above:'Upper range', middle:'Within the class middle', below:'Lower range'};
+const OP_LBL = {H:'H', P:'P', F:'F', Q:'H?', N:'–'};
+function renderOnePager(host, s, text){
+  const C = opClass(s.cohort); if(!C) return false;
+  const g = C.grids[s.id] || opGrid(s);
+  const page = elc('div','onepager');
+  /* grades */
+  const letters = OP_CODES.map(c => { const r = opRec(s, c); return r ? r.result : '—' });
+  const hon = letters.filter(l => l === 'Honors').length;
+  const gsec = elc('div','opsec');
+  gsec.appendChild(elc('h4', null, 'Clerkship grades'));
+  gsec.appendChild(elc('p','op-lede', (hon === 6 ? 'Honors in all six core clerkships.' : 'Honors in ' + hon + ' of 6 core clerkships.') +
+    ' Nearly every student in the class earned Honors, so the sections below show how it was earned.'));
+  const gr = elc('div','opgrades');
+  OP_CODES.forEach((c, i) => { const d = elc('div','opg'); d.appendChild(elc('span','c', c)); d.appendChild(elc('span','n', OP_NAMES[i]));
+    d.appendChild(elc('span','l', letters[i] === 'No final grade on record' ? '—' : letters[i])); gr.appendChild(d) });
+  gsec.appendChild(gr); page.appendChild(gsec);
+  /* competency grid */
+  const gsq = elc('div','opsec');
+  gsq.appendChild(elc('h4', null, 'Competencies met at the Honors standard'));
+  gsq.appendChild(elc('p','op-lede', 'Each square: the clerkship’s objectives in that competency area were met at the Honors standard (H), the Pass standard (P), ' +
+    'Pass with Honors not on file (H?), or the area was not assessed or its evidence is not on file (–). The last columns: met in every clerkship that assessed it, and the share of the class that did.'));
+  const tw = elc('div','tablewrap'), tb = elc('table','opgrid');
+  const thr = elc('tr'); ['ACGME competency'].concat(OP_CODES, ['Every clerkship','Class who also did']).forEach(h => thr.appendChild(elc('th', null, h)));
+  const th = elc('thead'); th.appendChild(thr); tb.appendChild(th);
+  const tbd = elc('tbody');
+  OP_AREAS.forEach(([name, a]) => {
+    const tr = elc('tr');
+    if(!a){ tr.className = 'grp'; const c = elc('th', null, name); c.colSpan = 9; tr.appendChild(c); tbd.appendChild(tr); return }
+    tr.appendChild(elc('th', null, name));
+    g[a].split('').forEach((v, i) => { const td = elc('td','sq'); const m = elc('span','opm ' + v, OP_LBL[v]); m.title = OP_NAMES[i]; td.appendChild(m); tr.appendChild(td) });
+    const ev = opEvery(g[a]); tr.appendChild(elc('td','opev' + (ev ? '' : ' no'), ev ? 'Yes' : 'No'));
+    const rt = elc('td','oprate'); const bar = elc('span','opbar'); const fill = elc('i'); fill.style.width = C.rate[a] + '%'; bar.appendChild(fill);
+    rt.appendChild(bar); rt.appendChild(elc('b', null, C.rate[a] + '%')); tr.appendChild(rt);
+    tbd.appendChild(tr);
+  });
+  tb.appendChild(tbd); tw.appendChild(tb); gsq.appendChild(tw); page.appendChild(gsq);
+  /* one graph per ACGME competency, each against the class */
+  const TA = twoAxes(s.cohort);
+  const graphs = [['Medical Knowledge', C.mk, 'NBME clinical subject (shelf) exams'],
+    ['Patient Care', TA && TA.competencies['Patient Care'], 'clinical evaluations: history, examination, clinical reasoning'],
+    ['Interpersonal & Communication Skills', TA && TA.competencies['Interpersonal & Communication Skills'], 'clinical evaluations: communication, documentation & presentation'],
+    ['Professionalism', TA && TA.competencies['Professionalism'], 'clinical evaluations: professionalism']]
+    .filter(([, ax]) => ax && ax.z[s.id] != null);
+  if(graphs.length){
+    const sec = elc('div','opsec');
+    sec.appendChild(elc('h4', null, 'Overall performance across the ACGME competencies'));
+    sec.appendChild(elc('p','op-lede', 'The overall combines the four measurable ACGME competencies with equal weight; the graphs below break it down, one per competency. Each shows the student\u2019s standing across the clerkships against classmates, with its 95% band. ' +
+      'A level is given only when the band excludes the class average. Dependability says how far each measure can be trusted for one student: ' +
+      'the shelf exams are consistent from clerkship to clerkship; the clinical evaluations much less so, so most students sit in the middle on them.'));
+    const O = TA && TA.overall, oz = O && O.z[s.id];
+    if(oz != null){
+      const lv = O.level(oz), row = elc('div','oprow'), left = elc('div');
+      const svg = document.createElementNS('http://www.w3.org/2000/svg','svg'); svg.setAttribute('viewBox','0 0 640 150'); svg.setAttribute('class','opsvg');
+      svg.setAttribute('role','img'); svg.setAttribute('aria-label', 'Overall across the ACGME competencies: ' + ord(taPct(oz)) + ' percentile');
+      left.appendChild(svg);
+      const lvs = elc('div','optiers');
+      [['below','Below the middle'],['middle','Class middle'],['above','Above the middle']].forEach(([k, n]) => {
+        const d = elc('div', k === lv ? 'on' : null); d.appendChild(elc('b', null, n));
+        d.appendChild(document.createTextNode(O.levels[k] + ' students \u00b7 ' + Math.round(100 * O.levels[k] / O.n) + '%')); lvs.appendChild(d) });
+      lvs.style.gridTemplateColumns = O.levels.below + 'fr ' + O.levels.middle + 'fr ' + O.levels.above + 'fr';
+      left.appendChild(lvs); row.appendChild(left);
+      const side = elc('div','opside');
+      side.appendChild(elc('div','big', ord(taPct(oz))));
+      side.appendChild(elc('p', null, 'Overall performance across the ACGME competencies: the four below combined with equal weight (dependability ' + O.rel.toFixed(2) + ')'));
+      side.appendChild(elc('p', null, ({above:'Above the class middle', middle:'Within the class middle', below:'Below the class middle'})[lv] +
+        '. The 95% band runs from the ' + ord(taPct(oz - O.cut)) + ' to the ' + ord(taPct(oz + O.cut)) + ' percentile.'));
+      row.appendChild(side); sec.appendChild(row);
+      opStrip(svg, oz, O.cut, ['Below','Class middle','Above'], 'Overall \u00b7 ' + ord(taPct(oz)));
+      sec.appendChild(elc('div','opbreak', 'Broken down by ACGME competency'));
+    }
+    const grid = elc('div','opcomp');
+    graphs.forEach(([name, ax, src]) => {
+      const z = ax.z[s.id], lv = ax.level(z), box = elc('div','opc');
+      const hd = elc('div','opchd'); hd.appendChild(elc('b', null, name)); hd.appendChild(elc('span','opcpct', ord(taPct(z))));
+      box.appendChild(hd);
+      box.appendChild(elc('div','opcsub', src + ' \u00b7 dependability ' + ax.rel.toFixed(2)));
+      const svg = document.createElementNS('http://www.w3.org/2000/svg','svg'); svg.setAttribute('viewBox','0 0 640 150'); svg.setAttribute('class','opsvg');
+      svg.setAttribute('role','img'); svg.setAttribute('aria-label', name + ': ' + OP_RANGE[lv] + ', ' + ord(taPct(z)) + ' percentile');
+      box.appendChild(svg);
+      box.appendChild(elc('div','opclv' + (lv === 'above' ? ' up' : lv === 'below' ? ' dn' : ''),
+        ({above:'Above the class middle', middle:'Within the class middle', below:'Below the class middle'})[lv] +
+        ' \u00b7 band ' + ord(taPct(z - ax.cut)) + '\u2013' + ord(taPct(z + ax.cut)) +
+        ' \u00b7 class: ' + ax.levels.below + ' below / ' + ax.levels.middle + ' middle / ' + ax.levels.above + ' above'));
+      if(name === 'Medical Knowledge'){
+        const sh = elc('div','opshelves');
+        OP_CODES.forEach(c => { const zz = ax.per[c] && ax.per[c][s.id]; const d = elc('div', null, c); d.appendChild(elc('b', null, zz == null ? '\u2014' : ord(taPct(zz)))); sh.appendChild(d) });
+        box.appendChild(sh);
+      }
+      grid.appendChild(box);
+      opStrip(svg, z, ax.cut, ['Below','Class middle','Above'], ord(taPct(z)));
+    });
+    sec.appendChild(grid);
+    sec.appendChild(elc('p','why', 'Practice-Based Learning & Improvement and Systems-Based Practice: limited evidence (no clinical-evaluation domain measures them), so no graph.'));
+    page.appendChild(sec);
+  }
+  /* How Honors was earned: one row per clerkship, one square per competency
+     objective (Honors / Pass / not on file), the clerkship's Honors
+     requirement as a line, and the grade - for a reader who has seconds */
+  {
+    const rowsH = OP_CODES.map((c, i) => ({c, name: OP_NAMES[i], r: opRec(s, c)})).filter(x => x.r && x.r.objectives && x.r.objectives.length);
+    if(rowsH.length){
+      const sec = elc('div','opsec');
+      sec.appendChild(elc('h4', null, 'How Honors was earned'));
+      let hTot = 0, nTot = 0;
+      const box = elc('div','hpath');
+      rowsH.forEach(({c, name, r}) => {
+        /* objectives that can carry Honors; pass/fail-only ones are counted apart */
+        const all = r.objectives.filter(o => o.rating !== 'NA');
+        const pf = all.filter(o => /^Pass\/fail/i.test(o.rule || ''));
+        const objs = all.filter(o => !/^Pass\/fail/i.test(o.rule || ''));
+        const need = (r.gradeRule || {}).need;
+        const order = {H:0, P:1, F:2, 'H/P':3, '?':4};
+        const sorted = objs.slice().sort((a, b) => (order[a.rating] ?? 5) - (order[b.rating] ?? 5));
+        const h = objs.filter(o => o.rating === 'H').length, known = objs.filter(o => ['H','P','F'].includes(o.rating)).length;
+        hTot += h; nTot += known;
+        const row = elc('div','hrow');
+        const lab = elc('div','hlab'); lab.appendChild(elc('b', null, c)); lab.appendChild(elc('span', null, name)); row.appendChild(lab);
+        const sq = elc('div','hsq');
+        sorted.forEach((o, k) => {
+          const cls = o.rating === 'H' ? 'H' : o.rating === 'P' ? 'P' : o.rating === 'F' ? 'F' : o.rating === 'H/P' ? 'Q' : 'N';
+          const d = elc('i', cls, cls === 'Q' ? '?' : null);
+          d.title = o.name + ': ' + ({H:'Honors standard', P:'Pass standard', F:'not met', Q:'passed; the Honors evidence is not on file', N:'not on file'})[cls];
+          sq.appendChild(d);
+          if(need && k === need - 1) sq.appendChild(elc('span','hneed'));
+        });
+        row.appendChild(sq);
+        row.appendChild(elc('div','hcount', h + ' of ' + known + (need ? ' · ' + need + ' needed' : '') +
+          (pf.length ? ' · +' + pf.filter(o => o.rating === 'P' || o.rating === 'H').length + ' pass/fail met' : '')));
+        row.appendChild(elc('div','hgrade' + (r.result === 'Honors' ? ' H' : ''), r.result === 'Honors' ? 'H' : r.result === 'Pass' ? 'P' : (r.result || '—')));
+        box.appendChild(row);
+      });
+      sec.appendChild(elc('p','op-lede', 'Each square is one competency objective of the clerkship’s criterion-based grade, met at the Honors standard (solid), ' +
+        'the Pass standard (amber), passed with the Honors evidence not on file (?), or not on file (outline). The line marks how many ' +
+        'Honors objectives the clerkship requires for an Honors grade; requirements graded pass/fail only are counted beside each row. ' +
+        hTot + ' of ' + nTot + ' objectives were met at the Honors standard.'));
+      sec.appendChild(box);
+      page.appendChild(sec);
+    }
+  }
+  /* paragraph */
+  if(text){
+    const sec = elc('div','opsec');
+    sec.appendChild(elc('h4', null, 'Summary paragraph · ' + ((s.summary && s.summary.status) || 'Draft for review')));
+    sec.appendChild(elc('p','summarytext', text));
+    if(s.summary && summaryNote(s.summary.note)) sec.appendChild(elc('p','why', summaryNote(s.summary.note)));
+    page.appendChild(sec);
+  }
+  host.appendChild(page);
+  return true;
+}
+
 /* ---------------- assemble the student view ---------------- */
 function renderStudent(s){
   const host = $('studentView'); host.textContent = '';
@@ -3836,6 +4990,41 @@ function renderStudent(s){
   /* The order the page reads in: who (by code), where they are, how they are
      doing, and finally what needs a conversation. */
   studentHeader(host, s);
+
+  /* the Class of 2027's summary paragraph: stored with the name replaced by
+     {NAME} / {FIRST}; filled from the names loaded this session, else the code */
+  const nm0 = nameOf(s.id), first0 = nm0 ? String(nm0).split(' ')[0] : s.id;
+  const text0 = s.summary && s.summary.text ? summaryCount(summaryClean(s.summary.text), s).split('{NAME}').join(nm0 || s.id).split('{FIRST}').join(first0) : '';
+  if(opClass(s.cohort) && (s.records||[]).some(r => r.objectives && r.objectives.length)){
+    const oBody = makeCard(host, 'Overall clinical performance in Phase 2',
+      'One-page profile' + (nm0 ? ' \u00b7 ' + nm0 : ''),
+      'Grades, the ACGME competencies met at the Honors standard with class context, ' +
+      'overall performance across the ACGME competencies and each competency against the class, and the summary paragraph. An Honors is an Honors: nothing here changes or qualifies ' +
+      'a clerkship grade. The evidence for every square and number is in the cards below. ' +
+      (nm0 ? '' : 'Load data, names & photos to see the student\u2019s name in place of the code. ') + 'A draft for review.', null);
+    const pb = elc('button','ghost opprint','Print one-pager'); pb.type = 'button';
+    pb.addEventListener('click', () => { document.body.classList.add('print-onepager'); window.print();
+      setTimeout(() => document.body.classList.remove('print-onepager'), 500) });
+    oBody.parentElement.querySelector('.cardhd').appendChild(pb);
+    oBody.parentElement.classList.add('onepager-card');
+    renderOnePager(oBody, s, text0);
+  } else if(text0){
+    const sBody = makeCard(host, 'Overall clinical performance in Phase 2',
+      'Summary paragraph \u00b7 ' + (s.summary.status || 'Draft for review'), 'A draft for review.', null);
+    sBody.appendChild(elc('p','summarytext', text0));
+    if(summaryNote(s.summary.note)) sBody.appendChild(elc('p','why', summaryNote(s.summary.note)));
+  }
+
+  if((s.records||[]).some(r => casList(r).some(c => c.scaled != null))){
+    const nBody = makeCard(host, 'NBME exams',
+      'Medical knowledge on the NBME exams',
+      'Every NBME exam on record, in the order sat: Phase 1 module exams and clerkship subject exams. The NBME exams are the ' +
+      'most dependable measure of medical knowledge here, and they weigh three times a quiz set in the knowledge standing. ' +
+      'One Phase 1 NBME exam below the 65% pass mark is a Monitor, two or more an Academic concern; a clerkship exam below ' +
+      'its pass mark is an Academic concern.', 'nbmeTable');
+    chartAndTable(nBody, 'nbmeChart', 'nbmeTable');
+    renderNbme($('nbmeChart'), s);
+  }
 
   const schedBody = makeCard(host, 'Rotation schedule',
     'Where this student has been and where they are going',
@@ -3873,8 +5062,37 @@ function renderStudent(s){
   chartAndTable(mxBody, 'matrixChart', 'matrixTable');
   renderMatrix($('matrixChart'), s);
 
-  /* every clerkship NBME exam together, each with its content areas */
-  if((s.records||[]).some(r => isClerkshipRec(r) && casList(r).length)){
+  /* a legacy clerkship's final grade, objective by objective */
+  if((s.records||[]).some(r => r.objectives && r.objectives.length)){
+    const gBody = makeCard(host, 'Clerkship grades',
+      'How each final grade was earned',
+      'Each clerkship grades objective by objective: an objective pairs a clinical-evaluation ' +
+      'rating with an assessment (the shelf, a direct observation, a write-up) and earns Honors, ' +
+      'Pass or Fail on its own. The final grade is Honors when enough objectives are Honors, none ' +
+      'is Fail, and the required items are done. Each square is one objective; open a clerkship ' +
+      'for the evidence and the cutoffs. A dashed square is an objective whose evidence is not on file; "H?" means Pass is ' +
+      'established and Honors depends on a result not on file. Items the Clerkship Information Sheet requires for a passing grade ' +
+      '(workplace direct observations, required clinical experiences) are taken as met for students who passed, and are labelled so.',
+      'gradeTable');
+    chartAndTable(gBody, 'gradeChart', 'gradeTable');
+    renderGradePaths($('gradeChart'), s);
+  }
+
+  /* knowledge and clinical standing across the clerkships finished */
+  const axes = twoAxes(s.cohort);
+  if(axes && ((axes.knowledge && s.id in axes.knowledge.z) || (axes.clinical && s.id in axes.clinical.z))){
+    const aBody = makeCard(host, 'Across clerkships',
+      'Knowledge and clinical performance, clerkship by clerkship',
+      'Two axes, each placed against the Class of ' + s.cohort + ' in every clerkship this student finished: ' +
+      'Medical Knowledge from the NBME shelf exams, and Patient Care, Interpersonal & Communication Skills and Professionalism (the ACGME competencies, through the school\u2019s MEPOs) from the clinical-evaluation domains. Shading ' +
+      'follows the class percentile, from 25+ points below the class midpoint to 25+ above. Read the caveat beneath.',
+      'axesTable');
+    chartAndTable(aBody, 'axesChart', 'axesTable');
+    renderTwoAxes($('axesChart'), s, axes);
+  }
+
+  /* content areas now open from each exam row in the NBME card */
+  if(false){
     const shBody = makeCard(host, 'Clerkship NBME exams',
       'Subject exams, content area by content area',
       'Every clerkship NBME exam on record, in the order sat. Each bar is this student’s ' +
@@ -3897,10 +5115,10 @@ function renderStudent(s){
   /* The NBME content areas that exist in the data are the clerkship exams'
      own, drawn exam by exam in the card above; there is no national
      content-area report to profile, so no card pretends to one. */
-  const dBody = makeCard(host, 'Clinical skills',
+  const dBody = makeCard(host, 'Clinical skills by ACGME competency',
     'Where the bedside strengths and gaps are',
-    'OSCE domain scores and clinical-evaluation ratings pooled onto one 0–100 scale, ' +
-    'then compared with the class mean for each domain.', 'domainTable');
+    'One panel per ACGME competency: the competency against the class mean, then each domain that makes it up. ' +
+    'Medical Knowledge is the NBME side.', 'domainTable');
   chartAndTable(dBody, 'domainChart', 'domainTable');
   renderSkillDomains(s);
 
@@ -3923,9 +5141,18 @@ function renderStudent(s){
   fold.addEventListener('toggle', setSum);
 }
 
+/* Leaving the list for a student keeps the list's place: the filters stay in
+   state, the scroll position is remembered, and a history entry is added so
+   the browser's Back button returns to the list instead of leaving the page
+   (no student code goes into the address bar). */
+let listScroll = 0, studentEntry = false;
 function openStudent(id){
   const s = (DATA.students||[]).find(x => x.id === id);
   if(!s) return;
+  if(!state.student){
+    listScroll = window.scrollY;
+    if(!studentEntry){ try { history.pushState({spStudent: true}, ''); studentEntry = true } catch(e){} }
+  }
   state.student = id;
   $('cohortView').hidden = true;
   $('studentView').hidden = false;
@@ -3938,7 +5165,10 @@ function setFiltersVisible(on){
   const f = document.querySelector('.filterbar');
   if(f) f.style.display = on ? '' : 'none';
 }
-function closeStudent(){
+function closeStudent(fromHistory){
+  /* the button steps back through history, so Back and the button agree */
+  if(fromHistory !== true && studentEntry){ history.back(); return }
+  studentEntry = false;
   state.student = null;
   setFiltersVisible(true);
   $('studentView').hidden = true;
@@ -3946,7 +5176,21 @@ function closeStudent(){
   $('cohortView').hidden = false;
   tipHide();
   renderAll();
-  window.scrollTo({top:0, behavior:'auto'});
+  requestAnimationFrame(() => window.scrollTo({top: listScroll, behavior:'auto'}));
+}
+/* leaving the page (the hub link, a reload, closing the tab) discards names,
+   photos and any data file loaded this session: ask first */
+let dataLoadedHere = false;
+window.addEventListener('beforeunload', e => {
+  if(Object.keys(NAMES).length || Object.keys(PHOTOS).length || dataLoadedHere){ e.preventDefault(); e.returnValue = '' }
+});
+window.addEventListener('popstate', () => { if(state.student) closeStudent(true); else studentEntry = false });
+/* what the list was showing, for the back button's label */
+function listLabel(){
+  const cls = state.cohort && state.cohort !== 'all' ? 'Class of ' + state.cohort : 'all classes';
+  const sub = subgroupLabel();
+  const n = filtered().length;
+  return cls + (sub ? ' \u00b7 ' + sub : '') + ' (' + n + ')';
 }
 
 function renderAll(){
@@ -3963,7 +5207,184 @@ function renderAll(){
   renderSkillsScatter();
   renderTypeChart();
   renderReview(list);
+  renderOffSchedule(list);
   renderRoster();
+  renderPredictors();
+}
+
+/* ---------------- off schedule ---------------- */
+/* Why a student is not moving with their class, from what the record shows:
+   the build's own reason (a Class of 2027 roster student with no Year 3
+   evaluation on file), no Step 1 once the class's Step 1 window has closed,
+   a failed Step 1 not yet passed, or a repeated phase. */
+function offScheduleReasons(s){
+  const out = [], recs = currentRecs(s.records);
+  if(s.offSchedule && s.offSchedule.reason) out.push(s.offSchedule.reason);
+  const s1 = recs.find(r => r.code === 'STEP1');
+  const dsb = recs.find(r => r.code === 'DSB');
+  const due = (dsb && dsb.end) || STEP1_ON_SCHEDULE[s.cohort];
+  /* a clerkship evaluation or shelf on file means the student went on to
+     Phase 2, so a missing Step 1 there is a matching gap, not a delay */
+  const inClerkships = recs.some(r => isClerkshipRec(r) && (r.eval || casList(r).length));
+  if(!s1 && due && due <= asOfDate() && !inClerkships)
+    out.push('No Step 1 on record; the class’s Step 1 window closed ' + due);
+  if(s1 && s1.result === 'Fail') out.push('Step 1 failed, no passing attempt on record');
+  if(s.enteredWith || (s.records || []).some(isPrior))
+    out.push('Repeating a phase' + (s.enteredWith ? ' (entered with the Class of ' + s.enteredWith + ')' : ''));
+  return out;
+}
+function renderOffSchedule(list){
+  const body = $('offBody'); if(!body) return;
+  body.textContent = '';
+  const rows = list.map(s => ({s, why: offScheduleReasons(s)})).filter(x => x.why.length)
+    .sort((a, b) => a.s.cohort - b.s.cohort || String(a.s.id).localeCompare(String(b.s.id)));
+  $('offTitle').textContent = rows.length ? rows.length + (rows.length === 1 ? ' student' : ' students') + ' off schedule' : 'Off schedule';
+  $('offEmpty').hidden = rows.length > 0;
+  $('offTable').hidden = !rows.length;
+  rows.forEach(({s, why}) => {
+    const tr = elc('tr', 'clickable');
+    tr.tabIndex = 0;
+    tr.setAttribute('aria-label', 'Open the record for ' + whoOf(s));
+    tr.addEventListener('click', () => openStudent(s.id));
+    tr.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openStudent(s.id) } });
+    const who = elc('td'), nc = elc('div', 'namecell');
+    const n = nameOf(s.id);
+    if(n) nc.appendChild(elc('span', 'nm', n));
+    nc.appendChild(elc('span', 'sid', s.id));
+    who.appendChild(nc); tr.appendChild(who);
+    tr.appendChild(elc('td', 'num', String(s.cohort)));
+    tr.appendChild(elc('td', null, s.program || '—'));
+    const w = elc('td', 'offwhy'); why.forEach(t => w.appendChild(elc('div', null, t))); tr.appendChild(w);
+    const st = elc('td'); st.appendChild(chipFor(s.status)); tr.appendChild(st);
+    body.appendChild(tr);
+  });
+}
+
+/* ---------------- across classes: what Phase 1 NBME results predict ---------------- */
+/* Pooled over every loaded class, never the filter. Phase 1 NBME failures
+   (first sittings below the pass mark) grouped none / one / two or more in
+   one semester / two or more across semesters, against Step 1 timing and
+   the first-attempt clerkship shelves; then Step 1 timing against the
+   shelves, where the legacy Class of 2027 (no Phase 1 NBME) is a comparator. */
+const STEP1_ON_SCHEDULE = {2027: '2025-06-30'};        /* legacy: the scheduled May-June 2025 sitting */
+const SHELF_CIS_PASS = {MED:59, NRL:67, OBG:65, PED:63, PSY:74, SUR:59};
+function predictorRows(){
+  const out = [];
+  (DATA.students || []).forEach(s => {
+    const recs = currentRecs(s.records);
+    const seen = new Set(), sems = new Set(); let fails = 0, p1 = 0;
+    recs.filter(r => r.phase === 1 && !isClerkshipRec(r)).forEach(r => casList(r).forEach(c => {
+      if(c.passMark == null || c.scaled == null || /cbse/i.test(c.label || '')) return;
+      const key = r.code + '|' + examName(c.label);
+      if(seen.has(key)) return; seen.add(key); p1++;
+      if(c.scaled < c.passMark){ fails++; sems.add((r.start || '').slice(0,4) + (+(r.start || '').slice(5,7) >= 7 ? 'F' : 'S')) }
+    }));
+    const s1 = recs.find(r => r.code === 'STEP1');
+    const dsb = recs.find(r => r.code === 'DSB');
+    const due = (dsb && dsb.end) || STEP1_ON_SCHEDULE[s.cohort];
+    const shelves = recs.filter(r => isClerkshipRec(r) && SHELF_CIS_PASS[r.code] != null).map(r => {
+      const c = casList(r).find(c => c.scaled != null && !/retake/i.test(c.label || ''));
+      return c ? {code: r.code, v: c.scaled, fail: c.scaled < SHELF_CIS_PASS[r.code]} : null }).filter(Boolean);
+    /* no Step 1 on record but already in clerkships: the result is missing
+       from the USMLE match, not late - left out of the timing rows */
+    const inClerkships = recs.some(r => isClerkshipRec(r) && (r.eval || casList(r).length));
+    out.push({s, p1, fails, group: !p1 ? null : fails === 0 ? 0 : fails === 1 ? 1 : sems.size === 1 ? 2 : 3,
+      /* only once the class's Step 1 window has closed: before that, not late */
+      timing: !due || due > asOfDate() ? null : !s1 ? (inClerkships ? null : 'none') : s1.start <= due ? 'on' : 'late', s1fail: !!(s1 && s1.result !== 'Pass'), shelves});
+  });
+  /* shelf z within class and clerkship */
+  const pool = {};
+  out.forEach(x => x.shelves.forEach(h => (pool[x.s.cohort + h.code] = pool[x.s.cohort + h.code] || []).push(h.v)));
+  const mz = {}; Object.entries(pool).forEach(([k, v]) => { const m = mean(v), sd = Math.sqrt(mean(v.map(x => (x - m) * (x - m)))); mz[k] = [m, sd] });
+  out.forEach(x => x.shelves.forEach(h => { const q = mz[x.s.cohort + h.code]; h.z = q && q[1] ? (h.v - q[0]) / q[1] : null }));
+  return out;
+}
+function renderPredictors(){
+  const host = $('predictBody'); if(!host) return; host.textContent = '';
+  const rows = predictorRows();
+  const pct = (a, b) => b ? Math.round(100 * a / b) + '%' : '\u2014';
+  const summary = G => {
+    const timed = G.filter(x => x.timing), late = timed.filter(x => x.timing !== 'on').length;
+    const sat = G.filter(x => x.shelves.length), sf = sat.filter(x => x.shelves.some(h => h.fail)).length;
+    const zs = sat.flatMap(x => x.shelves.map(h => h.z)).filter(z => z != null);
+    return [String(G.length), timed.length ? pct(late, timed.length) + ' (' + late + ' of ' + timed.length + ')' : '\u2014',
+      String(G.filter(x => x.s1fail).length), sat.length ? pct(sf, sat.length) + ' (' + sf + ' of ' + sat.length + ')' : '\u2014',
+      zs.length ? (mean(zs) >= 0 ? '+' : '') + mean(zs).toFixed(2) : '\u2014'];
+  };
+  const table = (caption, head, body) => {
+    const w = elc('div','tablewrap'), t = elc('table','grid predict'); t.appendChild(elc('caption','sr', caption));
+    const tr = elc('tr'); head.forEach(h => tr.appendChild(elc('th', null, h))); const th = elc('thead'); th.appendChild(tr); t.appendChild(th);
+    const tb = elc('tbody'); body.forEach(r => { const x = elc('tr', r.sub ? 'sub' : null); r.cells.forEach((c, i) => x.appendChild(elc(i ? 'td' : 'th', i ? 'num' : null, c))); tb.appendChild(x) });
+    t.appendChild(tb); w.appendChild(t); host.appendChild(w);
+  };
+  /* 1. Phase 1 NBME failures */
+  const NAMES = ['No Phase 1 NBME failure', 'One failure', 'Two or more, in one semester', 'Two or more, across semesters'];
+  const withP1 = rows.filter(x => x.group != null && x.timing);
+  const classes1 = [...new Set(withP1.map(x => x.s.cohort))].sort();
+  host.appendChild(elc('h3','predh', 'Phase 1 NBME failures \u2192 Step 1 timing and clerkship shelves'));
+  if(withP1.length){
+    const body = [];
+    NAMES.forEach((n, g) => {
+      const G = withP1.filter(x => x.group === g); if(!G.length) return;
+      body.push({cells: [n + (classes1.length > 1 ? ' \u00b7 pooled' : '')].concat(summary(G))});
+      if(classes1.length > 1) classes1.forEach(c => { const H = G.filter(x => x.s.cohort === c); if(H.length) body.push({sub: true, cells: ['   Class of ' + c].concat(summary(H))}) });
+    });
+    table('Phase 1 NBME failures against Step 1 timing and shelves', ['Phase 1 NBME (first sittings)', 'Students', 'Step 1 late or not on record', 'Failed Step 1', 'Any shelf failed (1st attempt)', 'Mean shelf (class z)'], body);
+    host.appendChild(elc('p','why', 'Classes with Phase 1 NBME exams and a Step 1 window: ' + classes1.map(c => 'Class of ' + c).join(', ') +
+      '. A class without Step 1 results yet joins when they are loaded.'));
+  } else host.appendChild(elc('p','why', 'No loaded class has both Phase 1 NBME exams and a Step 1 window yet.'));
+  /* 2. Step 1 timing -> shelves */
+  const withT = rows.filter(x => x.timing && x.shelves.length);
+  const classes2 = [...new Set(withT.map(x => x.s.cohort))].sort();
+  host.appendChild(elc('h3','predh', 'Step 1 timing \u2192 clerkship shelves'));
+  const body2 = [];
+  [['on','Step 1 on schedule'], ['late','Step 1 late'], ['none','No Step 1 on record']].forEach(([k, n]) => {
+    const G = withT.filter(x => x.timing === k); if(!G.length) return;
+    body2.push({cells: [n + (classes2.length > 1 ? ' \u00b7 pooled' : '')].concat(summary(G))});
+    if(classes2.length > 1) classes2.forEach(c => { const H = G.filter(x => x.s.cohort === c); if(H.length) body2.push({sub: true, cells: ['   Class of ' + c + (c <= 2027 ? ' (legacy)' : '')].concat(summary(H))}) });
+  });
+  if(body2.length) table('Step 1 timing against shelves', ['Step 1', 'Students', 'Step 1 late or not on record', 'Failed Step 1', 'Any shelf failed (1st attempt)', 'Mean shelf (class z)'], body2);
+  host.appendChild(elc('p','why', 'The legacy Class of 2027 had no Phase 1 NBME exams, so it appears only here, as a comparator for the second link. ' +
+    '\u201cNo Step 1 on record\u201d can also mean a roster name the USMLE match has not resolved yet.'));
+  renderLegacyCohorts(host, table, pct);
+}
+
+/* 3. Earlier classes: the legacy cohort analysis, class-level aggregates the
+   confidential build carries as meta.legacyCohorts - never student rows, and
+   never part of the public page. */
+function renderLegacyCohorts(host, table, pct){
+  const L = DATA.meta && DATA.meta.legacyCohorts;
+  host.appendChild(elc('h3','predh', 'Earlier classes \u00b7 legacy curriculum'));
+  if(!L || !L.groups){
+    host.appendChild(elc('p','why', 'Shown when the confidential build is loaded: the legacy Classes of 2023\u20132027 ' +
+      '(preclinical courses against Step 1, Step 2 CK and shelves), as class-level figures only.'));
+    return;
+  }
+  const f1 = v => v == null ? '\u2014' : String(v);
+  const sg = v => v == null ? '\u2014' : (v >= 0 ? '+' : '') + v.toFixed(2);
+  const share = v => v == null ? '\u2014' : Math.round(100 * v) + '%';
+  table('Legacy classes: end of Year 2 standing against later outcomes',
+    ['End of Year 2 standing', 'Students', 'Step 1 delayed or failed', 'Step 2 CK mean', 'Step 2 CK bottom quartile',
+     'Step 2 CK failed (1st attempt)', 'Mean shelf (z)', 'Any shelf >1 SD low'],
+    L.groups.map(g => ({cells: [g.group, String(g.n), g.step1N ? pct(g.step1Bad, g.step1N) + ' (' + g.step1Bad + ' of ' + g.step1N + ')' : '\u2014',
+      f1(g.step2Mean), share(g.step2Q1), g.step2N ? g.step2Fail + ' of ' + g.step2N : '\u2014', sg(g.shelfZ), share(g.shelfAnyLow)]})));
+  if(L.quartiles) table('Legacy classes: preclinical quartile against Step 2 CK and Step 1',
+    ['Preclinical quartile (within class)', 'With Step 2 CK', 'Step 2 CK (class z)', 'Step 2 CK bottom quartile', 'Step 2 CK failed', 'Step 1 delayed or failed'],
+    L.quartiles.map(q => ({cells: [q.quartile, String(q.step2N), sg(q.step2Z), share(q.step2Q1), String(q.step2Fail), share(q.step1Bad)]})));
+  const P = L.step2Pooled || {}, C = L.ccse2027 || {}, S = L.shelves || {}, A = L.academicStatus || {};
+  const lines = [];
+  if(P.r != null) lines.push('Preclinical performance against Step 2 CK: r = ' + P.r + ' within class (n ' + P.n + '), about ' +
+    P.pointsPerSd + ' points per SD; ' + P.failures + ' first-attempt failures, AUC ' + P.failAuc + '.');
+  if(L.step2ByClass) lines.push('By class: ' + L.step2ByClass.map(c => c.cohort + ' r ' + c.r).join(', ') + '.');
+  if(C.r != null) lines.push('Class of 2027 CCSE against Step 2 CK: r = ' + C.r + '; it explains ' + share(C.r2Ccse) +
+    ' of the variation, preclinical grades ' + share(C.r2Preclinical) + ', both ' + share(C.r2Both) + ' (n ' + C.n + ').');
+  if(S['2024'] || S['2027']) lines.push('Preclinical against mean shelf: ' + Object.entries(S).map(([k, v]) => 'Class of ' + k + ' r ' + v.r).join(', ') + '.');
+  if(A.n) lines.push(A.n + ' students carry a recorded academic status (Step 1 deferral list): median preclinical rank at the ' +
+    ord(Math.round(A.medianRank)) + ' percentile, Step 2 CK ' + sg(A.step2Z) + ' SD from their class.');
+  lines.forEach(t => host.appendChild(elc('p','why', t)));
+  const D = L.definitions || {};
+  host.appendChild(elc('p','why', [D.standing, D.preclinical, D.step1Bad, D.shelf].filter(Boolean).join(' ') +
+    (L.source ? ' Source: ' + L.source + '.' : '')));
 }
 
 /* ---------------- review cards ---------------- */
@@ -4036,7 +5457,17 @@ function renderReview(list){
     if(s.careerAdvisor || s.ccm)
       hl.appendChild(elc('div','rv-meta', [s.careerAdvisor && 'Advisor ' + s.careerAdvisor, s.ccm && 'CCM ' + s.ccm]
         .filter(Boolean).join(' · ')));
-    head.appendChild(hl); head.appendChild(chipFor(s.status)); card.appendChild(head);
+    head.appendChild(hl);
+    /* right: standing, then the licensing exams on record beneath it */
+    const side = elc('div','rv-side'); side.appendChild(chipFor(s.status));
+    const ex = elc('div','rv-exams');
+    const cbx = cbseOf(s), us = usmleOf(s);
+    const line = (k, v, bad) => { const d = elc('div', bad ? 'bad' : null); d.appendChild(elc('span', null, k)); d.appendChild(elc('b', null, v)); ex.appendChild(d) };
+    if(cbx) line('CBSE', Math.round(cbx.cas.scaled) + (cbx.prior ? '*' : ''), false);
+    if(us.STEP1) line('Step 1', us.STEP1.result === 'Pass with remediation' ? 'Pass (retake)' : us.STEP1.result, us.STEP1.result !== 'Pass');
+    if(us.STEP2CK) line('Step 2', us.STEP2CK.scores.length ? String(us.STEP2CK.scores[us.STEP2CK.scores.length - 1]) : us.STEP2CK.result, us.STEP2CK.result !== 'Pass');
+    if(ex.children.length) side.appendChild(ex);
+    head.appendChild(side); card.appendChild(head);
 
     const big = elc('div','rv-big');
     [['Medical knowledge', kOf(s)], ['Clinical skills', skOf(s)]].forEach(([l, v]) => {
@@ -4047,11 +5478,15 @@ function renderReview(list){
     });
     card.appendChild(big);
 
-    /* clinical-skills domains against the class mean */
-    const doms = SKILL_DOMAINS.filter(d => s.skillDomains && s.skillDomains[d] != null && refs.domains && refs.domains[d] != null);
-    if(doms.length){
-      card.appendChild(elc('div','rv-sec','Clinical skills vs. class mean'));
-      doms.forEach(d => card.appendChild(dvbar(d, s.skillDomains[d] - refs.domains[d])));
+    /* clinical skills by ACGME competency against the class mean: each
+       competency the mean of its domains, student and class alike */
+    const comps = SKILL_ACGME.map(([name, ds]) => {
+      const own = ds.filter(d => s.skillDomains && s.skillDomains[d] != null && refs.domains && refs.domains[d] != null);
+      return own.length ? [name, acgmeScore(s.skillDomains, own) - acgmeScore(refs.domains, own)] : null;
+    }).filter(Boolean);
+    if(comps.length){
+      card.appendChild(elc('div','rv-sec','ACGME competencies vs. class mean'));
+      comps.forEach(([name, dv]) => card.appendChild(dvbar(name, dv)));
     }
     /* knowledge by assessment type, this student's median percentile */
     const buckets = typePercentiles([s]);
@@ -4092,9 +5527,14 @@ function renderReview(list){
         class_photo_url,
         seq, block_code, block_name, term, site, result,
         start_date, end_date, status,
-        assessment_type   quiz | cas | osce | eval
+        assessment_type   quiz | cas | osce | eval | objective
         assessment_label, score, percentile, national_mean, cohort_mean,
         comment
+        rating, evidence, rule, grade_need, grade_by_rules
+                          an objective row: a legacy clerkship objective rated
+                          H/P/F (? = an input not on file), the evidence and
+                          rule behind it, the H's the final grade needs, and
+                          the letter the rules alone reach
         domain:<name>     any number of columns, e.g. domain:Clinical reasoning
         area:<name>       an NBME exam's content areas, e.g. area:Cardiovascular System
 
@@ -4148,6 +5588,9 @@ function csvToData(text){
       classPhotoUrl: get('class_photo_url') || '',
       records: [], contentAreas: {}
     });
+    if((get('assessment_type') || '').toLowerCase() === 'summary'){
+      s.summary = {text: get('comment'), note: get('result'), status: get('assessment_label')}; return;
+    }
     const code = get('block_code') || get('block_name') || 'BLOCK';
     let rec = s.records.find(x => x.code === code);
     if(!rec){
@@ -4190,6 +5633,10 @@ function csvToData(text){
     } else if(type === 'eval'){
       rec.eval = {label: get('assessment_label') || 'Clinical evaluation', overall: score,
         percentile: pct, cohortMean: num(get('cohort_mean')), domains, comment: get('comment')};
+    } else if(type === 'objective'){
+      (rec.objectives = rec.objectives || []).push({name: get('assessment_label'),
+        rating: get('rating'), evidence: get('evidence'), rule: get('rule')});
+      rec.gradeRule = {need: num(get('grade_need')), byRules: get('grade_by_rules')};
     }
   });
 
@@ -4202,6 +5649,7 @@ function adoptData(obj, sourceName){
   if(!obj || !Array.isArray(obj.students) || !obj.students.length)
     throw new Error('No students found in that file.');
   DATA = hydrate(obj);
+  dataLoadedHere = true;
   state.student = null;
   state.cohort = null;          /* a new extract opens on its own newest class */
   fillCohortFilter();
@@ -4307,8 +5755,11 @@ function init(){
     b.textContent = on ? 'Chart view' : 'Table view';
   });
 
-  /* theme toggle - the stamp wins over the OS setting either way */
+  /* theme toggle - dark by default; a choice made here is remembered in this
+     browser (per-viewer convenience only) and wins over the OS setting */
   const themeBtn = $('themeBtn');
+  const savedTheme = () => { try { return localStorage.getItem('ascendTheme') } catch(e){ return null } };
+  const saveTheme = m => { try { localStorage.setItem('ascendTheme', m) } catch(e){} };
   const applyTheme = mode => {
     if(mode) document.documentElement.setAttribute('data-theme', mode);
     else document.documentElement.removeAttribute('data-theme');
@@ -4322,9 +5773,10 @@ function init(){
     const dark = cur === 'dark' ||
       (!cur && window.matchMedia('(prefers-color-scheme: dark)').matches);
     applyTheme(dark ? 'light' : 'dark');
+    saveTheme(dark ? 'light' : 'dark');
     renderAll();                       /* charts read their colours from the tokens */
   });
-  applyTheme(null);
+  applyTheme(savedTheme() === 'light' ? 'light' : 'dark');
 
   $('printBtn').addEventListener('click', () => window.print());
   $('rvWatch').addEventListener('change', e => { state.reviewWatch = e.target.checked; renderReview(filtered()) });
@@ -4351,76 +5803,96 @@ function init(){
     if(run) run();
   });
   $('confHintCancel').addEventListener('click', () => { $('confHint').hidden = true; confThen = null });
-  /* Each button opens the newest file in the Confidential folder by itself
-     (see confidentialFolder); shift-click, or a browser without folder access,
-     falls back to the ordinary file picker. */
-  const loadFrom = (want, use, input) => ev => {
-    const plain = ev.shiftKey || !confPickerOk();
-    ferpaGate(want.why, () => {
-      if(plain){ $(input).click(); return }
-      confHint(async () => {
-        try {
-          const got = await fromConfidential(want);
-          if(got) use(got);
-        } catch(err){
-          if(err && err.name === 'AbortError') return;    /* the viewer closed the picker */
-          alert(err.message || String(err));
-        }
-      });
-    });
-  };
-  $('loadBtn').addEventListener('click', loadFrom(CONF.data, f => readData(f), 'fileInput'));
-  /* a folder of <code>.jpg photos, kept in memory for this session only */
-  $('photoBtn').addEventListener('click', loadFrom(CONF.photos, files => readPhotos(files), 'photoInput'));
-  /* the code key, kept in memory for this session only */
-  $('nameBtn').addEventListener('click', loadFrom(CONF.names, f => readNames(f), 'nameInput'));
-  const readNames = f => {
-    const fr = new FileReader();
-    fr.onload = () => {
-      let n = 0;
-      try{ n = adoptNames(String(fr.result)) }
-      catch(err){ alert('That file could not be read as a name key.\n\n' + err.message); return }
-      if(!n) alert('No names were found in that file.\n\nExpected a CSV with student_code and name ' +
-                   'columns (or first_name and last_name), or a JSON object mapping each code to a name.');
-      else logAccess('names', f.name, '');
-    };
-    fr.readAsText(f);
-  };
-  const readPhotos = files => {
-    const n = adoptPhotos(files);
-    if(!n) alert('No images were found in that folder.\n\nExpected one image per student, named by ' +
-                 'code, e.g. ASC-2028-014.jpg, as written by pipeline/student_photos.py.');
-    else logAccess('photos', n + ' photos' + (files.folder ? ' from ' + files.folder : ''), '');
-  };
-  const readData = f => {
-    const fr = new FileReader();
-    fr.onload = () => {
-      try{
-        const txt = String(fr.result);
-        adoptData(/\.csv$/i.test(f.name) ? csvToData(txt) : JSON.parse(txt), f.name);
-        logAccess('data', f.name, (DATA.meta && DATA.meta.asOf) || '');
-      }catch(err){
-        alert('That file could not be read as student data.\n\n' + err.message +
-              '\n\nExpected either the JSON shape documented at the top of this page’s ' +
-              'script, or a CSV with one row per assessment.');
+  /* One button loads everything: the newest data file, the name key and the
+     photo folder, all from # Confidential (see confidentialFolder) - one FERPA
+     gate and, once the folder is remembered, no picker at all. Shift-click, or a
+     browser without folder access, picks the folder with an ordinary picker. */
+  const LOAD_ALL_WHY = 'Loading brings coded education records into this browser and pairs a name and a ' +
+    'photo with each code, which re-identifies the students. Continue only with a legitimate educational interest.';
+  const loadAll = async find => {
+    const done = [], missing = [];
+    const step = async (want, use) => {
+      try {
+        const got = await find(want);
+        if(!got || (Array.isArray(got) && !got.length)){ missing.push(want.what); return }
+        const said = await use(got);
+        if(said) done.push(said); else missing.push(want.what + ' (nothing usable in it)');
+      } catch(err){
+        if(err && err.name === 'AbortError') throw err;
+        missing.push(want.what + ' (' + (err.message || err) + ')');
       }
     };
-    fr.readAsText(f);
+    await step(CONF.data, async f => {
+      const txt = await f.text();
+      adoptData(/\.csv$/i.test(f.name) ? csvToData(txt) : JSON.parse(txt), f.name);
+      logAccess('data', f.name, (DATA.meta && DATA.meta.asOf) || '');
+      return 'data ' + ((DATA.meta && DATA.meta.asOf) || f.name);
+    });
+    await step(CONF.names, async f => {
+      const n = adoptNames(await f.text());
+      if(n) logAccess('names', f.name, '');
+      return n ? n + ' names' : null;
+    });
+    await step(CONF.photos, async files => {
+      const n = adoptPhotos(files);
+      if(n) logAccess('photos', n + ' photos' + (files.folder ? ' from ' + files.folder : ''), '');
+      return n ? n + ' photos' : null;
+    });
+    const b = $('loadAllBtn');
+    if(b && done.length) b.textContent = 'Loaded: ' + done.join(' · ');
+    if(missing.length) alert((done.length ? 'Loaded ' + done.join(', ') + '.\n\n' : '') + 'Not found:\n• ' +
+      missing.join('\n• ') + '\n\nThe # Confidential folder should hold a "Student Performance Dashboard <date>" ' +
+      'folder, an ASCEND_Names_Key_for_Dashboard_<date>.csv file and a "Student Photos <date>" folder.');
   };
-  $('nameInput').addEventListener('change', e => {
-    const f = e.target.files && e.target.files[0]; if(!f) return;
-    readNames(f); e.target.value = '';
+  /* the folder-access route: one remembered folder for all three */
+  const loadAllFromFolder = async () => {
+    const {dir, fresh} = await confidentialFolder();
+    let any = false;
+    await loadAll(async want => { const got = await confFind(dir, want); if(got) any = true; return got });
+    if(fresh && any) await confRemember(dir);
+  };
+  /* the ordinary-picker route: the same newest-dated choice, made from the
+     picked folder's file list (paths relative to the folder picked) */
+  const listFind = (files, want) => {
+    const segs = f => (f.webkitRelativePath || f.name).split('/');
+    const dirOf = f => segs(f).slice(0, -1);
+    if(want.dir){
+      const byDir = {};
+      files.forEach(f => { const d = dirOf(f); const i = d.findIndex(x => want.dir.test(x));
+        if(i < 0 || i !== d.length - 1) return;      /* directly inside the dated folder */
+        const k = d.slice(0, i + 1).join('/'); (byDir[k] = byDir[k] || []).push(f) });
+      const keys = Object.keys(byDir).sort((x, y) => y.split('/').pop().localeCompare(x.split('/').pop()));
+      for(const k of keys){
+        const fs = byDir[k];
+        if(want.images){
+          const img = fs.filter(f => /\.(jpe?g|png|gif|webp|heic)$/i.test(f.name));
+          if(img.length){ img.folder = k.split('/').pop(); return img }
+        } else {
+          const hit = fs.filter(f => want.file.test(f.name))[0] || fs.filter(f => want.alsoFile.test(f.name))[0];
+          if(hit) return hit;
+        }
+      }
+      return null;
+    }
+    return files.filter(f => want.file.test(f.name)).sort((x, y) => y.name.localeCompare(x.name))[0] || null;
+  };
+  $('loadAllBtn').addEventListener('click', ev => {
+    const plain = ev.shiftKey || !confPickerOk();
+    ferpaGate(LOAD_ALL_WHY, () => {
+      if(plain){ $('allInput').click(); return }
+      confHint(async () => {
+        try { await loadAllFromFolder() }
+        catch(err){ if(!(err && err.name === 'AbortError')) alert(err.message || String(err)) }
+      });
+    });
   });
-  $('photoInput').addEventListener('change', e => {
-    readPhotos([...(e.target.files || [])]); e.target.value = '';
-  });
-  $('fileInput').addEventListener('change', e => {
-    const f = e.target.files && e.target.files[0]; if(!f) return;
-    readData(f); e.target.value = '';
+  $('allInput').addEventListener('change', e => {
+    const files = [...(e.target.files || [])]; e.target.value = '';
+    if(files.length) loadAll(async want => listFind(files, want)).catch(err => alert(err.message || String(err)));
   });
   confRemembered().then(k => { confKnown = k }).catch(() => {});
-  ['loadBtn', 'photoBtn', 'nameBtn'].forEach(id => { if($(id)) $(id).title =
-    'Opens the newest file in the # Confidential folder. Shift-click to choose a file yourself.' });
+  if($('loadAllBtn')) $('loadAllBtn').title =
+    'Loads the newest data file, name key and photo folder from # Confidential. Shift-click to pick the folder yourself.';
 
   /* charts are drawn at real pixel width, so a resize means a redraw */
   let rt = null;
@@ -4520,8 +5992,8 @@ document.addEventListener('DOMContentLoaded', bootGate);
 </script>
 <script src="https://sinaiascend.github.io/Dashboard---HUB/ascend-mast.js" data-title="Student Performance Dashboard" data-site="De-identified student data · all phases" data-hide="header.mast"></script>
 <script>
-/* The shared masthead hides this page's own header, which is where the Load data
-   file, Load photos, Access log, Dark mode and Print buttons lived. Move that
+/* The shared masthead hides this page's own header, which is where the Load data,
+   names & photos, Access log, Dark mode and Print buttons lived. Move that
    button group into the shared masthead's utility row so it stays reachable. */
 (function(){
   function move(){
