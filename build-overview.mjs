@@ -86,7 +86,7 @@ document.querySelector('.btn').addEventListener('click', function(e){
   var f = document.createElement('form');
   f.method = 'post'; f.action = ${JSON.stringify(s.unlock)};
   var add = function(n, v){ var i = document.createElement('input'); i.type = 'hidden'; i.name = n; i.value = v; f.appendChild(i); };
-  add('code', code); add('to', '/');
+  add('code', code); add('to', ${JSON.stringify(s.unlockTo || "/")});
   document.body.appendChild(f); f.submit();
 });
 </script>
