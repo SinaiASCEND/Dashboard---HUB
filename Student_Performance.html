@@ -1242,6 +1242,18 @@ const SITES = ['Mount Sinai Hospital','Mount Sinai Morningside','Mount Sinai Wes
 const SKILL_DOMAINS = ['History taking','Physical examination','Communication',
   'Clinical reasoning','Documentation & presentation','Professionalism',
   'Patient education & counseling'];
+/* the domains shown as ACGME competencies - the same grouping as the
+   clerkship analysis (TA_ACGME) and the Phase 2 paragraphs; the Phase 1 OSCE's
+   patient education & counseling is Patient Care ("counsel and educate
+   patients and families"). Medical Knowledge is the knowledge side. */
+const SKILL_ACGME = [['Patient Care', ['History taking','Physical examination','Clinical reasoning','Patient education & counseling']],
+  ['Interpersonal & Communication Skills', ['Communication','Documentation & presentation']],
+  ['Professionalism', ['Professionalism']]];
+/* a competency's score: the mean of its domains on record (student or class mean) */
+function acgmeScore(domains, ds){
+  const v = ds.map(d => domains && domains[d]).filter(x => x != null);
+  return v.length ? Math.round(v.reduce((a, b) => a + b, 0) / v.length) : null;
+}
 
 /* NBME content areas, as reported on CAS / shelf score reports. */
 const CONTENT_AREAS = ['Cardiovascular','Respiratory','Gastrointestinal','Renal & Urinary',
@@ -4094,15 +4106,18 @@ function divergingBars(chartId, tableId, items, opts){
 
 function renderSkillDomains(s){
   const refs = (DATA.refs||{})[s.cohort] || {domains:{}};
-  const items = SKILL_DOMAINS.map(d => {
-    const v = s.skillDomains ? s.skillDomains[d] : null;
-    const r = refs.domains ? refs.domains[d] : null;
-    if(v == null || r == null) return {label:d, delta:null};
-    return {label:d, delta: v - r, studentText: v + ' / 100', refText: r + ' / 100',
-      detail: v + ' against a class mean of ' + r};
+  /* by ACGME competency, each followed by the domains it is made of */
+  const row = (label, v, r) => (v == null || r == null) ? {label, delta:null} :
+    {label, delta: v - r, studentText: v + ' / 100', refText: r + ' / 100', detail: v + ' against a class mean of ' + r};
+  const items = [];
+  SKILL_ACGME.forEach(([name, ds]) => {
+    const own = ds.filter(d => s.skillDomains && s.skillDomains[d] != null && refs.domains && refs.domains[d] != null);
+    if(!own.length) return;
+    items.push(row(name, acgmeScore(s.skillDomains, own), acgmeScore(refs.domains, own)));
+    if(ds.length > 1) own.forEach(d => items.push(row('\u2003' + d, s.skillDomains[d], refs.domains[d])));
   });
   divergingBars('domainChart','domainTable', items, {
-    refName:'class mean', unit:'points', rowLabel:'Clinical skills domain',
+    refName:'class mean', unit:'points', rowLabel:'ACGME competency \u00b7 domain',
     axisLabel:'Points above or below the class mean', axisLabelShort:'vs. class mean',
     ariaLabel:'Clinical skills domains compared with the class mean',
     emptyText:'No OSCE or clinical evaluation domain scores on record yet.'
@@ -4807,10 +4822,11 @@ function renderStudent(s){
   /* The NBME content areas that exist in the data are the clerkship exams'
      own, drawn exam by exam in the card above; there is no national
      content-area report to profile, so no card pretends to one. */
-  const dBody = makeCard(host, 'Clinical skills',
+  const dBody = makeCard(host, 'Clinical skills by ACGME competency',
     'Where the bedside strengths and gaps are',
-    'OSCE domain scores and clinical-evaluation ratings pooled onto one 0–100 scale, ' +
-    'then compared with the class mean for each domain.', 'domainTable');
+    'OSCE domain scores and clinical-evaluation ratings pooled onto one 0–100 scale and grouped into the ACGME ' +
+    'competencies (Patient Care, Interpersonal & Communication Skills, Professionalism), each compared with the class mean; ' +
+    'the domains that make up each competency are listed beneath it. Medical Knowledge is the NBME side.', 'domainTable');
   chartAndTable(dBody, 'domainChart', 'domainTable');
   renderSkillDomains(s);
 
@@ -5134,11 +5150,15 @@ function renderReview(list){
     });
     card.appendChild(big);
 
-    /* clinical-skills domains against the class mean */
-    const doms = SKILL_DOMAINS.filter(d => s.skillDomains && s.skillDomains[d] != null && refs.domains && refs.domains[d] != null);
-    if(doms.length){
-      card.appendChild(elc('div','rv-sec','Clinical skills vs. class mean'));
-      doms.forEach(d => card.appendChild(dvbar(d, s.skillDomains[d] - refs.domains[d])));
+    /* clinical skills by ACGME competency against the class mean: each
+       competency the mean of its domains, student and class alike */
+    const comps = SKILL_ACGME.map(([name, ds]) => {
+      const own = ds.filter(d => s.skillDomains && s.skillDomains[d] != null && refs.domains && refs.domains[d] != null);
+      return own.length ? [name, acgmeScore(s.skillDomains, own) - acgmeScore(refs.domains, own)] : null;
+    }).filter(Boolean);
+    if(comps.length){
+      card.appendChild(elc('div','rv-sec','ACGME competencies vs. class mean'));
+      comps.forEach(([name, dv]) => card.appendChild(dvbar(name, dv)));
     }
     /* knowledge by assessment type, this student's median percentile */
     const buckets = typePercentiles([s]);
