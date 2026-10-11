@@ -149,18 +149,13 @@
    "title": "People",
    "short": "the directory",
    "audience": "Students, faculty, and staff. Open to everyone.",
-   "intro": "Who does what across the ASCEND curriculum, in one site: the Office of Curricular Affairs, the students who represent their classes in governance, and the faculty roles that are open.",
+   "intro": "Who does what across the ASCEND curriculum, in one site: the Office of Curricular Affairs and the faculty roles that are open.",
    "primary": "Curricular-Affairs/",
    "views": [
     {
      "title": "Office of Curricular Affairs",
      "blurb": "Org chart and directory of directors, co-directors, coordinators, and managers by phase and area.",
      "url": "Curricular-Affairs/"
-    },
-    {
-     "title": "Curricular student leadership",
-     "blurb": "Student representatives on the EEC and its subcommittees, and per-module and per-clerkship representatives by class.",
-     "url": "Curricular-Affairs/students/"
     },
     {
      "title": "Faculty opportunities",
@@ -462,6 +457,28 @@
     {
      "title": "Curriculum reviews",
      "blurb": "The LCME-mapped phase reviews and pre-meeting briefs."
+    }
+   ]
+  },
+  {
+   "slug": "student-leadership",
+   "key": "studentleaders",
+   "kicker": "Student Governance",
+   "title": "Curricular Student Leadership",
+   "short": "Student leadership",
+   "audience": "OCA leadership, committee members, and Clinical Competency Mentors. It names and pictures students, so it sits behind the Governance dashboard's code and is not on the open web.",
+   "intro": "The students who represent their classes in curricular governance, with their photos. Your Hub code opens it.",
+   "primaryAbs": "https://ascend-governance.vercel.app/students/",
+   "unlock": "https://ascend-governance.vercel.app/api/unlock",
+   "unlockTo": "/students/",
+   "views": [
+    {
+     "title": "Committee representatives",
+     "blurb": "Student representatives on the EEC and its subcommittees."
+    },
+    {
+     "title": "Module and clerkship representatives",
+     "blurb": "Per-module and per-clerkship representatives by class, with a printable PDF."
     }
    ]
   },
