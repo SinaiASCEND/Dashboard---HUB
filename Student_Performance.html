@@ -1643,6 +1643,11 @@ function nbmeKey(rec){ return isClerkshipRec(rec) ? 'shelf' : 'cas' }
    current standing, flags or percentiles. */
 const isPrior = r => !!r && r.attempt === 'prior';
 const currentRecs = recs => (recs || []).filter(r => !isPrior(r));
+/* What a student's standing, flags and review card count (user, 2026-10-11):
+   once in Phase 2 a student has completed Phase 1, so only Phase 2 and later
+   records count - plus the USMLE results. Phase 1 stays on the full record. */
+const inScope = (s, r) => !(s && s.phase >= 2) || r.phase >= 2 || r.kind === 'licensing';
+const scopeRecs = s => currentRecs(s.records).filter(r => inScope(s, r));
 function examName(label){ return String(label || '').replace(/\s*\(retake\)\s*$/i, '') }
 /* knowledge and skills percentile from a set of records - the whole record,
    or one phase of it. The two are never blended into one number: a student
@@ -1811,7 +1816,8 @@ function hydrate(data){
     if(s.phase == null)
       s.phase = s.current ? s.current.phase
               : (recs.filter(r => r.status === 'completed').slice(-1)[0] || {phase:1}).phase;
-    const live = currentRecs(recs);
+    const allLive = currentRecs(recs);
+    const live = allLive.filter(r => inScope(s, r));
     const all = standings(live);
     s.knowledgePct = all.knowledge;
     s.skillsPct    = all.skills;
@@ -1822,7 +1828,7 @@ function hydrate(data){
        only that phase's assessments */
     s.byPhase = {};
     [1, 2, 3].forEach(ph => {
-      const st = standings(live.filter(r => r.phase === ph));
+      const st = standings(allLive.filter(r => r.phase === ph));
       if(st.n) s.byPhase[ph] = st;
     });
 
@@ -1846,8 +1852,8 @@ function hydrate(data){
         if(rec.eval && rec.eval.domains && rec.eval.domains[d] != null) v.push(evalTo100(rec.eval.domains[d]));
       }); if(v.length) o[d] = Math.round(mean(v)) }); return o };
     s.skillByPhase = {
-      1: domOf(live.filter(r => r.phase === 1 && !isClerkshipRec(r))),
-      2: domOf(live.filter(r => isClerkshipRec(r) && r.eval).map(r => ({eval: r.eval})))
+      1: domOf(allLive.filter(r => r.phase === 1 && !isClerkshipRec(r))),
+      2: domOf(allLive.filter(r => isClerkshipRec(r) && r.eval).map(r => ({eval: r.eval})))
     };
 
     /* trajectory: one point per assessment, in academic order */
@@ -1946,7 +1952,7 @@ function hydrate(data){
 function casBelowPass(s){
   const open = [], resolved = [];
   const sittings = [];
-  currentRecs(s.records).forEach(r => casList(r).forEach(c => {
+  scopeRecs(s).forEach(r => casList(r).forEach(c => {
     /* a retake is the same exam in the same block: Phase 1 papers share generic
        names ("Mid Module Exam"), so the block code is part of the key */
     if(c.passMark != null && c.scaled != null) sittings.push({rec:r, cas:c, exam:examName(c.label), key:r.code + '|' + examName(c.label)});
@@ -1971,7 +1977,7 @@ function casBelowPass(s){
    concern even when the retake passed. */
 const CK_BELOW_HONORS = ['Pass', 'Pass with remediation', 'Grade C', 'Fail'];
 function clerkshipConcerns(s){
-  const out = [], recs = currentRecs(s.records);
+  const out = [], recs = scopeRecs(s);
   const graded = recs.filter(r => r.kind === 'clerkship' && r.objectives && r.objectives.length);
   const below = graded.filter(r => CK_BELOW_HONORS.includes(r.result));
   if(below.length)
@@ -1995,7 +2001,11 @@ function clerkshipConcerns(s){
 }
 
 function buildFlags(s){
-  const out = [], recs = currentRecs(s.records);
+  const out = [], recs = scopeRecs(s);
+  const p1done = s.phase >= 2 && currentRecs(s.records).some(r => r.phase === 1 && r.kind !== 'licensing');
+  if(p1done)
+    out.push({level:'info', what:'Phase 1 completed: not counted here',
+      why:'Standing and flags now read Phase 2 only. Every Phase 1 assessment stays on this record (NBME exams, trajectory, schedule).'});
   const prior = (s.records || []).filter(isPrior);
   if(prior.length){
     const pb = prior.reduce((n, r) => n + casList(r).filter(c => c.passMark != null && c.scaled != null && c.scaled < c.passMark).length, 0);
@@ -2081,7 +2091,7 @@ function buildFlags(s){
           ord(s.skillsPct) + ' — worth naming in the next coaching conversation.'});
 
   /* a sustained downward drift matters more than any single low score */
-  const seqPts = (s.timeline||[]).filter(t => !isPrior(t.rec)).map(t => mean([t.quiz,t.cas,t.osce,t.eval].filter(v=>v!=null)))
+  const seqPts = (s.timeline||[]).filter(t => !isPrior(t.rec) && inScope(s, t.rec)).map(t => mean([t.quiz,t.cas,t.osce,t.eval].filter(v=>v!=null)))
                                  .filter(v=>v!=null);
   if(seqPts.length >= 6){
     const early = mean(seqPts.slice(0,3)), late = mean(seqPts.slice(-3));
@@ -2102,7 +2112,7 @@ function buildFlags(s){
    below the 25th percentile. Strong performance in the other domain is real,
    and stays visible beside the flag, but does not cancel it. */
 function standingOf(s){
-  const recs = currentRecs(s.records);
+  const recs = scopeRecs(s);
   const domains = [s.knowledgePct, s.skillsPct].filter(v => v != null);
   const cb = casBelowPass(s);
   /* NBME exams below the pass mark with no passing retake: a clerkship exam is
@@ -5524,7 +5534,7 @@ function renderReview(list){
     }
     /* every NBME exam: score (dot) against the class median (tick) and the
        pass mark (red line) - the same marks as the record's NBME card */
-    const nb = currentRecs(s.records).slice().sort((a, b) => (a.start || '') < (b.start || '') ? -1 : 1)
+    const nb = scopeRecs(s).slice().sort((a, b) => (a.start || '') < (b.start || '') ? -1 : 1)
       .flatMap(r => casList(r).filter(c => c.scaled != null && !/cbse/i.test(c.label || '')).map(c => ({r, c})));
     if(nb.length){
       card.appendChild(elc('div','rv-sec','NBME exams \u00b7 score \u25cf, class median \u2502, pass mark \u2503'));
@@ -5550,15 +5560,15 @@ function renderReview(list){
       card.appendChild(wrap);
     }
     /* knowledge by assessment type, this student's median percentile */
-    const buckets = typePercentiles([s]);
+    const buckets = typePercentiles([Object.assign({}, s, {records: scopeRecs(s)})]);   /* Phase 2 only once in Phase 2 */
     const types = TYPE_META.filter(t => !SUMMARY_HIDE.has(t.key) && buckets[t.key] && buckets[t.key].length);
     if(types.length){
       card.appendChild(elc('div','rv-sec','By assessment type · percentile in class'));
       types.forEach(t => card.appendChild(bar(t.short || t.label, Math.round(median(buckets[t.key])))));
     }
     /* what is absolute: failed and remediated blocks */
-    const failed = (s.records||[]).filter(r => r.result === 'Fail');
-    const rem = (s.records||[]).filter(r => /remediation/i.test(r.result || ''));
+    const failed = scopeRecs(s).filter(r => r.result === 'Fail');
+    const rem = scopeRecs(s).filter(r => /remediation/i.test(r.result || ''));
     if(failed.length || rem.length){
       card.appendChild(elc('div','rv-sec','Blocks'));
       const chips = elc('div','rv-chips');
