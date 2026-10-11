@@ -472,6 +472,8 @@ table.opgrid{border-collapse:collapse;width:100%;min-width:680px;font-size:13px}
 .ustile b{font-size:28px;font-weight:800;line-height:1.15;color:var(--ink);font-variant-numeric:tabular-nums}
 .ustile .us{font-size:12px;color:var(--ink-2);max-width:42ch}
 .ustile.bad{border-left-color:var(--crit)}.ustile.bad b{color:var(--crit)}
+.predh{font-size:13px;letter-spacing:.06em;text-transform:uppercase;margin:6px 0 8px;color:var(--ink)}
+table.predict{min-width:720px}table.predict tr.sub th{font-weight:500;color:var(--ink-2);padding-left:22px}table.predict tr.sub td{color:var(--ink-2)}
 .summarytext{font-size:15px;line-height:1.6;max-width:80ch;margin:0 0 8px;color:var(--ink)}
 .gpath{border-top:1px solid var(--line);padding:10px 0}
 .gpath:first-of-type{border-top:0}
@@ -1021,6 +1023,23 @@ body.gated{overflow:hidden}
         </div>
         <div class="empty" id="rosterEmpty" hidden>No students match these filters.</div>
       </div>
+    </div>
+
+    <!-- across classes: not filtered to a class, every loaded class pooled -->
+    <div class="card" id="predictCard">
+      <div class="cardhd">
+        <div>
+          <div class="kicker">Across classes &middot; all loaded data pooled</div>
+          <h2>What Phase 1 NBME results predict</h2>
+          <p class="why">Not tied to the class filter: every class with the data is pooled, and each class is
+            shown beneath as a comparator. A Phase 1 NBME failure is a first sitting below 65; Step 1 is
+            &ldquo;on schedule&rdquo; when sat by the end of the class&rsquo;s Dedicated Study Block (legacy Class of
+            2027: by 30 June 2025), and &ldquo;late&rdquo; otherwise &mdash; including no Step 1 on record, which
+            delays Phase 2 entry. A shelf failure is a first attempt below its Clerkship Information Sheet pass
+            mark. Small groups: read the direction, not the decimals.</p>
+        </div>
+      </div>
+      <div class="cardbody" id="predictBody"></div>
     </div>
   </section>
 
@@ -4823,6 +4842,92 @@ function renderAll(){
   renderTypeChart();
   renderReview(list);
   renderRoster();
+  renderPredictors();
+}
+
+/* ---------------- across classes: what Phase 1 NBME results predict ---------------- */
+/* Pooled over every loaded class, never the filter. Phase 1 NBME failures
+   (first sittings below the pass mark) grouped none / one / two or more in
+   one semester / two or more across semesters, against Step 1 timing and
+   the first-attempt clerkship shelves; then Step 1 timing against the
+   shelves, where the legacy Class of 2027 (no Phase 1 NBME) is a comparator. */
+const STEP1_ON_SCHEDULE = {2027: '2025-06-30'};        /* legacy: the scheduled May-June 2025 sitting */
+const SHELF_CIS_PASS = {MED:59, NRL:67, OBG:65, PED:63, PSY:74, SUR:59};
+function predictorRows(){
+  const out = [];
+  (DATA.students || []).forEach(s => {
+    const recs = currentRecs(s.records);
+    const seen = new Set(), sems = new Set(); let fails = 0, p1 = 0;
+    recs.filter(r => r.phase === 1 && !isClerkshipRec(r)).forEach(r => casList(r).forEach(c => {
+      if(c.passMark == null || c.scaled == null || /cbse/i.test(c.label || '')) return;
+      const key = r.code + '|' + examName(c.label);
+      if(seen.has(key)) return; seen.add(key); p1++;
+      if(c.scaled < c.passMark){ fails++; sems.add((r.start || '').slice(0,4) + (+(r.start || '').slice(5,7) >= 7 ? 'F' : 'S')) }
+    }));
+    const s1 = recs.find(r => r.code === 'STEP1');
+    const dsb = recs.find(r => r.code === 'DSB');
+    const due = (dsb && dsb.end) || STEP1_ON_SCHEDULE[s.cohort];
+    const shelves = recs.filter(r => isClerkshipRec(r) && SHELF_CIS_PASS[r.code] != null).map(r => {
+      const c = casList(r).find(c => c.scaled != null && !/retake/i.test(c.label || ''));
+      return c ? {code: r.code, v: c.scaled, fail: c.scaled < SHELF_CIS_PASS[r.code]} : null }).filter(Boolean);
+    out.push({s, p1, fails, group: !p1 ? null : fails === 0 ? 0 : fails === 1 ? 1 : sems.size === 1 ? 2 : 3,
+      /* only once the class's Step 1 window has closed: before that, not late */
+      timing: !due || due > asOfDate() ? null : !s1 ? 'none' : s1.start <= due ? 'on' : 'late', s1fail: !!(s1 && s1.result !== 'Pass'), shelves});
+  });
+  /* shelf z within class and clerkship */
+  const pool = {};
+  out.forEach(x => x.shelves.forEach(h => (pool[x.s.cohort + h.code] = pool[x.s.cohort + h.code] || []).push(h.v)));
+  const mz = {}; Object.entries(pool).forEach(([k, v]) => { const m = mean(v), sd = Math.sqrt(mean(v.map(x => (x - m) * (x - m)))); mz[k] = [m, sd] });
+  out.forEach(x => x.shelves.forEach(h => { const q = mz[x.s.cohort + h.code]; h.z = q && q[1] ? (h.v - q[0]) / q[1] : null }));
+  return out;
+}
+function renderPredictors(){
+  const host = $('predictBody'); if(!host) return; host.textContent = '';
+  const rows = predictorRows();
+  const pct = (a, b) => b ? Math.round(100 * a / b) + '%' : '\u2014';
+  const summary = G => {
+    const timed = G.filter(x => x.timing), late = timed.filter(x => x.timing !== 'on').length;
+    const sat = G.filter(x => x.shelves.length), sf = sat.filter(x => x.shelves.some(h => h.fail)).length;
+    const zs = sat.flatMap(x => x.shelves.map(h => h.z)).filter(z => z != null);
+    return [String(G.length), timed.length ? pct(late, timed.length) + ' (' + late + ' of ' + timed.length + ')' : '\u2014',
+      String(G.filter(x => x.s1fail).length), sat.length ? pct(sf, sat.length) + ' (' + sf + ' of ' + sat.length + ')' : '\u2014',
+      zs.length ? (mean(zs) >= 0 ? '+' : '') + mean(zs).toFixed(2) : '\u2014'];
+  };
+  const table = (caption, head, body) => {
+    const w = elc('div','tablewrap'), t = elc('table','grid predict'); t.appendChild(elc('caption','sr', caption));
+    const tr = elc('tr'); head.forEach(h => tr.appendChild(elc('th', null, h))); const th = elc('thead'); th.appendChild(tr); t.appendChild(th);
+    const tb = elc('tbody'); body.forEach(r => { const x = elc('tr', r.sub ? 'sub' : null); r.cells.forEach((c, i) => x.appendChild(elc(i ? 'td' : 'th', i ? 'num' : null, c))); tb.appendChild(x) });
+    t.appendChild(tb); w.appendChild(t); host.appendChild(w);
+  };
+  /* 1. Phase 1 NBME failures */
+  const NAMES = ['No Phase 1 NBME failure', 'One failure', 'Two or more, in one semester', 'Two or more, across semesters'];
+  const withP1 = rows.filter(x => x.group != null && x.timing);
+  const classes1 = [...new Set(withP1.map(x => x.s.cohort))].sort();
+  host.appendChild(elc('h3','predh', 'Phase 1 NBME failures \u2192 Step 1 timing and clerkship shelves'));
+  if(withP1.length){
+    const body = [];
+    NAMES.forEach((n, g) => {
+      const G = withP1.filter(x => x.group === g); if(!G.length) return;
+      body.push({cells: [n + (classes1.length > 1 ? ' \u00b7 pooled' : '')].concat(summary(G))});
+      if(classes1.length > 1) classes1.forEach(c => { const H = G.filter(x => x.s.cohort === c); if(H.length) body.push({sub: true, cells: ['   Class of ' + c].concat(summary(H))}) });
+    });
+    table('Phase 1 NBME failures against Step 1 timing and shelves', ['Phase 1 NBME (first sittings)', 'Students', 'Step 1 late or not on record', 'Failed Step 1', 'Any shelf failed (1st attempt)', 'Mean shelf (class z)'], body);
+    host.appendChild(elc('p','why', 'Classes with Phase 1 NBME exams and a Step 1 window: ' + classes1.map(c => 'Class of ' + c).join(', ') +
+      '. A class without Step 1 results yet joins when they are loaded.'));
+  } else host.appendChild(elc('p','why', 'No loaded class has both Phase 1 NBME exams and a Step 1 window yet.'));
+  /* 2. Step 1 timing -> shelves */
+  const withT = rows.filter(x => x.timing && x.shelves.length);
+  const classes2 = [...new Set(withT.map(x => x.s.cohort))].sort();
+  host.appendChild(elc('h3','predh', 'Step 1 timing \u2192 clerkship shelves'));
+  const body2 = [];
+  [['on','Step 1 on schedule'], ['late','Step 1 late'], ['none','No Step 1 on record']].forEach(([k, n]) => {
+    const G = withT.filter(x => x.timing === k); if(!G.length) return;
+    body2.push({cells: [n + (classes2.length > 1 ? ' \u00b7 pooled' : '')].concat(summary(G))});
+    if(classes2.length > 1) classes2.forEach(c => { const H = G.filter(x => x.s.cohort === c); if(H.length) body2.push({sub: true, cells: ['   Class of ' + c + (c <= 2027 ? ' (legacy)' : '')].concat(summary(H))}) });
+  });
+  if(body2.length) table('Step 1 timing against shelves', ['Step 1', 'Students', 'Step 1 late or not on record', 'Failed Step 1', 'Any shelf failed (1st attempt)', 'Mean shelf (class z)'], body2);
+  host.appendChild(elc('p','why', 'The legacy Class of 2027 had no Phase 1 NBME exams, so it appears only here, as a comparator for the second link. ' +
+    '\u201cNo Step 1 on record\u201d can also mean a roster name the USMLE match has not resolved yet.'));
 }
 
 /* ---------------- review cards ---------------- */
