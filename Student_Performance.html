@@ -301,6 +301,7 @@ main{padding-bottom:44px}
 .rv-chips .fail{background:var(--crit-wash);border-color:rgba(208,59,59,.45);color:var(--crit)}
 .rv-chips .rem{background:var(--warn-wash);border-color:rgba(224,172,53,.75);color:#8a5a00}
 .rv-flag{font-size:11.5px;color:var(--ink-2);line-height:1.35}
+.rv-note{font-size:11px;color:var(--muted);margin-top:4px}
 .rv-empty{padding:26px 12px;text-align:center;color:var(--muted);font-size:13.5px}
 .kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
   padding:14px 16px;box-shadow:0 1px 2px var(--ring)}
@@ -5491,7 +5492,30 @@ function renderReview(list){
     /* knowledge by assessment type, this student's median percentile */
     const buckets = typePercentiles([s]);
     const types = TYPE_META.filter(t => !SUMMARY_HIDE.has(t.key) && buckets[t.key] && buckets[t.key].length);
-    if(types.length){
+    /* Phase 1: each NBME CAS exam up front, one row per exam in module order -
+       the best single read on knowledge. The other assessment types (quizzes,
+       Pre-CCSG, Blackboard...) are in the full record. A paper below its pass
+       mark shows red whatever its percentile. */
+    const casShort = l => /mid/i.test(l) ? 'Mid' : /end|final/i.test(l) ? 'End' : examName(l);
+    const cas = [];
+    (s.records||[]).filter(r => r.phase === 1 && !isClerkshipRec(r) && r.attempt !== 'prior')
+      .sort((a, b) => String(a.start || '').localeCompare(String(b.start || '')))
+      .forEach(r => {
+        const list = casList(r).filter(c => c.percentile != null && !/cbse/i.test(c.label || ''));
+        list.forEach(c => cas.push({r, c, label: r.code + (list.length > 1 && c.label ? ' · ' + casShort(c.label) : '')}));
+      });
+    if(cas.length){
+      card.appendChild(elc('div','rv-sec','NBME CAS · percentile in class'));
+      cas.forEach(({c, label}) => {
+        const below = c.passMark != null && c.scaled != null && c.scaled < c.passMark;
+        const row = bar(label, Math.round(c.percentile), below ? 'low' : null,
+                        Math.round(c.percentile) + (below ? ' · ' + c.scaled + '%' : ''));
+        if(below) row.title = label + ': ' + c.scaled + '% correct, below the ' + c.passMark + '% pass mark';
+        card.appendChild(row);
+      });
+      const others = types.filter(t => t.key !== 'cas').map(t => t.short || t.label);
+      if(others.length) card.appendChild(elc('div','rv-note', others.join(', ') + ' percentiles: in the full record'));
+    } else if(types.length){
       card.appendChild(elc('div','rv-sec','By assessment type · percentile in class'));
       types.forEach(t => card.appendChild(bar(t.short || t.label, Math.round(median(buckets[t.key])))));
     }
