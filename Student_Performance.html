@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -474,6 +474,17 @@ table.opgrid{border-collapse:collapse;width:100%;min-width:680px;font-size:13px}
 .ustile.bad{border-left-color:var(--crit)}.ustile.bad b{color:var(--crit)}
 .predh{font-size:13px;letter-spacing:.06em;text-transform:uppercase;margin:6px 0 8px;color:var(--ink)}
 table.predict{min-width:720px}table.predict tr.sub th{font-weight:500;color:var(--ink-2);padding-left:22px}table.predict tr.sub td{color:var(--ink-2)}
+
+/* Dark mode: every card carries a soft luminous edge so neighbouring cards
+   read as separate panels on the dark plane. */
+:root[data-theme="dark"]{--glow-edge:rgba(120,170,255,.34);--glow-halo:rgba(70,130,255,.16)}
+:root[data-theme="dark"] .card,:root[data-theme="dark"] .kpi,:root[data-theme="dark"] .rv-card{
+  border-color:var(--glow-edge);
+  box-shadow:0 0 0 1px rgba(120,170,255,.08),0 0 16px var(--glow-halo),inset 0 1px 0 rgba(255,255,255,.04)}
+:root[data-theme="dark"] .rv-card:hover{box-shadow:0 0 0 1px rgba(120,170,255,.18),0 0 22px rgba(70,130,255,.26)}
+:root[data-theme="dark"] .rv-card.concern{border-top-color:var(--crit)}
+:root[data-theme="dark"] .rv-card.watch{border-top-color:var(--warn)}
+@media print{:root[data-theme="dark"] .card,:root[data-theme="dark"] .kpi,:root[data-theme="dark"] .rv-card{box-shadow:none}}
 .summarytext{font-size:15px;line-height:1.6;max-width:80ch;margin:0 0 8px;color:var(--ink)}
 .gpath{border-top:1px solid var(--line);padding:10px 0}
 .gpath:first-of-type{border-top:0}
@@ -5420,8 +5431,11 @@ function init(){
     b.textContent = on ? 'Chart view' : 'Table view';
   });
 
-  /* theme toggle - the stamp wins over the OS setting either way */
+  /* theme toggle - dark by default; a choice made here is remembered in this
+     browser (per-viewer convenience only) and wins over the OS setting */
   const themeBtn = $('themeBtn');
+  const savedTheme = () => { try { return localStorage.getItem('ascendTheme') } catch(e){ return null } };
+  const saveTheme = m => { try { localStorage.setItem('ascendTheme', m) } catch(e){} };
   const applyTheme = mode => {
     if(mode) document.documentElement.setAttribute('data-theme', mode);
     else document.documentElement.removeAttribute('data-theme');
@@ -5435,9 +5449,10 @@ function init(){
     const dark = cur === 'dark' ||
       (!cur && window.matchMedia('(prefers-color-scheme: dark)').matches);
     applyTheme(dark ? 'light' : 'dark');
+    saveTheme(dark ? 'light' : 'dark');
     renderAll();                       /* charts read their colours from the tokens */
   });
-  applyTheme(null);
+  applyTheme(savedTheme() === 'light' ? 'light' : 'dark');
 
   $('printBtn').addEventListener('click', () => window.print());
   $('rvWatch').addEventListener('change', e => { state.reviewWatch = e.target.checked; renderReview(filtered()) });
