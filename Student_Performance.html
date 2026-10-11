@@ -423,6 +423,41 @@ details.fold[open] > summary{margin-bottom:12px}
 .nbprior .nbrow.below .nbscore{color:var(--ink-2)}
 td.belowcell{color:var(--crit);font-weight:700}
 @media (max-width:640px){.nbrow{grid-template-columns:1fr 54px 56px}.nbtrack{grid-column:1 / -1;order:5}}
+.onepager{display:grid;gap:22px}
+.opsec h4{margin:0 0 4px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}
+.op-lede{margin:0 0 10px;font-size:13px;color:var(--ink-2);max-width:80ch}
+.opgrades{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+.opg{border:1px solid var(--line);border-radius:6px;padding:7px 9px;display:flex;flex-direction:column;min-width:0}
+.opg .c{font-size:11px;color:var(--muted);font-weight:700}.opg .n{font-size:12px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.opg .l{font-size:17px;font-weight:800;color:var(--ink)}
+.oprow{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:16px 24px;align-items:start}
+.opsvg{width:100%;height:auto;display:block}
+.opz.lo{fill:var(--surface-2);opacity:.6}.opz.mid{fill:var(--surface-2)}.opz.hi{fill:rgba(49,121,198,.12)}
+.opcurve{fill:var(--line);opacity:.8;stroke:var(--ink-2);stroke-width:1.2}
+.opband{fill:rgba(49,121,198,.18)}.opmark{stroke:#d6117f;stroke-width:2.5}.opmarkdot{fill:#d6117f}
+.opaxis{stroke:var(--line);stroke-width:1.5}.optick{stroke:var(--muted)}
+.oplab{font-size:12px;fill:var(--muted)}.opzlab{font-size:12px;font-weight:600;fill:var(--ink-2)}.opmarklab{font-size:12px;font-weight:700;fill:#d6117f}
+.optiers{display:grid;grid-template-columns:19fr 60fr 21fr;gap:4px;font-size:12px;color:var(--ink-2)}
+.optiers div{border-top:3px solid var(--line);padding-top:4px;min-width:0}.optiers div.on{border-top-color:#d6117f;color:var(--ink)}
+.optiers b{display:block;color:var(--ink)}
+.opside{border-left:3px solid var(--ink);padding-left:12px}.opside .big{font-size:26px;font-weight:800;line-height:1.1}
+.opside p{margin:6px 0 0;font-size:12.5px;color:var(--ink-2)}
+.opshelves{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;margin-top:8px;font-size:12px;color:var(--ink-2);text-align:center}
+.opshelves div{border-top:2px solid var(--line);padding-top:3px}.opshelves b{display:block;color:var(--ink)}
+table.opgrid{border-collapse:collapse;width:100%;min-width:680px;font-size:13px}
+.opgrid th,.opgrid td{border-bottom:1px solid var(--line);padding:5px 6px;text-align:center}
+.opgrid thead th{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.opgrid tbody th{text-align:left;font-weight:600}.opgrid tr.grp th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding-top:10px}
+.opm{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:4px;font-size:11px;font-weight:700}
+.opm.H{background:var(--ink);color:var(--surface)}.opm.P{background:var(--line);color:var(--ink)}.opm.F{background:var(--crit);color:#fff}
+.opm.Q{border:1.5px dashed var(--ink);color:var(--ink)}.opm.N{background:var(--surface-2);color:var(--muted)}
+.opev{font-weight:700}.opev.no{color:var(--muted);font-weight:500}
+.oprate{display:flex;align-items:center;gap:6px;min-width:120px}.opbar{flex:1;height:7px;background:var(--surface-2);border-radius:4px;position:relative;overflow:hidden}
+.opbar i{position:absolute;inset:0 auto 0 0;background:var(--s2)}.oprate b{font-size:12px;color:var(--ink-2);min-width:32px;text-align:right}
+.opprint{margin-left:auto}
+@media (max-width:640px){.oprow{grid-template-columns:1fr}.opgrades,.opshelves{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media print{ body.print-onepager *{visibility:hidden} body.print-onepager .onepager-card, body.print-onepager .onepager-card *{visibility:visible}
+  body.print-onepager .onepager-card{position:absolute;left:0;top:0;width:100%;border:0;box-shadow:none} body.print-onepager .opprint{display:none} }
 .summarytext{font-size:15px;line-height:1.6;max-width:80ch;margin:0 0 8px;color:var(--ink)}
 .gpath{border-top:1px solid var(--line);padding:10px 0}
 .gpath:first-of-type{border-top:0}
@@ -4255,6 +4290,185 @@ function renderNbme(host, s){
     'Every NBME exam on record');
 }
 
+
+/* ---------------- Phase 2 one-pager (legacy clerkship classes) ---------------- */
+/* The "Overall clinical performance in Phase 2" profile: grades, overall
+   standing tier, competency grid with class shares, Medical Knowledge against
+   the class, and the summary paragraph. Same method as the confidential
+   profiles file (build_profiles.py): objectives grouped by competency area;
+   Medical Knowledge = the shelf axis (TA); overall standing = shelf and the
+   clinical evaluation (overall rating) combined with equal weight per
+   clerkship; levels at 1.96 SEM. */
+const OP_CODES = ['MED','NRL','OBG','PED','PSY','SUR'];
+const OP_NAMES = ['Medicine','Neurology','OB/GYN','Pediatrics','Psychiatry','Surgery-Anesthesiology'];
+const OP_GROUP = {
+  MED:{'Medical knowledge':'mk','Assessment & management plan':'dx','History taking':'hx','Physical exam':'pe','Presentations':'pres','Differential diagnosis':'dx','Patients & families':'pf','Initiative & reliability':'team'},
+  NRL:{'Neurologic knowledge':'mk','Rapport':'pf','Differential diagnosis':'dx','History taking':'hx','Neurologic exam':'pe','Diagnostic & management plan':'dx','Communicating findings':'pres','Teamwork & professionalism':'team'},
+  OBG:{'Differential diagnosis & plan':'dx',"Women's health interview":'hx','Rapport':'pf','Teamwork':'team','Basic skills & GU exam':'pe'},
+  PED:{'Medical knowledge':'mk','History taking':'hx','Physical exam':'pe','Oral communication':'pres','Written communication':'pres','Differential diagnosis':'dx','Plan & follow-up':'dx','Culture & social determinants':'pf'},
+  PSY:{'Recognizing psychiatric illness':'mk','Psychiatric assessment':'hx','Diagnosis':'dx','Therapeutic alliance':'pf','Oral & written presentation':'pres','Treatment plan':'dx','Teamwork':'team'},
+  SUR:{'Differential diagnosis':'dx','Management plan':'dx','Perioperative plan':'dx','Perioperative team':'team','Medical knowledge':'mk','History taking':'hx','Physical exam':'pe','Oral & written presentation':'pres','Interpersonal skills':'pf'}
+};
+const OP_AREAS = [['Medical Knowledge'], ['Medical Knowledge','mk'], ['Patient Care'], ['History taking','hx'], ['Physical examination','pe'],
+  ['Clinical reasoning','dx'], ['Interpersonal & Communication Skills'], ['Case presentation','pres'], ['Patients and families','pf'],
+  ['Professionalism'], ['Teamwork and reliability','team']];
+let OP_CACHE = {data:null, byCohort:{}};
+const opRec = (s, c) => (s.records||[]).find(r => r.kind === 'clerkship' && r.code === c && !isPrior(r));
+function opSquare(ratings){
+  const known = ratings.filter(r => r === 'H' || r === 'P' || r === 'F');
+  if(!ratings.length) return 'N';
+  if(known.includes('F')) return 'F';
+  if(known.includes('P')) return 'P';
+  if(known.length) return 'H';
+  return ratings.includes('H/P') ? 'Q' : 'N';
+}
+function opGrid(s){
+  const g = {};
+  OP_AREAS.forEach(([, a]) => { if(!a) return;
+    g[a] = OP_CODES.map(c => { const r = opRec(s, c);
+      return opSquare(((r && r.objectives) || []).filter(o => OP_GROUP[c][o.name] === a && o.rating !== 'NA').map(o => o.rating)) }).join('');
+  });
+  return g;
+}
+const opEvery = row => { const on = row.split('').filter(v => 'HPF'.includes(v)); return on.length >= 4 && on.every(v => v === 'H') };
+function opClass(cohort){
+  if(OP_CACHE.data !== DATA) OP_CACHE = {data: DATA, byCohort:{}};
+  if(cohort in OP_CACHE.byCohort) return OP_CACHE.byCohort[cohort];
+  const studs = (DATA.students||[]).filter(s => s.cohort === cohort && OP_CODES.some(c => { const r = opRec(s, c); return r && r.objectives && r.objectives.length }));
+  if(!studs.length) return (OP_CACHE.byCohort[cohort] = null);
+  const grids = {}; studs.forEach(s => grids[s.id] = opGrid(s));
+  const rate = {}; OP_AREAS.forEach(([, a]) => { if(a) rate[a] = Math.round(100 * studs.filter(s => opEvery(grids[s.id][a])).length / studs.length) });
+  /* overall standing: shelf and clinical evaluation, standardised per clerkship, averaged */
+  const comb = {};
+  OP_CODES.forEach(c => {
+    const sh = {}, cl = {};
+    studs.forEach(s => { const r = opRec(s, c); if(!r) return;
+      const v = taShelf(r); if(v != null) sh[s.id] = v;
+      if(r.eval && r.eval.overall != null) cl[s.id] = r.eval.overall; });
+    const zs = taStd(sh), zc = taStd(cl), m = {};
+    Object.keys(zs).forEach(u => { if(u in zc) m[u] = (zs[u] + zc[u]) / 2 });
+    const zm = taStd(m); if(Object.keys(zm).length) comb[c] = zm;
+  });
+  const out = {grids, rate, n: studs.length, tier: taAxis(comb), mk: (twoAxes(cohort) || {}).knowledge || null};
+  return (OP_CACHE.byCohort[cohort] = out);
+}
+function opStrip(svg, z, cut, names, label){
+  const NSv = 'http://www.w3.org/2000/svg', L = 20, Rr = 620, base = 104, top = 22;
+  svg.textContent = '';
+  const x = v => L + (Math.max(-3, Math.min(3, v)) + 3) / 6 * (Rr - L);
+  const el = (t, a) => { const e = document.createElementNS(NSv, t); for(const k in a) e.setAttribute(k, a[k]); svg.appendChild(e); return e };
+  el('rect', {x:x(-3), y:top, width:x(-cut)-x(-3), height:base-top, class:'opz lo'});
+  el('rect', {x:x(-cut), y:top, width:x(cut)-x(-cut), height:base-top, class:'opz mid'});
+  el('rect', {x:x(cut), y:top, width:x(3)-x(cut), height:base-top, class:'opz hi'});
+  let d = ''; for(let v = -3; v <= 3.001; v += 0.05) d += (d ? 'L' : 'M') + x(v).toFixed(1) + ' ' + (base - Math.exp(-v*v/2) * (base-top-8)).toFixed(1);
+  el('path', {d: d + 'L' + x(3) + ' ' + base + 'L' + x(-3) + ' ' + base + 'Z', class:'opcurve'});
+  el('rect', {x:x(z-cut), y:top, width:x(z+cut)-x(z-cut), height:base-top, class:'opband'});
+  el('line', {x1:x(z), x2:x(z), y1:top-6, y2:base, class:'opmark'});
+  el('circle', {cx:x(z), cy:top-6, r:5, class:'opmarkdot'});
+  el('line', {x1:L, x2:Rr, y1:base, y2:base, class:'opaxis'});
+  const lab = (t, xx, y, anchor, cls) => { const e = el('text', {x:xx, y, 'text-anchor':anchor || 'middle', class: cls || 'oplab'}); e.textContent = t };
+  [[-2,'2nd'],[-1,'16th'],[0,'50th'],[1,'84th'],[2,'98th']].forEach(([v, t]) => { el('line', {x1:x(v), x2:x(v), y1:base, y2:base+5, class:'optick'}); lab(t, x(v), base+18) });
+  lab('class percentile', x(3), base+36, 'end');
+  const mid = (x(-cut)+x(cut))/2, mx = x(z);
+  lab(names[0], (x(-3)+x(-cut))/2, top+14, 'middle', 'opzlab');
+  lab(names[1], Math.abs(mid - mx) < 60 ? mid - 60 : mid, top+14, 'middle', 'opzlab');
+  lab(names[2], Math.min((x(cut)+x(3))/2, x(3) - 40), top+44, 'middle', 'opzlab');
+  lab(label, mx + 158 > Rr ? mx - 8 : mx + 8, top-2, mx + 158 > Rr ? 'end' : 'start', 'opmarklab');
+}
+const OP_TIER = {above:'Upper tier', middle:'Middle tier', below:'Lower tier'};
+const OP_RANGE = {above:'Upper range', middle:'Within the class middle', below:'Lower range'};
+const OP_LBL = {H:'H', P:'P', F:'F', Q:'H?', N:'–'};
+function renderOnePager(host, s, text){
+  const C = opClass(s.cohort); if(!C) return false;
+  const g = C.grids[s.id] || opGrid(s);
+  const page = elc('div','onepager');
+  /* grades */
+  const letters = OP_CODES.map(c => { const r = opRec(s, c); return r ? r.result : '—' });
+  const hon = letters.filter(l => l === 'Honors').length;
+  const gsec = elc('div','opsec');
+  gsec.appendChild(elc('h4', null, 'Clerkship grades'));
+  gsec.appendChild(elc('p','op-lede', (hon === 6 ? 'Honors in all six core clerkships.' : 'Honors in ' + hon + ' of 6 core clerkships.') +
+    ' Nearly every student in the class earned Honors, so the sections below show how it was earned.'));
+  const gr = elc('div','opgrades');
+  OP_CODES.forEach((c, i) => { const d = elc('div','opg'); d.appendChild(elc('span','c', c)); d.appendChild(elc('span','n', OP_NAMES[i]));
+    d.appendChild(elc('span','l', letters[i] === 'No final grade on record' ? '—' : letters[i])); gr.appendChild(d) });
+  gsec.appendChild(gr); page.appendChild(gsec);
+  /* overall standing */
+  const T = C.tier, tz = T && T.z[s.id];
+  if(tz != null){
+    const t = T.level(tz), sec = elc('div','opsec');
+    sec.appendChild(elc('h4', null, 'Overall standing among Honors students'));
+    sec.appendChild(elc('p','op-lede', 'Knowledge (shelf exams) and clinical evaluations combined with equal weight, against the class ' +
+      '(dependability ' + T.rel.toFixed(2) + '). A student is placed in the upper or lower tier only when the 95% band excludes the class average.'));
+    const row = elc('div','oprow'), left = elc('div');
+    const svg = document.createElementNS('http://www.w3.org/2000/svg','svg'); svg.setAttribute('viewBox','0 0 640 150'); svg.setAttribute('class','opsvg');
+    svg.setAttribute('role','img'); svg.setAttribute('aria-label', 'Overall standing: ' + OP_TIER[t] + ', ' + ord(taPct(tz)) + ' percentile');
+    left.appendChild(svg);
+    const tiers = elc('div','optiers');
+    [['below','Lower tier'],['middle','Middle tier'],['above','Upper tier']].forEach(([k, n]) => {
+      const d = elc('div', k === t ? 'on' : null); d.appendChild(elc('b', null, n));
+      d.appendChild(document.createTextNode(T.levels[k] + ' students · ' + Math.round(100 * T.levels[k] / T.n) + '%')); tiers.appendChild(d) });
+    left.appendChild(tiers); row.appendChild(left);
+    const side = elc('div','opside');
+    side.appendChild(elc('div','big', OP_TIER[t]));
+    side.appendChild(elc('p', null, ord(taPct(tz)) + ' percentile on knowledge and clinical evaluations combined'));
+    side.appendChild(elc('p', null, 'The 95% band runs from the ' + ord(taPct(tz - T.cut)) + ' to the ' + ord(taPct(tz + T.cut)) + ' percentile' +
+      (t === 'middle' ? ' and includes the class average.' : ' and excludes the class average.') + ' Students within a tier are not distinguishable from one another.'));
+    row.appendChild(side); sec.appendChild(row); page.appendChild(sec);
+    opStrip(svg, tz, T.cut, ['Lower tier','Middle tier','Upper tier'], 'This student · ' + ord(taPct(tz)));
+  }
+  /* competency grid */
+  const gsq = elc('div','opsec');
+  gsq.appendChild(elc('h4', null, 'Competencies met at the Honors standard'));
+  gsq.appendChild(elc('p','op-lede', 'Each square: the clerkship’s objectives in that competency area were met at the Honors standard (H), the Pass standard (P), ' +
+    'Pass with Honors not on file (H?), or the area was not assessed or its evidence is not on file (–). The last columns: met in every clerkship that assessed it, and the share of the class that did.'));
+  const tw = elc('div','tablewrap'), tb = elc('table','opgrid');
+  const thr = elc('tr'); ['ACGME competency'].concat(OP_CODES, ['Every clerkship','Class who also did']).forEach(h => thr.appendChild(elc('th', null, h)));
+  const th = elc('thead'); th.appendChild(thr); tb.appendChild(th);
+  const tbd = elc('tbody');
+  OP_AREAS.forEach(([name, a]) => {
+    const tr = elc('tr');
+    if(!a){ tr.className = 'grp'; const c = elc('th', null, name); c.colSpan = 9; tr.appendChild(c); tbd.appendChild(tr); return }
+    tr.appendChild(elc('th', null, name));
+    g[a].split('').forEach((v, i) => { const td = elc('td','sq'); const m = elc('span','opm ' + v, OP_LBL[v]); m.title = OP_NAMES[i]; td.appendChild(m); tr.appendChild(td) });
+    const ev = opEvery(g[a]); tr.appendChild(elc('td','opev' + (ev ? '' : ' no'), ev ? 'Yes' : 'No'));
+    const rt = elc('td','oprate'); const bar = elc('span','opbar'); const fill = elc('i'); fill.style.width = C.rate[a] + '%'; bar.appendChild(fill);
+    rt.appendChild(bar); rt.appendChild(elc('b', null, C.rate[a] + '%')); tr.appendChild(rt);
+    tbd.appendChild(tr);
+  });
+  tb.appendChild(tbd); tw.appendChild(tb); gsq.appendChild(tw); page.appendChild(gsq);
+  /* medical knowledge */
+  const K = C.mk, kz = K && K.z[s.id];
+  if(kz != null){
+    const r = K.level(kz), sec = elc('div','opsec');
+    sec.appendChild(elc('h4', null, 'Medical Knowledge against the class'));
+    sec.appendChild(elc('p','op-lede', 'The NBME clinical subject exams, the one measure consistent enough across clerkships to place a student against classmates (dependability ' + K.rel.toFixed(2) + ').'));
+    const row = elc('div','oprow'), left = elc('div');
+    const svg = document.createElementNS('http://www.w3.org/2000/svg','svg'); svg.setAttribute('viewBox','0 0 640 150'); svg.setAttribute('class','opsvg');
+    svg.setAttribute('role','img'); svg.setAttribute('aria-label', 'Medical Knowledge: ' + OP_RANGE[r] + ', ' + ord(taPct(kz)) + ' percentile');
+    left.appendChild(svg);
+    const sh = elc('div','opshelves');
+    OP_CODES.forEach(c => { const z = K.per[c] && K.per[c][s.id]; const d = elc('div', null, c); d.appendChild(elc('b', null, z == null ? '—' : ord(taPct(z)))); sh.appendChild(d) });
+    left.appendChild(sh); row.appendChild(left);
+    const side = elc('div','opside');
+    side.appendChild(elc('div','big', ord(taPct(kz))));
+    side.appendChild(elc('p', null, 'percentile across ' + Object.keys(K.per).filter(c => K.per[c][s.id] != null).length + ' shelf exams'));
+    side.appendChild(elc('p', null, OP_RANGE[r] + '. The 95% band runs from the ' + ord(taPct(kz - K.cut)) + ' to the ' + ord(taPct(kz + K.cut)) + ' percentile.'));
+    row.appendChild(side); sec.appendChild(row); page.appendChild(sec);
+    opStrip(svg, kz, K.cut, ['Lower range','Class middle','Upper range'], 'This student · ' + ord(taPct(kz)));
+  }
+  /* paragraph */
+  if(text){
+    const sec = elc('div','opsec');
+    sec.appendChild(elc('h4', null, 'Summary paragraph · ' + ((s.summary && s.summary.status) || 'Draft for review')));
+    sec.appendChild(elc('p','summarytext', text));
+    if(s.summary && s.summary.note) sec.appendChild(elc('p','why', s.summary.note));
+    page.appendChild(sec);
+  }
+  host.appendChild(page);
+  return true;
+}
+
 /* ---------------- assemble the student view ---------------- */
 function renderStudent(s){
   const host = $('studentView'); host.textContent = '';
@@ -4265,16 +4479,25 @@ function renderStudent(s){
 
   /* the Class of 2027's summary paragraph: stored with the name replaced by
      {NAME} / {FIRST}; filled from the names loaded this session, else the code */
-  if(s.summary && s.summary.text){
-    const nm = nameOf(s.id), first = nm ? String(nm).split(' ')[0] : s.id;
-    const text = s.summary.text.split('{NAME}').join(nm || s.id).split('{FIRST}').join(first);
+  const nm0 = nameOf(s.id), first0 = nm0 ? String(nm0).split(' ')[0] : s.id;
+  const text0 = s.summary && s.summary.text ? s.summary.text.split('{NAME}').join(nm0 || s.id).split('{FIRST}').join(first0) : '';
+  if(opClass(s.cohort) && (s.records||[]).some(r => r.objectives && r.objectives.length)){
+    const oBody = makeCard(host, 'Overall clinical performance in Phase 2',
+      'One-page profile' + (nm0 ? ' \u00b7 ' + nm0 : ''),
+      'Grades, overall standing among Honors students, the ACGME competencies met at the Honors standard with class context, ' +
+      'Medical Knowledge against the class, and the summary paragraph. An Honors is an Honors: nothing here changes or qualifies ' +
+      'a clerkship grade. The evidence for every square and number is in the cards below. ' +
+      (nm0 ? '' : 'Load names to see the student\u2019s name in place of the code. ') + 'A draft for review.', null);
+    const pb = elc('button','ghost opprint','Print one-pager'); pb.type = 'button';
+    pb.addEventListener('click', () => { document.body.classList.add('print-onepager'); window.print();
+      setTimeout(() => document.body.classList.remove('print-onepager'), 500) });
+    oBody.parentElement.querySelector('.cardhd').appendChild(pb);
+    oBody.parentElement.classList.add('onepager-card');
+    renderOnePager(oBody, s, text0);
+  } else if(text0){
     const sBody = makeCard(host, 'Overall clinical performance in Phase 2',
-      'Summary paragraph \u00b7 ' + (s.summary.status || 'Draft for review'),
-      'Generated from the clerkship grades, the competency objectives met at the Honors standard, the shelf exams, ' +
-      'the overall standing and the faculty narratives, then checked against them; the evidence is in the cards below. ' +
-      (nm ? '' : 'Load names to see the student\u2019s name in place of the code. ') +
-      'A draft: every paragraph is reviewed by a person before use.', null);
-    const p = elc('p','summarytext', text); sBody.appendChild(p);
+      'Summary paragraph \u00b7 ' + (s.summary.status || 'Draft for review'), 'A draft for review.', null);
+    sBody.appendChild(elc('p','summarytext', text0));
     if(s.summary.note) sBody.appendChild(elc('p','why', s.summary.note));
   }
 
