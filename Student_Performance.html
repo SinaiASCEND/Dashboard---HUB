@@ -1098,11 +1098,11 @@ body.gated{overflow:hidden}
             counts three times as much as a module's quiz set. A failed block, a remediation, a clinical
             evaluation below 3.0, or two or more Phase 1 NBME exams below 65 is what makes a standing absolute.
             One Phase 1 NBME exam below 65 is a Monitor, and a passing retake of the same Phase 1 exam turns a
-            concern into a Monitor. <strong>Clerkships (Class of 2027)</strong>: an Academic concern is any shelf below
-            its Clerkship Information Sheet pass mark (5th percentile; Surgery&rsquo;s CAS follows the shelf), even if
-            the retake passed; a clerkship grade below Honors; overall performance across the ACGME competencies
-            below the class middle; or a DO Week overall score below the 70% pass mark of the clerkship direct
-            observations. An Incomplete is a Monitor.</p>
+            concern into a Monitor. <strong>Clerkships (Class of 2027 and ASCEND Phase 2, graded Honors / Pass / Fail)</strong>: an Academic concern is
+            any shelf or CAS below its pass mark (the clerkship&rsquo;s 5th-percentile cut; Surgery&rsquo;s CAS 65%), even if
+            the retake passed; a clerkship grade of Pass or Fail; a clinical evaluation below 3.0; overall performance across
+            the ACGME competencies below the class middle; a clerkship direct observation (or the Class of 2027&rsquo;s DO Week)
+            below 70%; or a failed Step 1 not yet passed. An Incomplete is a Monitor. Once in Phase 2, Phase 1 no longer counts.</p>
         </div>
       </div>
       <div class="cardbody">
@@ -1966,10 +1966,12 @@ function casBelowPass(s){
   return {open, resolved};
 }
 
-/* Clerkship Academic concern rules for the objective-graded (legacy)
-   clerkships, decided 2026-10-10. Each returns the flag that explains it:
+/* Clerkship Academic concern rules - the legacy Class of 2027 (decided
+   2026-10-10) and ASCEND Phase 2, graded Honors / Pass / Fail (2026-10-11).
+   Each returns the flag that explains it:
    - a clerkship grade below Honors (Pass, Pass with remediation, Grade C, Fail);
      an Incomplete is a Monitor until a grade is recorded
+   - a clerkship direct observation below its pass mark (70%)
    - overall performance across the ACGME competencies below the class middle
      (the one-pager's level: beyond 1.96 SEM)
    - the DO Week overall score below the clerkship direct-observation pass mark
@@ -1979,21 +1981,28 @@ const CK_BELOW_HONORS = ['Pass', 'Pass with remediation', 'Grade C', 'Fail'];
 function clerkshipConcerns(s){
   const out = [], recs = scopeRecs(s);
   const graded = recs.filter(r => r.kind === 'clerkship' && r.objectives && r.objectives.length);
-  const below = graded.filter(r => CK_BELOW_HONORS.includes(r.result));
+  /* the grade rules read every clerkship with a final grade, legacy or Phase 2 */
+  const finals = recs.filter(r => r.kind === 'clerkship');
+  const below = finals.filter(r => CK_BELOW_HONORS.includes(r.result));
   if(below.length)
     out.push({level:'crit', what: below.length + ' clerkship grade' + (below.length === 1 ? '' : 's') + ' below Honors',
       why: below.map(r => r.code + ' ' + r.result).join(', ') + ' \u2014 in a class where nearly every student earns Honors, a grade below it is an Academic concern.'});
-  const inc = graded.filter(r => r.result === 'Incomplete');
+  const inc = finals.filter(r => r.result === 'Incomplete');
   if(inc.length)
     out.push({level:'watch', what: inc.length + ' clerkship' + (inc.length === 1 ? '' : 's') + ' Incomplete',
       why: inc.map(r => r.code).join(', ') + ' \u2014 no final grade yet; reviewed again when it is recorded.'});
-  if(graded.length){
+  if(finals.length){
     const A = twoAxes(s.cohort, TA_LOADING), O = A && A.overall, z = O && O.z[s.id];
     if(z != null && O.level(z) === 'below')
       out.push({level:'crit', what: 'Overall performance across the ACGME competencies below the class middle',
         why: ord(taPct(z)) + ' percentile; the 95% band (' + ord(taPct(z - O.cut)) + '\u2013' + ord(taPct(z + O.cut)) +
              ') lies below the class average. Medical Knowledge, Patient Care, ICS and Professionalism with equal weight.'});
   }
+  /* a clerkship's direct observations below the pass mark */
+  const lowDo = finals.filter(r => r.osce && r.osce.pct != null && r.osce.passMark != null && r.osce.pct < r.osce.passMark);
+  if(lowDo.length)
+    out.push({level:'crit', what: lowDo.length + ' clerkship direct observation' + (lowDo.length === 1 ? '' : 's') + ' below ' + lowDo[0].osce.passMark + '%',
+      why: lowDo.map(r => r.code + ' ' + r.osce.pct + '%').join(', ') + ' \u2014 below the ' + lowDo[0].osce.passMark + '% pass mark for the clerkship direct observations.'});
   recs.filter(r => r.code === 'DOWEEK' && r.osce && r.osce.pct != null && r.osce.passMark != null && r.osce.pct < r.osce.passMark)
     .forEach(r => out.push({level:'crit', what: 'DO Week overall score below ' + r.osce.passMark + '%',
       why: r.osce.pct + '% across the DO Week encounters, below the ' + r.osce.passMark + '% pass mark the clerkship direct observations use.'}));
