@@ -2158,7 +2158,7 @@ function stand(s){
   return (s.byPhase && s.byPhase[state.phase]) || NO_STANDING;
 }
 const kOf = s => stand(s).knowledge, skOf = s => stand(s).skills;
-/* clinical performance (the four ACGME competencies combined), as a class
+/* overall performance across the four ACGME competencies, as a class
    percentile - clerkship classes only */
 const ovOf = s => { const A = twoAxes(s.cohort), O = A && A.overall; return O && O.z[s.id] != null ? taPct(O.z[s.id]) : null };
 const nbOf = s => stand(s).nbme, belowOf = s => stand(s).nbmeBelow || 0;
@@ -2499,7 +2499,7 @@ const ROSTER_COLS = [
   {key:'below',     label:'NBME below 65', num:true},
   {key:'knowledge', label:'Medical knowledge'},
   {key:'skills',    label:'Clinical skills'},
-  {key:'overall',   label:'Clinical performance'},
+  {key:'overall',   label:'Overall (ACGME)'},
   {key:'standing',  label:'Standing'},
   {key:'open',      label:''}
 ];
@@ -4253,7 +4253,7 @@ function twoAxes(cohort){
       const cz = taStd(cm); if(Object.keys(cz).length) comp[name][code] = cz;
     });
   });
-  /* clinical performance overall: the four measurable ACGME competencies
+  /* overall performance across the ACGME competencies: the four measurable ones
      (Medical Knowledge = the shelf, Patient Care, ICS, Professionalism), equal
      weight, averaged within each clerkship (3 of the 4 at least),
      restandardised, then carried across clerkships like every other axis */
@@ -4588,15 +4588,15 @@ function renderOnePager(host, s, text){
     .filter(([, ax]) => ax && ax.z[s.id] != null);
   if(graphs.length){
     const sec = elc('div','opsec');
-    sec.appendChild(elc('h4', null, 'Clinical performance against the class'));
-    sec.appendChild(elc('p','op-lede', 'Clinical performance combines the four measurable ACGME competencies with equal weight; the graphs below break it down, one per competency. Each shows the student\u2019s standing across the clerkships against classmates, with its 95% band. ' +
+    sec.appendChild(elc('h4', null, 'Overall performance across the ACGME competencies'));
+    sec.appendChild(elc('p','op-lede', 'The overall combines the four measurable ACGME competencies with equal weight; the graphs below break it down, one per competency. Each shows the student\u2019s standing across the clerkships against classmates, with its 95% band. ' +
       'A level is given only when the band excludes the class average. Dependability says how far each measure can be trusted for one student: ' +
       'the shelf exams are consistent from clerkship to clerkship; the clinical evaluations much less so, so most students sit in the middle on them.'));
     const O = TA && TA.overall, oz = O && O.z[s.id];
     if(oz != null){
       const lv = O.level(oz), row = elc('div','oprow'), left = elc('div');
       const svg = document.createElementNS('http://www.w3.org/2000/svg','svg'); svg.setAttribute('viewBox','0 0 640 150'); svg.setAttribute('class','opsvg');
-      svg.setAttribute('role','img'); svg.setAttribute('aria-label', 'Clinical performance: ' + ord(taPct(oz)) + ' percentile');
+      svg.setAttribute('role','img'); svg.setAttribute('aria-label', 'Overall across the ACGME competencies: ' + ord(taPct(oz)) + ' percentile');
       left.appendChild(svg);
       const lvs = elc('div','optiers');
       [['below','Below the middle'],['middle','Class middle'],['above','Above the middle']].forEach(([k, n]) => {
@@ -4606,11 +4606,11 @@ function renderOnePager(host, s, text){
       left.appendChild(lvs); row.appendChild(left);
       const side = elc('div','opside');
       side.appendChild(elc('div','big', ord(taPct(oz))));
-      side.appendChild(elc('p', null, 'Clinical performance: the four competencies below combined with equal weight (dependability ' + O.rel.toFixed(2) + ')'));
+      side.appendChild(elc('p', null, 'Overall performance across the ACGME competencies: the four below combined with equal weight (dependability ' + O.rel.toFixed(2) + ')'));
       side.appendChild(elc('p', null, ({above:'Above the class middle', middle:'Within the class middle', below:'Below the class middle'})[lv] +
         '. The 95% band runs from the ' + ord(taPct(oz - O.cut)) + ' to the ' + ord(taPct(oz + O.cut)) + ' percentile.'));
       row.appendChild(side); sec.appendChild(row);
-      opStrip(svg, oz, O.cut, ['Below','Class middle','Above'], 'Clinical performance \u00b7 ' + ord(taPct(oz)));
+      opStrip(svg, oz, O.cut, ['Below','Class middle','Above'], 'Overall \u00b7 ' + ord(taPct(oz)));
       sec.appendChild(elc('div','opbreak', 'Broken down by ACGME competency'));
     }
     const grid = elc('div','opcomp');
