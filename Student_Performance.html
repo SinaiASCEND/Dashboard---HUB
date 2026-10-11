@@ -3287,13 +3287,36 @@ function step2Pct(s, score){
   if(pool.length < 5) return null;
   return Math.round(100 * (pool.filter(v => v < score).length + (pool.filter(v => v === score).length - 1) / 2) / pool.length);
 }
+/* the NBME Comprehensive Basic Science Exam (CBSE), sat at the end of Phase 1
+   before Step 1: equated percent correct, ranked within the class. A repeated
+   phase's earlier sitting is shown, marked, when it is the only one. */
+function cbseOf(s){
+  const find = prior => { for(const r of (s.records || []).filter(r => isPrior(r) === prior))
+    for(const c of casList(r)) if(/cbse/i.test(c.label || '') && c.scaled != null) return {rec: r, cas: c, prior}; return null };
+  return find(false) || find(true);
+}
+function cbsePct(s, v){
+  const pool = (DATA.students || []).filter(o => o.cohort === s.cohort).map(o => cbseOf(o)).filter(x => x && !x.prior).map(x => x.cas.scaled);
+  if(pool.length < 5) return null;
+  return Math.round(100 * (pool.filter(x => x < v).length + (pool.filter(x => x === v).length - 1) / 2) / pool.length);
+}
 function usmleStrip(host, s){
-  const u = usmleOf(s);
-  if(!u.STEP1 && !u.STEP2CK && s.cohort > 2028) return;
+  const u = usmleOf(s), cb = cbseOf(s);
+  if(!u.STEP1 && !u.STEP2CK && !cb && s.cohort > 2028) return;
   const strip = elc('div','usmle');
   const tile = (name, big, sub, bad) => { const d = elc('div','ustile' + (bad ? ' bad' : '')); d.appendChild(elc('span','un', name));
     d.appendChild(elc('b', null, big)); if(sub) d.appendChild(elc('span','us', sub)); strip.appendChild(d) };
   const resWord = x => x.result === 'Pass with remediation' ? 'Pass on retake' : x.result;
+  if(cb){
+    const pc = cb.prior ? null : cbsePct(s, cb.cas.scaled);
+    tile('NBME CBSE', String(Math.round(cb.cas.scaled)),
+      'equated percent correct \u00b7 ' + fmtDate(cb.rec.end || cb.rec.start) +
+      (pc != null ? ' \u00b7 ' + ord(pc) + ' percentile in the class' : '') +
+      (cb.cas.cohortMean != null ? ' \u00b7 class mean ' + Math.round(cb.cas.cohortMean) : '') +
+      (cb.prior ? ' \u00b7 earlier attempt' + (s.enteredWith ? ' with the Class of ' + s.enteredWith : '') : ''), false);
+  } else if(s.cohort >= 2028 && s.phase > 1){
+    tile('NBME CBSE', 'Not on record', 'No CBSE score on file', false);
+  }
   const s1 = u.STEP1;
   tile('USMLE Step 1', s1 ? resWord(s1) : 'Not on record',
        s1 ? fmtDate(s1.date) + (s1.tries > 1 ? ' \u00b7 ' + s1.tries + ' attempts' : '') + ' \u00b7 pass/fail' : 'No result in the score roster',
