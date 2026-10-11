@@ -1315,6 +1315,14 @@ const SKILL_DOMAINS = ['History taking','Physical examination','Communication',
 const SKILL_ACGME = [['Patient Care', ['History taking','Physical examination','Clinical reasoning','Patient education & counseling']],
   ['Interpersonal & Communication Skills', ['Communication','Documentation & presentation']],
   ['Professionalism', ['Professionalism']]];
+/* which clinical skills a student's ACGME view reads: Phase 1 students the POM
+   clinical skills, Phase 2 and beyond the clerkship clinical evaluations only */
+function skillLens(s){
+  const refs = (DATA.refs || {})[s.cohort] || {};
+  const ph = s.phase >= 2 ? 2 : 1;
+  return {phase: ph, dom: (s.skillByPhase || {})[ph] || {}, ref: (refs.domainsByPhase || {})[ph] || {},
+    label: ph === 2 ? 'clerkship clinical evaluation' : 'POM clinical skills'};
+}
 /* a competency's score: the mean of its domains on record (student or class mean) */
 function acgmeScore(domains, ds){
   const v = ds.map(d => domains && domains[d]).filter(x => x != null);
@@ -1829,6 +1837,18 @@ function hydrate(data){
       if(vals.length) dom[d] = Math.round(mean(vals));
     });
     s.skillDomains = dom;
+    /* the same, phase by phase: Phase 1 = the POM clinical skills (OSCEs,
+       direct observations, evaluations); Phase 2 = the clerkship clinical
+       evaluations only, with nothing from POM */
+    const domOf = recsIn => { const o = {}; SKILL_DOMAINS.forEach(d => { const v = [];
+      recsIn.forEach(rec => {
+        if(rec.osce && rec.osce.domains && rec.osce.domains[d] != null) v.push(rec.osce.domains[d]);
+        if(rec.eval && rec.eval.domains && rec.eval.domains[d] != null) v.push(evalTo100(rec.eval.domains[d]));
+      }); if(v.length) o[d] = Math.round(mean(v)) }); return o };
+    s.skillByPhase = {
+      1: domOf(live.filter(r => r.phase === 1 && !isClerkshipRec(r))),
+      2: domOf(live.filter(r => isClerkshipRec(r) && r.eval).map(r => ({eval: r.eval})))
+    };
 
     /* trajectory: one point per assessment, in academic order */
     s.timeline = recs.map(rec => {
@@ -1854,10 +1874,12 @@ function hydrate(data){
   const refs = {};
   Object.keys(byCohort).forEach(c => {
     const grp = byCohort[c];
-    const domains = {};
+    const domains = {}, domainsByPhase = {1:{}, 2:{}};
     SKILL_DOMAINS.forEach(d => {
       const v = grp.map(s=>s.skillDomains[d]).filter(x=>x!=null);
       if(v.length) domains[d] = Math.round(mean(v));
+      [1, 2].forEach(ph => { const w = grp.map(s => (s.skillByPhase && s.skillByPhase[ph] || {})[d]).filter(x => x != null);
+        if(w.length) domainsByPhase[ph][d] = Math.round(mean(w)) });
     });
     const areas = {};
     CONTENT_AREAS.forEach(a => {
@@ -1906,7 +1928,7 @@ function hydrate(data){
       obsCases[k] = {};
       Object.entries(byA).forEach(([a, v]) => obsCases[k][a] = Math.round(mean(v)*10)/10);
     });
-    refs[c] = {domains, areas, seqMedian, examAreas, obsCases, n: grp.length};
+    refs[c] = {domains, domainsByPhase, areas, seqMedian, examAreas, obsCases, n: grp.length};
   });
   data.refs = refs;
   return data;
@@ -4272,7 +4294,8 @@ function divergingBars(chartId, tableId, items, opts){
 }
 
 function renderSkillDomains(s){
-  const refs = (DATA.refs||{})[s.cohort] || {domains:{}};
+  const L = skillLens(s);
+  const refs = {domains: L.ref}, sd = {skillDomains: L.dom};
   const host = $('domainChart'); host.textContent = '';
   /* one panel per ACGME competency: the competency's score against the class
      mean, then every domain that makes it up with its own score and mean */
@@ -4280,9 +4303,9 @@ function renderSkillDomains(s){
   const tone = d => d <= -5 ? 'neg' : d >= 5 ? 'pos' : 'flat';
   const grid = elc('div','acgrid'), tab = [];
   SKILL_ACGME.forEach(([name, ds]) => {
-    const own = ds.filter(d => s.skillDomains && s.skillDomains[d] != null && refs.domains && refs.domains[d] != null);
+    const own = ds.filter(d => sd.skillDomains[d] != null && refs.domains[d] != null);
     if(!own.length) return;
-    const v = acgmeScore(s.skillDomains, own), r = acgmeScore(refs.domains, own), dv = v - r;
+    const v = acgmeScore(sd.skillDomains, own), r = acgmeScore(refs.domains, own), dv = v - r;
     const p = elc('div','acpanel');
     const hd = elc('div','achd');
     hd.appendChild(elc('div','acname', name));
@@ -4293,7 +4316,7 @@ function renderSkillDomains(s){
     tab.push([name, v, r, sign(dv)]);
     if(ds.length > 1 || own[0] !== name){
       own.forEach(d => {
-        const a = s.skillDomains[d], b = refs.domains[d], dd = a - b;
+        const a = sd.skillDomains[d], b = refs.domains[d], dd = a - b;
         const row = elc('div','acrow');
         row.appendChild(elc('span','acd', d));
         const tr = elc('span','actrack');
@@ -4307,10 +4330,10 @@ function renderSkillDomains(s){
     }
     grid.appendChild(p);
   });
-  if(!grid.children.length){ host.appendChild(emptyDiv('No OSCE or clinical evaluation domain scores on record yet.')); }
+  if(!grid.children.length){ host.appendChild(emptyDiv(L.phase === 2 ? 'No clerkship clinical evaluations on record yet.' : 'No POM clinical skills scores on record yet.')); }
   else {
     host.appendChild(grid);
-    host.appendChild(elc('p','why', 'Scores on a 0–100 scale (OSCE checklist percent and clinical-evaluation ratings rescaled). ' +
+    host.appendChild(elc('p','why', (L.phase === 2 ? 'Phase 2 clerkship clinical evaluations only (faculty ratings 1–5, rescaled to 0–100; nothing from POM). ' : 'Phase 1 POM clinical skills: OSCE checklist percent and evaluation ratings on a 0–100 scale. ') + 'Compared with the class mean from the same source. ' +
       'Bars run left of the centre line when below the class mean and right when above (10 points = full half); red or blue once the gap is 5 points or more.'));
   }
   buildTable($('domainTable'), [{label:'ACGME competency · domain'},{label:'This student',num:true},{label:'Class mean',num:true},{label:'Difference',num:true}],
@@ -5125,7 +5148,7 @@ function renderStudent(s){
   /* The NBME content areas that exist in the data are the clerkship exams'
      own, drawn exam by exam in the card above; there is no national
      content-area report to profile, so no card pretends to one. */
-  const dBody = makeCard(host, 'Clinical skills by ACGME competency',
+  const dBody = makeCard(host, 'ACGME competencies (' + skillLens(s).label + ')',
     'Where the bedside strengths and gaps are',
     'One panel per ACGME competency: the competency against the class mean, then each domain that makes it up. ' +
     'Medical Knowledge is the NBME side.', 'domainTable');
@@ -5490,12 +5513,13 @@ function renderReview(list){
 
     /* clinical skills by ACGME competency against the class mean: each
        competency the mean of its domains, student and class alike */
+    const L = skillLens(s);
     const comps = SKILL_ACGME.map(([name, ds]) => {
-      const own = ds.filter(d => s.skillDomains && s.skillDomains[d] != null && refs.domains && refs.domains[d] != null);
-      return own.length ? [name, acgmeScore(s.skillDomains, own) - acgmeScore(refs.domains, own)] : null;
+      const own = ds.filter(d => L.dom[d] != null && L.ref[d] != null);
+      return own.length ? [name, acgmeScore(L.dom, own) - acgmeScore(L.ref, own)] : null;
     }).filter(Boolean);
     if(comps.length){
-      card.appendChild(elc('div','rv-sec','ACGME competencies vs. class mean'));
+      card.appendChild(elc('div','rv-sec','ACGME competencies (' + L.label + ') vs. class mean'));
       comps.forEach(([name, dv]) => card.appendChild(dvbar(name, dv)));
     }
     /* every NBME exam: score (dot) against the class median (tick) and the
