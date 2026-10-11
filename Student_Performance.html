@@ -401,6 +401,24 @@ details.fold > summary:focus-visible{outline:2px solid var(--s1);outline-offset:
 details.fold[open] > summary{margin-bottom:12px}
 
 /* clerkship grade paths: one fold per clerkship, its objectives as badges */
+.nbhead{display:flex;flex-wrap:wrap;gap:12px 28px;margin:0 0 14px}
+.nbbig{display:flex;align-items:baseline;gap:10px}
+.nbbig b{font-size:30px;font-weight:800;line-height:1;color:var(--ink);font-variant-numeric:tabular-nums}
+.nbbig span{font-size:13px;color:var(--ink-2);max-width:30ch}
+.nbbig.warn b{color:var(--crit)}
+.nbrow{display:grid;grid-template-columns:minmax(150px,230px) minmax(0,1fr) 54px 64px;gap:12px;align-items:center;padding:6px 0;border-top:1px solid var(--line)}
+.nbcolhd{border-top:0;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.nblab{display:flex;flex-direction:column;min-width:0}.nblab b{font-size:13px}.nblab span{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nbtrack{position:relative;height:18px;background:linear-gradient(var(--line),var(--line)) center/100% 2px no-repeat}
+.nbtrack i{position:absolute;top:50%;transform:translate(-50%,-50%)}
+.nbpass{width:2px;height:18px;background:var(--crit);opacity:.75}
+.nbmed{width:2px;height:12px;background:var(--muted)}
+.nbdot{width:12px;height:12px;border-radius:50%;background:var(--s2);box-shadow:0 0 0 2px var(--surface)}
+.nbrow.below .nbdot{background:var(--crit)}
+.nbscore{font-weight:700;font-variant-numeric:tabular-nums;text-align:right}.nbrow.below .nbscore{color:var(--crit)}
+.nbpct{font-variant-numeric:tabular-nums;color:var(--ink-2);text-align:right}
+td.belowcell{color:var(--crit);font-weight:700}
+@media (max-width:640px){.nbrow{grid-template-columns:1fr 54px 56px}.nbtrack{grid-column:1 / -1;order:5}}
 .summarytext{font-size:15px;line-height:1.6;max-width:80ch;margin:0 0 8px;color:var(--ink)}
 .gpath{border-top:1px solid var(--line);padding:10px 0}
 .gpath:first-of-type{border-top:0}
@@ -1444,7 +1462,14 @@ function standings(recs){
   });
   const k = know.length ? Math.round(mean(know)) : null;
   const sk = skill.length ? Math.round(mean(skill)) : null;
-  return {knowledge: k, skills: sk, n: know.length + skill.length};
+  /* the NBME exams alone - the best single indicator of medical knowledge */
+  const nb = []; let below = 0;
+  recs.forEach(rec => casList(rec).forEach(c => {
+    if(c.percentile != null) nb.push(c.percentile);
+    if(c.passMark != null && c.scaled != null && c.scaled < c.passMark) below++;
+  }));
+  return {knowledge: k, skills: sk, nbme: nb.length ? Math.round(mean(nb)) : null, nbmeN: nb.length,
+          nbmeBelow: below, n: know.length + skill.length};
 }
 /* One number per block, for the trajectory: a block plots one point, so two
    proctored exams in the same block average. Every individual result stays
@@ -1589,6 +1614,9 @@ function hydrate(data){
     const all = standings(recs);
     s.knowledgePct = all.knowledge;
     s.skillsPct    = all.skills;
+    s.nbmePct      = all.nbme;
+    s.nbmeN        = all.nbmeN;
+    s.nbmeBelow    = all.nbmeBelow;
     /* the same, phase by phase: the class view filtered to a phase reads
        only that phase's assessments */
     s.byPhase = {};
@@ -1999,10 +2027,11 @@ const $ = id => document.getElementById(id);
 const NO_STANDING = {knowledge:null, skills:null};
 function stand(s){
   if(state.phase === 'all')
-    return {knowledge:s.knowledgePct, skills:s.skillsPct};
+    return {knowledge:s.knowledgePct, skills:s.skillsPct, nbme:s.nbmePct, nbmeBelow:s.nbmeBelow};
   return (s.byPhase && s.byPhase[state.phase]) || NO_STANDING;
 }
 const kOf = s => stand(s).knowledge, skOf = s => stand(s).skills;
+const nbOf = s => stand(s).nbme, belowOf = s => stand(s).nbmeBelow || 0;
 function inPhase(rec){ return state.phase === 'all' || String(rec.phase) === state.phase }
 
 function filtered(){
@@ -2336,6 +2365,8 @@ const ROSTER_COLS = [
   {key:'cohort',    label:'Cohort',  num:true},
   {key:'phase',     label:'Phase',   num:true},
   {key:'done',      label:'Blocks done', num:true},
+  {key:'nbme',      label:'NBME exams'},
+  {key:'below',     label:'NBME below 65', num:true},
   {key:'knowledge', label:'Medical knowledge'},
   {key:'skills',    label:'Clinical skills'},
   {key:'standing',  label:'Standing'},
@@ -2346,6 +2377,8 @@ const SORT_VAL = {
   cohort: s => s.cohort,
   phase: s => s.phase,
   done: s => s.completed,
+  nbme: s => nbOf(s) == null ? -1 : nbOf(s),
+  below: s => belowOf(s),
   knowledge: s => kOf(s) == null ? -1 : kOf(s),
   skills: s => skOf(s) == null ? -1 : skOf(s),
   standing: s => ({concern:0, watch:1, ok:2})[s.status]
@@ -2446,6 +2479,9 @@ function renderRoster(){
     const c2 = document.createElement('td'); c2.className = 'num'; c2.textContent = s.cohort; cells.push(c2);
     const c3 = document.createElement('td'); c3.className = 'num'; c3.textContent = s.phase; cells.push(c3);
     const c4 = document.createElement('td'); c4.className = 'num'; c4.textContent = s.completed; cells.push(c4);
+    const cn = document.createElement('td'); cn.appendChild(meterCell(nbOf(s))); cells.push(cn);
+    const cb = document.createElement('td'); cb.className = 'num' + (belowOf(s) ? ' belowcell' : '');
+    cb.textContent = belowOf(s) ? String(belowOf(s)) : '\u2013'; cells.push(cb);
     const c5 = document.createElement('td'); c5.appendChild(meterCell(kOf(s))); cells.push(c5);
     const c6 = document.createElement('td'); c6.appendChild(meterCell(skOf(s))); cells.push(c6);
     const c8 = document.createElement('td'); c8.appendChild(chipFor(s.status)); cells.push(c8);
@@ -4137,6 +4173,60 @@ function renderTwoAxes(host, s, A){
     'Knowledge and clinical standing by clerkship and across clerkships');
 }
 
+/* ---------------- NBME exams, first ---------------- */
+/* Every NBME exam on record, in the order sat: the student's score (equated
+   percent correct) against the 65% pass mark where the exam has one, the class
+   median, and the class percentile. The NBME exams are the most dependable
+   measure of medical knowledge on this page, so they lead. */
+function renderNbme(host, s){
+  host.textContent = '';
+  const rows = [];
+  (s.records||[]).slice().sort((a,b) => (a.start||'') < (b.start||'') ? -1 : (a.start||'') > (b.start||'') ? 1 : a.seq - b.seq)
+    .forEach(r => casList(r).forEach(c => { if(c.scaled != null) rows.push({r, c}) }));
+  if(!rows.length){ host.appendChild(elc('div','empty','No NBME exams on record yet.')); return }
+  const cb = casBelowPass(s);
+  const head = elc('div','nbhead');
+  const big = elc('div','nbbig');
+  big.appendChild(elc('b', null, s.nbmePct == null ? '\u2014' : ord(s.nbmePct)));
+  big.appendChild(elc('span', null, 'class percentile across ' + rows.length + (rows.length === 1 ? ' NBME exam' : ' NBME exams')));
+  head.appendChild(big);
+  const bl = elc('div','nbbig' + (cb.open.length ? ' warn' : ''));
+  bl.appendChild(elc('b', null, String(cb.open.length)));
+  bl.appendChild(elc('span', null, (cb.open.length === 1 ? 'exam' : 'exams') + ' below the 65% pass mark with no passing retake' +
+    (cb.resolved.length ? ' \u00b7 ' + cb.resolved.length + ' passed on retake' : '')));
+  head.appendChild(bl);
+  host.appendChild(head);
+  const lo = 30, hi = 100, x = v => Math.max(0, Math.min(100, (v - lo) / (hi - lo) * 100));
+  const list = elc('div','nblist');
+  rows.forEach(({r, c}) => {
+    const row = elc('div','nbrow' + (c.passMark != null && c.scaled < c.passMark ? ' below' : ''));
+    const lab = elc('div','nblab');
+    lab.appendChild(elc('b', null, r.code));
+    lab.appendChild(elc('span', null, (c.label || 'NBME exam').replace(/^NBME\s*/i, '') + (r.name && r.name !== r.code ? ' \u00b7 ' + r.name : '')));
+    row.appendChild(lab);
+    const tr = elc('div','nbtrack');
+    if(c.passMark != null){ const pm = elc('i','nbpass'); pm.style.left = x(c.passMark) + '%'; pm.title = 'Pass mark ' + c.passMark + '%'; tr.appendChild(pm) }
+    if(c.classMedian != null){ const md = elc('i','nbmed'); md.style.left = x(c.classMedian) + '%'; md.title = 'Class median ' + fmtScaled(c.classMedian); tr.appendChild(md) }
+    const dot = elc('i','nbdot'); dot.style.left = x(c.scaled) + '%'; tr.appendChild(dot);
+    row.appendChild(tr);
+    row.appendChild(elc('div','nbscore', fmtScaled(c.scaled) + (c.passMark != null && c.scaled < c.passMark ? ' \u2193' : '')));
+    row.appendChild(elc('div','nbpct', c.percentile == null ? '\u2014' : ord(c.percentile)));
+    row.setAttribute('aria-label', r.code + ' ' + (c.label || '') + ': ' + fmtScaled(c.scaled) +
+      (c.passMark != null ? ', pass mark ' + c.passMark : '') + (c.classMedian != null ? ', class median ' + fmtScaled(c.classMedian) : '') +
+      (c.percentile != null ? ', ' + ord(c.percentile) + ' percentile' : ''));
+    list.appendChild(row);
+  });
+  const hd = elc('div','nbrow nbcolhd');
+  ['Exam', 'Score (dot) \u00b7 class median (tick) \u00b7 pass mark (line)', 'Score', 'Class pct'].forEach(t => hd.appendChild(elc('div', null, t)));
+  host.appendChild(hd);
+  host.appendChild(list);
+  buildTable($('nbmeTable'),
+    [{label:'Block'},{label:'Exam'},{label:'Block starts'},{label:'Score',num:true},{label:'Pass mark',num:true},{label:'Class median',num:true},{label:'Class percentile',num:true}],
+    rows.map(({r, c}) => [r.code, c.label || '', r.start ? fmtDate(r.start) : '', fmtScaled(c.scaled),
+      c.passMark == null ? '' : c.passMark, c.classMedian == null ? '' : fmtScaled(c.classMedian), c.percentile == null ? '' : c.percentile]),
+    'Every NBME exam on record');
+}
+
 /* ---------------- assemble the student view ---------------- */
 function renderStudent(s){
   const host = $('studentView'); host.textContent = '';
@@ -4158,6 +4248,17 @@ function renderStudent(s){
       'A draft: every paragraph is reviewed by a person before use.', null);
     const p = elc('p','summarytext', text); sBody.appendChild(p);
     if(s.summary.note) sBody.appendChild(elc('p','why', s.summary.note));
+  }
+
+  if((s.records||[]).some(r => casList(r).some(c => c.scaled != null))){
+    const nBody = makeCard(host, 'NBME exams',
+      'Medical knowledge on the NBME exams',
+      'Every NBME exam on record, in the order sat: Phase 1 module exams and clerkship subject exams. The NBME exams are the ' +
+      'most dependable measure of medical knowledge here, and they weigh three times a quiz set in the knowledge standing. ' +
+      'One Phase 1 NBME exam below the 65% pass mark is a Monitor, two or more an Academic concern; a clerkship exam below ' +
+      'its pass mark is an Academic concern.', 'nbmeTable');
+    chartAndTable(nBody, 'nbmeChart', 'nbmeTable');
+    renderNbme($('nbmeChart'), s);
   }
 
   const schedBody = makeCard(host, 'Rotation schedule',
