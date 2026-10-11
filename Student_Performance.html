@@ -485,7 +485,7 @@ table.predict{min-width:720px}table.predict tr.sub th{font-weight:500;color:var(
 :root[data-theme="dark"] .rv-card.concern{border-top-color:var(--crit)}
 :root[data-theme="dark"] .rv-card.watch{border-top-color:var(--warn)}
 @media print{:root[data-theme="dark"] .card,:root[data-theme="dark"] .kpi,:root[data-theme="dark"] .rv-card{box-shadow:none}}
-table.standards{min-width:560px}table.standards th[scope],table.standards tbody th{text-align:left;font-weight:600}
+table.standards{min-width:0;font-size:13px}table.standards td,table.standards th{padding:7px 8px}table.standards th[scope],table.standards tbody th{text-align:left;font-weight:600}
 .summarytext{font-size:15px;line-height:1.6;max-width:80ch;margin:0 0 8px;color:var(--ink)}
 .gpath{border-top:1px solid var(--line);padding:10px 0}
 .gpath:first-of-type{border-top:0}
@@ -2631,23 +2631,23 @@ function renderTypeStandards(host, list){
     const m = mean(sit.map(c => c.scaled)), nm = withNat.length ? mean(withNat.map(c => c.natlMean)) : null,
           own = withNat.length ? mean(withNat.map(c => c.scaled)) : null;
     rows.push([label, sit.length, f1(m) + '%',
-      nm != null ? 'national mean ' + f1(nm) + '% (' + (own - nm >= 0 ? '+' : '') + f1(own - nm) + ')' : (pm.length ? 'pass mark' : '\u2014'),
-      pm.length ? pct(pm.filter(c => c.scaled < c.passMark).length, pm.length) + ' below the pass mark' : '\u2014']);
+      nm != null ? 'national ' + f1(nm) + '% (' + (own - nm >= 0 ? '+' : '\u2212') + f1(Math.abs(own - nm)) + ')' : (pm.length ? 'pass mark' : '\u2014'),
+      pm.length ? pct(pm.filter(c => c.scaled < c.passMark).length, pm.length) + ' below pass' : '\u2014']);
   };
-  nbme('NBME module exams (CAS)', r => !isClerkshipRec(r));
-  nbme('NBME clerkship exams (shelf)', r => isClerkshipRec(r));
+  nbme('NBME module exams', r => !isClerkshipRec(r));
+  nbme('NBME shelf exams', r => isClerkshipRec(r));
   const cb = recs.flatMap(r => casList(r).filter(c => /cbse/i.test(c.label || '') && c.scaled != null));
   if(cb.length) rows.push(['NBME CBSE', cb.length, f1(mean(cb.map(c => c.scaled))) + '% EPC', 'no pass mark', '\u2014']);
   const os = recs.filter(r => r.osce && r.osce.pct != null);
   if(os.length){ const pm = os.filter(r => r.osce.passMark != null);
-    rows.push(['OSCE & direct observation', os.length, f1(mean(os.map(r => r.osce.pct))) + '%', pm.length ? 'pass mark ' + pm[0].osce.passMark + '%' : '\u2014',
-      pm.length ? pct(pm.filter(r => r.osce.pct < r.osce.passMark).length, pm.length) + ' below the pass mark' : '\u2014']) }
+    rows.push(['OSCE & direct observation', os.length, f1(mean(os.map(r => r.osce.pct))) + '%', pm.length ? 'pass ' + pm[0].osce.passMark + '%' : '\u2014',
+      pm.length ? pct(pm.filter(r => r.osce.pct < r.osce.passMark).length, pm.length) + ' below pass' : '\u2014']) }
   const ev = recs.filter(r => r.eval && r.eval.overall != null);
-  if(ev.length) rows.push(['Clinical evaluations', ev.length, f1(mean(ev.map(r => r.eval.overall))) + ' of 5', 'expectation 3.0',
+  if(ev.length) rows.push(['Clinical evaluations', ev.length, f1(mean(ev.map(r => r.eval.overall))) + ' of 5', '3.0 expected',
     pct(ev.filter(r => r.eval.overall < 3.0).length, ev.length) + ' below 3.0']);
   if(!rows.length){ host.appendChild(emptyDiv(unavailableMsg() || 'No assessments in this filter.')); return rows }
   const t = elc('table','grid standards'), hr = elc('tr');
-  ['Assessment', 'Sittings', 'Class mean', 'Standard', 'Below standard'].forEach((h, i) => hr.appendChild(elc('th', i && i < 3 ? 'num' : null, h)));
+  ['Assessment', 'n', 'Mean', 'Standard', 'Below'].forEach((h, i) => hr.appendChild(elc('th', i && i < 3 ? 'num' : null, h)));
   const th = elc('thead'); th.appendChild(hr); t.appendChild(th);
   const tb = elc('tbody');
   rows.forEach(r => { const tr = elc('tr'); r.forEach((c, i) => tr.appendChild(elc(i ? 'td' : 'th', i && i < 3 ? 'num' : null, String(c)))); tb.appendChild(tr) });
