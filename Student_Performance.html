@@ -1109,11 +1109,13 @@ body.gated{overflow:hidden}
             counts three times as much as a module's quiz set. A failed block, a remediation, a clinical
             evaluation below 3.0, or two or more Phase 1 NBME exams below 65 is what makes a standing absolute.
             One Phase 1 NBME exam below 65 is a Monitor, and a passing retake of the same Phase 1 exam turns a
-            concern into a Monitor. <strong>Clerkships (Class of 2027 and ASCEND Phase 2, graded Honors / Pass / Fail)</strong>: an Academic concern is
-            any shelf or CAS below its pass mark (the clerkship&rsquo;s 5th-percentile cut; Surgery&rsquo;s CAS 65%), even if
-            the retake passed; a clerkship grade of Pass or Fail; a clinical evaluation below 3.0; overall performance across
-            the ACGME competencies below the class middle; a clerkship direct observation (or the Class of 2027&rsquo;s DO Week)
-            below 70%; or a failed Step 1 not yet passed. An Incomplete is a Monitor. Once in Phase 2, Phase 1 no longer counts.</p>
+            concern into a Monitor. In PEAKS only the CBSE counts. <strong>Once in Phase 2 (Class of 2027 and ASCEND Phase 2, graded
+            Honors / Pass / Fail), only the Phase 2 red flags decide the standing</strong> &mdash; Phase 1 no longer counts, and
+            relative standing is not used. An Academic concern is a USMLE Step failure; a clerkship failure; any shelf or CAS
+            below its pass mark (Surgery&rsquo;s CAS 65%), even if the retake passed; a clerkship direct observation (or the
+            Class of 2027&rsquo;s DO Week) below 70%; or any clinical evaluation domain below 3. A Monitor is a shelf within 5
+            points above its pass mark, a clerkship grade of Pass, an Incomplete, or an assessment owed (a finished
+            clerkship with no shelf on record two weeks after it ended).</p>
         </div>
       </div>
       <div class="cardbody">
@@ -1658,7 +1660,14 @@ const currentRecs = recs => (recs || []).filter(r => !isPrior(r));
    once in Phase 2 a student has completed Phase 1, so only Phase 2 and later
    records count - plus the USMLE results. Phase 1 stays on the full record. */
 const inScope = (s, r) => !(s && s.phase >= 2) || r.phase >= 2 || r.kind === 'licensing';
-const scopeRecs = s => currentRecs(s.records).filter(r => inScope(s, r));
+/* PEAKS (the end-of-Phase-1 board-preparation block): only its CBSE counts
+   toward standing and flags (2026-10-12); its quizzes, OSCE and block result
+   stay on the record but are left out of what decides a red flag */
+const isPeaks = r => /^PEAKS/i.test(r.code || '');
+const countsView = r => !isPeaks(r) ? r : Object.assign({}, r, {
+  cas: casList(r).filter(c => /cbse/i.test(c.label || '')), quizzes: null, qtypes: {}, quizPercentile: null,
+  osce: null, eval: null, result: /fail|remediation/i.test(r.result || '') ? 'Pass' : r.result});
+const scopeRecs = s => currentRecs(s.records).filter(r => inScope(s, r)).map(countsView);
 function examName(label){ return String(label || '').replace(/\s*\(retake\)\s*$/i, '') }
 /* knowledge and skills percentile from a set of records - the whole record,
    or one phase of it. The two are never blended into one number: a student
@@ -1697,6 +1706,7 @@ function casPercentile(rec){ const v = casPcts(rec); return v.length ? Math.roun
 function poolKey(s, rec){ return rec.pool || (s.cohort + '|' + rec.code) }
 
 function hydrate(data){
+  HYDRATE_ASOF = (data && data.meta && data.meta.asOf) || new Date().toISOString().slice(0,10);   /* DATA is not set while hydrating */
   const students = data.students || [];
   TA_LOADING = students;
 
@@ -1828,7 +1838,7 @@ function hydrate(data){
       s.phase = s.current ? s.current.phase
               : (recs.filter(r => r.status === 'completed').slice(-1)[0] || {phase:1}).phase;
     const allLive = currentRecs(recs);
-    const live = allLive.filter(r => inScope(s, r));
+    const live = allLive.filter(r => inScope(s, r)).map(countsView);
     const all = standings(live);
     s.knowledgePct = all.knowledge;
     s.skillsPct    = all.skills;
@@ -1989,6 +1999,8 @@ function casBelowPass(s){
    A shelf below its CIS pass mark is in casBelowPass: for a clerkship it is a
    concern even when the retake passed. */
 const CK_BELOW_HONORS = ['Pass', 'Pass with remediation', 'Grade C', 'Fail'];
+/* (Phase 2 students are judged by phase2Flags below since 2026-10-12; this
+   is kept for the clerkship records of anyone not yet counted as Phase 2) */
 function clerkshipConcerns(s){
   const out = [], recs = scopeRecs(s);
   const graded = recs.filter(r => r.kind === 'clerkship' && r.objectives && r.objectives.length);
@@ -2020,6 +2032,71 @@ function clerkshipConcerns(s){
   return out;
 }
 
+/* Phase 2 standing (2026-10-12). Once a student is in Phase 2 these alone
+   decide their standing; Phase 1 flags no longer count (that record stays on
+   the page). Academic concern: a USMLE Step failure, a clerkship failure, a
+   clerkship shelf below its pass mark (even when the retake passed), a direct
+   observation below its pass mark (the clerkships' and DO Week), or any
+   clinical evaluation domain below 3 (of 5). Monitor: a shelf within
+   SHELF_NEAR points above its pass mark, a clerkship grade of Pass, an
+   Incomplete or unrecognised grade, or an assessment owed (a finished
+   clerkship with no shelf on record OWED_GRACE_DAYS after it ended). */
+const SHELF_NEAR = 5, OWED_GRACE_DAYS = 14;
+let HYDRATE_ASOF = null;
+const SHELF_CODES = ['MED','NRL','OBG','PED','PSY','SUR','EM'];
+function phase2Flags(s){
+  const out = [], recs = scopeRecs(s), ck = recs.filter(r => r.kind === 'clerkship');
+  const count = (n, one, many) => n + ' ' + (n === 1 ? one : many);
+  /* concern */
+  const us = usmleOf(s);
+  const steps = [['STEP1','Step 1'], ['STEP2CK','Step 2 CK']].filter(([k]) => us[k] && us[k].result !== 'Pass');
+  if(steps.length)
+    out.push({level:'crit', what: 'USMLE ' + steps.map(x => x[1]).join(' and ') + ' failed',
+      why: steps.map(([k, n]) => n + ': ' + us[k].result + (us[k].tries > 1 ? ' (' + us[k].tries + ' attempts)' : '')).join('; ') + '.'});
+  const failed = ck.filter(r => r.result === 'Fail' || r.result === 'Pass with remediation');
+  if(failed.length)
+    out.push({level:'crit', what: count(failed.length, 'clerkship failure', 'clerkship failures'),
+      why: failed.map(r => r.code + ' ' + r.result).join(', ') + '.'});
+  const sittings = [];
+  ck.forEach(r => casList(r).forEach(c => { if(c.passMark != null && c.scaled != null) sittings.push({r, c}) }));
+  const below = sittings.filter(x => x.c.scaled < x.c.passMark);
+  if(below.length)
+    out.push({level:'crit', what: count(below.length, 'shelf exam', 'shelf exams') + ' below the pass mark',
+      why: below.map(x => x.r.code + (/retake/i.test(x.c.label || '') ? ' retake' : '') + ' ' + fmtScaled(x.c.scaled) +
+        '% (pass ' + x.c.passMark + '%)' + (sittings.some(y => y.r === x.r && y.c !== x.c && y.c.scaled >= y.c.passMark) ? ', passed on retake' : '')).join(', ') +
+        ' — a shelf failure is an Academic concern even when the retake passed.'});
+  const lowDo = recs.filter(r => (r.kind === 'clerkship' || r.code === 'DOWEEK') && r.osce && r.osce.pct != null &&
+                                 r.osce.passMark != null && r.osce.pct < r.osce.passMark);
+  if(lowDo.length)
+    out.push({level:'crit', what: count(lowDo.length, 'direct observation', 'direct observations') + ' below ' + lowDo[0].osce.passMark + '%',
+      why: lowDo.map(r => (r.code === 'DOWEEK' ? 'DO Week' : r.code) + ' ' + r.osce.pct + '%').join(', ') + ' — below the pass mark.'});
+  const lowDom = [];
+  ck.forEach(r => { const d = (r.eval && r.eval.domains) || {};
+    Object.keys(d).forEach(k => { if(d[k] != null && d[k] < 3) lowDom.push(r.code + ' ' + k.toLowerCase() + ' ' + d[k].toFixed(1)) });
+    if(r.eval && r.eval.overall != null && r.eval.overall < 3 && !Object.keys(d).some(k => d[k] < 3)) lowDom.push(r.code + ' overall ' + r.eval.overall.toFixed(1)) });
+  if(lowDom.length)
+    out.push({level:'crit', what: count(lowDom.length, 'clinical evaluation domain', 'clinical evaluation domains') + ' below 3',
+      why: lowDom.join(', ') + ' — the faculty’s mean rating, below 3 on the 1–5 scale.'});
+  /* monitor */
+  const near = sittings.filter(x => x.c.scaled >= x.c.passMark && x.c.scaled < x.c.passMark + SHELF_NEAR);
+  if(near.length)
+    out.push({level:'watch', what: count(near.length, 'shelf exam', 'shelf exams') + ' within ' + SHELF_NEAR + ' points of the pass mark',
+      why: near.map(x => x.r.code + ' ' + fmtScaled(x.c.scaled) + '% (pass ' + x.c.passMark + '%)').join(', ') + '.'});
+  const pass = ck.filter(r => r.result === 'Pass');
+  if(pass.length)
+    out.push({level:'watch', what: count(pass.length, 'clerkship grade of Pass', 'clerkship grades of Pass'), why: pass.map(r => r.code).join(', ') + '.'});
+  const odd = ck.filter(r => r.result === 'Incomplete' || /^Grade /.test(r.result || ''));
+  if(odd.length)
+    out.push({level:'watch', what: count(odd.length, 'clerkship grade Incomplete or not H/P/F', 'clerkship grades Incomplete or not H/P/F'),
+      why: odd.map(r => r.code + ' ' + r.result).join(', ') + ' — check the grade sheet; reviewed again when a final grade is recorded.'});
+  const cutoff = new Date(new Date(HYDRATE_ASOF).getTime() - OWED_GRACE_DAYS * 864e5).toISOString().slice(0, 10);
+  const owed = ck.filter(r => SHELF_CODES.includes(r.code) && r.status === 'completed' && r.end && r.end < cutoff && !casList(r).length);
+  if(owed.length)
+    out.push({level:'watch', what: count(owed.length, 'assessment owed', 'assessments owed'),
+      why: owed.map(r => r.code + ' shelf').join(', ') + ' — the clerkship ended ' + OWED_GRACE_DAYS + '+ days ago with no shelf on record (deferred, not yet sat, or not yet reported).'});
+  return out;
+}
+
 function buildFlags(s){
   const out = [], recs = scopeRecs(s);
   const p1done = s.phase >= 2 && currentRecs(s.records).some(r => r.phase === 1 && r.kind !== 'licensing');
@@ -2035,6 +2112,8 @@ function buildFlags(s){
         'the current standing, flags or percentiles' + (pb ? '; ' + pb + ' NBME exam' + (pb === 1 ? ' was' : 's were') +
         ' below the pass mark in that attempt' : '') + '.'});
   }
+  /* in Phase 2, its own red flags decide the standing */
+  if(s.phase >= 2) return out.concat(phase2Flags(s));
   const codes = list => list.map(r => r.code).join(', ');
   const count = (n, one, many) => n + ' ' + (n === 1 ? one : many);
 
@@ -2111,7 +2190,8 @@ function buildFlags(s){
           ord(s.skillsPct) + ' — worth naming in the next coaching conversation.'});
 
   /* a sustained downward drift matters more than any single low score */
-  const seqPts = (s.timeline||[]).filter(t => !isPrior(t.rec) && inScope(s, t.rec)).map(t => mean([t.quiz,t.cas,t.osce,t.eval].filter(v=>v!=null)))
+  const seqPts = (s.timeline||[]).filter(t => !isPrior(t.rec) && inScope(s, t.rec))
+    .map(t => mean((isPeaks(t.rec) ? [t.cas] : [t.quiz,t.cas,t.osce,t.eval]).filter(v=>v!=null)))
                                  .filter(v=>v!=null);
   if(seqPts.length >= 6){
     const early = mean(seqPts.slice(0,3)), late = mean(seqPts.slice(-3));
@@ -2132,6 +2212,10 @@ function buildFlags(s){
    below the 25th percentile. Strong performance in the other domain is real,
    and stays visible beside the flag, but does not cancel it. */
 function standingOf(s){
+  if(s.phase >= 2){
+    const f = s.flags || buildFlags(s);
+    return f.some(x => x.level === 'crit') ? 'concern' : f.some(x => x.level === 'watch') ? 'watch' : 'ok';
+  }
   const recs = scopeRecs(s);
   const domains = [s.knowledgePct, s.skillsPct].filter(v => v != null);
   const cb = casBelowPass(s);
@@ -2452,12 +2536,16 @@ function inPhase(rec){ return state.phase === 'all' || String(rec.phase) === sta
 /* The Flag filter: students carrying a flag of one kind (Monitor or
    Academic concern - not the notes), by the flag's wording */
 const FLAG_FILTERS = [
-  ['nbmefail', 'NBME exam or shelf below its pass mark', /NBME exams? below (the pass mark|\d)/],
-  ['nbmelow', 'Low NBME percentile or knowledge standing', /NBME assessments? below the|Medical knowledge standing/],
-  ['grade', 'Clerkship grade below Honors, failed, remediated or incomplete', /grades? below Honors|failed block|after remediation|Incomplete/],
-  ['obs', 'Direct observation, OSCE or DO Week below standard', /direct observation|OSCEs? below|DO Week/],
-  ['clin', 'Clinical performance: ACGME overall, evaluations, skills standing', /ACGME competencies|clinical evaluations? below|Clinical skills standing/],
-  ['trend', 'Downward trajectory', /Downward trajectory/]];
+  ['step', 'USMLE Step failure', /USMLE Step/],
+  ['nbmefail', 'Shelf or NBME exam below its pass mark', /NBME exams? below (the pass mark|\d)|shelf exams? below the pass mark/],
+  ['near', 'Shelf within ' + 5 + ' points of its pass mark', /points of the pass mark/],
+  ['grade', 'Clerkship failure, Pass, Incomplete; failed or remediated block', /clerkship failure|grades? of Pass|Incomplete or not|failed block|after remediation/],
+  ['obs', 'Direct observation, OSCE or DO Week below standard', /direct observations? below|OSCEs? below/],
+  ['ce', 'Clinical evaluation below 3', /clinical evaluation/],
+  ['owed', 'Assessment owed', /owed/],
+  ['nbmelow', 'Phase 1: low NBME percentile or knowledge standing', /NBME assessments? below the|Medical knowledge standing/],
+  ['clin', 'Phase 1: clinical skills standing', /Clinical skills standing/],
+  ['trend', 'Phase 1: downward trajectory', /Downward trajectory/]];
 const hasFlag = (s, key) => { const f = FLAG_FILTERS.find(f => f[0] === key);
   return !f || (s.flags || []).some(x => x.level !== 'info' && f[2].test(x.what)) };
 function filtered(){
@@ -5479,7 +5567,12 @@ function renderReview(list){
   const want = new Set(['concern'].concat(state.reviewWatch ? ['watch'] : []));
   const picked = list.filter(s => want.has(s.status));
   const worst = s => Math.min(...[kOf(s), skOf(s)].filter(v => v != null).concat([101]));
-  picked.sort((a, b) => (a.status === b.status ? 0 : a.status === 'concern' ? -1 : 1) || worst(a) - worst(b));
+  /* the most serious first: a USMLE Step failure, a clerkship failure, a
+     shelf failure; then the other Academic concerns; then Monitor */
+  const rank = s => { const w = (s.flags || []).filter(f => f.level === 'crit').map(f => f.what).join(' | ');
+    return /USMLE Step/.test(w) ? 0 : /clerkship failure/.test(w) ? 1 : /shelf exams? below the pass mark/.test(w) ? 2
+         : s.status === 'concern' ? 3 : 4 };
+  picked.sort((a, b) => rank(a) - rank(b) || worst(a) - worst(b));
   $('reviewTitle').textContent = picked.length
     ? picked.length + (picked.length === 1 ? ' student' : ' students') + ' needing attention, side by side'
     : 'Students needing attention, side by side';
