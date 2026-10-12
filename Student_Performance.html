@@ -717,6 +717,7 @@ tr.rosterrow:focus-visible{outline:3px solid var(--s1);outline-offset:-3px}
 .flags .ic{flex:none;font-size:13px;line-height:1.4}
 .flags .fx{font-weight:700;color:var(--ink)}
 .flags .fy{color:var(--ink-2);font-size:12.5px}
+.flags.support .fy{margin-top:3px}.flags.support .fy b{color:var(--ink);font-weight:600}
 .empty{padding:34px 18px;text-align:center;color:var(--muted);font-size:13.5px}
 .foot{border-top:1px solid var(--line);padding:16px 0 34px;color:var(--muted);font-size:11.5px}
 
@@ -4562,6 +4563,99 @@ function renderDirectObs(host, s){
 }
 
 /* ---------------- flags & narrative ---------------- */
+/* ---------------- support signals (anticipatory counseling) ----------------
+   Patterns seen across earlier classes in the Office's cohort analysis ("Who
+   struggles, and what predicts it", Classes of 2023-2030, draft v4, 11 Oct
+   2026). They are NOT predictions about the student and are not part of the
+   standing: each names what in this record matches a pattern, what that
+   pattern went with in earlier classes, and a support to consider - and is
+   shown only while the outcome it relates to is still ahead. */
+const SUPPORT_SOURCE = 'Office of Curricular Affairs cohort analysis “Who struggles, and what predicts it” (Classes of 2023–2030, draft v4, 11 Oct 2026).';
+function classRank(s, valOf){
+  const v = valOf(s); if(v == null) return null;
+  const pool = (DATA.students || []).filter(o => o.cohort === s.cohort).map(valOf).filter(x => x != null);
+  if(pool.length < 5) return null;
+  return Math.round(100 * (pool.filter(x => x < v).length + (pool.filter(x => x === v).length - 1) / 2) / pool.length);
+}
+function supportSignals(s){
+  const out = [], recs = currentRecs(s.records), us = usmleOf(s);
+  const step1Passed = !!(us.STEP1 && us.STEP1.result === 'Pass'), step2Done = !!us.STEP2CK;
+  const shelfDone = recs.filter(r => r.kind === 'clerkship' && SHELF_CODES.includes(r.code) && casList(r).length).length;
+  const shelvesAhead = s.phase < 2 || shelfDone < SHELF_CODES.length;
+  /* 1. Phase 1 NBME exams below the pass mark in the first semester (first sittings, no CBSE) */
+  const p1 = recs.filter(r => r.phase === 1 && !isClerkshipRec(r) && !isPeaks(r));
+  const first = p1.map(r => r.start).filter(Boolean).sort()[0];
+  if(s.phase < 2 && first){
+    const semEnd = (+first.slice(0, 4) + (+first.slice(5, 7) >= 7 ? 1 : 0)) + '-01-01';
+    const seen = new Set(); const low = [];
+    p1.filter(r => (r.start || '') < semEnd).forEach(r => casList(r).forEach(c => {
+      const k = r.code + '|' + examName(c.label);
+      if(c.passMark == null || c.scaled == null || seen.has(k) || /retake/i.test(c.label || '')) return; seen.add(k);
+      if(c.scaled < c.passMark) low.push(r.code + ' ' + fmtScaled(c.scaled) + '%');
+    }));
+    if(low.length >= 2)
+      out.push({what: low.length + ' first-semester NBME exams below the pass mark',
+        mine: low.join(', ') + '.',
+        seen: 'Classes of 2028–2029 (n = 246): 60% of students with two or more first-semester exams below 65% had two or more further exams below 65% later, against 3% of those with none.',
+        support: 'An early study plan with a learning specialist; NBME-style practice ahead of each module exam.'});
+  }
+  /* 2. Phase 1 knowledge in the bottom quarter of the class, with shelves or Step 2 CK still ahead */
+  const kp = classRank(s, o => o.byPhase && o.byPhase[1] ? o.byPhase[1].knowledge : null);
+  if(kp != null && kp < 25 && (shelvesAhead || !step2Done))
+    out.push({what: 'Phase 1 knowledge in the bottom quarter of the class',
+      mine: 'Phase 1 medical knowledge at the ' + ord(kp) + ' percentile of the Class of ' + s.cohort + ' (a quarter of every class sits here by construction).',
+      seen: 'Students in the bottom Phase 1 quarter were three to four times as likely to have a shelf more than 1 SD below the national mean (Class of 2028: 48% against 14%). ' +
+            'Preclinical performance also tracks Step 2 CK, about 10 points per SD; 45% of the bottom quarter landed in the Step 2 CK bottom quartile (legacy classes, n = 515).',
+      support: 'Shelf preparation planned from the first week of each clerkship; a check-in after the first shelf.'});
+  /* 3. CBSE in the bottom quarter of the class, before Step 1 (still in Phase 1: clerkships require Step 1) */
+  const cb = cbseOf(s), cp = cb && !cb.prior ? cbsePct(s, cb.cas.scaled) : null;
+  if(cp != null && cp < 25 && !step1Passed && s.phase < 2)
+    out.push({what: 'CBSE in the bottom quarter of the class',
+      mine: 'CBSE ' + Math.round(cb.cas.scaled) + ', the ' + ord(cp) + ' percentile of the class; no Step 1 pass on record yet.',
+      seen: 'Both Class of 2028 Step 1 failures came from the CBSE bottom quarter (3rd and 6th percentiles): 2 of 32 there, 0 of 86 above it.',
+      support: 'A Step 1 readiness review before the exam date is set; a dedicated-study plan with the learning specialist.'});
+  /* 4. a shelf more than 1 SD below the national mean, Step 2 CK not yet taken */
+  if(!step2Done){
+    const weak = [];
+    recs.filter(r => r.kind === 'clerkship').forEach(r => {
+      const c = casList(r).find(c => c.scaled != null && !/retake/i.test(c.label || ''));
+      if(c && c.natlMean != null && c.natlSd) { const z = (c.scaled - c.natlMean) / c.natlSd; if(z < -1) weak.push(r.code + ' ' + fmtScaled(c.scaled) + ' (' + z.toFixed(1) + ' SD)') }
+    });
+    if(weak.length)
+      out.push({what: weak.length === 1 ? 'A shelf more than 1 SD below the national mean' : weak.length + ' shelves more than 1 SD below the national mean',
+        mine: weak.join(', ') + '; Step 2 CK not yet on record.',
+        seen: 'For Step 2 CK, the weakest shelf was the better shelf signal (Class of 2027, r = 0.46); the CCSE, once sat, is the strongest (r = 0.77, Step 2 CK ≈ 137 + 0.52 × CCSE). Weak shelves are common even among strong students.',
+        support: 'Plan Step 2 CK timing around a CCSE result; targeted review of the weaker disciplines.'});
+  }
+  /* 5. Step 1 not passed on the first attempt, Step 2 CK not yet taken */
+  if(us.STEP1 && us.STEP1.result !== 'Pass' && !step2Done)
+    out.push({what: 'Step 1 not passed on the first attempt',
+      mine: 'Step 1: ' + us.STEP1.result + '; Step 2 CK not yet on record.',
+      seen: 'In earlier classes a Step 1 delay or failure went with a Step 2 CK about 0.9 SD lower later.',
+      support: 'Early Step 2 CK planning, with the CCSE as a readiness check.'});
+  return out;
+}
+function renderSupport(host, s){
+  host.textContent = '';
+  const sig = supportSignals(s);
+  if(!sig.length) host.appendChild(elc('div','empty','No support signal in this record: nothing here matches a pattern that went with later difficulty in earlier classes.'));
+  else {
+    const ul = elc('ul','flags support');
+    sig.forEach(f => {
+      const li = elc('li');
+      const ic = elc('span','ic','◆'); ic.style.color = cssv('--s4'); ic.setAttribute('aria-hidden','true');
+      const txt = elc('div');
+      txt.appendChild(elc('div','fx', f.what));
+      txt.appendChild(elc('div','fy', f.mine));
+      const seen = elc('div','fy'); seen.appendChild(elc('b', null, 'In earlier classes: ')); seen.append(f.seen); txt.appendChild(seen);
+      const sup = elc('div','fy'); sup.appendChild(elc('b', null, 'Support to consider: ')); sup.append(f.support); txt.appendChild(sup);
+      li.appendChild(ic); li.appendChild(txt); ul.appendChild(li);
+    });
+    host.appendChild(ul);
+  }
+  host.appendChild(elc('p','why stdnote', 'Not well predicted, so not shown: clerkship grades below Honors (knowledge measures do not foresee them) and legacy Step 1 delays (often planned). Source: ' + SUPPORT_SOURCE));
+}
+
 function renderFlags(host, s){
   host.textContent = '';
   const flags = s.flags || [];
@@ -5291,6 +5385,12 @@ function renderStudent(s){
   const fBody = makeCard(host, 'Review', 'What needs a conversation', null, null);
   const fHost = elc('div'); fHost.id = 'flagHost'; fBody.appendChild(fHost);
   renderFlags(fHost, s);
+
+  const sBody = makeCard(host, 'Anticipatory support', 'Support signals',
+    'Patterns from earlier classes that match something in this record, to start an early, supportive conversation. ' +
+    'They are not predictions about this student, and they do not change the standing.', null);
+  const sHost = elc('div'); sBody.appendChild(sHost);
+  renderSupport(sHost, s);
 
   /* the full log runs to hundreds of rows: folded until asked for */
   const lBody = makeCard(host, 'Source data', 'Complete assessment log',
