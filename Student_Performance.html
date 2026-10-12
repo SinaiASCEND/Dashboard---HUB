@@ -281,7 +281,8 @@ main{padding-bottom:44px}
 .rv-nbtrack{position:relative;height:12px;background:linear-gradient(var(--line),var(--line)) center/100% 2px no-repeat}
 .rv-nbtrack i{position:absolute;top:50%;transform:translate(-50%,-50%)}
 .rv-nbtrack .md{width:2px;height:12px;background:var(--ink-2)}
-.rv-nbtrack .pm{width:2px;height:12px;background:var(--crit);opacity:.8}
+.rv-nbtrack .pm{width:3px;height:14px;border-radius:1px;background:var(--warn)}
+.rv-key .k-dot{color:var(--s2)}.rv-key .k-md{color:var(--ink-2)}.rv-key .k-pm{color:var(--warn)}
 .rv-nbtrack .dot{width:9px;height:9px;border-radius:50%;background:var(--s2);box-shadow:0 0 0 1.5px var(--surface)}
 .rv-nbrow.below .dot{background:var(--crit)}
 .rv-side{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none}
@@ -433,7 +434,7 @@ details.fold[open] > summary{margin-bottom:12px}
 .nbkey{display:flex;flex-wrap:wrap;gap:6px 20px;align-items:center;margin:4px 0 10px;font-size:12.5px;color:var(--ink-2)}
 .nbk{display:inline-flex;align-items:center;gap:8px}.nbk.hint{color:var(--muted);margin-left:auto}
 .nbsw{position:relative;width:18px;height:18px;display:inline-block}.nbsw i{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}
-.nbpass{width:2px;height:18px;background:var(--crit);opacity:.75}
+.nbpass{width:3px;height:18px;border-radius:1px;background:var(--warn)}
 .nbmed{width:2px;height:12px;background:var(--muted)}
 .nbdot{width:12px;height:12px;border-radius:50%;background:var(--s2);box-shadow:0 0 0 2px var(--surface)}
 .nbrow.below .nbdot{background:var(--crit)}
@@ -929,6 +930,12 @@ body.gated{overflow:hidden}
         <option value="ok">On track</option>
         <option value="watch">Monitor</option>
         <option value="concern">Academic concern</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="fFlag">Flag</label>
+      <select id="fFlag">
+        <option value="all">Any or none</option>
       </select>
     </div>
     <div class="field">
@@ -2414,7 +2421,7 @@ function taPct(z){
 
 let DATA = hydrate(buildSampleData());
 const state = {
-  cohort:null, program:'all', advisor:'all', ccm:'all', phase:'all', standing:'all', emphasis:'knowledge', q:'',
+  cohort:null, program:'all', advisor:'all', ccm:'all', phase:'all', standing:'all', flag:'all', emphasis:'knowledge', q:'',
   reviewWatch:false,
   sort:{key:'knowledge', dir:'desc'}, student:null
 };
@@ -2437,6 +2444,17 @@ const ovOf = s => { const A = twoAxes(s.cohort), O = A && A.overall; return O &&
 const nbOf = s => stand(s).nbme, belowOf = s => stand(s).nbmeBelow || 0;
 function inPhase(rec){ return state.phase === 'all' || String(rec.phase) === state.phase }
 
+/* The Flag filter: students carrying a flag of one kind (Monitor or
+   Academic concern - not the notes), by the flag's wording */
+const FLAG_FILTERS = [
+  ['nbmefail', 'NBME exam or shelf below its pass mark', /NBME exams? below (the pass mark|\d)/],
+  ['nbmelow', 'Low NBME percentile or knowledge standing', /NBME assessments? below the|Medical knowledge standing/],
+  ['grade', 'Clerkship grade below Honors, failed, remediated or incomplete', /grades? below Honors|failed block|after remediation|Incomplete/],
+  ['obs', 'Direct observation, OSCE or DO Week below standard', /direct observation|OSCEs? below|DO Week/],
+  ['clin', 'Clinical performance: ACGME overall, evaluations, skills standing', /ACGME competencies|clinical evaluations? below|Clinical skills standing/],
+  ['trend', 'Downward trajectory', /Downward trajectory/]];
+const hasFlag = (s, key) => { const f = FLAG_FILTERS.find(f => f[0] === key);
+  return !f || (s.flags || []).some(x => x.level !== 'info' && f[2].test(x.what)) };
 function filtered(){
   const q = state.q.trim().toLowerCase();
   return (DATA.students||[]).filter(s => {
@@ -2446,6 +2464,7 @@ function filtered(){
     if(state.ccm !== 'all' && (s.ccm || '') !== state.ccm) return false;
     if(state.phase !== 'all' && !(s.byPhase && s.byPhase[state.phase])) return false;
     if(state.standing !== 'all' && s.status !== state.standing) return false;
+    if(state.flag !== 'all' && !hasFlag(s, state.flag)) return false;
     if(q && !String(s.id).toLowerCase().includes(q) && !nameOf(s.id).toLowerCase().includes(q)) return false;
     return true;
   });
@@ -2529,6 +2548,7 @@ function describeFilter(){
   if(state.ccm !== 'all') bits.push(state.ccm ? 'CCM ' + state.ccm : 'No CCM set');
   if(state.phase !== 'all') bits.push('Phase ' + state.phase + ' assessments only');
   if(state.standing !== 'all') bits.push(STANDING[state.standing].label);
+  if(state.flag !== 'all') bits.push('Flag: ' + FLAG_FILTERS.find(f => f[0] === state.flag)[1]);
   return bits.join(' · ');
 }
 
@@ -2706,6 +2726,7 @@ function typePercentiles(list){
 function subgroupLabel(){
   const parts = [];
   if(state.standing !== 'all') parts.push((STANDING[state.standing] || {}).label || state.standing);
+  if(state.flag !== 'all') parts.push(FLAG_FILTERS.find(f => f[0] === state.flag)[1].toLowerCase());
   if(state.advisor !== 'all') parts.push('career advisor ' + state.advisor);
   if(state.ccm !== 'all') parts.push('CCM ' + state.ccm);
   if(state.program !== 'all') parts.push(state.program || 'no program');
@@ -5542,11 +5563,14 @@ function renderReview(list){
       comps.forEach(([name, dv]) => card.appendChild(dvbar(name, dv)));
     }
     /* every NBME exam: score (dot) against the class median (tick) and the
-       pass mark (red line) - the same marks as the record's NBME card */
+       pass mark (amber line) - the same marks as the record's NBME card */
     const nb = scopeRecs(s).slice().sort((a, b) => (a.start || '') < (b.start || '') ? -1 : 1)
       .flatMap(r => casList(r).filter(c => c.scaled != null && !/cbse/i.test(c.label || '')).map(c => ({r, c})));
     if(nb.length){
-      card.appendChild(elc('div','rv-sec','NBME exams \u00b7 score \u25cf, class median \u2502, pass mark \u2503'));
+      const key = elc('div','rv-sec rv-key');
+      key.append('NBME exams \u00b7 score ', elc('span','k-dot','\u25cf'), ', class median ', elc('span','k-md','\u2502'),
+                 ', pass mark ', elc('span','k-pm','\u2503'));
+      card.appendChild(key);
       const lo = 30, hi = 100, x = v => Math.max(0, Math.min(100, (v - lo) / (hi - lo) * 100));
       const wrap = elc('div','rv-nb');
       nb.forEach(({r, c}) => {
@@ -5795,7 +5819,8 @@ function init(){
     $('studentView').hidden = true; $('cohortView').hidden = false; renderAll();
   });
   bind('fCohort','cohort'); bind('fProgram','program'); bind('fAdvisor','advisor'); bind('fCcm','ccm');
-  bind('fPhase','phase'); bind('fStatus','standing');
+  bind('fPhase','phase'); bind('fStatus','standing'); bind('fFlag','flag');
+  FLAG_FILTERS.forEach(([k, label]) => { const o = document.createElement('option'); o.value = k; o.textContent = label; $('fFlag').appendChild(o) });
   /* Emphasis also decides which column the roster leads with. */
   $('fDomain').addEventListener('change', e => {
     state.emphasis = e.target.value;
@@ -5812,11 +5837,11 @@ function init(){
   });
   $('fClear').addEventListener('click', () => {
     state.cohort = latestCohort(); state.program = 'all'; state.advisor = 'all'; state.ccm = 'all';
-    state.phase = 'all'; state.standing = 'all';
+    state.phase = 'all'; state.standing = 'all'; state.flag = 'all';
     state.emphasis = 'knowledge'; state.q = ''; state.student = null;
     state.sort = {key:'knowledge', dir:'desc'};
     $('fCohort').value = state.cohort; $('fProgram').value = 'all'; $('fAdvisor').value = 'all'; $('fCcm').value = 'all';
-    $('fPhase').value = 'all'; $('fStatus').value = 'all';
+    $('fPhase').value = 'all'; $('fStatus').value = 'all'; $('fFlag').value = 'all';
     $('fDomain').value = 'knowledge'; $('fSearch').value = '';
     $('studentView').hidden = true; $('cohortView').hidden = false;
     renderAll();
