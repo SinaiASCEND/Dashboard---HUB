@@ -965,18 +965,17 @@ body.gated{overflow:hidden}
        once per session, then the file or folder picker opens -->
   <form class="ferpa gate2" id="loadGate" hidden novalidate>
     <p id="loadGateNote"></p>
-    <p class="fine">Access is logged with the Office of Curricular Affairs: your role and reason, what you
-      loaded and when. A pre-filled form then opens for you to submit; it records your name from your
-      Mount Sinai sign-in, so you are not asked for it here.</p>
+    <p class="fine">Access is logged with the Office of Curricular Affairs: your name and reason, what you
+      loaded and when. A pre-filled form then opens for you to submit; it also records your Mount Sinai
+      sign-in. Only the four people listed have access to this dashboard.</p>
     <div class="who">
-      <select id="loadGateRole" aria-label="Your role">
-        <option value="">Your role…</option>
-        <option>Career advisor</option>
-        <option>Clinical competency mentor</option>
-        <option>Course or clerkship director</option>
-        <option>Office of Curricular Affairs</option>
-        <option>Student affairs / advising dean</option>
-        <option>Other</option>
+      <!-- the only people with access to this dashboard -->
+      <select id="loadGateWho" aria-label="Your name">
+        <option value="">Your name…</option>
+        <option>Rainier Soriano</option>
+        <option>Staci Leisman</option>
+        <option>Teddy Holzer</option>
+        <option>Chris Strother</option>
       </select>
       <input type="text" id="loadGateReason" placeholder="Reason for access (e.g. advising meeting)" autocomplete="off" aria-label="Reason for access">
     </div>
@@ -3238,7 +3237,8 @@ const LOOKUP_HASH = '28f1339ffc323de47879d9c7d6ec761f8bd4737841daa5c0acb7ab4d6f3
 /* ---------------------------------------------------------------------------
    BREAK-THE-GLASS: who is loading student data, and why
    Loading the data file or the photo folder brings education records into
-   the browser. Before either, the viewer gives their name, role and reason
+   the browser. Before either, the viewer picks their name (only four people
+   have access) and gives a reason
    and the FERPA code, and is told the access is logged. Each load is then
    recorded two ways:
      1. the Office's Microsoft Form opens in a new tab, pre-filled with the
@@ -3312,16 +3312,16 @@ function logAccess(action, file, asOf){
 
 let loadGateThen = null;
 function ferpaGate(why, then){
-  if(ferpaPassed() && whoAmI()){ then(); return }
+  if(ferpaPassed() && whoAmI() && whoAmI().name){ then(); return }
   const form = $('loadGate');
   loadGateThen = then;
-  $('loadGateNote').textContent = why + ' Give your role and reason, and enter the FERPA code to continue.';
+  $('loadGateNote').textContent = why + ' Choose your name, give your reason, and enter the FERPA code to continue.';
   $('loadGateErr').textContent = ''; $('loadGateInput').value = '';
   const who = whoAmI() || {};
-  $('loadGateRole').value = who.role || ''; $('loadGateReason').value = who.reason || '';
+  $('loadGateWho').value = who.name || ''; $('loadGateReason').value = who.reason || '';
   form.hidden = false;
   form.scrollIntoView({block:'nearest'});
-  $('loadGateRole').focus();
+  $('loadGateWho').focus();
 }
 function bootLoadGate(){
   const form = $('loadGate'), input = $('loadGateInput'), err = $('loadGateErr');
@@ -3332,14 +3332,14 @@ function bootLoadGate(){
   if(nudge) $('logNudgeDone').addEventListener('click', () => { nudge.hidden = true });
   form.addEventListener('submit', ev => {
     ev.preventDefault();
-    const role = $('loadGateRole').value, reason = $('loadGateReason').value.trim();
-    if(!role || !reason){ err.textContent = 'Please give your role and reason for access.'; return }
+    const name = $('loadGateWho').value, reason = $('loadGateReason').value.trim();
+    if(!name || !reason){ err.textContent = 'Please choose your name and give your reason for access.'; return }
     if(sha256(input.value.trim().toUpperCase()) !== LOOKUP_HASH){
       err.textContent = 'That code isn’t recognized.';
       input.select();
       return;
     }
-    memFerpa = true; memAccess = {role, reason};
+    memFerpa = true; memAccess = {name, role: 'Authorized viewer', reason};
     try { sessionStorage.setItem('ascendFerpa', LOOKUP_HASH);
           sessionStorage.setItem('ascendAccess', JSON.stringify(memAccess)) } catch(e){}
     input.value = ''; form.hidden = true;
