@@ -537,7 +537,7 @@
    "kicker": "Maintainer Tools",
    "title": "Remove Student Names",
    "short": "Remove Student Names",
-   "audience": "Dashboard maintainers in the Office of Curricular Affairs, before they drop a file in a dashboard inbox. Not for Student Performance: its owner keeps that data.",
+   "audience": "Office of Curricular Affairs staff, dashboard maintainers and governance support, before a file with student names is shared or dropped in a dashboard inbox. Not for Student Performance: its owner keeps that data.",
    "intro": "Most dashboard files start with student names, like Blackboard gradebooks. This site takes the names, usernames, IDs and emails out before the file goes in an inbox, so Claude only ever sees codes. It reads the file inside your browser: nothing is uploaded or stored. Your Hub code opens it.",
    "primaryAbs": "https://ascend-remove-names.vercel.app/",
    "unlock": "https://ascend-remove-names.vercel.app/api/unlock",

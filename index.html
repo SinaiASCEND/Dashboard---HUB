@@ -420,7 +420,7 @@ const DASHBOARDS = {
   },
   /* Vercel site (13 Oct 2026): the How-To Library's Remove Student Names tool as its own site.
      Files are read in the visitor's browser and never uploaded; the server only checks the code.
-     For dashboard maintainers: opens for ASCEND and RPS. */
+     Opens for ASCEND, RPS and SUPPORT (SUPPORT added 13 Oct 2026 at the owner's request). */
   deid: {
     url: "overview/remove-student-names.html",
     kicker: "Maintainer Tools",
@@ -498,9 +498,9 @@ const TIERS = {
   },
   "a42b8352b4c79f604f3ca0f8c703cbd08f648e86099ec682ce98bd4a11286741": {  // SUPPORT
     name: "Governance Support",
-    sub: "The ASCEND Curriculum Governance Dashboard and the Meeting Minutes Generator.",
-    // Governance, the Meeting Minutes Generator and the How-To Library, on purpose: no student leadership card (13 Oct 2026).
-    dashboards: ["governance", "meetings", "howto"],
+    sub: "The ASCEND Curriculum Governance Dashboard, the Meeting Minutes Generator and Remove Student Names.",
+    // Governance, the Meeting Minutes Generator, Remove Student Names and the How-To Library, on purpose: no student leadership card (13 Oct 2026).
+    dashboards: ["governance", "meetings", "deid", "howto"],
     pinned: ["governance"]
   }
 };
