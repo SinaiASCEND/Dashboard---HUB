@@ -512,7 +512,7 @@
    "kicker": "Meeting Tools",
    "title": "Meeting Minutes Generator",
    "short": "the Meeting Minutes Generator",
-   "audience": "OCA leadership (ASCEND), governance support staff (SUPPORT) and RPS; colleagues outside the Hub can be given the site's own OCS code. Not for curricular governance minutes: EEC, subcommittee and Monday Curricular Affairs transcripts are turned away, because those minutes are kept in the Governance dashboard.",
+   "audience": "Office of Curricular Affairs staff and governance support. Not for EEC, subcommittee or Monday Curricular Affairs minutes: those stay in the Governance dashboard.",
    "intro": "Drop in the transcript Zoom or Teams makes of a meeting, or paste its text, and get a Word draft of the minutes straight away for you to edit. Nothing else to fill in; nothing you upload is stored. Your Hub code opens it.",
    "primaryAbs": "https://ascend-meeting-summaries.vercel.app/",
    "unlock": "https://ascend-meeting-summaries.vercel.app/api/unlock",
