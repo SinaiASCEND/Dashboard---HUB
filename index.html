@@ -409,6 +409,15 @@ const DASHBOARDS = {
     title: "Baby Bates",
     blurb: "A pocket clinical reference for history-taking and physical examination, drawn from Bates' Guide, for clinical skills coaching and direct observation."
   },
+  /* Vercel site (13 Oct 2026): a Zoom/Teams transcript in, a written summary out, drafted by
+     Claude. For operational meetings only: it turns away governance transcripts, whose minutes
+     stay in Governance. Opens for ASCEND, RPS and SUPPORT (plus its own OCS code). */
+  meetings: {
+    url: "overview/meeting-summaries.html",
+    kicker: "Meeting Tools",
+    title: "Meeting Summaries",
+    blurb: "Upload a Zoom or Teams transcript and get a written summary: overview, decisions, action items with owners, and discussion by topic, ready to edit and download as Word."
+  },
   /* A Claude artifact (shared by link), not a GitHub Pages site. */
   howto: {
     url: "https://claude.ai/artifact/2RA7WChp13CueGLpEhBaH3",
@@ -432,7 +441,7 @@ const TIERS = {
     sub: "Full access \u2014 all monitoring, mapping, governance, and accreditation views.",
     // Every dashboard the Hub knows, except Student Performance: that one stays
     // on the RPS tier only, or by its direct URL (and the RPS code). Add a new card's key here too.
-    dashboards: ["calendar", "phase1", "clinicalskills", "phase2", "phase3", "nbme",  "objectives", "policies", "surveys", "lcme", "governance", "studentleaders",
+    dashboards: ["calendar", "phase1", "clinicalskills", "phase2", "phase3", "nbme",  "objectives", "policies", "surveys", "lcme", "governance", "meetings", "studentleaders",
                  "navigator", "electives", "babybates", "people", "howto"],
     pinned: ["phase1","phase2","phase3","governance"]
   },
@@ -480,9 +489,9 @@ const TIERS = {
   },
   "a42b8352b4c79f604f3ca0f8c703cbd08f648e86099ec682ce98bd4a11286741": {  // SUPPORT
     name: "Governance Support",
-    sub: "The ASCEND Curriculum Governance Dashboard.",
-    // Governance and the How-To Library only, on purpose: no student leadership card (13 Oct 2026).
-    dashboards: ["governance", "howto"],
+    sub: "The ASCEND Curriculum Governance Dashboard and Meeting Summaries.",
+    // Governance, Meeting Summaries and the How-To Library, on purpose: no student leadership card (13 Oct 2026).
+    dashboards: ["governance", "meetings", "howto"],
     pinned: ["governance"]
   }
 };
