@@ -466,8 +466,10 @@ const TIERS = {
     dashboards: ["clinicalskills", "objectives", "phase1", "phase2", "people", "navigator", "electives", "studentleaders"]
   },
   "b9b2b6f01aa767c022763ca563e0882c08635da21f2519dc7b02564aaf0aa9ba": {  // RPS
-    name: "De-identified Student Data",
-    sub: "Every dashboard, plus student-level performance across all three phases by student code. Names are held in a separate key.",
+    // RPS = Rainier Soriano's own tier. Named for the tier, not its first card
+    // (whose kicker is "De-identified Student Data").
+    name: "Rainier Soriano \u2014 Full Access with Student Data",
+    sub: "Every dashboard, including the de-identified Student Performance dashboard: student-level results across all three phases by student code. Names are held in a separate key.",
     // Always every card in DASHBOARDS, so a new card shows here without being listed.
     // Student Performance shows only here.
     dashboards: Object.keys(DASHBOARDS),
