@@ -418,6 +418,15 @@ const DASHBOARDS = {
     title: "Meeting Minutes Generator",
     blurb: "Upload a Zoom or Teams transcript and get a Word draft of the minutes straight away: overview, decisions, action items with owners, and discussion by topic, ready for you to edit."
   },
+  /* Vercel site (13 Oct 2026): the How-To Library's Remove Student Names tool as its own site.
+     Files are read in the visitor's browser and never uploaded; the server only checks the code.
+     Opens for ASCEND, RPS and SUPPORT (SUPPORT added 13 Oct 2026 at the owner's request). */
+  deid: {
+    url: "overview/remove-student-names.html",
+    kicker: "Maintainer Tools",
+    title: "Remove Student Names",
+    blurb: "Take student names, usernames, IDs and emails out of a gradebook or export before it goes in a dashboard inbox. Works in your browser; nothing is uploaded."
+  },
   /* A Claude artifact (shared by link), not a GitHub Pages site. */
   howto: {
     url: "https://claude.ai/artifact/2RA7WChp13CueGLpEhBaH3",
@@ -442,7 +451,7 @@ const TIERS = {
     // Every dashboard the Hub knows, except Student Performance: that one stays
     // on the RPS tier only, or by its direct URL (and the RPS code). Add a new card's key here too.
     dashboards: ["calendar", "phase1", "clinicalskills", "phase2", "phase3", "nbme",  "objectives", "policies", "surveys", "lcme", "governance", "meetings", "studentleaders",
-                 "navigator", "electives", "babybates", "people", "howto"],
+                 "navigator", "electives", "babybates", "people", "deid", "howto"],
     pinned: ["phase1","phase2","phase3","governance"]
   },
   "255af8d0734e8438d7fcef7cb457da08d130e24f574065175f2ab73ed2ffb360": {  // EEC
@@ -489,9 +498,9 @@ const TIERS = {
   },
   "a42b8352b4c79f604f3ca0f8c703cbd08f648e86099ec682ce98bd4a11286741": {  // SUPPORT
     name: "Governance Support",
-    sub: "The ASCEND Curriculum Governance Dashboard and the Meeting Minutes Generator.",
-    // Governance, the Meeting Minutes Generator and the How-To Library, on purpose: no student leadership card (13 Oct 2026).
-    dashboards: ["governance", "meetings", "howto"],
+    sub: "The ASCEND Curriculum Governance Dashboard, the Meeting Minutes Generator and Remove Student Names.",
+    // Governance, the Meeting Minutes Generator, Remove Student Names and the How-To Library, on purpose: no student leadership card (13 Oct 2026).
+    dashboards: ["governance", "meetings", "deid", "howto"],
     pinned: ["governance"]
   }
 };

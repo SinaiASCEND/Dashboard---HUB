@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Remove Student Names · ASCEND</title>
+<link rel="stylesheet" href="../ascend-mast.css">
+<style>
+:root{--navy:#0A1F44;--navy2:#0E2C5C;--ink:#1d2433;--bg:#eef1f6;--line:#d7dde8;--muted:#5b6678;--soft:#f6f8fc;--magenta:#D6177F;--cyan:#00A0C8;--radius:14px;
+  --sans:"Helvetica Neue",-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+.wrap{max-width:980px;margin:0 auto;padding:0 22px}
+.intro{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:26px 26px 22px;margin:26px auto 0;box-shadow:0 2px 12px rgba(10,31,68,.06)}
+.lead{font-size:16px;line-height:1.6;margin:0;color:var(--ink);max-width:760px}
+.btn{display:inline-block;margin-top:18px;background:var(--navy);color:#fff;text-decoration:none;font-weight:700;font-size:14px;padding:12px 20px;border-radius:999px}
+.btn:hover{background:var(--magenta)}
+h2{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:800;margin:30px 0 12px}
+.vgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.vcard{background:#fff;border:1px solid var(--line);border-top:3px solid var(--magenta);border-radius:var(--radius);padding:20px 20px 18px;position:relative}
+.vcard:nth-child(even){border-top-color:var(--cyan)}
+.vk{font-size:10.5px;letter-spacing:.16em;font-weight:800;color:var(--muted)}
+.vt{font-size:17px;font-weight:800;color:var(--navy);margin:6px 0 6px;line-height:1.25}
+.vb{font-size:13.5px;color:var(--muted);line-height:1.5}
+.vgo{display:inline-block;margin-top:12px;font-weight:700;font-size:13px;color:var(--magenta);text-decoration:none}
+.vcard:nth-child(even) .vgo{color:var(--cyan)}
+.aud{margin:28px 0 40px;font-size:13px;color:var(--muted);line-height:1.6;border-left:3px solid var(--line);padding-left:14px}
+.aud b{color:var(--navy)}
+@media (max-width:680px){.vgrid{grid-template-columns:1fr}.wrap{padding:0 16px}}
+/* Phones: 16px text and 44px targets. Desktop untouched. */
+@media (max-width:767px){
+  .btn{display:inline-flex;align-items:center;min-height:44px;font-size:15px;padding:10px 20px}
+  h2{font-size:13px}
+  .vk{font-size:11.5px}
+  .vb{font-size:16px}
+  .vgo{display:inline-flex;align-items:center;min-height:44px;font-size:15px;margin-top:4px}
+  .aud{font-size:14.5px}
+}
+</style><script src="https://sinaiascend.github.io/Dashboard---HUB/ascend-stats.js" async></script>
+</head><body>
+<header class="ascend-mast ascend-mast--compact">
+  <img class="am-logo" src="../oca-mountain.png" alt="">
+  <div class="am-wrap">
+    <div class="am-top"><span class="am-dot"></span>
+      <div class="am-eyebrow">ICAHN SCHOOL OF MEDICINE AT MOUNT SINAI<br><span class="am-dept">OFFICE OF CURRICULAR AFFAIRS &middot; ASCEND DASHBOARD HUB</span></div>
+      <a class="am-hub" href="../">&larr; Back to ASCEND Hub</a></div>
+    <h1>Remove Student Names</h1>
+    <div class="am-motto"><span class="a">Climb higher.</span><span class="b">Reach further.</span><span class="c">Care deeper.</span></div>
+  </div>
+  <div class="am-util"><div class="in">Maintainer Tools <span>&middot; Access-code dashboard</span></div></div>
+  <div class="am-stripe"><i></i><i></i><i></i></div>
+</header>
+<main class="wrap">
+  <section class="intro">
+    <p class="lead">Most dashboard files start with student names, like Blackboard gradebooks. This site takes the names, usernames, IDs and emails out before the file goes in an inbox, so Claude only ever sees codes. It reads the file inside your browser: nothing is uploaded or stored. Your Hub code opens it.</p>
+    <a class="btn" href="https://ascend-remove-names.vercel.app/">Open Remove Student Names &rarr;</a>
+  </section>
+  <h2>What you will find</h2>
+  <div class="vgrid">
+      <div class="vcard">
+        <div class="vk">01</div>
+        <div class="vt">Choose the file</div>
+        <div class="vb">A Blackboard gradebook, NBME score download, one45 or CPEvals export, or a Registrar workbook (.xlsx, .xls, .csv, .txt). A practice file with made-up students is built in.</div>
+        
+      </div>
+      <div class="vcard">
+        <div class="vk">02</div>
+        <div class="vt">Check what it found</div>
+        <div class="vb">Columns that show who a student is are ticked, by heading or by what they hold. Look across every column, then tick or untick.</div>
+        
+      </div>
+      <div class="vcard">
+        <div class="vk">03</div>
+        <div class="vt">No key or with a key</div>
+        <div class="vb">No key for Phase 1 and Electives (S001, S002…). With a key for Phase 2, NBME, Clinical Skills and MEPO, so the same student gets the same code in every file.</div>
+        
+      </div>
+      <div class="vcard">
+        <div class="vk">04</div>
+        <div class="vt">Save the DEID file</div>
+        <div class="vb">The cleaned file saves to your Downloads, named … DEID. Put it in the dashboard's inbox and delete the original.</div>
+        
+      </div>
+  </div>
+  <div class="aud"><b>Who this is for.</b> Office of Curricular Affairs staff, dashboard maintainers and governance support, before a file with student names is shared or dropped in a dashboard inbox. Not for Student Performance: its owner keeps that data.</div>
+</main>
+<script>
+/* This site keeps its own server-side gate on another origin, so the hub's
+   unlock cannot reach it. The hub kept the code this tab was opened with; the
+   button posts it to the site's unlock endpoint, which sets the cookie and
+   sends the person on. Without a stored code the button is a plain link and
+   the site's own gate asks. */
+document.querySelector('.btn').addEventListener('click', function(e){
+  var code = null;
+  try { code = sessionStorage.getItem('ascendCode'); } catch(_){}
+  if(!code) return;
+  e.preventDefault();
+  var f = document.createElement('form');
+  f.method = 'post'; f.action = "https://ascend-remove-names.vercel.app/api/unlock";
+  var add = function(n, v){ var i = document.createElement('input'); i.type = 'hidden'; i.name = n; i.value = v; f.appendChild(i); };
+  add('code', code); add('to', "/");
+  document.body.appendChild(f); f.submit();
+});
+</script>
+</body></html>
