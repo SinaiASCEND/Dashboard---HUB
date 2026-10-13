@@ -591,6 +591,13 @@ function renderTier(tier){
       a.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openSubGate(key); } });
     } else {
       a.href=d.url;
+      /* A card on another site (the How-To Library on claude.ai) opens its
+         links in a new tab, where this tab's sessionStorage is not visible.
+         Remember the tier in this browser for 12 hours so its "ASCEND Hub"
+         link (?back) can reopen it. */
+      if(/^https?:/.test(d.url)) a.addEventListener('click', ()=>{
+        try { localStorage.setItem('ascendReturn', JSON.stringify({h: sessionStorage.getItem('ascendTier'), t: Date.now()})); } catch(e){}
+      });
     }
     const isFav = favs.has(key);
     const body =
@@ -680,6 +687,7 @@ document.getElementById('lockBtn').addEventListener('click', () => {
   try { sessionStorage.removeItem('ascendTier'); } catch(e){}
   try { sessionStorage.removeItem('ascendSub'); } catch(e){}
   try { sessionStorage.removeItem('ascendCode'); } catch(e){}
+  try { localStorage.removeItem('ascendReturn'); } catch(e){}
   hub.classList.remove('active');
   gate.classList.remove('hidden');
   pwArea.classList.remove('open');
@@ -694,6 +702,12 @@ function restoreTier(){
   if(/[?&]home\b/.test(location.search)) return;
   let h = null;
   try { h = sessionStorage.getItem('ascendTier'); } catch(e){}
+  if(!h && /[?&]back\b/.test(location.search)){
+    try {
+      const r = JSON.parse(localStorage.getItem('ascendReturn') || 'null');
+      if(r && TIERS[r.h] && Date.now() - r.t < 12*3600*1000){ h = r.h; sessionStorage.setItem('ascendTier', h); }
+    } catch(e){}
+  }
   const tier = h && TIERS[h];
   if(tier){
     renderTier(tier);
