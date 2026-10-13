@@ -358,11 +358,6 @@
      "url": "Dashboard---Policy-Library/"
     },
     {
-     "title": "Review packets",
-     "blurb": "Current versus proposed text, rationale, and approval history for policies under committee review.",
-     "url": "Dashboard---Policy-Library/review/"
-    },
-    {
      "title": "Ask the policy desk",
      "blurb": "Plain-language questions answered from the policy text."
     }
