@@ -224,7 +224,7 @@
    "title": "Clinical Skills Rubrics",
    "short": "Clinical Skills Rubrics",
    "audience": "OCA leadership (ASCEND code) and RPS. It holds standardized-patient checklists, faculty-only rubrics and quiz answer keys, so it sits behind its own server-side gate and is not on the open web.",
-   "intro": "The Practice of Medicine checklists, rubrics, scoring guides and quizzes for 2025-26 and 2026-27 (POM 1, 2 and 3, plus items moved to PEAKS), searchable down to the single item and comparable across years. Your Hub code opens it.",
+   "intro": "The Practice of Medicine checklists, rubrics, scoring guides and quizzes for 2025-26 and 2026-27 (POM 1, 2 and 3, plus items moved to PEAKS 1), searchable down to the single item and comparable across years. Your Hub code opens it.",
    "primaryAbs": "https://ascend-clinical-skills-rubrics.vercel.app/",
    "unlock": "https://ascend-clinical-skills-rubrics.vercel.app/api/unlock",
    "views": [
@@ -235,6 +235,10 @@
     {
      "title": "All items",
      "blurb": "Every checklist item, rubric anchor, SP answer and quiz question in one searchable list, filterable by area (clinical skills or cognitive), module, domain, scorer, audience and competency."
+    },
+    {
+     "title": "Crosswalk",
+     "blurb": "Each behavior scored in more than one rubric (hand washing, introductions, chief concern, cranial nerves and more), with every rubric that scores it and how each defines full credit."
     },
     {
      "title": "Compare",
