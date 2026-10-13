@@ -530,6 +530,35 @@
      "blurb": "The draft downloads as Word, marked DRAFT. Check names, who said what and the action-item owners, then send it."
     }
    ]
+  },
+  {
+   "slug": "remove-student-names",
+   "key": "deid",
+   "kicker": "Maintainer Tools",
+   "title": "Remove Student Names",
+   "short": "Remove Student Names",
+   "audience": "Dashboard maintainers in the Office of Curricular Affairs, before they drop a file in a dashboard inbox. Not for Student Performance: its owner keeps that data.",
+   "intro": "Most dashboard files start with student names, like Blackboard gradebooks. This site takes the names, usernames, IDs and emails out before the file goes in an inbox, so Claude only ever sees codes. It reads the file inside your browser: nothing is uploaded or stored. Your Hub code opens it.",
+   "primaryAbs": "https://ascend-remove-names.vercel.app/",
+   "unlock": "https://ascend-remove-names.vercel.app/api/unlock",
+   "views": [
+    {
+     "title": "Choose the file",
+     "blurb": "A Blackboard gradebook, NBME score download, one45 or CPEvals export, or a Registrar workbook (.xlsx, .xls, .csv, .txt). A practice file with made-up students is built in."
+    },
+    {
+     "title": "Check what it found",
+     "blurb": "Columns that show who a student is are ticked, by heading or by what they hold. Look across every column, then tick or untick."
+    },
+    {
+     "title": "No key or with a key",
+     "blurb": "No key for Phase 1 and Electives (S001, S002…). With a key for Phase 2, NBME, Clinical Skills and MEPO, so the same student gets the same code in every file."
+    },
+    {
+     "title": "Save the DEID file",
+     "blurb": "The cleaned file saves to your Downloads, named … DEID. Put it in the dashboard's inbox and delete the original."
+    }
+   ]
   }
  ]
 }
