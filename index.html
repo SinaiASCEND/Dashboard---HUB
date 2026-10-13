@@ -324,6 +324,14 @@ const DASHBOARDS = {
     title: "ASCEND Clinical Skills Dashboard",
     blurb: "Student-level Practice of Medicine and PEAKS I clinical skills by domain, with analytics and the competency framework crosswalk."
   },
+  /* POM checklists, rubrics and quiz answer keys: behind the site's own server-side gate
+     (ASCEND and RPS codes only), never on a public page. */
+  clinicalskillsrubrics: {
+    url: "overview/clinical-skills-rubrics.html",
+    kicker: "Clinical Skills Assessment",
+    title: "Clinical Skills Rubrics",
+    blurb: "Every Practice of Medicine checklist, rubric, scoring guide and quiz, 2025-26 and 2026-27: search, filter by course, domain and competency, and compare versions item by item."
+  },
   phase2: {
     url: "overview/phase-2-assessment.html",
     kicker: "Programmatic Assessment",
@@ -429,7 +437,7 @@ const TIERS = {
     sub: "Full access \u2014 all monitoring, mapping, governance, and accreditation views.",
     // Every dashboard the Hub knows, except Student Performance: that one stays
     // on the RPS tier only, or by its direct URL (and the RPS code). Add a new card's key here too.
-    dashboards: ["calendar", "phase1", "clinicalskills", "phase2", "phase3", "nbme",  "objectives", "policies", "surveys", "lcme", "governance", "studentleaders",
+    dashboards: ["calendar", "phase1", "clinicalskills", "clinicalskillsrubrics", "phase2", "phase3", "nbme",  "objectives", "policies", "surveys", "lcme", "governance", "studentleaders",
                  "navigator", "electives", "babybates", "people", "howto"],
     pinned: ["phase1","phase2","phase3","governance"]
   },
