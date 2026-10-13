@@ -318,19 +318,14 @@ const DASHBOARDS = {
     title: "ASCEND Phase 1 Directors Dashboard",
     blurb: "Module Director dashboards for the pre-clerkship phase: cohort outcomes, assessment quality, and module evaluation for every Phase 1 module."
   },
+  /* Clinical Skills Portal (13 Oct 2026): one server-side gate, two separate dashboards.
+     Clinical Skills opens for ASCEND, EEC, PCCS, CIS, CCM and RPS; the Rubrics (SP checklists,
+     quiz answer keys) only for ASCEND, RPS and CCM. The portal's middleware enforces the split. */
   clinicalskills: {
     url: "overview/clinical-skills.html",
     kicker: "Clinical Skills",
-    title: "ASCEND Clinical Skills Dashboard",
-    blurb: "Student-level Practice of Medicine and PEAKS I clinical skills by domain, with analytics and the competency framework crosswalk."
-  },
-  /* POM checklists, rubrics and quiz answer keys: behind the site's own server-side gate
-     (ASCEND and RPS codes only), never on a public page. */
-  clinicalskillsrubrics: {
-    url: "overview/clinical-skills-rubrics.html",
-    kicker: "Clinical Skills Assessment",
-    title: "Clinical Skills Rubrics",
-    blurb: "Every Practice of Medicine checklist, rubric, scoring guide and quiz by class, POM 1 through PEAKS 1: search, filter by module, domain and competency, crosswalk shared skills, and compare deliveries item by item."
+    title: "Clinical Skills Portal",
+    blurb: "Two linked dashboards for POM 1 through PEAKS 1: student performance by clinical skill domain, and the checklists, rubrics and quizzes behind those scores (rubrics for ASCEND, RPS and CCM)."
   },
   phase2: {
     url: "overview/phase-2-assessment.html",
@@ -437,7 +432,7 @@ const TIERS = {
     sub: "Full access \u2014 all monitoring, mapping, governance, and accreditation views.",
     // Every dashboard the Hub knows, except Student Performance: that one stays
     // on the RPS tier only, or by its direct URL (and the RPS code). Add a new card's key here too.
-    dashboards: ["calendar", "phase1", "clinicalskills", "clinicalskillsrubrics", "phase2", "phase3", "nbme",  "objectives", "policies", "surveys", "lcme", "governance", "studentleaders",
+    dashboards: ["calendar", "phase1", "clinicalskills", "phase2", "phase3", "nbme",  "objectives", "policies", "surveys", "lcme", "governance", "studentleaders",
                  "navigator", "electives", "babybates", "people", "howto"],
     pinned: ["phase1","phase2","phase3","governance"]
   },
@@ -471,7 +466,7 @@ const TIERS = {
   "9f8b17ea00b6b3fd1efa6d10aa21cfedc91ba71a26b03557e09576370c157a81": {  // CCM
     name: "Clinical Competency Mentors",
     sub: "Clinical skills, Phase 1 and 2 assessment, and objectives to guide mentoring conversations.",
-    dashboards: ["clinicalskills", "clinicalskillsrubrics", "objectives", "phase1", "phase2", "people", "navigator", "electives", "studentleaders"]
+    dashboards: ["clinicalskills", "objectives", "phase1", "phase2", "people", "navigator", "electives", "studentleaders"]
   },
   "b9b2b6f01aa767c022763ca563e0882c08635da21f2519dc7b02564aaf0aa9ba": {  // RPS
     // RPS = Rainier Soriano's own tier. Named for the tier, not its first card
