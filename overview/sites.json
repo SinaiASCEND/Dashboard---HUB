@@ -505,6 +505,35 @@
      "blurb": "Performance by rotation and site."
     }
    ]
+  },
+  {
+   "slug": "meeting-summaries",
+   "key": "meetings",
+   "kicker": "Meeting Tools",
+   "title": "Meeting Summaries",
+   "short": "Meeting Summaries",
+   "audience": "OCA leadership (ASCEND), governance support staff (SUPPORT) and RPS; colleagues outside the Hub can be given the site's own OCS code. Not for curricular governance minutes: EEC, subcommittee and Monday Curricular Affairs transcripts are turned away, because those minutes are kept in the Governance dashboard.",
+   "intro": "Turns the transcript Zoom or Teams makes of a meeting into a written summary that someone who missed it can act on. Claude drafts it; you review and edit every line before downloading. Nothing you upload is stored. Your Hub code opens it.",
+   "primaryAbs": "https://ascend-meeting-summaries.vercel.app/",
+   "unlock": "https://ascend-meeting-summaries.vercel.app/api/unlock",
+   "views": [
+    {
+     "title": "Upload a transcript",
+     "blurb": "A Zoom “Audio transcript” (.vtt), a Teams transcript (.docx or .vtt), or plain text. The site shows who spoke and for how long."
+    },
+    {
+     "title": "Claude drafts the summary",
+     "blurb": "Overview, decisions, action items with owners and due dates, discussion by topic, and open questions. Student names are left out by default."
+    },
+    {
+     "title": "Review and edit",
+     "blurb": "Every line is editable on screen. Guessed speaker attributions are flagged for you to check."
+    },
+    {
+     "title": "Download or copy",
+     "blurb": "A Word file in the Office of Curricular Affairs layout, or plain text to paste into an email."
+    }
+   ]
   }
  ]
 }
