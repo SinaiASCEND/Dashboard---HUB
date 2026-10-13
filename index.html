@@ -406,6 +406,13 @@ const DASHBOARDS = {
     title: "Baby Bates",
     blurb: "A pocket clinical reference for history-taking and physical examination, drawn from Bates' Guide, for clinical skills coaching and direct observation."
   },
+  /* A Claude artifact (shared by link), not a GitHub Pages site. */
+  howto: {
+    url: "https://claude.ai/artifact/2RA7WChp13CueGLpEhBaH3",
+    kicker: "How-To Guides",
+    title: "ASCEND How-To Library",
+    blurb: "Plain-language guides for committee coordinators and dashboard maintainers: the Governance dashboard buttons, meeting files, and step-by-step checklists."
+  },
   people: {
     url: "overview/people.html",
     kicker: "Office Resources",
@@ -469,8 +476,9 @@ const TIERS = {
   "a42b8352b4c79f604f3ca0f8c703cbd08f648e86099ec682ce98bd4a11286741": {  // SUPPORT
     name: "Governance Support",
     sub: "The ASCEND Curriculum Governance Dashboard.",
-    // Governance only, on purpose: no student leadership card (13 Oct 2026).
-    dashboards: ["governance"]
+    // Governance and the How-To Library only, on purpose: no student leadership card (13 Oct 2026).
+    dashboards: ["governance", "howto"],
+    pinned: ["governance"]
   }
 };
 /* ============================================================ */
