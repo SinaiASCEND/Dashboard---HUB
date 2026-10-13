@@ -43,6 +43,10 @@
   padding:9px 18px;border-radius:999px;font-size:13px;font-weight:600;text-decoration:none;
   white-space:nowrap;backdrop-filter:blur(2px)}
 .ascend-mast .am-hub:hover{background:#d6117f;border-color:#d6117f;color:#fff}
+/* Dashboard-home + Hub buttons, side by side at the right of the top row. */
+.ascend-mast .am-btns{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.ascend-mast .am-btns .am-hub{margin-left:0}
+.ascend-mast .am-hub[hidden],.ascend-mast .am-hub .am-sm{display:none}
 .ascend-mast h1{font-weight:800;font-size:44px;letter-spacing:-1px;line-height:1.05;margin:20px 0 0;color:#fff}
 .ascend-mast .am-lead{border-left:4px solid #d6117f;padding-left:16px;margin:18px 0 0;max-width:680px;
   font-size:15px;line-height:1.6;color:#dbe4ee}
@@ -104,6 +108,9 @@
   .ascend-mast .am-eyebrow{font-size:9.5px;letter-spacing:1px;line-height:1.3;min-width:0;flex:1 1 auto}
   .ascend-mast .am-eyebrow .am-dept,.ascend-mast .am-eyebrow br:has(+ .am-dept){display:none}
   .ascend-mast .am-hub{min-height:44px;padding:8px 12px;font-size:12.5px;flex:0 0 auto}
+  .ascend-mast .am-btns{flex:0 0 auto;flex-wrap:nowrap;gap:6px}
+  .ascend-mast .am-hub .am-lg{display:none}
+  .ascend-mast .am-hub .am-sm{display:inline}
   .ascend-mast h1{font-size:21px;letter-spacing:-.4px;margin:6px 0 0}
   .ascend-mast .am-lead{margin:10px 0 0;font-size:14px}
   .ascend-mast .am-motto{display:none}
