@@ -468,9 +468,9 @@ const TIERS = {
   "b9b2b6f01aa767c022763ca563e0882c08635da21f2519dc7b02564aaf0aa9ba": {  // RPS
     name: "De-identified Student Data",
     sub: "Every dashboard, plus student-level performance across all three phases by student code. Names are held in a separate key.",
-    // Student Performance shows only here. Every other dashboard is listed too.
-    dashboards: ["studentperf", "calendar", "phase1", "clinicalskills", "phase2", "phase3", "nbme", "objectives", "policies",
-                 "surveys", "lcme", "governance", "studentleaders", "navigator", "electives", "babybates", "people"],
+    // Always every card in DASHBOARDS, so a new card shows here without being listed.
+    // Student Performance shows only here.
+    dashboards: Object.keys(DASHBOARDS),
     pinned: ["studentperf","phase1","phase2","phase3","governance"]
   },
   "a42b8352b4c79f604f3ca0f8c703cbd08f648e86099ec682ce98bd4a11286741": {  // SUPPORT
