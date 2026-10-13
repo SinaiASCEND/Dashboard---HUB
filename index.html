@@ -414,7 +414,7 @@ const DASHBOARDS = {
   }
 };
 
-/* Tiers, keyed by SHA-256 of the UPPERCASED access code. Seven codes: ASCEND, EEC, PCCS, CCS, CIS, CCM, RPS.
+/* Tiers, keyed by SHA-256 of the UPPERCASED access code. Eight codes: ASCEND, EEC, PCCS, CCS, CIS, CCM, RPS, SUPPORT.
    To change a code: uppercase it, hash it (any SHA-256 tool), replace the key. */
 const TIERS = {
   "5942bd952f12e02478b5a6aba902340a58c9c769a961f128dbb57f0b79358537": {  // ASCEND
@@ -465,6 +465,12 @@ const TIERS = {
     dashboards: ["studentperf", "calendar", "phase1", "clinicalskills", "phase2", "phase3", "nbme", "objectives", "policies",
                  "surveys", "lcme", "governance", "studentleaders", "navigator", "electives", "babybates", "people"],
     pinned: ["studentperf","phase1","phase2","phase3","governance"]
+  },
+  "a42b8352b4c79f604f3ca0f8c703cbd08f648e86099ec682ce98bd4a11286741": {  // SUPPORT
+    name: "Governance Support",
+    sub: "The ASCEND Curriculum Governance Dashboard.",
+    // Governance only, on purpose: no student leadership card (13 Oct 2026).
+    dashboards: ["governance"]
   }
 };
 /* ============================================================ */
