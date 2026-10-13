@@ -13,7 +13,8 @@ for (const s of cfg.sites) {
         <div class="vk">${String(i+1).padStart(2,"0")}</div>
         <div class="vt">${esc(v.title)}</div>
         <div class="vb">${esc(v.blurb)}</div>
-        ${v.url ? `<a class="vgo" href="${esc(abs(v.url))}">Open &rarr;</a>` : ""}
+        ${v.url ? (s.equal ? `<a class="btn vbtn" href="${esc(abs(v.url))}" aria-label="Open ${esc(v.title)}">Open dashboard &rarr;</a>`
+                           : `<a class="vgo" href="${esc(abs(v.url))}">Open &rarr;</a>`) : ""}
       </div>`).join("");
   const html = `<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
@@ -37,7 +38,14 @@ h2{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute
 .vb{font-size:13.5px;color:var(--muted);line-height:1.5}
 .vgo{display:inline-block;margin-top:12px;font-weight:700;font-size:13px;color:var(--magenta);text-decoration:none}
 .vcard:nth-child(even) .vgo{color:var(--cyan)}
-.aud{margin:28px 0 40px;font-size:13px;color:var(--muted);line-height:1.6;border-left:3px solid var(--line);padding-left:14px}
+${s.equal ? `/* "equal" sites are several dashboards of equal weight: no hero button, one
+   identical button per card, cards in one row. */
+.vgrid.eq{grid-template-columns:repeat(${Math.min(s.views.length,3)},1fr)}
+.vgrid.eq .vcard{display:flex;flex-direction:column}
+.vgrid.eq .vb{flex:1}
+.btn.vbtn{display:flex;justify-content:center;align-items:center;margin-top:16px}
+@media (max-width:680px){.vgrid.eq{grid-template-columns:1fr}}
+` : ""}.aud{margin:28px 0 40px;font-size:13px;color:var(--muted);line-height:1.6;border-left:3px solid var(--line);padding-left:14px}
 .aud b{color:var(--navy)}
 @media (max-width:680px){.vgrid{grid-template-columns:1fr}.wrap{padding:0 16px}}
 /* Phones: 16px text and 44px targets. Desktop untouched. */
@@ -66,10 +74,10 @@ h2{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute
 <main class="wrap">
   <section class="intro">
     <p class="lead">${esc(s.intro)}</p>
-    <a class="btn" href="${esc(primary)}">Open ${esc(s.short)} &rarr;</a>
+    ${s.equal ? "" : `<a class="btn" href="${esc(primary)}">Open ${esc(s.short)} &rarr;</a>`}
   </section>
-  <h2>What you will find</h2>
-  <div class="vgrid">${views}
+  <h2>${s.equal ? `${["","One","Two","Three","Four","Five","Six"][s.views.length] || s.views.length} dashboards` : "What you will find"}</h2>
+  <div class="vgrid${s.equal ? " eq" : ""}">${views}
   </div>
   <div class="aud"><b>Who this is for.</b> ${esc(s.audience)}</div>
 </main>

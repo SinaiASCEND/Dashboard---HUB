@@ -20,6 +20,13 @@ h2{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute
 .vb{font-size:13.5px;color:var(--muted);line-height:1.5}
 .vgo{display:inline-block;margin-top:12px;font-weight:700;font-size:13px;color:var(--magenta);text-decoration:none}
 .vcard:nth-child(even) .vgo{color:var(--cyan)}
+/* "equal" sites are several dashboards of equal weight: no hero button, one
+   identical button per card, cards in one row. */
+.vgrid.eq{grid-template-columns:repeat(3,1fr)}
+.vgrid.eq .vcard{display:flex;flex-direction:column}
+.vgrid.eq .vb{flex:1}
+.btn.vbtn{display:flex;justify-content:center;align-items:center;margin-top:16px}
+@media (max-width:680px){.vgrid.eq{grid-template-columns:1fr}}
 .aud{margin:28px 0 40px;font-size:13px;color:var(--muted);line-height:1.6;border-left:3px solid var(--line);padding-left:14px}
 .aud b{color:var(--navy)}
 @media (max-width:680px){.vgrid{grid-template-columns:1fr}.wrap{padding:0 16px}}
@@ -49,33 +56,27 @@ h2{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute
 <main class="wrap">
   <section class="intro">
     <p class="lead">The program's learning objectives and how students are meeting them: every objective in Phases 1 to 3, the 23 program objectives, the milestones expected at each phase, and measured outcomes. The library and the Milestones Map share one framework file and one MEPO wording.</p>
-    <a class="btn" href="https://sinaiascend.github.io/PMB-MLOs/">Open Objectives and Outcomes &rarr;</a>
+    
   </section>
-  <h2>What you will find</h2>
-  <div class="vgrid">
+  <h2>Three dashboards</h2>
+  <div class="vgrid eq">
       <div class="vcard">
         <div class="vk">01</div>
-        <div class="vt">Learning objectives library</div>
-        <div class="vb">Every module and clerkship objective in Phases 1 to 3, mapped to the 23 program objectives, with a coverage matrix and CSV export.</div>
-        <a class="vgo" href="https://sinaiascend.github.io/PMB-MLOs/">Open &rarr;</a>
+        <div class="vt">Learning Objectives Library</div>
+        <div class="vb">Every module and clerkship objective in Phases 1 to 3, mapped to the 23 program objectives, with a coverage matrix, CSV export, and the MEPO reference by competency domain.</div>
+        <a class="btn vbtn" href="https://sinaiascend.github.io/PMB-MLOs/" aria-label="Open Learning Objectives Library">Open dashboard &rarr;</a>
       </div>
       <div class="vcard">
         <div class="vk">02</div>
-        <div class="vt">Program objectives reference</div>
-        <div class="vb">The 23 MEPOs by competency domain.</div>
-        <a class="vgo" href="https://sinaiascend.github.io/PMB-MLOs/#view=mepos">Open &rarr;</a>
+        <div class="vt">Milestones</div>
+        <div class="vb">The end-of-phase milestone for each program objective at three gates, with measured Phase 1 results.</div>
+        <a class="btn vbtn" href="https://sinaiascend.github.io/PMB-MLOs/milestones.html" aria-label="Open Milestones">Open dashboard &rarr;</a>
       </div>
       <div class="vcard">
         <div class="vk">03</div>
-        <div class="vt">Milestones</div>
-        <div class="vb">The end-of-phase milestone for each program objective at three gates, with measured Phase 1 results.</div>
-        <a class="vgo" href="https://sinaiascend.github.io/PMB-MLOs/milestones.html">Open &rarr;</a>
-      </div>
-      <div class="vcard">
-        <div class="vk">04</div>
-        <div class="vt">MEPO outcomes</div>
+        <div class="vt">MEPO Outcomes</div>
         <div class="vb">Each program objective traced through its assessments and measures, with cohort and threshold views.</div>
-        <a class="vgo" href="https://sinaiascend.github.io/MEPO-Outcomes-Dashboard/">Open &rarr;</a>
+        <a class="btn vbtn" href="https://sinaiascend.github.io/MEPO-Outcomes-Dashboard/" aria-label="Open MEPO Outcomes">Open dashboard &rarr;</a>
       </div>
   </div>
   <div class="aud"><b>Who this is for.</b> Curriculum leaders, all EEC subcommittees, the EEC, and OCA leadership.</div>
