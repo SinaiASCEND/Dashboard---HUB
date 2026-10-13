@@ -688,8 +688,10 @@ document.getElementById('lockBtn').addEventListener('click', () => {
 /* Restore the unlocked tier when returning to the hub (e.g., browser Back
    from a dashboard). The tier hash lives in sessionStorage, so it survives
    navigation within the tab but is cleared when the tab closes or the user
-   clicks Lock. */
+   clicks Lock. ?home (a "Home" link from the How-To Library) shows the front
+   page instead, leaving the stored tier for the next visit. */
 function restoreTier(){
+  if(/[?&]home\b/.test(location.search)) return;
   let h = null;
   try { h = sessionStorage.getItem('ascendTier'); } catch(e){}
   const tier = h && TIERS[h];
