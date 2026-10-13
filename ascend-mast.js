@@ -24,10 +24,20 @@
   var d = s.dataset, HUB = "https://sinaiascend.github.io/Dashboard---HUB/";
   var esc = function (t) { return String(t == null ? "" : t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" }[c]; }); };
   if (!document.querySelector('link[href$="ascend-mast.css"]')) {
-    var css = document.createElement("link"); css.rel = "stylesheet"; css.href = HUB + "ascend-mast.css"; document.head.appendChild(css);
+    var css = document.createElement("link"); css.rel = "stylesheet"; css.href = HUB + "ascend-mast.css?v=2"; document.head.appendChild(css);
   }
   if (!window.__ascendStats) {                    // site stats, see ascend-stats.js
     var st0 = document.createElement("script"); st0.async = true; st0.src = HUB + "ascend-stats.js"; document.head.appendChild(st0);
+  }
+  // The two masthead buttons depend on these rules; carry them here so a browser
+  // holding an older cached ascend-mast.css never shows both long and short labels.
+  if (!document.getElementById("am-btn-css")) {
+    var bc = document.createElement("style"); bc.id = "am-btn-css";
+    bc.textContent = ".ascend-mast .am-btns{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}" +
+      ".ascend-mast .am-btns .am-hub{margin-left:0}.ascend-mast .am-hub[hidden],.ascend-mast .am-hub .am-sm{display:none}" +
+      "@media(max-width:767px){.ascend-mast .am-btns{flex:0 0 auto;flex-wrap:nowrap;gap:6px}" +
+      ".ascend-mast .am-hub .am-lg{display:none}.ascend-mast .am-hub .am-sm{display:inline}}";
+    document.head.appendChild(bc);
   }
   if (d.hide) { var st = document.createElement("style"); st.textContent = d.hide + "{display:none!important}"; document.head.appendChild(st); }
   function render() {
