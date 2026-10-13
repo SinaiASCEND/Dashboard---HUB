@@ -263,8 +263,13 @@ main{padding-bottom:44px}
 .rv-card:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
 .rv-card.concern{border-top:4px solid var(--crit)}
 .rv-card.watch{border-top:4px solid var(--warn)}
-.rv-head{display:flex;align-items:flex-start;gap:10px}
-.rv-head .rv-id{flex:1 1 auto;min-width:0}
+.rv-head{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:start;column-gap:10px}
+.rv-head .rv-side{align-items:flex-start;margin-bottom:4px}
+.rv-head .rv-code{white-space:nowrap}
+.rv-head .rv-id{min-width:0}
+/* class, block, advisor, CCM and the licensing exams: one strip across the card */
+.rv-wide{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 14px;margin-top:6px}
+.rv-wide .rv-meta{margin-top:0}
 .rv-photo{flex:0 0 auto;width:52px;height:52px;border-radius:8px;object-fit:cover;
   border:1px solid var(--line);background:var(--surface-2)}
 .rv-photo.empty::after{content:'';display:block;width:100%;height:100%;border-radius:8px;
@@ -274,9 +279,20 @@ main{padding-bottom:44px}
 .rv-name{font-size:17px;font-weight:800;letter-spacing:-.01em;color:var(--ink)}
 .rv-name + .rv-code{font-size:12.5px;font-weight:600;color:var(--muted);letter-spacing:0;
   font-variant-numeric:tabular-nums}
+.rv-nb{display:grid;gap:3px;max-height:220px;overflow:auto}
+.rv-nbrow{display:grid;grid-template-columns:62px minmax(0,1fr) 34px;gap:8px;align-items:center;font-size:11.5px}
+.rv-nbrow .lab{color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rv-nbrow .val{text-align:right;font-variant-numeric:tabular-nums;color:var(--ink)}
+.rv-nbrow.below .val{color:var(--crit);font-weight:700}
+.rv-nbtrack{position:relative;height:12px;background:linear-gradient(var(--line),var(--line)) center/100% 2px no-repeat}
+.rv-nbtrack i{position:absolute;top:50%;transform:translate(-50%,-50%)}
+.rv-nbtrack .md{width:2px;height:12px;background:var(--ink-2)}
+.rv-nbtrack .pm{width:3px;height:14px;border-radius:1px;background:var(--warn)}
+.rv-key .k-dot{color:var(--s2)}.rv-key .k-md{color:var(--ink-2)}.rv-key .k-pm{color:var(--warn)}
+.rv-nbtrack .dot{width:9px;height:9px;border-radius:50%;background:var(--s2);box-shadow:0 0 0 1.5px var(--surface)}
+.rv-nbrow.below .dot{background:var(--crit)}
 .rv-side{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none}
-.rv-exams{display:grid;gap:2px;font-size:12px;text-align:right}
-.rv-exams div{display:flex;gap:8px;justify-content:flex-end}.rv-exams span{color:var(--muted)}.rv-exams b{color:var(--ink);font-variant-numeric:tabular-nums}
+.rv-exams{display:flex;flex-wrap:wrap;gap:2px 12px;font-size:12px;margin-left:auto}
+.rv-exams div{display:flex;gap:6px}.rv-exams span{color:var(--muted)}.rv-exams b{color:var(--ink);font-variant-numeric:tabular-nums}
 .rv-exams .bad b{color:var(--crit)}
 .rv-meta{font-size:11.5px;color:var(--muted);margin-top:2px}
 .rv-big{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -424,7 +440,7 @@ details.fold[open] > summary{margin-bottom:12px}
 .nbkey{display:flex;flex-wrap:wrap;gap:6px 20px;align-items:center;margin:4px 0 10px;font-size:12.5px;color:var(--ink-2)}
 .nbk{display:inline-flex;align-items:center;gap:8px}.nbk.hint{color:var(--muted);margin-left:auto}
 .nbsw{position:relative;width:18px;height:18px;display:inline-block}.nbsw i{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}
-.nbpass{width:2px;height:18px;background:var(--crit);opacity:.75}
+.nbpass{width:3px;height:18px;border-radius:1px;background:var(--warn)}
 .nbmed{width:2px;height:12px;background:var(--muted)}
 .nbdot{width:12px;height:12px;border-radius:50%;background:var(--s2);box-shadow:0 0 0 2px var(--surface)}
 .nbrow.below .nbdot{background:var(--crit)}
@@ -702,6 +718,7 @@ tr.rosterrow:focus-visible{outline:3px solid var(--s1);outline-offset:-3px}
 .flags .ic{flex:none;font-size:13px;line-height:1.4}
 .flags .fx{font-weight:700;color:var(--ink)}
 .flags .fy{color:var(--ink-2);font-size:12.5px}
+.flags.support .fy{margin-top:3px}.flags.support .fy b{color:var(--ink);font-weight:600}
 .empty{padding:34px 18px;text-align:center;color:var(--muted);font-size:13.5px}
 .foot{border-top:1px solid var(--line);padding:16px 0 34px;color:var(--muted);font-size:11.5px}
 
@@ -923,6 +940,12 @@ body.gated{overflow:hidden}
       </select>
     </div>
     <div class="field">
+      <label for="fFlag">Flag</label>
+      <select id="fFlag">
+        <option value="all">Any or none</option>
+      </select>
+    </div>
+    <div class="field">
       <label for="fDomain">Emphasis</label>
       <select id="fDomain">
         <option value="knowledge">Medical knowledge</option>
@@ -956,18 +979,17 @@ body.gated{overflow:hidden}
        once per session, then the file or folder picker opens -->
   <form class="ferpa gate2" id="loadGate" hidden novalidate>
     <p id="loadGateNote"></p>
-    <p class="fine">Access is logged with the Office of Curricular Affairs: your role and reason, what you
-      loaded and when. A pre-filled form then opens for you to submit; it records your name from your
-      Mount Sinai sign-in, so you are not asked for it here.</p>
+    <p class="fine">Access is logged with the Office of Curricular Affairs: your name and reason, what you
+      loaded and when. A pre-filled form then opens for you to submit; it also records your Mount Sinai
+      sign-in. Only the four people listed have access to this dashboard.</p>
     <div class="who">
-      <select id="loadGateRole" aria-label="Your role">
-        <option value="">Your role…</option>
-        <option>Career advisor</option>
-        <option>Clinical competency mentor</option>
-        <option>Course or clerkship director</option>
-        <option>Office of Curricular Affairs</option>
-        <option>Student affairs / advising dean</option>
-        <option>Other</option>
+      <!-- the only people with access to this dashboard -->
+      <select id="loadGateWho" aria-label="Your name">
+        <option value="">Your name…</option>
+        <option>Rainier Soriano</option>
+        <option>Staci Leisman</option>
+        <option>Teddy Holzer</option>
+        <option>Chris Strother</option>
       </select>
       <input type="text" id="loadGateReason" placeholder="Reason for access (e.g. advising meeting)" autocomplete="off" aria-label="Reason for access">
     </div>
@@ -1089,11 +1111,13 @@ body.gated{overflow:hidden}
             counts three times as much as a module's quiz set. A failed block, a remediation, a clinical
             evaluation below 3.0, or two or more Phase 1 NBME exams below 65 is what makes a standing absolute.
             One Phase 1 NBME exam below 65 is a Monitor, and a passing retake of the same Phase 1 exam turns a
-            concern into a Monitor. <strong>Clerkships (Class of 2027)</strong>: an Academic concern is any shelf below
-            its Clerkship Information Sheet pass mark (5th percentile; Surgery&rsquo;s CAS follows the shelf), even if
-            the retake passed; a clerkship grade below Honors; overall performance across the ACGME competencies
-            below the class middle; or a DO Week overall score below the 70% pass mark of the clerkship direct
-            observations. An Incomplete is a Monitor.</p>
+            concern into a Monitor. In PEAKS only the CBSE counts. <strong>Once in Phase 2 (Class of 2027 and ASCEND Phase 2, graded
+            Honors / Pass / Fail), only the Phase 2 red flags decide the standing</strong> &mdash; Phase 1 no longer counts, and
+            relative standing is not used. An Academic concern is a USMLE Step failure; a clerkship failure; any shelf or CAS
+            below its pass mark (Surgery&rsquo;s CAS 65%), even if the retake passed; a clerkship direct observation (or the
+            Class of 2027&rsquo;s DO Week) below 70%; or any clinical evaluation domain below 3. A Monitor is a shelf within 5
+            points above its pass mark, a clerkship grade of Pass, an Incomplete, or an assessment owed (a finished
+            clerkship with no shelf on record two weeks after it ended).</p>
         </div>
       </div>
       <div class="cardbody">
@@ -1306,6 +1330,14 @@ const SKILL_DOMAINS = ['History taking','Physical examination','Communication',
 const SKILL_ACGME = [['Patient Care', ['History taking','Physical examination','Clinical reasoning','Patient education & counseling']],
   ['Interpersonal & Communication Skills', ['Communication','Documentation & presentation']],
   ['Professionalism', ['Professionalism']]];
+/* which clinical skills a student's ACGME view reads: Phase 1 students the POM
+   clinical skills, Phase 2 and beyond the clerkship clinical evaluations only */
+function skillLens(s){
+  const refs = (DATA.refs || {})[s.cohort] || {};
+  const ph = s.phase >= 2 ? 2 : 1;
+  return {phase: ph, dom: (s.skillByPhase || {})[ph] || {}, ref: (refs.domainsByPhase || {})[ph] || {},
+    label: ph === 2 ? 'clerkship clinical evaluation' : 'POM clinical skills'};
+}
 /* a competency's score: the mean of its domains on record (student or class mean) */
 function acgmeScore(domains, ds){
   const v = ds.map(d => domains && domains[d]).filter(x => x != null);
@@ -1626,6 +1658,18 @@ function nbmeKey(rec){ return isClerkshipRec(rec) ? 'shelf' : 'cas' }
    current standing, flags or percentiles. */
 const isPrior = r => !!r && r.attempt === 'prior';
 const currentRecs = recs => (recs || []).filter(r => !isPrior(r));
+/* What a student's standing, flags and review card count (user, 2026-10-11):
+   once in Phase 2 a student has completed Phase 1, so only Phase 2 and later
+   records count - plus the USMLE results. Phase 1 stays on the full record. */
+const inScope = (s, r) => !(s && s.phase >= 2) || r.phase >= 2 || r.kind === 'licensing';
+/* PEAKS (the end-of-Phase-1 board-preparation block): only its CBSE counts
+   toward standing and flags (2026-10-12); its quizzes, OSCE and block result
+   stay on the record but are left out of what decides a red flag */
+const isPeaks = r => /^PEAKS/i.test(r.code || '');
+const countsView = r => !isPeaks(r) ? r : Object.assign({}, r, {
+  cas: casList(r).filter(c => /cbse/i.test(c.label || '')), quizzes: null, qtypes: {}, quizPercentile: null,
+  osce: null, eval: null, result: /fail|remediation/i.test(r.result || '') ? 'Pass' : r.result});
+const scopeRecs = s => currentRecs(s.records).filter(r => inScope(s, r)).map(countsView);
 function examName(label){ return String(label || '').replace(/\s*\(retake\)\s*$/i, '') }
 /* knowledge and skills percentile from a set of records - the whole record,
    or one phase of it. The two are never blended into one number: a student
@@ -1664,6 +1708,7 @@ function casPercentile(rec){ const v = casPcts(rec); return v.length ? Math.roun
 function poolKey(s, rec){ return rec.pool || (s.cohort + '|' + rec.code) }
 
 function hydrate(data){
+  HYDRATE_ASOF = (data && data.meta && data.meta.asOf) || new Date().toISOString().slice(0,10);   /* DATA is not set while hydrating */
   const students = data.students || [];
   TA_LOADING = students;
 
@@ -1794,7 +1839,8 @@ function hydrate(data){
     if(s.phase == null)
       s.phase = s.current ? s.current.phase
               : (recs.filter(r => r.status === 'completed').slice(-1)[0] || {phase:1}).phase;
-    const live = currentRecs(recs);
+    const allLive = currentRecs(recs);
+    const live = allLive.filter(r => inScope(s, r)).map(countsView);
     const all = standings(live);
     s.knowledgePct = all.knowledge;
     s.skillsPct    = all.skills;
@@ -1805,7 +1851,7 @@ function hydrate(data){
        only that phase's assessments */
     s.byPhase = {};
     [1, 2, 3].forEach(ph => {
-      const st = standings(live.filter(r => r.phase === ph));
+      const st = standings(allLive.filter(r => r.phase === ph));
       if(st.n) s.byPhase[ph] = st;
     });
 
@@ -1820,6 +1866,18 @@ function hydrate(data){
       if(vals.length) dom[d] = Math.round(mean(vals));
     });
     s.skillDomains = dom;
+    /* the same, phase by phase: Phase 1 = the POM clinical skills (OSCEs,
+       direct observations, evaluations); Phase 2 = the clerkship clinical
+       evaluations only, with nothing from POM */
+    const domOf = recsIn => { const o = {}; SKILL_DOMAINS.forEach(d => { const v = [];
+      recsIn.forEach(rec => {
+        if(rec.osce && rec.osce.domains && rec.osce.domains[d] != null) v.push(rec.osce.domains[d]);
+        if(rec.eval && rec.eval.domains && rec.eval.domains[d] != null) v.push(evalTo100(rec.eval.domains[d]));
+      }); if(v.length) o[d] = Math.round(mean(v)) }); return o };
+    s.skillByPhase = {
+      1: domOf(allLive.filter(r => r.phase === 1 && !isClerkshipRec(r))),
+      2: domOf(allLive.filter(r => isClerkshipRec(r) && r.eval).map(r => ({eval: r.eval})))
+    };
 
     /* trajectory: one point per assessment, in academic order */
     s.timeline = recs.map(rec => {
@@ -1845,10 +1903,12 @@ function hydrate(data){
   const refs = {};
   Object.keys(byCohort).forEach(c => {
     const grp = byCohort[c];
-    const domains = {};
+    const domains = {}, domainsByPhase = {1:{}, 2:{}};
     SKILL_DOMAINS.forEach(d => {
       const v = grp.map(s=>s.skillDomains[d]).filter(x=>x!=null);
       if(v.length) domains[d] = Math.round(mean(v));
+      [1, 2].forEach(ph => { const w = grp.map(s => (s.skillByPhase && s.skillByPhase[ph] || {})[d]).filter(x => x != null);
+        if(w.length) domainsByPhase[ph][d] = Math.round(mean(w)) });
     });
     const areas = {};
     CONTENT_AREAS.forEach(a => {
@@ -1897,7 +1957,7 @@ function hydrate(data){
       obsCases[k] = {};
       Object.entries(byA).forEach(([a, v]) => obsCases[k][a] = Math.round(mean(v)*10)/10);
     });
-    refs[c] = {domains, areas, seqMedian, examAreas, obsCases, n: grp.length};
+    refs[c] = {domains, domainsByPhase, areas, seqMedian, examAreas, obsCases, n: grp.length};
   });
   data.refs = refs;
   return data;
@@ -1915,7 +1975,7 @@ function hydrate(data){
 function casBelowPass(s){
   const open = [], resolved = [];
   const sittings = [];
-  currentRecs(s.records).forEach(r => casList(r).forEach(c => {
+  scopeRecs(s).forEach(r => casList(r).forEach(c => {
     /* a retake is the same exam in the same block: Phase 1 papers share generic
        names ("Mid Module Exam"), so the block code is part of the key */
     if(c.passMark != null && c.scaled != null) sittings.push({rec:r, cas:c, exam:examName(c.label), key:r.code + '|' + examName(c.label)});
@@ -1929,42 +1989,122 @@ function casBelowPass(s){
   return {open, resolved};
 }
 
-/* Clerkship Academic concern rules for the objective-graded (legacy)
-   clerkships, decided 2026-10-10. Each returns the flag that explains it:
+/* Clerkship Academic concern rules - the legacy Class of 2027 (decided
+   2026-10-10) and ASCEND Phase 2, graded Honors / Pass / Fail (2026-10-11).
+   Each returns the flag that explains it:
    - a clerkship grade below Honors (Pass, Pass with remediation, Grade C, Fail);
      an Incomplete is a Monitor until a grade is recorded
+   - a clerkship direct observation below its pass mark (70%)
    - overall performance across the ACGME competencies below the class middle
      (the one-pager's level: beyond 1.96 SEM)
    - the DO Week overall score below the clerkship direct-observation pass mark
    A shelf below its CIS pass mark is in casBelowPass: for a clerkship it is a
    concern even when the retake passed. */
 const CK_BELOW_HONORS = ['Pass', 'Pass with remediation', 'Grade C', 'Fail'];
+/* (Phase 2 students are judged by phase2Flags below since 2026-10-12; this
+   is kept for the clerkship records of anyone not yet counted as Phase 2) */
 function clerkshipConcerns(s){
-  const out = [], recs = currentRecs(s.records);
+  const out = [], recs = scopeRecs(s);
   const graded = recs.filter(r => r.kind === 'clerkship' && r.objectives && r.objectives.length);
-  const below = graded.filter(r => CK_BELOW_HONORS.includes(r.result));
+  /* the grade rules read every clerkship with a final grade, legacy or Phase 2 */
+  const finals = recs.filter(r => r.kind === 'clerkship');
+  const below = finals.filter(r => CK_BELOW_HONORS.includes(r.result));
   if(below.length)
     out.push({level:'crit', what: below.length + ' clerkship grade' + (below.length === 1 ? '' : 's') + ' below Honors',
       why: below.map(r => r.code + ' ' + r.result).join(', ') + ' \u2014 in a class where nearly every student earns Honors, a grade below it is an Academic concern.'});
-  const inc = graded.filter(r => r.result === 'Incomplete');
+  const inc = finals.filter(r => r.result === 'Incomplete');
   if(inc.length)
     out.push({level:'watch', what: inc.length + ' clerkship' + (inc.length === 1 ? '' : 's') + ' Incomplete',
       why: inc.map(r => r.code).join(', ') + ' \u2014 no final grade yet; reviewed again when it is recorded.'});
-  if(graded.length){
+  if(finals.length){
     const A = twoAxes(s.cohort, TA_LOADING), O = A && A.overall, z = O && O.z[s.id];
     if(z != null && O.level(z) === 'below')
       out.push({level:'crit', what: 'Overall performance across the ACGME competencies below the class middle',
         why: ord(taPct(z)) + ' percentile; the 95% band (' + ord(taPct(z - O.cut)) + '\u2013' + ord(taPct(z + O.cut)) +
              ') lies below the class average. Medical Knowledge, Patient Care, ICS and Professionalism with equal weight.'});
   }
+  /* a clerkship's direct observations below the pass mark */
+  const lowDo = finals.filter(r => r.osce && r.osce.pct != null && r.osce.passMark != null && r.osce.pct < r.osce.passMark);
+  if(lowDo.length)
+    out.push({level:'crit', what: lowDo.length + ' clerkship direct observation' + (lowDo.length === 1 ? '' : 's') + ' below ' + lowDo[0].osce.passMark + '%',
+      why: lowDo.map(r => r.code + ' ' + r.osce.pct + '%').join(', ') + ' \u2014 below the ' + lowDo[0].osce.passMark + '% pass mark for the clerkship direct observations.'});
   recs.filter(r => r.code === 'DOWEEK' && r.osce && r.osce.pct != null && r.osce.passMark != null && r.osce.pct < r.osce.passMark)
     .forEach(r => out.push({level:'crit', what: 'DO Week overall score below ' + r.osce.passMark + '%',
       why: r.osce.pct + '% across the DO Week encounters, below the ' + r.osce.passMark + '% pass mark the clerkship direct observations use.'}));
   return out;
 }
 
+/* Phase 2 standing (2026-10-12). Once a student is in Phase 2 these alone
+   decide their standing; Phase 1 flags no longer count (that record stays on
+   the page). Academic concern: a USMLE Step failure, a clerkship failure, a
+   clerkship shelf below its pass mark (even when the retake passed), a direct
+   observation below its pass mark (the clerkships' and DO Week), or any
+   clinical evaluation domain below 3 (of 5). Monitor: a shelf within
+   SHELF_NEAR points above its pass mark, a clerkship grade of Pass, an
+   Incomplete or unrecognised grade, or an assessment owed (a finished
+   clerkship with no shelf on record OWED_GRACE_DAYS after it ended). */
+const SHELF_NEAR = 5, OWED_GRACE_DAYS = 14;
+let HYDRATE_ASOF = null;
+const SHELF_CODES = ['MED','NRL','OBG','PED','PSY','SUR','EM'];
+function phase2Flags(s){
+  const out = [], recs = scopeRecs(s), ck = recs.filter(r => r.kind === 'clerkship');
+  const count = (n, one, many) => n + ' ' + (n === 1 ? one : many);
+  /* concern */
+  const us = usmleOf(s);
+  const steps = [['STEP1','Step 1'], ['STEP2CK','Step 2 CK']].filter(([k]) => us[k] && us[k].result !== 'Pass');
+  if(steps.length)
+    out.push({level:'crit', what: 'USMLE ' + steps.map(x => x[1]).join(' and ') + ' failed',
+      why: steps.map(([k, n]) => n + ': ' + us[k].result + (us[k].tries > 1 ? ' (' + us[k].tries + ' attempts)' : '')).join('; ') + '.'});
+  const failed = ck.filter(r => r.result === 'Fail' || r.result === 'Pass with remediation');
+  if(failed.length)
+    out.push({level:'crit', what: count(failed.length, 'clerkship failure', 'clerkship failures'),
+      why: failed.map(r => r.code + ' ' + r.result).join(', ') + '.'});
+  const sittings = [];
+  ck.forEach(r => casList(r).forEach(c => { if(c.passMark != null && c.scaled != null) sittings.push({r, c}) }));
+  const below = sittings.filter(x => x.c.scaled < x.c.passMark);
+  if(below.length)
+    out.push({level:'crit', what: count(below.length, 'shelf exam', 'shelf exams') + ' below the pass mark',
+      why: below.map(x => x.r.code + (/retake/i.test(x.c.label || '') ? ' retake' : '') + ' ' + fmtScaled(x.c.scaled) +
+        '% (pass ' + x.c.passMark + '%)' + (sittings.some(y => y.r === x.r && y.c !== x.c && y.c.scaled >= y.c.passMark) ? ', passed on retake' : '')).join(', ') +
+        ' — a shelf failure is an Academic concern even when the retake passed.'});
+  const lowDo = recs.filter(r => (r.kind === 'clerkship' || r.code === 'DOWEEK') && r.osce && r.osce.pct != null &&
+                                 r.osce.passMark != null && r.osce.pct < r.osce.passMark);
+  if(lowDo.length)
+    out.push({level:'crit', what: count(lowDo.length, 'direct observation', 'direct observations') + ' below ' + lowDo[0].osce.passMark + '%',
+      why: lowDo.map(r => (r.code === 'DOWEEK' ? 'DO Week' : r.code) + ' ' + r.osce.pct + '%').join(', ') + ' — below the pass mark.'});
+  const lowDom = [];
+  ck.forEach(r => { const d = (r.eval && r.eval.domains) || {};
+    Object.keys(d).forEach(k => { if(d[k] != null && d[k] < 3) lowDom.push(r.code + ' ' + k.toLowerCase() + ' ' + d[k].toFixed(1)) });
+    if(r.eval && r.eval.overall != null && r.eval.overall < 3 && !Object.keys(d).some(k => d[k] < 3)) lowDom.push(r.code + ' overall ' + r.eval.overall.toFixed(1)) });
+  if(lowDom.length)
+    out.push({level:'crit', what: count(lowDom.length, 'clinical evaluation domain', 'clinical evaluation domains') + ' below 3',
+      why: lowDom.join(', ') + ' — the faculty’s mean rating, below 3 on the 1–5 scale.'});
+  /* monitor */
+  const near = sittings.filter(x => x.c.scaled >= x.c.passMark && x.c.scaled < x.c.passMark + SHELF_NEAR);
+  if(near.length)
+    out.push({level:'watch', what: count(near.length, 'shelf exam', 'shelf exams') + ' within ' + SHELF_NEAR + ' points of the pass mark',
+      why: near.map(x => x.r.code + ' ' + fmtScaled(x.c.scaled) + '% (pass ' + x.c.passMark + '%)').join(', ') + '.'});
+  const pass = ck.filter(r => r.result === 'Pass');
+  if(pass.length)
+    out.push({level:'watch', what: count(pass.length, 'clerkship grade of Pass', 'clerkship grades of Pass'), why: pass.map(r => r.code).join(', ') + '.'});
+  const odd = ck.filter(r => r.result === 'Incomplete' || /^Grade /.test(r.result || ''));
+  if(odd.length)
+    out.push({level:'watch', what: count(odd.length, 'clerkship grade Incomplete or not H/P/F', 'clerkship grades Incomplete or not H/P/F'),
+      why: odd.map(r => r.code + ' ' + r.result).join(', ') + ' — check the grade sheet; reviewed again when a final grade is recorded.'});
+  const cutoff = new Date(new Date(HYDRATE_ASOF).getTime() - OWED_GRACE_DAYS * 864e5).toISOString().slice(0, 10);
+  const owed = ck.filter(r => SHELF_CODES.includes(r.code) && r.status === 'completed' && r.end && r.end < cutoff && !casList(r).length);
+  if(owed.length)
+    out.push({level:'watch', what: count(owed.length, 'assessment owed', 'assessments owed'),
+      why: owed.map(r => r.code + ' shelf').join(', ') + ' — the clerkship ended ' + OWED_GRACE_DAYS + '+ days ago with no shelf on record (deferred, not yet sat, or not yet reported).'});
+  return out;
+}
+
 function buildFlags(s){
-  const out = [], recs = currentRecs(s.records);
+  const out = [], recs = scopeRecs(s);
+  const p1done = s.phase >= 2 && currentRecs(s.records).some(r => r.phase === 1 && r.kind !== 'licensing');
+  if(p1done)
+    out.push({level:'info', what:'Phase 1 completed: not counted here',
+      why:'Standing and flags now read Phase 2 only. Every Phase 1 assessment stays on this record (NBME exams, trajectory, schedule).'});
   const prior = (s.records || []).filter(isPrior);
   if(prior.length){
     const pb = prior.reduce((n, r) => n + casList(r).filter(c => c.passMark != null && c.scaled != null && c.scaled < c.passMark).length, 0);
@@ -1974,6 +2114,8 @@ function buildFlags(s){
         'the current standing, flags or percentiles' + (pb ? '; ' + pb + ' NBME exam' + (pb === 1 ? ' was' : 's were') +
         ' below the pass mark in that attempt' : '') + '.'});
   }
+  /* in Phase 2, its own red flags decide the standing */
+  if(s.phase >= 2) return out.concat(phase2Flags(s));
   const codes = list => list.map(r => r.code).join(', ');
   const count = (n, one, many) => n + ' ' + (n === 1 ? one : many);
 
@@ -2050,7 +2192,8 @@ function buildFlags(s){
           ord(s.skillsPct) + ' — worth naming in the next coaching conversation.'});
 
   /* a sustained downward drift matters more than any single low score */
-  const seqPts = (s.timeline||[]).filter(t => !isPrior(t.rec)).map(t => mean([t.quiz,t.cas,t.osce,t.eval].filter(v=>v!=null)))
+  const seqPts = (s.timeline||[]).filter(t => !isPrior(t.rec) && inScope(s, t.rec))
+    .map(t => mean((isPeaks(t.rec) ? [t.cas] : [t.quiz,t.cas,t.osce,t.eval]).filter(v=>v!=null)))
                                  .filter(v=>v!=null);
   if(seqPts.length >= 6){
     const early = mean(seqPts.slice(0,3)), late = mean(seqPts.slice(-3));
@@ -2071,7 +2214,11 @@ function buildFlags(s){
    below the 25th percentile. Strong performance in the other domain is real,
    and stays visible beside the flag, but does not cancel it. */
 function standingOf(s){
-  const recs = currentRecs(s.records);
+  if(s.phase >= 2){
+    const f = s.flags || buildFlags(s);
+    return f.some(x => x.level === 'crit') ? 'concern' : f.some(x => x.level === 'watch') ? 'watch' : 'ok';
+  }
+  const recs = scopeRecs(s);
   const domains = [s.knowledgePct, s.skillsPct].filter(v => v != null);
   const cb = casBelowPass(s);
   /* NBME exams below the pass mark with no passing retake: a clerkship exam is
@@ -2365,7 +2512,7 @@ function taPct(z){
 
 let DATA = hydrate(buildSampleData());
 const state = {
-  cohort:null, program:'all', advisor:'all', ccm:'all', phase:'all', standing:'all', emphasis:'knowledge', q:'',
+  cohort:null, program:'all', advisor:'all', ccm:'all', phase:'all', standing:'all', flag:'all', emphasis:'knowledge', q:'',
   reviewWatch:false,
   sort:{key:'knowledge', dir:'desc'}, student:null
 };
@@ -2388,6 +2535,21 @@ const ovOf = s => { const A = twoAxes(s.cohort), O = A && A.overall; return O &&
 const nbOf = s => stand(s).nbme, belowOf = s => stand(s).nbmeBelow || 0;
 function inPhase(rec){ return state.phase === 'all' || String(rec.phase) === state.phase }
 
+/* The Flag filter: students carrying a flag of one kind (Monitor or
+   Academic concern - not the notes), by the flag's wording */
+const FLAG_FILTERS = [
+  ['step', 'USMLE Step failure', /USMLE Step/],
+  ['nbmefail', 'Shelf or NBME exam below its pass mark', /NBME exams? below (the pass mark|\d)|shelf exams? below the pass mark/],
+  ['near', 'Shelf within ' + 5 + ' points of its pass mark', /points of the pass mark/],
+  ['grade', 'Clerkship failure, Pass, Incomplete; failed or remediated block', /clerkship failure|grades? of Pass|Incomplete or not|failed block|after remediation/],
+  ['obs', 'Direct observation, OSCE or DO Week below standard', /direct observations? below|OSCEs? below/],
+  ['ce', 'Clinical evaluation below 3', /clinical evaluation/],
+  ['owed', 'Assessment owed', /owed/],
+  ['nbmelow', 'Phase 1: low NBME percentile or knowledge standing', /NBME assessments? below the|Medical knowledge standing/],
+  ['clin', 'Phase 1: clinical skills standing', /Clinical skills standing/],
+  ['trend', 'Phase 1: downward trajectory', /Downward trajectory/]];
+const hasFlag = (s, key) => { const f = FLAG_FILTERS.find(f => f[0] === key);
+  return !f || (s.flags || []).some(x => x.level !== 'info' && f[2].test(x.what)) };
 function filtered(){
   const q = state.q.trim().toLowerCase();
   return (DATA.students||[]).filter(s => {
@@ -2397,6 +2559,7 @@ function filtered(){
     if(state.ccm !== 'all' && (s.ccm || '') !== state.ccm) return false;
     if(state.phase !== 'all' && !(s.byPhase && s.byPhase[state.phase])) return false;
     if(state.standing !== 'all' && s.status !== state.standing) return false;
+    if(state.flag !== 'all' && !hasFlag(s, state.flag)) return false;
     if(q && !String(s.id).toLowerCase().includes(q) && !nameOf(s.id).toLowerCase().includes(q)) return false;
     return true;
   });
@@ -2480,6 +2643,7 @@ function describeFilter(){
   if(state.ccm !== 'all') bits.push(state.ccm ? 'CCM ' + state.ccm : 'No CCM set');
   if(state.phase !== 'all') bits.push('Phase ' + state.phase + ' assessments only');
   if(state.standing !== 'all') bits.push(STANDING[state.standing].label);
+  if(state.flag !== 'all') bits.push('Flag: ' + FLAG_FILTERS.find(f => f[0] === state.flag)[1]);
   return bits.join(' · ');
 }
 
@@ -2657,6 +2821,7 @@ function typePercentiles(list){
 function subgroupLabel(){
   const parts = [];
   if(state.standing !== 'all') parts.push((STANDING[state.standing] || {}).label || state.standing);
+  if(state.flag !== 'all') parts.push(FLAG_FILTERS.find(f => f[0] === state.flag)[1].toLowerCase());
   if(state.advisor !== 'all') parts.push('career advisor ' + state.advisor);
   if(state.ccm !== 'all') parts.push('CCM ' + state.ccm);
   if(state.program !== 'all') parts.push(state.program || 'no program');
@@ -3188,7 +3353,8 @@ const LOOKUP_HASH = '28f1339ffc323de47879d9c7d6ec761f8bd4737841daa5c0acb7ab4d6f3
 /* ---------------------------------------------------------------------------
    BREAK-THE-GLASS: who is loading student data, and why
    Loading the data file or the photo folder brings education records into
-   the browser. Before either, the viewer gives their name, role and reason
+   the browser. Before either, the viewer picks their name (only four people
+   have access) and gives a reason
    and the FERPA code, and is told the access is logged. Each load is then
    recorded two ways:
      1. the Office's Microsoft Form opens in a new tab, pre-filled with the
@@ -3262,16 +3428,16 @@ function logAccess(action, file, asOf){
 
 let loadGateThen = null;
 function ferpaGate(why, then){
-  if(ferpaPassed() && whoAmI()){ then(); return }
+  if(ferpaPassed() && whoAmI() && whoAmI().name){ then(); return }
   const form = $('loadGate');
   loadGateThen = then;
-  $('loadGateNote').textContent = why + ' Give your role and reason, and enter the FERPA code to continue.';
+  $('loadGateNote').textContent = why + ' Choose your name, give your reason, and enter the FERPA code to continue.';
   $('loadGateErr').textContent = ''; $('loadGateInput').value = '';
   const who = whoAmI() || {};
-  $('loadGateRole').value = who.role || ''; $('loadGateReason').value = who.reason || '';
+  $('loadGateWho').value = who.name || ''; $('loadGateReason').value = who.reason || '';
   form.hidden = false;
   form.scrollIntoView({block:'nearest'});
-  $('loadGateRole').focus();
+  $('loadGateWho').focus();
 }
 function bootLoadGate(){
   const form = $('loadGate'), input = $('loadGateInput'), err = $('loadGateErr');
@@ -3282,14 +3448,14 @@ function bootLoadGate(){
   if(nudge) $('logNudgeDone').addEventListener('click', () => { nudge.hidden = true });
   form.addEventListener('submit', ev => {
     ev.preventDefault();
-    const role = $('loadGateRole').value, reason = $('loadGateReason').value.trim();
-    if(!role || !reason){ err.textContent = 'Please give your role and reason for access.'; return }
+    const name = $('loadGateWho').value, reason = $('loadGateReason').value.trim();
+    if(!name || !reason){ err.textContent = 'Please choose your name and give your reason for access.'; return }
     if(sha256(input.value.trim().toUpperCase()) !== LOOKUP_HASH){
       err.textContent = 'That code isn’t recognized.';
       input.select();
       return;
     }
-    memFerpa = true; memAccess = {role, reason};
+    memFerpa = true; memAccess = {name, role: 'Authorized viewer', reason};
     try { sessionStorage.setItem('ascendFerpa', LOOKUP_HASH);
           sessionStorage.setItem('ascendAccess', JSON.stringify(memAccess)) } catch(e){}
     input.value = ''; form.hidden = true;
@@ -4263,7 +4429,8 @@ function divergingBars(chartId, tableId, items, opts){
 }
 
 function renderSkillDomains(s){
-  const refs = (DATA.refs||{})[s.cohort] || {domains:{}};
+  const L = skillLens(s);
+  const refs = {domains: L.ref}, sd = {skillDomains: L.dom};
   const host = $('domainChart'); host.textContent = '';
   /* one panel per ACGME competency: the competency's score against the class
      mean, then every domain that makes it up with its own score and mean */
@@ -4271,9 +4438,9 @@ function renderSkillDomains(s){
   const tone = d => d <= -5 ? 'neg' : d >= 5 ? 'pos' : 'flat';
   const grid = elc('div','acgrid'), tab = [];
   SKILL_ACGME.forEach(([name, ds]) => {
-    const own = ds.filter(d => s.skillDomains && s.skillDomains[d] != null && refs.domains && refs.domains[d] != null);
+    const own = ds.filter(d => sd.skillDomains[d] != null && refs.domains[d] != null);
     if(!own.length) return;
-    const v = acgmeScore(s.skillDomains, own), r = acgmeScore(refs.domains, own), dv = v - r;
+    const v = acgmeScore(sd.skillDomains, own), r = acgmeScore(refs.domains, own), dv = v - r;
     const p = elc('div','acpanel');
     const hd = elc('div','achd');
     hd.appendChild(elc('div','acname', name));
@@ -4284,7 +4451,7 @@ function renderSkillDomains(s){
     tab.push([name, v, r, sign(dv)]);
     if(ds.length > 1 || own[0] !== name){
       own.forEach(d => {
-        const a = s.skillDomains[d], b = refs.domains[d], dd = a - b;
+        const a = sd.skillDomains[d], b = refs.domains[d], dd = a - b;
         const row = elc('div','acrow');
         row.appendChild(elc('span','acd', d));
         const tr = elc('span','actrack');
@@ -4298,10 +4465,10 @@ function renderSkillDomains(s){
     }
     grid.appendChild(p);
   });
-  if(!grid.children.length){ host.appendChild(emptyDiv('No OSCE or clinical evaluation domain scores on record yet.')); }
+  if(!grid.children.length){ host.appendChild(emptyDiv(L.phase === 2 ? 'No clerkship clinical evaluations on record yet.' : 'No POM clinical skills scores on record yet.')); }
   else {
     host.appendChild(grid);
-    host.appendChild(elc('p','why', 'Scores on a 0–100 scale (OSCE checklist percent and clinical-evaluation ratings rescaled). ' +
+    host.appendChild(elc('p','why', (L.phase === 2 ? 'Phase 2 clerkship clinical evaluations only (faculty ratings 1–5, rescaled to 0–100; nothing from POM). ' : 'Phase 1 POM clinical skills: OSCE checklist percent and evaluation ratings on a 0–100 scale. ') + 'Compared with the class mean from the same source. ' +
       'Bars run left of the centre line when below the class mean and right when above (10 points = full half); red or blue once the gap is 5 points or more.'));
   }
   buildTable($('domainTable'), [{label:'ACGME competency · domain'},{label:'This student',num:true},{label:'Class mean',num:true},{label:'Difference',num:true}],
@@ -4397,6 +4564,99 @@ function renderDirectObs(host, s){
 }
 
 /* ---------------- flags & narrative ---------------- */
+/* ---------------- support signals (anticipatory counseling) ----------------
+   Patterns seen across earlier classes in the Office's cohort analysis ("Who
+   struggles, and what predicts it", Classes of 2023-2030, draft v4, 11 Oct
+   2026). They are NOT predictions about the student and are not part of the
+   standing: each names what in this record matches a pattern, what that
+   pattern went with in earlier classes, and a support to consider - and is
+   shown only while the outcome it relates to is still ahead. */
+const SUPPORT_SOURCE = 'Office of Curricular Affairs cohort analysis “Who struggles, and what predicts it” (Classes of 2023–2030, draft v4, 11 Oct 2026).';
+function classRank(s, valOf){
+  const v = valOf(s); if(v == null) return null;
+  const pool = (DATA.students || []).filter(o => o.cohort === s.cohort).map(valOf).filter(x => x != null);
+  if(pool.length < 5) return null;
+  return Math.round(100 * (pool.filter(x => x < v).length + (pool.filter(x => x === v).length - 1) / 2) / pool.length);
+}
+function supportSignals(s){
+  const out = [], recs = currentRecs(s.records), us = usmleOf(s);
+  const step1Passed = !!(us.STEP1 && us.STEP1.result === 'Pass'), step2Done = !!us.STEP2CK;
+  const shelfDone = recs.filter(r => r.kind === 'clerkship' && SHELF_CODES.includes(r.code) && casList(r).length).length;
+  const shelvesAhead = s.phase < 2 || shelfDone < SHELF_CODES.length;
+  /* 1. Phase 1 NBME exams below the pass mark in the first semester (first sittings, no CBSE) */
+  const p1 = recs.filter(r => r.phase === 1 && !isClerkshipRec(r) && !isPeaks(r));
+  const first = p1.map(r => r.start).filter(Boolean).sort()[0];
+  if(s.phase < 2 && first){
+    const semEnd = (+first.slice(0, 4) + (+first.slice(5, 7) >= 7 ? 1 : 0)) + '-01-01';
+    const seen = new Set(); const low = [];
+    p1.filter(r => (r.start || '') < semEnd).forEach(r => casList(r).forEach(c => {
+      const k = r.code + '|' + examName(c.label);
+      if(c.passMark == null || c.scaled == null || seen.has(k) || /retake/i.test(c.label || '')) return; seen.add(k);
+      if(c.scaled < c.passMark) low.push(r.code + ' ' + fmtScaled(c.scaled) + '%');
+    }));
+    if(low.length >= 2)
+      out.push({what: low.length + ' first-semester NBME exams below the pass mark',
+        mine: low.join(', ') + '.',
+        seen: 'Classes of 2028–2029 (n = 246): 60% of students with two or more first-semester exams below 65% had two or more further exams below 65% later, against 3% of those with none.',
+        support: 'An early study plan with a learning specialist; NBME-style practice ahead of each module exam.'});
+  }
+  /* 2. Phase 1 knowledge in the bottom quarter of the class, with shelves or Step 2 CK still ahead */
+  const kp = classRank(s, o => o.byPhase && o.byPhase[1] ? o.byPhase[1].knowledge : null);
+  if(kp != null && kp < 25 && (shelvesAhead || !step2Done))
+    out.push({what: 'Phase 1 knowledge in the bottom quarter of the class',
+      mine: 'Phase 1 medical knowledge at the ' + ord(kp) + ' percentile of the Class of ' + s.cohort + ' (a quarter of every class sits here by construction).',
+      seen: 'Students in the bottom Phase 1 quarter were three to four times as likely to have a shelf more than 1 SD below the national mean (Class of 2028: 48% against 14%). ' +
+            'Preclinical performance also tracks Step 2 CK, about 10 points per SD; 45% of the bottom quarter landed in the Step 2 CK bottom quartile (legacy classes, n = 515).',
+      support: 'Shelf preparation planned from the first week of each clerkship; a check-in after the first shelf.'});
+  /* 3. CBSE in the bottom quarter of the class, before Step 1 (still in Phase 1: clerkships require Step 1) */
+  const cb = cbseOf(s), cp = cb && !cb.prior ? cbsePct(s, cb.cas.scaled) : null;
+  if(cp != null && cp < 25 && !step1Passed && s.phase < 2)
+    out.push({what: 'CBSE in the bottom quarter of the class',
+      mine: 'CBSE ' + Math.round(cb.cas.scaled) + ', the ' + ord(cp) + ' percentile of the class; no Step 1 pass on record yet.',
+      seen: 'Both Class of 2028 Step 1 failures came from the CBSE bottom quarter (3rd and 6th percentiles): 2 of 32 there, 0 of 86 above it.',
+      support: 'A Step 1 readiness review before the exam date is set; a dedicated-study plan with the learning specialist.'});
+  /* 4. a shelf more than 1 SD below the national mean, Step 2 CK not yet taken */
+  if(!step2Done){
+    const weak = [];
+    recs.filter(r => r.kind === 'clerkship').forEach(r => {
+      const c = casList(r).find(c => c.scaled != null && !/retake/i.test(c.label || ''));
+      if(c && c.natlMean != null && c.natlSd) { const z = (c.scaled - c.natlMean) / c.natlSd; if(z < -1) weak.push(r.code + ' ' + fmtScaled(c.scaled) + ' (' + z.toFixed(1) + ' SD)') }
+    });
+    if(weak.length)
+      out.push({what: weak.length === 1 ? 'A shelf more than 1 SD below the national mean' : weak.length + ' shelves more than 1 SD below the national mean',
+        mine: weak.join(', ') + '; Step 2 CK not yet on record.',
+        seen: 'For Step 2 CK, the weakest shelf was the better shelf signal (Class of 2027, r = 0.46); the CCSE, once sat, is the strongest (r = 0.77, Step 2 CK ≈ 137 + 0.52 × CCSE). Weak shelves are common even among strong students.',
+        support: 'Plan Step 2 CK timing around a CCSE result; targeted review of the weaker disciplines.'});
+  }
+  /* 5. Step 1 not passed on the first attempt, Step 2 CK not yet taken */
+  if(us.STEP1 && us.STEP1.result !== 'Pass' && !step2Done)
+    out.push({what: 'Step 1 not passed on the first attempt',
+      mine: 'Step 1: ' + us.STEP1.result + '; Step 2 CK not yet on record.',
+      seen: 'In earlier classes a Step 1 delay or failure went with a Step 2 CK about 0.9 SD lower later.',
+      support: 'Early Step 2 CK planning, with the CCSE as a readiness check.'});
+  return out;
+}
+function renderSupport(host, s){
+  host.textContent = '';
+  const sig = supportSignals(s);
+  if(!sig.length) host.appendChild(elc('div','empty','No support signal in this record: nothing here matches a pattern that went with later difficulty in earlier classes.'));
+  else {
+    const ul = elc('ul','flags support');
+    sig.forEach(f => {
+      const li = elc('li');
+      const ic = elc('span','ic','◆'); ic.style.color = cssv('--s4'); ic.setAttribute('aria-hidden','true');
+      const txt = elc('div');
+      txt.appendChild(elc('div','fx', f.what));
+      txt.appendChild(elc('div','fy', f.mine));
+      const seen = elc('div','fy'); seen.appendChild(elc('b', null, 'In earlier classes: ')); seen.append(f.seen); txt.appendChild(seen);
+      const sup = elc('div','fy'); sup.appendChild(elc('b', null, 'Support to consider: ')); sup.append(f.support); txt.appendChild(sup);
+      li.appendChild(ic); li.appendChild(txt); ul.appendChild(li);
+    });
+    host.appendChild(ul);
+  }
+  host.appendChild(elc('p','why stdnote', 'Not well predicted, so not shown: clerkship grades below Honors (knowledge measures do not foresee them) and legacy Step 1 delays (often planned). Source: ' + SUPPORT_SOURCE));
+}
+
 function renderFlags(host, s){
   host.textContent = '';
   const flags = s.flags || [];
@@ -5116,7 +5376,7 @@ function renderStudent(s){
   /* The NBME content areas that exist in the data are the clerkship exams'
      own, drawn exam by exam in the card above; there is no national
      content-area report to profile, so no card pretends to one. */
-  const dBody = makeCard(host, 'Clinical skills by ACGME competency',
+  const dBody = makeCard(host, 'ACGME competencies (' + skillLens(s).label + ')',
     'Where the bedside strengths and gaps are',
     'One panel per ACGME competency: the competency against the class mean, then each domain that makes it up. ' +
     'Medical Knowledge is the NBME side.', 'domainTable');
@@ -5126,6 +5386,12 @@ function renderStudent(s){
   const fBody = makeCard(host, 'Review', 'What needs a conversation', null, null);
   const fHost = elc('div'); fHost.id = 'flagHost'; fBody.appendChild(fHost);
   renderFlags(fHost, s);
+
+  const sBody = makeCard(host, 'Anticipatory support', 'Support signals',
+    'Patterns from earlier classes that match something in this record, to start an early, supportive conversation. ' +
+    'They are not predictions about this student, and they do not change the standing.', null);
+  const sHost = elc('div'); sBody.appendChild(sHost);
+  renderSupport(sHost, s);
 
   /* the full log runs to hundreds of rows: folded until asked for */
   const lBody = makeCard(host, 'Source data', 'Complete assessment log',
@@ -5402,7 +5668,12 @@ function renderReview(list){
   const want = new Set(['concern'].concat(state.reviewWatch ? ['watch'] : []));
   const picked = list.filter(s => want.has(s.status));
   const worst = s => Math.min(...[kOf(s), skOf(s)].filter(v => v != null).concat([101]));
-  picked.sort((a, b) => (a.status === b.status ? 0 : a.status === 'concern' ? -1 : 1) || worst(a) - worst(b));
+  /* the most serious first: a USMLE Step failure, a clerkship failure, a
+     shelf failure; then the other Academic concerns; then Monitor */
+  const rank = s => { const w = (s.flags || []).filter(f => f.level === 'crit').map(f => f.what).join(' | ');
+    return /USMLE Step/.test(w) ? 0 : /clerkship failure/.test(w) ? 1 : /shelf exams? below the pass mark/.test(w) ? 2
+         : s.status === 'concern' ? 3 : 4 };
+  picked.sort((a, b) => rank(a) - rank(b) || worst(a) - worst(b));
   $('reviewTitle').textContent = picked.length
     ? picked.length + (picked.length === 1 ? ' student' : ' students') + ' needing attention, side by side'
     : 'Students needing attention, side by side';
@@ -5450,25 +5721,28 @@ function renderReview(list){
     if(url){ ph.src = url; ph.alt = 'Photo of ' + whoOf(s) } else ph.setAttribute('aria-hidden','true');
     head.appendChild(ph);
     const hl = elc('div','rv-id');
+    /* standing first, so the name and code have the card's width beside the photo */
+    const side = elc('div','rv-side'); side.appendChild(chipFor(s.status));
+    hl.appendChild(side);
     const rvName = nameOf(s.id);
     if(rvName) hl.appendChild(elc('div','rv-name', rvName));
     hl.appendChild(elc('div','rv-code', s.id));
-    hl.appendChild(elc('div','rv-meta', 'Class of ' + s.cohort + (s.program ? ' · ' + s.program : '') +
+    head.appendChild(hl);
+    /* beneath, across the card: class, block, advisors, then the licensing exams on record */
+    const wide = elc('div','rv-wide');
+    wide.appendChild(elc('div','rv-meta', 'Class of ' + s.cohort + (s.program ? ' · ' + s.program : '') +
       (s.current ? ' · in ' + s.current.code : '')));
     if(s.careerAdvisor || s.ccm)
-      hl.appendChild(elc('div','rv-meta', [s.careerAdvisor && 'Advisor ' + s.careerAdvisor, s.ccm && 'CCM ' + s.ccm]
+      wide.appendChild(elc('div','rv-meta', [s.careerAdvisor && 'Advisor ' + s.careerAdvisor, s.ccm && 'CCM ' + s.ccm]
         .filter(Boolean).join(' · ')));
-    head.appendChild(hl);
-    /* right: standing, then the licensing exams on record beneath it */
-    const side = elc('div','rv-side'); side.appendChild(chipFor(s.status));
     const ex = elc('div','rv-exams');
     const cbx = cbseOf(s), us = usmleOf(s);
     const line = (k, v, bad) => { const d = elc('div', bad ? 'bad' : null); d.appendChild(elc('span', null, k)); d.appendChild(elc('b', null, v)); ex.appendChild(d) };
     if(cbx) line('CBSE', Math.round(cbx.cas.scaled) + (cbx.prior ? '*' : ''), false);
     if(us.STEP1) line('Step 1', us.STEP1.result === 'Pass with remediation' ? 'Pass (retake)' : us.STEP1.result, us.STEP1.result !== 'Pass');
     if(us.STEP2CK) line('Step 2', us.STEP2CK.scores.length ? String(us.STEP2CK.scores[us.STEP2CK.scores.length - 1]) : us.STEP2CK.result, us.STEP2CK.result !== 'Pass');
-    if(ex.children.length) side.appendChild(ex);
-    head.appendChild(side); card.appendChild(head);
+    if(ex.children.length) wide.appendChild(ex);
+    head.appendChild(wide); card.appendChild(head);
 
     const big = elc('div','rv-big');
     [['Medical knowledge', kOf(s)], ['Clinical skills', skOf(s)]].forEach(([l, v]) => {
@@ -5481,16 +5755,47 @@ function renderReview(list){
 
     /* clinical skills by ACGME competency against the class mean: each
        competency the mean of its domains, student and class alike */
+    const L = skillLens(s);
     const comps = SKILL_ACGME.map(([name, ds]) => {
-      const own = ds.filter(d => s.skillDomains && s.skillDomains[d] != null && refs.domains && refs.domains[d] != null);
-      return own.length ? [name, acgmeScore(s.skillDomains, own) - acgmeScore(refs.domains, own)] : null;
+      const own = ds.filter(d => L.dom[d] != null && L.ref[d] != null);
+      return own.length ? [name, acgmeScore(L.dom, own) - acgmeScore(L.ref, own)] : null;
     }).filter(Boolean);
     if(comps.length){
-      card.appendChild(elc('div','rv-sec','ACGME competencies vs. class mean'));
+      card.appendChild(elc('div','rv-sec','ACGME competencies (' + L.label + ') vs. class mean'));
       comps.forEach(([name, dv]) => card.appendChild(dvbar(name, dv)));
     }
+    /* every NBME exam: score (dot) against the class median (tick) and the
+       pass mark (amber line) - the same marks as the record's NBME card */
+    const nb = scopeRecs(s).slice().sort((a, b) => (a.start || '') < (b.start || '') ? -1 : 1)
+      .flatMap(r => casList(r).filter(c => c.scaled != null && !/cbse/i.test(c.label || '')).map(c => ({r, c})));
+    if(nb.length){
+      const key = elc('div','rv-sec rv-key');
+      key.append('NBME exams \u00b7 score ', elc('span','k-dot','\u25cf'), ', class median ', elc('span','k-md','\u2502'),
+                 ', pass mark ', elc('span','k-pm','\u2503'));
+      card.appendChild(key);
+      const lo = 30, hi = 100, x = v => Math.max(0, Math.min(100, (v - lo) / (hi - lo) * 100));
+      const wrap = elc('div','rv-nb');
+      nb.forEach(({r, c}) => {
+        const below = c.passMark != null && c.scaled < c.passMark;
+        const row = elc('div','rv-nbrow' + (below ? ' below' : ''));
+        const retake = /retake/i.test(c.label || '');
+        const tag = r.code + (isClerkshipRec(r) ? (retake ? ' retake' : '')
+          : casList(r).length > 1 ? ' ' + (/mid/i.test(c.label || '') ? 'mid' : retake ? 'retake' : 'end') : retake ? ' retake' : '');
+        row.appendChild(elc('span','lab', tag));
+        const tr = elc('span','rv-nbtrack');
+        if(c.passMark != null){ const pm = elc('i','pm'); pm.style.left = x(c.passMark) + '%'; tr.appendChild(pm) }
+        if(c.classMedian != null){ const md = elc('i','md'); md.style.left = x(c.classMedian) + '%'; tr.appendChild(md) }
+        const dot = elc('i','dot'); dot.style.left = x(c.scaled) + '%'; tr.appendChild(dot);
+        row.appendChild(tr);
+        row.appendChild(elc('span','val', fmtScaled(c.scaled)));
+        row.title = (c.label || 'NBME exam') + ': ' + fmtScaled(c.scaled) + (c.classMedian != null ? ' \u00b7 class median ' + fmtScaled(c.classMedian) : '') +
+          (c.passMark != null ? ' \u00b7 pass mark ' + c.passMark : '');
+        wrap.appendChild(row);
+      });
+      card.appendChild(wrap);
+    }
     /* knowledge by assessment type, this student's median percentile */
-    const buckets = typePercentiles([s]);
+    const buckets = typePercentiles([Object.assign({}, s, {records: scopeRecs(s)})]);   /* Phase 2 only once in Phase 2 */
     const types = TYPE_META.filter(t => !SUMMARY_HIDE.has(t.key) && buckets[t.key] && buckets[t.key].length);
     /* Phase 1: each NBME CAS exam up front, one row per exam in module order -
        the best single read on knowledge. The other assessment types (quizzes,
@@ -5520,8 +5825,8 @@ function renderReview(list){
       types.forEach(t => card.appendChild(bar(t.short || t.label, Math.round(median(buckets[t.key])))));
     }
     /* what is absolute: failed and remediated blocks */
-    const failed = (s.records||[]).filter(r => r.result === 'Fail');
-    const rem = (s.records||[]).filter(r => /remediation/i.test(r.result || ''));
+    const failed = scopeRecs(s).filter(r => r.result === 'Fail');
+    const rem = scopeRecs(s).filter(r => /remediation/i.test(r.result || ''));
     if(failed.length || rem.length){
       card.appendChild(elc('div','rv-sec','Blocks'));
       const chips = elc('div','rv-chips');
@@ -5739,7 +6044,8 @@ function init(){
     $('studentView').hidden = true; $('cohortView').hidden = false; renderAll();
   });
   bind('fCohort','cohort'); bind('fProgram','program'); bind('fAdvisor','advisor'); bind('fCcm','ccm');
-  bind('fPhase','phase'); bind('fStatus','standing');
+  bind('fPhase','phase'); bind('fStatus','standing'); bind('fFlag','flag');
+  FLAG_FILTERS.forEach(([k, label]) => { const o = document.createElement('option'); o.value = k; o.textContent = label; $('fFlag').appendChild(o) });
   /* Emphasis also decides which column the roster leads with. */
   $('fDomain').addEventListener('change', e => {
     state.emphasis = e.target.value;
@@ -5756,11 +6062,11 @@ function init(){
   });
   $('fClear').addEventListener('click', () => {
     state.cohort = latestCohort(); state.program = 'all'; state.advisor = 'all'; state.ccm = 'all';
-    state.phase = 'all'; state.standing = 'all';
+    state.phase = 'all'; state.standing = 'all'; state.flag = 'all';
     state.emphasis = 'knowledge'; state.q = ''; state.student = null;
     state.sort = {key:'knowledge', dir:'desc'};
     $('fCohort').value = state.cohort; $('fProgram').value = 'all'; $('fAdvisor').value = 'all'; $('fCcm').value = 'all';
-    $('fPhase').value = 'all'; $('fStatus').value = 'all';
+    $('fPhase').value = 'all'; $('fStatus').value = 'all'; $('fFlag').value = 'all';
     $('fDomain').value = 'knowledge'; $('fSearch').value = '';
     $('studentView').hidden = true; $('cohortView').hidden = false;
     renderAll();
