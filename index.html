@@ -410,13 +410,13 @@ const DASHBOARDS = {
     blurb: "A pocket clinical reference for history-taking and physical examination, drawn from Bates' Guide, for clinical skills coaching and direct observation."
   },
   /* Vercel site (13 Oct 2026): a Zoom/Teams transcript in, a written summary out, drafted by
-     Claude. For operational meetings only: it turns away governance transcripts, whose minutes
+     Claude, as a Word draft. For operational meetings only: it turns away governance transcripts, whose minutes
      stay in Governance. Opens for ASCEND, RPS and SUPPORT (plus its own OCS code). */
   meetings: {
     url: "overview/meeting-summaries.html",
     kicker: "Meeting Tools",
-    title: "Meeting Summaries",
-    blurb: "Upload a Zoom or Teams transcript and get a written summary: overview, decisions, action items with owners, and discussion by topic, ready to edit and download as Word."
+    title: "Meeting Minutes Generator",
+    blurb: "Upload a Zoom or Teams transcript and get a Word draft of the minutes straight away: overview, decisions, action items with owners, and discussion by topic, ready for you to edit."
   },
   /* A Claude artifact (shared by link), not a GitHub Pages site. */
   howto: {
@@ -489,8 +489,8 @@ const TIERS = {
   },
   "a42b8352b4c79f604f3ca0f8c703cbd08f648e86099ec682ce98bd4a11286741": {  // SUPPORT
     name: "Governance Support",
-    sub: "The ASCEND Curriculum Governance Dashboard and Meeting Summaries.",
-    // Governance, Meeting Summaries and the How-To Library, on purpose: no student leadership card (13 Oct 2026).
+    sub: "The ASCEND Curriculum Governance Dashboard and the Meeting Minutes Generator.",
+    // Governance, the Meeting Minutes Generator and the How-To Library, on purpose: no student leadership card (13 Oct 2026).
     dashboards: ["governance", "meetings", "howto"],
     pinned: ["governance"]
   }
