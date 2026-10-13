@@ -230,11 +230,11 @@
    "views": [
     {
      "title": "Library",
-     "blurb": "34 instruments grouped by course, skill domain, assessment, format or 2026-27 status, each with its scoring and pass rules and the original Word or PDF file."
+     "blurb": "34 instruments grouped by module, skill domain, assessment, format or 2026-27 status, each with its scoring and pass rules and the original Word or PDF file."
     },
     {
      "title": "All items",
-     "blurb": "Every checklist item, rubric anchor, SP answer and quiz question in one searchable list, filterable by area (clinical skills or cognitive), course, domain, scorer, audience and competency."
+     "blurb": "Every checklist item, rubric anchor, SP answer and quiz question in one searchable list, filterable by area (clinical skills or cognitive), module, domain, scorer, audience and competency."
     },
     {
      "title": "Compare",
