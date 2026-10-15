@@ -433,6 +433,14 @@ const DASHBOARDS = {
     title: "Remove Student Names",
     blurb: "Take student names, usernames, IDs and emails out of a gradebook or export before it goes in a dashboard inbox. Works in your browser; nothing is uploaded."
   },
+  /* Vercel site (15 Oct 2026): the 22 Oct 2026 Curriculum Integration Retreat. Session materials open
+     at set times (held on the server). Opens for the CIS, ASCEND and RPS codes and its own retreat code. */
+  retreat: {
+    url: "overview/integration-retreat.html",
+    kicker: "Curricular Integration",
+    title: "Curriculum Integration Retreat",
+    blurb: "Thursday, October 22, 2026: the schedule, and each session's materials as the session starts. For AOC Directors and Curriculum Thread Leads."
+  },
   /* A Claude artifact (shared by link), not a GitHub Pages site. */
   howto: {
     url: "https://claude.ai/artifact/2RA7WChp13CueGLpEhBaH3",
@@ -457,7 +465,7 @@ const TIERS = {
     // Every dashboard the Hub knows, except Student Performance: that one stays
     // on the RPS tier only, or by its direct URL (and the RPS code). Add a new card's key here too.
     dashboards: ["calendar", "phase1", "clinicalskills", "phase2", "phase3", "nbme",  "objectives", "nutrition", "policies", "surveys", "lcme", "governance", "meetings", "studentleaders",
-                 "navigator", "electives", "babybates", "people", "deid", "howto"],
+                 "navigator", "electives", "babybates", "people", "deid", "howto", "retreat"],
     pinned: ["phase1","phase2","phase3","governance"]
   },
   "255af8d0734e8438d7fcef7cb457da08d130e24f574065175f2ab73ed2ffb360": {  // EEC
@@ -484,8 +492,10 @@ const TIERS = {
   "4ed5cb948f5f7c10d66e38ed679d0e5f0be24469df2de636c2da893d5b06ecb3": {  // CIS
     name: "Curricular Integration Subcommittee",
     sub: "Programmatic assessment across all three phases, clinical skills, objectives, policies, and governance.",
+    // Integration Retreat card added 15 Oct 2026 at the owner's request (pinned until the retreat is over).
     dashboards: ["phase1", "clinicalskills", "phase2", "phase3", "objectives", "nutrition", "policies", "governance", "studentleaders",
-                 "people", "navigator", "electives"]
+                 "people", "navigator", "electives", "retreat"],
+    pinned: ["retreat"]
   },
   "9f8b17ea00b6b3fd1efa6d10aa21cfedc91ba71a26b03557e09576370c157a81": {  // CCM
     name: "Clinical Competency Mentors",
