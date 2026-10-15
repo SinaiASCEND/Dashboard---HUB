@@ -140,6 +140,14 @@ a.card.pinned{background:linear-gradient(180deg,#e9f3fb 0%,#f3f8fd 100%);border-
 a.card.pinned .cardkicker{color:var(--navy2)}
 a.card.pinned[data-key="governance"]{background:linear-gradient(180deg,#fbeaf3 0%,#fdf5f9 100%);border-color:#e9b6d3;border-top-color:var(--magenta)}
 a.card.pinned[data-key="governance"] .cardgo{color:var(--magenta)}
+/* Integration Retreat (Oct 2026): full-width dark banner at the top of the tier, so it reads as an event, not a dashboard. */
+a.card[data-key="retreat"]{grid-column:1/-1;background:linear-gradient(120deg,#0A1F44 0%,#221F72 55%,#5B2A86 100%);border:0;border-top:3px solid var(--magenta)}
+a.card[data-key="retreat"] .cardkicker{color:#7FD3F2}
+a.card[data-key="retreat"] .cardtitle{color:#fff;font-size:21px}
+a.card[data-key="retreat"] .cardblurb{color:#D9DDF0}
+a.card[data-key="retreat"] .cardgo{color:#fff}
+a.card[data-key="retreat"] .favstar{color:#B9BFD8}
+a.card[data-key="retreat"] .favstar:hover{background:rgba(255,255,255,.12)}
 a.card:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
 .cardkicker{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:800;color:var(--muted);margin-bottom:8px}
 .cardtitle{font-size:18px;font-weight:800;line-height:1.25;margin-bottom:8px;color:var(--navy)}
@@ -433,6 +441,14 @@ const DASHBOARDS = {
     title: "Remove Student Names",
     blurb: "Take student names, usernames, IDs and emails out of a gradebook or export before it goes in a dashboard inbox. Works in your browser; nothing is uploaded."
   },
+  /* Vercel site (15 Oct 2026): the 22 Oct 2026 Curriculum Integration Retreat. Session materials open
+     at set times (held on the server). Opens for the CIS, ASCEND and RPS codes and its own retreat code. */
+  retreat: {
+    url: "overview/integration-retreat.html",
+    kicker: "Curricular Integration",
+    title: "Curriculum Integration Retreat",
+    blurb: "Thursday, October 22, 2026: the schedule, and each session's materials as the session starts. For AOC Directors and Curriculum Thread Leads."
+  },
   /* A Claude artifact (shared by link), not a GitHub Pages site. */
   howto: {
     url: "https://claude.ai/artifact/2RA7WChp13CueGLpEhBaH3",
@@ -457,8 +473,8 @@ const TIERS = {
     // Every dashboard the Hub knows, except Student Performance: that one stays
     // on the RPS tier only, or by its direct URL (and the RPS code). Add a new card's key here too.
     dashboards: ["calendar", "phase1", "clinicalskills", "phase2", "phase3", "nbme",  "objectives", "nutrition", "policies", "surveys", "lcme", "governance", "meetings", "studentleaders",
-                 "navigator", "electives", "babybates", "people", "deid", "howto"],
-    pinned: ["phase1","phase2","phase3","governance"]
+                 "navigator", "electives", "babybates", "people", "deid", "howto", "retreat"],
+    pinned: ["retreat","phase1","phase2","phase3","governance"]
   },
   "255af8d0734e8438d7fcef7cb457da08d130e24f574065175f2ab73ed2ffb360": {  // EEC
     name: "Executive Education Committee",
@@ -484,8 +500,10 @@ const TIERS = {
   "4ed5cb948f5f7c10d66e38ed679d0e5f0be24469df2de636c2da893d5b06ecb3": {  // CIS
     name: "Curricular Integration Subcommittee",
     sub: "Programmatic assessment across all three phases, clinical skills, objectives, policies, and governance.",
+    // Integration Retreat card added 15 Oct 2026 at the owner's request (pinned until the retreat is over).
     dashboards: ["phase1", "clinicalskills", "phase2", "phase3", "objectives", "nutrition", "policies", "governance", "studentleaders",
-                 "people", "navigator", "electives"]
+                 "people", "navigator", "electives", "retreat"],
+    pinned: ["retreat"]
   },
   "9f8b17ea00b6b3fd1efa6d10aa21cfedc91ba71a26b03557e09576370c157a81": {  // CCM
     name: "Clinical Competency Mentors",
@@ -500,7 +518,7 @@ const TIERS = {
     // Always every card in DASHBOARDS, so a new card shows here without being listed.
     // Student Performance shows only here.
     dashboards: Object.keys(DASHBOARDS),
-    pinned: ["studentperf","phase1","phase2","phase3","governance"]
+    pinned: ["retreat","studentperf","phase1","phase2","phase3","governance"]
   },
   "a42b8352b4c79f604f3ca0f8c703cbd08f648e86099ec682ce98bd4a11286741": {  // SUPPORT
     name: "Governance Support",

@@ -389,6 +389,35 @@
    ]
   },
   {
+   "slug": "integration-retreat",
+   "key": "retreat",
+   "kicker": "Curricular Integration",
+   "title": "Curriculum Integration Retreat",
+   "short": "Integration Retreat",
+   "audience": "AOC Directors and Curriculum Thread Leads, and the CIS members who work with them, for the retreat on Thursday, October 22, 2026.",
+   "intro": "The schedule and session materials for the Curriculum Integration Retreat. Each session's materials open on the page when the session starts, so check back during the day. Your Hub code opens it.",
+   "primaryAbs": "https://ascend-integration-retreat.vercel.app/",
+   "unlock": "https://ascend-integration-retreat.vercel.app/api/unlock",
+   "views": [
+    {
+     "title": "Today",
+     "blurb": "A countdown before the day; during it, the session happening now and what comes next."
+    },
+    {
+     "title": "Schedule",
+     "blurb": "Seven sessions from 9:00 to 4:00, with who leads each, what you will do, and the outcome."
+    },
+    {
+     "title": "Materials",
+     "blurb": "Handouts, the Nutrition worked example and the Milestone Map worksheet, each opening at its session's start time."
+    },
+    {
+     "title": "Before you arrive",
+     "blurb": "What to bring, what has changed since the pre-retreat assignment, and the assignment itself."
+    }
+   ]
+  },
+  {
    "slug": "policies",
    "key": "policies",
    "kicker": "Policies",
