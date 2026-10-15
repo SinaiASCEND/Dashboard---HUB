@@ -345,6 +345,11 @@
      "url": "PMB-MLOs/milestones.html"
     },
     {
+     "title": "Clinical Skills Milestones",
+     "blurb": "Nine clinical skill strands across the three phase gates: milestone, observable behaviors, teaching, in-course assessment and the PEAKS gate assessment.",
+     "url": "PMB-MLOs/clinical-skills.html"
+    },
+    {
      "title": "Nutrition Milestones",
      "blurb": "One JAMA nutrition competency (#5, nutrition assessment) carried through the three phase gates: milestone, objectives, observable behaviors, teaching and assessment.",
      "url": "PMB-MLOs/nutrition.html"
@@ -353,6 +358,39 @@
      "title": "MEPO Outcomes",
      "blurb": "Each program objective traced through its assessments and measures, with cohort and threshold views.",
      "url": "MEPO-Outcomes-Dashboard/"
+    }
+   ]
+  },
+  {
+   "slug": "clinical-skills-milestones",
+   "key": "csmilestones",
+   "kicker": "Clinical Skills",
+   "title": "Clinical Skills Milestones",
+   "short": "Clinical Skills Milestones",
+   "audience": "Clinical Competency Mentors, POM, clerkship, Acting Internship, Chronic Care and TTR directors, the Curricular Integration Subcommittee, and OCA leadership. Draft content for review.",
+   "intro": "One ladder of clinical skill milestones that anchors teaching and assessment from the Practice of Medicine to residency. Nine skill strands, from history taking to social and structural context, each followed across the three phase gates: the end of Phase 1, the end of Phase 2, and the end of Phase 3 after the Acting Internships, Chronic Care Clerkship and Transition to Residency. Each strand rolls up to the program objectives (MEPOs) and AAMC Core EPAs.",
+   "primary": "PMB-MLOs/clinical-skills.html",
+   "views": [
+    {
+     "title": "Milestones by strand and phase",
+     "blurb": "What the student can do at each gate, in what setting and how independently, for all nine strands."
+    },
+    {
+     "title": "Observable behaviors",
+     "blurb": "The checklist a rater uses at each gate: the same items in every rubric, with the expected level rising by phase."
+    },
+    {
+     "title": "Where it is taught",
+     "blurb": "POM sessions from the curriculum map, clerkship experiences, Acting Internships, the Chronic Care Clerkship and TTR modules."
+    },
+    {
+     "title": "Assessment and gate assessment",
+     "blurb": "In-course assessments with curriculum-map codes, and the end-of-phase PEAKS capstone (PEAKS III is the TTR final assessment), each marked existing or proposed."
+    },
+    {
+     "title": "Why this layer exists",
+     "blurb": "The explainer: the problems it solves, how it is built and the decisions still open.",
+     "url": "https://claude.ai/artifact/QrWXhUxQfixYjHhABj31Sx"
     }
    ]
   },
