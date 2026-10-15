@@ -345,9 +345,46 @@
      "url": "PMB-MLOs/milestones.html"
     },
     {
+     "title": "Nutrition Milestones",
+     "blurb": "One JAMA nutrition competency (#5, nutrition assessment) carried through the three phase gates: milestone, objectives, observable behaviors, teaching and assessment.",
+     "url": "PMB-MLOs/nutrition.html"
+    },
+    {
      "title": "MEPO Outcomes",
      "blurb": "Each program objective traced through its assessments and measures, with cohort and threshold views.",
      "url": "MEPO-Outcomes-Dashboard/"
+    }
+   ]
+  },
+  {
+   "slug": "nutrition-milestones",
+   "key": "nutrition",
+   "kicker": "Curriculum Mapping",
+   "title": "Nutrition Milestones",
+   "short": "Nutrition Milestones",
+   "audience": "The Nutrition Content Area Director, module and clerkship directors, all EEC subcommittees, the EEC, and OCA leadership. Draft content for review by the Nutrition Content Area Director, PCCS and CCS.",
+   "intro": "End-of-phase milestones for nutrition, built on the Milestones Map framework. It takes one competency from the JAMA nutrition competencies for medical students (Eisenberg et al., 2024), #5: assessing a patient's nutritional status with a brief diet history, measurements and lab tests. It follows that competency from the end of Phase 1 to residency readiness, and marks what is already taught and what is proposed.",
+   "primary": "PMB-MLOs/nutrition.html",
+   "views": [
+    {
+     "title": "Milestone statements",
+     "blurb": "What a student must demonstrate at the end of Phase 1 (simulated), Phase 2 (core clerkships) and Phase 3 (Chronic Care Clerkship and Acting Internships), with Miller level, supervision and criterion."
+    },
+    {
+     "title": "Learning objectives",
+     "blurb": "Six objectives per phase, each tagged to MEPOs and related JAMA competencies, with where it is taught."
+    },
+    {
+     "title": "Observable behaviors",
+     "blurb": "The checklist a rater uses to see the milestone: eight or nine behaviors per phase."
+    },
+    {
+     "title": "Teaching and assessment",
+     "blurb": "Instructional methods and assessment methods (with curriculum-map AM codes), each marked existing, expand or new."
+    },
+    {
+     "title": "Current coverage",
+     "blurb": "The Phase 1 nutrition sessions on the master curriculum map and all 36 JAMA competencies with their coverage."
     }
    ]
   },
