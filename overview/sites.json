@@ -356,7 +356,7 @@
     {
      "title": "MEPO Outcomes",
      "blurb": "Each program objective traced through its assessments and measures, with cohort and threshold views.",
-     "url": "MEPO-Outcomes-Dashboard/"
+     "url": "https://ascend-clinical-skills.vercel.app/mepo/"
     }
    ]
   },
