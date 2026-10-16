@@ -335,6 +335,14 @@ const DASHBOARDS = {
     title: "Clinical Skills Portal",
     blurb: "Three linked dashboards: student performance by clinical skill domain and the checklists, rubrics and quizzes behind those scores for POM 1 through PEAKS 1 (rubrics for faculty and staff only), and the clinical skills milestones for each phase, from POM to residency."
   },
+  /* Bates Faculty Guides (16 Oct 2026): the CCM session guides, served behind the Clinical Skills Portal's gate at
+     /bates-guides/; the portal's middleware decides who may open it. */
+  batesguides: {
+    url: "overview/bates-faculty-guides.html",
+    kicker: "Clinical Skills",
+    title: "Bates Faculty Guides",
+    blurb: "The CCM faculty guides for the POM 1 core physical exam sessions, each step linked to the Bates' Visual Guide video (with timestamps) and the Bates' Guide 14e passage. Faculty and staff only."
+  },
   phase2: {
     url: "overview/phase-2-assessment.html",
     kicker: "Programmatic Assessment",
@@ -481,7 +489,7 @@ const TIERS = {
     sub: "Full access \u2014 all monitoring, mapping, governance, and accreditation views.",
     // Every dashboard the Hub knows, except Student Performance: that one stays
     // on the owner's tier only, or by its direct URL. Add a new card's key here too.
-    dashboards: ["calendar", "phase1", "clinicalskills", "phase2", "phase3", "nbme",  "objectives", "nutrition", "policies", "surveys", "lcme", "governance", "meetings", "studentleaders",
+    dashboards: ["calendar", "phase1", "clinicalskills", "batesguides", "phase2", "phase3", "nbme",  "objectives", "nutrition", "policies", "surveys", "lcme", "governance", "meetings", "studentleaders",
                  "navigator", "electives", "babybates", "people", "deid", "howto", "retreat", "assessmentreports"],
     pinned: ["retreat","phase1","phase2","phase3","governance"]
   },
@@ -516,8 +524,8 @@ const TIERS = {
   },
   "9f8b17ea00b6b3fd1efa6d10aa21cfedc91ba71a26b03557e09576370c157a81": {
     name: "Clinical Competency Mentors",
-    sub: "Clinical skills, the Baby Bates reference, and student navigation tools to guide mentoring conversations.",
-    dashboards: ["clinicalskills", "babybates", "people", "navigator", "electives", "studentleaders"]
+    sub: "Clinical skills, the Bates Faculty Guides for teaching the exam sessions, the Baby Bates reference, and student navigation tools to guide mentoring conversations.",
+    dashboards: ["clinicalskills", "batesguides", "babybates", "people", "navigator", "electives", "studentleaders"]
   },
   "b9b2b6f01aa767c022763ca563e0882c08635da21f2519dc7b02564aaf0aa9ba": {
     // The owner's own tier. Named for the tier, not its first card

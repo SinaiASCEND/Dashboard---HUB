@@ -231,6 +231,36 @@
    "unlock": "https://ascend-clinical-skills.vercel.app/api/unlock"
   },
   {
+   "slug": "bates-faculty-guides",
+   "key": "batesguides",
+   "kicker": "Clinical Skills",
+   "title": "Bates Faculty Guides",
+   "short": "the Bates Faculty Guides",
+   "audience": "Clinical Competency Mentors who teach the POM 1 physical exam sessions, and Office of Curricular Affairs faculty and staff. Faculty material: the guides sit behind the Clinical Skills Portal's server-side gate, and your Hub code opens them if your role allows.",
+   "intro": "The CCM faculty guides for the POM 1 core physical exam sessions (Sessions 12 to 15), laid out for reading on a laptop or phone. Each guide's faculty-cue column, timeline and appendices link to the Bates' Visual Guide clip that shows the step, with the time to skip to, and to the passage in RP Soriano et al, Bates' Guide to Physical Examination and History Taking, 14th edition. The student versions of the exam steps are on Baby Bates.",
+   "views": [
+    {
+     "title": "Session 12: Cardiovascular",
+     "blurb": "Vital signs, carotid arteries, cardiac exam, peripheral pulses and edema."
+    },
+    {
+     "title": "Session 13: Cardiopulmonary",
+     "blurb": "Chest landmarks, respiration, percussion and auscultation, with a cardiac recap."
+    },
+    {
+     "title": "Session 14: Abdominal",
+     "blurb": "Illness scripts, the SP interview, inspection, auscultation, palpation and the liver edge."
+    },
+    {
+     "title": "Session 15: Head, Neck & Cranial Nerves",
+     "blurb": "Cranial nerves II to XII, otoscopy, oral cavity, lymph nodes, thyroid and carotids."
+    }
+   ],
+   "primaryAbs": "https://ascend-clinical-skills.vercel.app/bates-guides/",
+   "unlock": "https://ascend-clinical-skills.vercel.app/api/unlock",
+   "unlockTo": "/bates-guides/"
+  },
+  {
    "slug": "phase-2-assessment",
    "key": "phase2",
    "kicker": "Programmatic Assessment",
