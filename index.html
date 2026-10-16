@@ -441,6 +441,15 @@ const DASHBOARDS = {
     title: "Remove Student Names",
     blurb: "Take student names, usernames, IDs and emails out of a gradebook or export before it goes in a dashboard inbox. Works in your browser; nothing is uploaded."
   },
+  /* Vercel site (12 Oct 2026): one45 module evaluation export -> Module Evaluation Report (Word), with
+     Claude-coded comment themes and prior-year comparison. Its server gate opens for ASCEND, AES and RPS:
+     the exports rate named educators. */
+  assessmentreports: {
+    url: "overview/assessment-reports.html",
+    kicker: "Assessment Tools",
+    title: "Assessment Report Generator",
+    blurb: "Upload a module's one45 evaluation export and get the Module Evaluation Report in Word: summary, rating charts, prior-year comparison, comment themes and educator ratings."
+  },
   /* Vercel site (15 Oct 2026): the 22 Oct 2026 Curriculum Integration Retreat. Session materials open
      at set times (held on the server). Opens for the CIS, ASCEND and RPS codes and its own retreat code. */
   retreat: {
@@ -473,7 +482,7 @@ const TIERS = {
     // Every dashboard the Hub knows, except Student Performance: that one stays
     // on the RPS tier only, or by its direct URL (and the RPS code). Add a new card's key here too.
     dashboards: ["calendar", "phase1", "clinicalskills", "phase2", "phase3", "nbme",  "objectives", "nutrition", "policies", "surveys", "lcme", "governance", "meetings", "studentleaders",
-                 "navigator", "electives", "babybates", "people", "deid", "howto", "retreat"],
+                 "navigator", "electives", "babybates", "people", "deid", "howto", "retreat", "assessmentreports"],
     pinned: ["retreat","phase1","phase2","phase3","governance"]
   },
   "255af8d0734e8438d7fcef7cb457da08d130e24f574065175f2ab73ed2ffb360": {  // EEC
@@ -527,6 +536,15 @@ const TIERS = {
     // Remove Student Names and the How-To Library.
     dashboards: ["governance", "studentleaders", "meetings", "deid", "howto"],
     pinned: ["governance"]
+  },
+  "7299453b621d99c8276fe0e83fa140072a0ab85e1a2be10331ff8f668db65b0c": {  // AES
+    // Added 15 Oct 2026 at the owner's request. Each server-gated site in this list must also accept AES
+    // in its own unlock (Assessment Report Generator, Governance student roster, Meeting Minutes, Remove Student Names).
+    name: "Assessment and Evaluation Subcommittee",
+    sub: "Programmatic assessment across all three phases, exam performance, student surveys, objectives and milestones, and the assessment and meeting tools.",
+    dashboards: ["assessmentreports", "phase1", "phase2", "phase3", "nbme", "surveys", "objectives", "nutrition", "clinicalskills",
+                 "policies", "calendar", "people", "navigator", "studentleaders", "meetings", "deid"],
+    pinned: ["assessmentreports","phase1","phase2","phase3"]
   }
 };
 /* ============================================================ */

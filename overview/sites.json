@@ -629,6 +629,31 @@
      "blurb": "The cleaned file saves to your Downloads, named … DEID. Put it in the dashboard's inbox and delete the original."
     }
    ]
+  },
+  {
+   "slug": "assessment-reports",
+   "key": "assessmentreports",
+   "kicker": "Assessment Tools",
+   "title": "Assessment Report Generator",
+   "short": "the Assessment Report Generator",
+   "audience": "Office of Curricular Affairs staff and the Assessment and Evaluation Subcommittee. The exports rate named educators, so the site opens only with the ASCEND, AES and RPS codes.",
+   "intro": "Upload a module's one45 evaluation export and get the Module Evaluation Report as a Word file: a one-page summary, rating charts, last year's ratings for comparison, themes from student comments, educator ratings and the verbatim module comments. Nothing you upload is stored. Your Hub code opens it.",
+   "primaryAbs": "https://ascend-assessment-reports.vercel.app/",
+   "unlock": "https://ascend-assessment-reports.vercel.app/api/unlock",
+   "views": [
+    {
+     "title": "Upload the one45 export",
+     "blurb": "The module's evaluation export (.xlsx). The site recognizes the module and fills in the cohort, dates and response counts."
+    },
+    {
+     "title": "Review the comment themes",
+     "blurb": "Claude groups every student comment into themes; each needs three or more students. Read the quotes behind a theme, rename it or remove it."
+    },
+    {
+     "title": "Download the Word report",
+     "blurb": "In the Office of Curricular Affairs layout, with 2024-25 and 2025-26 ratings for comparison where the one45 summaries have them."
+    }
+   ]
   }
  ]
 }
