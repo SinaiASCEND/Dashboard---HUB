@@ -142,6 +142,35 @@
    ]
   },
   {
+   "slug": "bates-faculty-guides",
+   "key": "facultyguides",
+   "kicker": "Physical Examination",
+   "title": "Bates Faculty Guides",
+   "short": "Bates Faculty Guides",
+   "audience": "Clinical Competency Mentors and the Office of Curricular Affairs. The guides are faculty material (scripts, expected answers, case findings), so the site sits behind its own server-side gate; your Hub code opens it if your role allows. Students use the matching exam guides on Baby Bates.",
+   "intro": "The Practice of Medicine faculty session guides for the POM 1 core physical exam, rebuilt as pages that read well on a laptop or phone. Each guide is the whole session: outline and timeline, the facilitator script with what to say and ask, the expected responses, and the exam checklist. The guide's faculty cues sit beside the script, with the Bates' Visual Guide video (and the time to skip to) and the Bates' Guide, 14th edition passage for each part of the exam.",
+   "primaryAbs": "https://ascend-bates-faculty-guides.vercel.app/",
+   "unlock": "https://ascend-bates-faculty-guides.vercel.app/api/unlock",
+   "views": [
+    {
+     "title": "Session 12: Cardiovascular",
+     "blurb": "Vital signs, carotid arteries, the cardiac exam, peripheral pulses and edema."
+    },
+    {
+     "title": "Session 13: Cardiopulmonary",
+     "blurb": "Chest landmarks, observing respiration, percussion, auscultation, and adding the cardiac exam."
+    },
+    {
+     "title": "Session 14: Abdominal",
+     "blurb": "Illness scripts, the SP interview, inspection, auscultation, light and deep palpation, and the liver edge."
+    },
+    {
+     "title": "Session 15: Head, Neck & Cranial Nerves",
+     "blurb": "Cranial nerves II–XII, otoscopy, the oral cavity, cervical lymph nodes, thyroid and carotids."
+    }
+   ]
+  },
+  {
    "slug": "people",
    "key": "people",
    "public": true,
