@@ -395,11 +395,11 @@
   {
    "slug": "integration-retreat",
    "key": "retreat",
-   "kicker": "Curricular Integration",
-   "title": "Curriculum Integration Retreat",
-   "short": "Integration Retreat",
+   "kicker": "Faculty Development",
+   "title": "AOC Directors and Thread Leaders Faculty Development Retreat",
+   "short": "Faculty Development Retreat",
    "audience": "AOC Directors and Curriculum Thread Leads, and the CIS members who work with them, for the retreat on Thursday, October 22, 2026.",
-   "intro": "The schedule and session materials for the Curriculum Integration Retreat. Each session's materials open on the page when the session starts, so check back during the day. Your Hub code opens it.",
+   "intro": "The schedule and session materials for the AOC Directors and Thread Leaders Faculty Development Retreat. Each session's materials open on the page when the session starts, so check back during the day. Your Hub code opens it.",
    "primaryAbs": "https://ascend-integration-retreat.vercel.app/",
    "unlock": "https://ascend-integration-retreat.vercel.app/api/unlock",
    "views": [
