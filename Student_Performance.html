@@ -505,6 +505,16 @@ table.opgrid{border-collapse:collapse;width:100%;min-width:680px;font-size:13px}
 .ustile b{font-size:28px;font-weight:800;line-height:1.15;color:var(--ink);font-variant-numeric:tabular-nums}
 .ustile .us{font-size:12px;color:var(--ink-2);max-width:42ch}
 .ustile.bad{border-left-color:var(--crit)}.ustile.bad b{color:var(--crit)}
+.boardhd{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px}
+.boardhd:first-child{margin-top:0}
+.boardchart{display:block;max-width:100%;height:auto;margin-top:6px}
+.boardchart .bband.ok{fill:var(--ok-wash)}.boardchart .bband.watch{fill:var(--warn-wash)}.boardchart .bband.concern{fill:var(--crit-wash)}
+.boardchart .bpass{stroke:var(--crit);stroke-width:1.25;stroke-dasharray:4 3}
+.boardchart .blbl{font-size:10.5px;fill:var(--muted);font-variant-numeric:tabular-nums}
+.boardchart .berr{stroke:var(--context);stroke-width:2;stroke-linecap:round}
+.boardchart .bdot{stroke:var(--surface);stroke-width:1.5}.boardchart .bdot.ok{fill:var(--ok)}
+.boardchart .bdot.watch{fill:var(--warn)}.boardchart .bdot.concern{fill:var(--crit)}
+.boardchart .brow{cursor:pointer;outline:none}.boardchart .brow:hover .bdot,.boardchart .brow:focus .bdot{r:6}
 .ssatrend{display:block;width:100%;max-width:300px;margin-top:6px;overflow:visible}
 .ssatrend .ssapass{stroke:var(--muted);stroke-width:1;stroke-dasharray:3 3}
 .ssatrend .ssaline{fill:none;stroke:var(--s2);stroke-width:1.75}
@@ -1107,6 +1117,24 @@ body.gated{overflow:hidden}
       </div>
     </div>
 
+    <!-- what the practice exams say about Step 1 and Step 2 CK, calibrated on
+         earlier classes' results; advising information, never a standing -->
+    <div class="card" id="boardCard">
+      <div class="cardhd">
+        <div>
+          <div class="kicker">Board readiness &middot; calibrated on earlier classes</div>
+          <h2>Step 1 and Step 2 CK predictor</h2>
+          <p class="why">For students in the current filter who have not sat the exam yet. Each reading comes from the
+            student&rsquo;s latest <strong>standard-paced</strong> practice exam &mdash; the CBSE or CBSSA for Step 1, the CCSE
+            or CCSSA for Step 2 CK &mdash; read against how earlier students with similar scores did on their first attempt.
+            Self-paced sittings are shown but never read. Step 1 is pass/fail, so it reads as a band; Step 2 CK reads as a
+            predicted score with the range 80% of earlier students landed within. A prediction is a prompt for an advising
+            conversation, not a determination, and it never changes a standing.</p>
+        </div>
+      </div>
+      <div class="cardbody" id="boardBody"></div>
+    </div>
+
     <div class="card">
       <div class="cardhd">
         <div>
@@ -1248,6 +1276,9 @@ body.gated{overflow:hidden}
                                   //   pacing "Standard" | "Self-Paced". Practice,
                                   //   not assessment: shown and noted, never
                                   //   counted toward standing.
+     stepDates: {STEP1, STEP2CK}, // optional: planned exam dates (ISO), for a
+                                  //   step not yet on record - the predictor
+                                  //   shows the days left
      records: [ Record, ... ]     // one per module / clerkship / transition course
    }
 
@@ -1559,8 +1590,8 @@ function makeStudent(rng, idx, cohort){
      Step 2 CK (spring of the clerkship year), one to three sittings each,
      mostly standard-paced, each a little better than the last */
   const selfAssessments = [];
-  const sitRun = (exam, year, month, base, slope, lo, hi, forms) => {
-    const n = 1 + Math.floor(r()*3);
+  const sitRun = (exam, year, month, base, slope, lo, hi, forms, nMax = 3) => {
+    const n = 1 + Math.floor(r()*nMax);
     for(let k = 0; k < n; k++){
       const score = clamp(Math.round(base + kAbility*slope + k*slope*0.3 + rnorm(r)*slope*0.35), lo, hi);
       const correct = exam === 'CCSSA' ? 0.78 - (254 - score)*0.004 : score/100;
@@ -1568,15 +1599,40 @@ function makeStudent(rng, idx, cohort){
         label: exam === 'CCSSA'
           ? 'Comprehensive Clinical Science Self-Assessment (CCSSA) Form ' + forms[Math.floor(r()*forms.length)] + ' - Retired'
           : 'Comprehensive Basic Science Self-Assessment (CBSSA) Form ' + forms[Math.floor(r()*forms.length)] + ' - Retired',
-        date: year + '-' + String(month + k).padStart(2,'0') + '-' + String(3 + Math.floor(r()*24)).padStart(2,'0'),
+        date: year + '-' + String(month + k).padStart(2,'0') + '-' + String(3 + Math.floor(r()*(nMax < 3 ? 15 : 24))).padStart(2,'0'),
         score, incorrect: clamp(Math.round(200*(1 - correct)), 5, 150),
         pacing: r() < 0.82 ? 'Standard' : 'Self-Paced'});
     }
   };
   if(cohort <= 2028) sitRun('CBSSA', cohort - 2, 3, 72, 9, 35, 95, [28,29,30,31,32,33]);
   if(cohort <= 2027) sitRun('CCSSA', cohort - 1, 3, 244, 15, 175, 285, [10,11,12,13,14,15,16]);
+  /* the classes still ahead of an exam: a share has started practising */
+  if(cohort === 2028 && r() < 0.55) sitRun('CCSSA', 2026, 7, 238, 15, 175, 285, [10,11,12,13,14,15,16], 2);
+  if(cohort === 2029 && r() < 0.30) sitRun('CBSSA', 2026, 7, 62, 9, 35, 95, [28,29,30,31,32,33], 2);
 
-  return {id: code, cohort, selfAssessments,
+  /* USMLE: Step 1 in June of the year the class sits it, Step 2 CK the
+     following summer; the classes still ahead of one carry its planned date.
+     Synthetic, and only so the predictor has earlier classes to calibrate on. */
+  const stepDates = {};
+  const day = () => String(3 + Math.floor(r()*24)).padStart(2,'0');
+  const addStep = (code, name, date, result, term) => {
+    const before = records.filter(x => x.start && x.start <= date);
+    records.push({seq: (before.length ? Math.max(...before.map(x => x.seq)) : 0) + 0.5, phase: code === 'STEP1' ? 1 : 2,
+      kind:'licensing', code, name, term, site:'', start: date, end: date, status:'completed', result,
+      quizzes:null, cas:null, osce:null, eval:null});
+  };
+  if(cohort <= 2028){
+    const fail = kAbility + rnorm(r)*0.45 < -1.9;
+    const res = fail ? (r() < 0.6 ? 'Pass with remediation' : 'Fail') : 'Pass';
+    addStep('STEP1', 'USMLE Step 1', (cohort - 2) + '-06-' + day(), res, 'USMLE · ' + res + (fail ? ' · 2 attempts' : ''));
+  } else stepDates.STEP1 = (cohort - 2) + '-06-' + day();
+  if(cohort <= 2027){
+    const sc = clamp(Math.round(250 + kAbility*15 + rnorm(r)*7), 180, 290);
+    addStep('STEP2CK', 'USMLE Step 2 CK', (cohort - 1) + '-0' + (6 + Math.floor(r()*3)) + '-' + day(),
+      sc >= STEP2_PASS_SAMPLE ? 'Pass' : 'Fail', 'USMLE · score ' + sc);
+  } else if(cohort === 2028) stepDates.STEP2CK = '2027-0' + (3 + Math.floor(r()*4)) + '-' + day();
+
+  return {id: code, cohort, selfAssessments, stepDates,
     careerAdvisor: SAMPLE_ADVISORS[Math.floor(r()*SAMPLE_ADVISORS.length)],
     ccm: SAMPLE_CCMS[Math.floor(r()*SAMPLE_CCMS.length)],
     advisingGroup: 'AG-' + String(1 + Math.floor(r()*12)).padStart(2,'0'),
@@ -2104,6 +2160,7 @@ function clerkshipConcerns(s){
    Incomplete or unrecognised grade, or an assessment owed (a finished
    clerkship with no shelf on record OWED_GRACE_DAYS after it ended). */
 const SHELF_NEAR = 5, OWED_GRACE_DAYS = 14;
+const STEP2_PASS_SAMPLE = 218;   /* the sample's Step 2 CK pass mark; STEP2_PASS below is declared after the sample is built */
 /* NBME self-assessment pass lines: the CCSSA against the Step 2 CK minimum
    passing score (and within SSA_CCSSA_NEAR of it), the CBSSA's equated percent
    correct against the 65 the Phase 1 NBME exams use. See ssaNotes. */
@@ -3934,7 +3991,9 @@ function ssaTrend(all, exam){
   const svg = sv('svg', {viewBox: '0 0 ' + W + ' ' + H, class: 'ssatrend', role: 'img',
     'aria-label': exam + ' over time: ' + all.map(x => x.score + ' on ' + fmtDate(x.date)).join(', ') + '; pass line ' + pass});
   add(svg, 'line', {x1: L, x2: W - R, y1: y(pass), y2: y(pass), class: 'ssapass'});
-  add(svg, 'text', {x: W - R, y: y(pass) - 3, 'text-anchor': 'end', class: 'ssalbl'}, 'pass ' + pass);
+  /* the pass label sits on the side of the line away from the last point, so the two never collide */
+  const last = all[all.length - 1].score;
+  add(svg, 'text', {x: W - R, y: last >= pass ? y(pass) + 10 : y(pass) - 3, 'text-anchor': 'end', class: 'ssalbl'}, 'pass ' + pass);
   add(svg, 'polyline', {points: all.map((x, i) => xs[i] + ',' + y(x.score)).join(' '), class: 'ssaline'});
   all.forEach((x, i) => {
     const c = add(svg, 'circle', {cx: xs[i], cy: y(x.score), r: 3.5,
@@ -3969,11 +4028,13 @@ function usmleStrip(host, s){
     tile('NBME CBSE', 'Not on record', 'No CBSE score on file', false);
   }
   ssaTile(s, 'CBSSA', tile);
+  boardTile(s, 'STEP1', tile);
   const s1 = u.STEP1;
   tile('USMLE Step 1', s1 ? resWord(s1) : 'Not on record',
        s1 ? fmtDate(s1.date) + (s1.tries > 1 ? ' \u00b7 ' + s1.tries + ' attempts' : '') + ' \u00b7 pass/fail' : 'No result in the score roster',
        s1 && s1.result !== 'Pass');
   ssaTile(s, 'CCSSA', tile);
+  boardTile(s, 'STEP2CK', tile);
   const s2 = u.STEP2CK;
   if(s2 && s2.scores.length){
     const pc = step2Pct(s, s2.scores[0]);
@@ -5642,6 +5703,7 @@ function renderAll(){
   renderOffSchedule(list);
   renderRoster();
   renderPredictors();
+  renderBoard(list);
 }
 
 /* ---------------- off schedule ---------------- */
@@ -5817,6 +5879,262 @@ function renderLegacyCohorts(host, table, pct){
   const D = L.definitions || {};
   host.appendChild(elc('p','why', [D.standing, D.preclinical, D.step1Bad, D.shelf].filter(Boolean).join(' ') +
     (L.source ? ' Source: ' + L.source + '.' : '')));
+}
+
+/* ---------------- Step 1 and Step 2 CK predictor ---------------- */
+/* What the practice exams say about the real one, calibrated on this school's
+   own students. Every loaded class with Step results is the training set:
+   each student's last standard-paced measure before their first attempt,
+   against that first attempt. Self-paced sittings are never read.
+   Step 2 CK (a score): one straight-line fit per measure (CCSSA, CCSE), and
+   the misses of that fit as the error band - the band is the distance 80% of
+   earlier students landed within. Until PRED_MIN_N earlier students have a
+   measure and a result, the CCSSA reads as its own Step 2 CK score (NBME's
+   scale, +/-10) and the CCSE goes through the office's cohort-analysis
+   equation (137 + 0.52 x CCSE, Class of 2027, r 0.77).
+   Step 1 (pass/fail): the CBSE and CBSSA share a scale (equated percent
+   correct), so earlier students are grouped by score band and the band's
+   first-attempt pass rate is the reading; a band with fewer than
+   PRED_MIN_BAND students falls back to the rule-of-thumb reading.
+   Advising information only: it never moves a standing. */
+const PRED_MIN_N = 15, PRED_MIN_BAND = 8, STEP2_PASS = 218;
+const STEP1_BANDS = [
+  {lo: 70, label: '70 and above', rule: 'ok'},
+  {lo: 62, label: '62–69', rule: 'ok'},
+  {lo: 55, label: '55–61', rule: 'watch'},
+  {lo: -Infinity, label: 'under 55', rule: 'concern'}];
+const BOARD_WORD = {ok: 'Likely pass', watch: 'Borderline', concern: 'At risk'};
+const ncdf = z => { const t = 1 / (1 + 0.2316419 * Math.abs(z)), d = 0.3989423 * Math.exp(-z * z / 2);
+  const p = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
+  return z > 0 ? 1 - p : p };
+const boardStep = step => step === 'STEP1' ? {name: 'Step 1', exams: ['CBSE', 'CBSSA']} : {name: 'Step 2 CK', exams: ['CCSE', 'CCSSA']};
+
+/* every sitting of the step's practice exams, oldest first */
+function boardMeasures(s, step){
+  const out = [], test = step === 'STEP1' ? /\bcbse\b/i : /\bccse\b/i, exam = step === 'STEP1' ? 'CBSE' : 'CCSE';
+  currentRecs(s.records || []).forEach(r => casList(r).forEach(c => {
+    if(test.test(c.label || '') && c.scaled != null && !/retake/i.test(c.label || ''))
+      out.push({exam, score: c.scaled, date: r.end || r.start, selfPaced: false});
+  }));
+  ssaOf(s, step === 'STEP1' ? 'CBSSA' : 'CCSSA').forEach(x =>
+    out.push({exam: x.exam, score: x.score, date: x.date, form: x.form, selfPaced: x.selfPaced}));
+  return out.sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')));
+}
+/* the first attempt, if there is one */
+function boardOutcome(s, step){
+  const u = usmleOf(s)[step]; if(!u) return null;
+  return {date: u.date, firstPass: u.result === 'Pass' && u.tries <= 1, firstScore: u.scores.length ? u.scores[0] : null};
+}
+/* the one measure a prediction is read from: the last standard-paced sitting
+   (before the exam, when there is one) */
+function boardLatest(s, step, before){
+  return boardMeasures(s, step).filter(x => !x.selfPaced && x.score != null && (!before || !x.date || x.date < before)).pop() || null;
+}
+
+let BOARD_CACHE = null;
+function boardModels(){
+  if(BOARD_CACHE && BOARD_CACHE.data === DATA) return BOARD_CACHE;
+  const students = DATA.students || [];
+  const train = step => students.map(s => { const o = boardOutcome(s, step); if(!o) return null;
+    const m = boardLatest(s, step, o.date); return m ? {s, m, o} : null }).filter(Boolean);
+  /* Step 2 CK: a line per exam */
+  const t2 = train('STEP2CK').filter(x => x.o.firstScore != null), step2 = {};
+  ['CCSSA', 'CCSE'].forEach(exam => {
+    const pts = t2.filter(x => x.m.exam === exam).map(x => ({x: x.m.score, y: x.o.firstScore, c: x.s.cohort}));
+    const classes = [...new Set(pts.map(p => p.c))].sort();
+    if(pts.length >= PRED_MIN_N){
+      const mx = mean(pts.map(p => p.x)), my = mean(pts.map(p => p.y));
+      const sxx = pts.reduce((a, p) => a + (p.x - mx) ** 2, 0), sxy = pts.reduce((a, p) => a + (p.x - mx) * (p.y - my), 0);
+      const syy = pts.reduce((a, p) => a + (p.y - my) ** 2, 0);
+      if(sxx > 0){
+        const b = sxy / sxx, a = my - b * mx, res = pts.map(p => Math.abs(p.y - (a + b * p.x))).sort((u, v) => u - v);
+        step2[exam] = {exam, calibrated: true, a, b, n: pts.length, classes, r: syy ? sxy / Math.sqrt(sxx * syy) : null,
+          band: Math.max(1, Math.round(res[Math.min(res.length - 1, Math.floor(0.8 * res.length))])),
+          sd: Math.sqrt(res.reduce((u, v) => u + v * v, 0) / Math.max(1, pts.length - 2)),
+          within10: res.filter(v => v <= 10).length};
+        return;
+      }
+    }
+    step2[exam] = exam === 'CCSSA'
+      ? {exam, calibrated: false, a: 0, b: 1, band: 10, sd: 8, n: pts.length, classes}
+      : {exam, calibrated: false, a: 137, b: 0.52, band: 13, sd: 10, n: pts.length, classes, threeDigitOnly: true};
+  });
+  /* Step 1: pass rates by score band */
+  const t1 = train('STEP1');
+  const bands = STEP1_BANDS.map(b => ({...b, n: 0, pass: 0}));
+  t1.forEach(x => { const b = bands.find(b => x.m.score >= b.lo); b.n++; if(x.o.firstPass) b.pass++ });
+  BOARD_CACHE = {data: DATA, step2, step1: {bands, n: t1.length, classes: [...new Set(t1.map(x => x.s.cohort))].sort()}};
+  return BOARD_CACHE;
+}
+
+/* a Step 1 band's reading: its earlier students' first-attempt pass rate once
+   it holds PRED_MIN_BAND of them, the rule of thumb before that */
+function bandLevel(b){
+  if(b.n < PRED_MIN_BAND) return b.rule;
+  const p = b.pass / b.n;
+  return p >= 0.95 ? 'ok' : p >= 0.8 ? 'watch' : 'concern';
+}
+/* a student's reading for one step, or null when there is nothing to read */
+function boardPredict(s, step){
+  const all = boardMeasures(s, step);
+  if(!all.length) return null;
+  const m = boardLatest(s, step), M = boardModels(), when = s.stepDates && s.stepDates[step];
+  if(!m) return {step, m: null, all, when, level: null, note: 'self-paced sittings only: not read'};
+  if(step === 'STEP1'){
+    const b = M.step1.bands.find(b => m.score >= b.lo);
+    if(b.n >= PRED_MIN_BAND){
+      return {step, m, all, when, band: b, p: b.pass / b.n, calibrated: true, level: bandLevel(b),
+        note: b.pass + ' of ' + b.n + ' earlier students scoring ' + b.label + ' passed on the first attempt'};
+    }
+    return {step, m, all, when, band: b, p: null, calibrated: false, level: b.rule,
+      note: 'rule of thumb for ' + b.label + ' (only ' + b.n + ' earlier students in this band)'};
+  }
+  const md = M.step2[m.exam];
+  if(md.threeDigitOnly && m.score < 100)
+    return {step, m, all, when, level: null, note: m.exam + ' not on the 3-digit scale and not yet calibrated: not read'};
+  const pred = Math.round(md.a + md.b * m.score), p = ncdf((pred - STEP2_PASS) / md.sd);
+  return {step, m, all, when, pred, band: md.band, p, calibrated: md.calibrated, model: md,
+    level: p >= 0.9 ? 'ok' : p >= 0.6 ? 'watch' : 'concern'};
+}
+
+function boardChip(level, text){
+  const c = elc('span', 'chip ' + (level || 'neutral')); c.appendChild(elc('span', 'dot'));
+  c.appendChild(elc('span', null, text || (level ? BOARD_WORD[level] : 'Not read'))); return c;
+}
+const boardMeasureText = m => m.exam + (m.form ? ' Form ' + m.form : '') + ' ' + Math.round(m.score) + ' · ' + fmtDate(m.date);
+function boardModelLines(step){
+  const M = boardModels(), cl = c => !c.length ? '' : c.length === 1 ? 'the Class of ' + c[0] :
+    'the Classes of ' + c.slice(0, -1).join(', ') + ' and ' + c[c.length - 1];
+  if(step === 'STEP1'){
+    const t = M.step1;
+    return [t.n ? 'Calibrated on ' + t.n + ' earlier students from ' + cl(t.classes) + ': the last standard-paced CBSE or CBSSA ' +
+      'before Step 1, against the first attempt. A band with fewer than ' + PRED_MIN_BAND + ' students reads by rule of thumb.'
+      : 'No earlier class has Step 1 results with a CBSE or CBSSA before them yet, so every band reads by rule of thumb ' +
+        '(70+ and 62–69 likely pass, 55–61 borderline, under 55 at risk).'];
+  }
+  return ['CCSSA', 'CCSE'].map(e => { const md = M.step2[e];
+    if(md.calibrated) return e + ': Step 2 CK ≈ ' + md.a.toFixed(0) + ' + ' + md.b.toFixed(2) + ' × ' + e +
+      ', from ' + md.n + ' earlier students in ' + cl(md.classes) + (md.r != null ? ' (r ' + md.r.toFixed(2) + ')' : '') +
+      '. 80% landed within ±' + md.band + ' of the prediction; ' + md.within10 + ' of ' + md.n + ' within 10 points.';
+    return e + ': ' + (md.n ? 'only ' + md.n + ' earlier students' : 'no earlier students') + ' with a result (' + PRED_MIN_N + ' needed), so ' +
+      (e === 'CCSSA' ? 'it reads as its own Step 2 CK score, ±10.' :
+        'it reads through the office’s equation, 137 + 0.52 × CCSE (Class of 2027 cohort analysis, r 0.77), ±13.') });
+}
+
+/* one row per student, worst first: a dot at the reading and, for Step 2 CK,
+   its error band; the pass line (Step 2 CK) or the bands (Step 1) behind */
+function boardChart(host, rows, step){
+  /* drawn at the card's real width, so the type stays its own size */
+  const W = Math.max(300, Math.round(host.clientWidth || 640)), rowH = 14, T = 22, B = 26, L = 10, R = 10, H = T + B + rows.length * rowH;
+  const v = r => step === 'STEP1' ? r.m.score : r.pred;
+  const lo = step === 'STEP1' ? Math.min(40, ...rows.map(v)) - 2 : Math.min(190, ...rows.map(r => r.pred - r.band)) - 4;
+  const hi = step === 'STEP1' ? Math.max(90, ...rows.map(v)) + 2 : Math.max(275, ...rows.map(r => r.pred + r.band)) + 4;
+  const x = val => L + (W - L - R) * (val - lo) / (hi - lo);
+  const svg = sv('svg', {viewBox: '0 0 ' + W + ' ' + H, width: W, height: H, class: 'boardchart', role: 'img',
+    'aria-label': boardStep(step).name + ' readings for ' + rows.length + ' students; the table view lists them'});
+  if(step === 'STEP1'){
+    let top = hi;
+    boardModels().step1.bands.forEach(b => { const from = Math.max(lo, b.lo === -Infinity ? lo : b.lo);
+      add(svg, 'rect', {x: x(from), y: T - 4, width: Math.max(0, x(top) - x(from)), height: H - T - B + 8, class: 'bband ' + bandLevel(b)});
+      add(svg, 'text', {x: (x(from) + x(top)) / 2, y: T - 8, 'text-anchor': 'middle', class: 'blbl'}, b.label);
+      top = from });
+  } else {
+    add(svg, 'line', {x1: x(STEP2_PASS), x2: x(STEP2_PASS), y1: T - 6, y2: H - B + 4, class: 'bpass'});
+    add(svg, 'text', {x: x(STEP2_PASS) + 4, y: T - 8, class: 'blbl'}, 'pass ' + STEP2_PASS);
+  }
+  const ticks = step === 'STEP1' ? [40, 50, 60, 70, 80, 90] : [190, 200, 210, 220, 230, 240, 250, 260, 270];
+  ticks.filter(t => t >= lo && t <= hi).forEach(t => add(svg, 'text', {x: x(t), y: H - 8, 'text-anchor': 'middle', class: 'blbl'}, String(t)));
+  rows.forEach((r, i) => {
+    const y = T + i * rowH + rowH / 2, g = add(svg, 'g', {class: 'brow', tabindex: 0, role: 'button',
+      'aria-label': whoOf(r.s) + ': ' + (step === 'STEP1' ? boardMeasureText(r.m) : 'predicted ' + r.pred + ' ±' + r.band) + ', ' + BOARD_WORD[r.level]});
+    if(step !== 'STEP1') add(g, 'line', {x1: x(r.pred - r.band), x2: x(r.pred + r.band), y1: y, y2: y, class: 'berr'});
+    add(g, 'circle', {cx: x(v(r)), cy: y, r: 4, class: 'bdot ' + r.level});
+    add(g, 'title', null, whoOf(r.s) + ' · ' + boardMeasureText(r.m) +
+      (step === 'STEP1' ? '' : ' · predicted ' + r.pred + ' ±' + r.band) + (r.p != null ? ' · ' + Math.round(100 * r.p) + '% pass' : ''));
+    g.addEventListener('click', () => openStudent(r.s.id));
+    g.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openStudent(r.s.id) } });
+  });
+  host.appendChild(svg);
+}
+
+function renderBoard(list){
+  const host = $('boardBody'); if(!host) return; host.textContent = '';
+  ['STEP1', 'STEP2CK'].forEach(step => {
+    const name = boardStep(step).name;
+    const all = list.map(s => ({s, done: !!boardOutcome(s, step), r: boardPredict(s, step)})).filter(x => x.r);
+    const rows = all.filter(x => !x.done && x.r.level).map(x => ({s: x.s, ...x.r}))
+      .sort((a, b) => (a.p == null ? (a.level === 'concern' ? 0 : a.level === 'watch' ? .5 : 1) : a.p) -
+                      (b.p == null ? (b.level === 'concern' ? 0 : b.level === 'watch' ? .5 : 1) : b.p) || a.m.score - b.m.score);
+    const unread = all.filter(x => !x.done && !x.r.level).length, done = all.filter(x => x.done).length;
+    const hd = elc('div', 'boardhd');
+    hd.appendChild(elc('h3', 'predh', name + (step === 'STEP1' ? ' · CBSE and CBSSA' : ' · CCSE and CCSSA')));
+    const tvId = 'boardTable' + step, tv = elc('button', 'tv', 'Table view');
+    tv.type = 'button'; tv.dataset.tv = tvId; tv.setAttribute('aria-pressed', 'false');
+    if(rows.length) hd.appendChild(tv);
+    host.appendChild(hd);
+    boardModelLines(step).forEach(t => host.appendChild(elc('p', 'why', t)));
+    if(step === 'STEP1'){
+      const M = boardModels().step1;
+      if(M.n){
+        const w = elc('div', 'tablewrap'), t = elc('table', 'grid predict');
+        t.appendChild(elc('caption', 'sr', 'Earlier students: Step 1 first-attempt pass rate by CBSE or CBSSA band'));
+        const th = elc('thead'), tr = elc('tr');
+        ['Last CBSE or CBSSA before Step 1', 'Earlier students', 'Passed first time', 'Reading'].forEach(h => tr.appendChild(elc('th', null, h)));
+        th.appendChild(tr); t.appendChild(th); const tb = elc('tbody');
+        M.bands.forEach(b => { const r = elc('tr'); r.appendChild(elc('th', null, b.label));
+          r.appendChild(elc('td', 'num', String(b.n))); r.appendChild(elc('td', 'num', b.n ? b.pass + ' (' + Math.round(100 * b.pass / b.n) + '%)' : '—'));
+          const c = elc('td'); const lv = bandLevel(b);
+          c.appendChild(boardChip(lv, BOARD_WORD[lv] + (b.n >= PRED_MIN_BAND ? '' : ' (rule of thumb)'))); r.appendChild(c); tb.appendChild(r) });
+        t.appendChild(tb); w.appendChild(t); host.appendChild(w);
+      }
+    }
+    host.appendChild(elc('p', 'why', rows.length
+      ? rows.length + ' student' + (rows.length === 1 ? '' : 's') + ' in this filter with no ' + name + ' result yet, at-risk first' +
+        (done ? '; ' + done + ' already ha' + (done === 1 ? 's a result' : 've results') : '') +
+        (unread ? '; ' + unread + ' with only self-paced or unreadable sittings' : '') + '. Select a student to open their record.'
+      : 'No student in this filter has a ' + name + ' practice exam and no ' + name + ' result yet.'));
+    if(!rows.length) return;
+    const chart = elc('div', 'chartarea'); host.appendChild(chart); boardChart(chart, rows, step);
+    const tw = elc('div', 'tableview'); tw.id = tvId; host.appendChild(tw);
+    const wrap = elc('div', 'tablewrap'), t = elc('table', 'grid');
+    t.appendChild(elc('caption', 'sr', name + ' predictor, at-risk first'));
+    const th = elc('thead'), tr = elc('tr');
+    ['Student', 'Class', 'Read from', 'Sittings', step === 'STEP1' ? 'Earlier students in this band' : 'Predicted Step 2 CK',
+     'Chance of passing', 'Reading', name + ' date'].forEach(h => tr.appendChild(elc('th', null, h)));
+    th.appendChild(tr); t.appendChild(th); const tb = elc('tbody');
+    rows.forEach(r => {
+      const row = elc('tr', 'clickable'); row.tabIndex = 0; row.setAttribute('aria-label', 'Open the record for ' + whoOf(r.s));
+      row.addEventListener('click', () => openStudent(r.s.id));
+      row.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openStudent(r.s.id) } });
+      const who = elc('td'), nc = elc('div', 'namecell'), n = nameOf(r.s.id);
+      if(n) nc.appendChild(elc('span', 'nm', n)); nc.appendChild(elc('span', 'sid', r.s.id)); who.appendChild(nc); row.appendChild(who);
+      row.appendChild(elc('td', 'num', String(r.s.cohort)));
+      row.appendChild(elc('td', null, boardMeasureText(r.m)));
+      row.appendChild(elc('td', null, r.all.length > 1 ? r.all.length + ': ' + r.all.map(x => Math.round(x.score) + (x.selfPaced ? '†' : '')).join(' → ') : '1'));
+      row.appendChild(elc('td', null, step === 'STEP1' ? r.note : r.pred + ' ±' + r.band + (r.calibrated ? '' : ' (uncalibrated)')));
+      row.appendChild(elc('td', 'num', r.p != null ? Math.round(100 * r.p) + '%' : '—'));
+      const c = elc('td'); c.appendChild(boardChip(r.level)); row.appendChild(c);
+      const w = r.when, days = w ? Math.round((Date.parse(w) - Date.parse(asOfDate())) / 864e5) : null;
+      row.appendChild(elc('td', null, w ? fmtDate(w) + (days >= 0 ? ' · in ' + days + ' days' : '') : '—'));
+      tb.appendChild(row);
+    });
+    t.appendChild(tb); wrap.appendChild(t); tw.appendChild(wrap);
+    if(rows.some(r => r.all.some(x => x.selfPaced))) tw.appendChild(elc('p', 'why', '† self-paced: shown, not read.'));
+  });
+}
+
+/* the student's own reading, as a tile beside the step's result tile */
+function boardTile(s, step, tile){
+  if(boardOutcome(s, step)) return;
+  const r = boardPredict(s, step); if(!r) return;
+  const name = boardStep(step).name, when = r.when ? ' · ' + name + ' ' + fmtDate(r.when) : '';
+  if(!r.level){ tile(name + ' outlook', 'Not read', r.note + when, false); return }
+  if(step === 'STEP1')
+    tile(name + ' outlook', BOARD_WORD[r.level], 'from ' + boardMeasureText(r.m) + ' · ' + r.note + when, r.level === 'concern');
+  else
+    tile(name + ' predicted', r.pred + ' ±' + r.band, BOARD_WORD[r.level] + ' · ' + Math.round(100 * r.p) + '% chance of passing · from ' +
+      boardMeasureText(r.m) + (r.calibrated ? ' · calibrated on ' + r.model.n + ' earlier students' : ' · not yet calibrated') + when,
+      r.level === 'concern');
 }
 
 /* ---------------- review cards ---------------- */
@@ -6023,7 +6341,7 @@ function renderReview(list){
         class_photo_url,
         seq, block_code, block_name, term, site, result,
         start_date, end_date, status,
-        assessment_type   quiz | cas | osce | eval | objective | self_assessment
+        assessment_type   quiz | cas | osce | eval | objective | self_assessment | step_date
         assessment_label, score, percentile, national_mean, cohort_mean,
         comment
         rating, evidence, rule, grade_need, grade_by_rules
@@ -6041,6 +6359,8 @@ function renderReview(list){
                           end_date the Exam Completion date, pacing "Standard"
                           or "Self-Paced". It belongs to the student, not a
                           block: leave the block columns blank.
+                          a step_date row: a planned USMLE date - assessment_label
+                          STEP1 or STEP2CK, start_date the date
 
       Rows for the same student_code and block_code are folded into one block.
       start_date / end_date are ISO dates and drive the rotation schedule; the
@@ -6094,6 +6414,11 @@ function csvToData(text){
     });
     if((get('assessment_type') || '').toLowerCase() === 'summary'){
       s.summary = {text: get('comment'), note: get('result'), status: get('assessment_label')}; return;
+    }
+    if(/^step_date$/i.test(get('assessment_type'))){
+      const k = get('assessment_label').toUpperCase().replace(/[^A-Z0-9]/g, '');
+      if(/^STEP(1|2CK)$/.test(k) && get('start_date')) (s.stepDates = s.stepDates || {})[k] = get('start_date');
+      return;
     }
     if(/^(self_assessment|ssa|cbssa|ccssa)$/i.test(get('assessment_type'))){
       s.selfAssessments.push({label: get('assessment_label') || get('assessment_type').toUpperCase(),
