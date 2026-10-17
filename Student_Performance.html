@@ -1121,7 +1121,9 @@ body.gated{overflow:hidden}
             below its pass mark (Surgery&rsquo;s CAS 65%), even if the retake passed; a clerkship direct observation (or the
             Class of 2027&rsquo;s DO Week) below 70%; or any clinical evaluation domain below 3. A Monitor is a shelf within 5
             points above its pass mark, a clerkship grade of Pass, an Incomplete, or an assessment owed (a finished
-            clerkship with no shelf on record two weeks after it ended).</p>
+            clerkship with no shelf on record two weeks after it ended). <strong>NBME self-assessments</strong> (CBSSA, CCSSA)
+            are practice exams and never move a standing: a standard-paced CBSSA below 65, or a CCSSA below the Step 2 CK
+            pass line of 218 or within 10 points of it, is a note; a self-paced sitting is shown but not read.</p>
         </div>
       </div>
       <div class="cardbody">
@@ -1230,6 +1232,15 @@ body.gated{overflow:hidden}
                                   //   shown on the record and as a filter.
      classPhotoUrl,               // optional per-student override for the cohort
                                   //   class picture link; http(s) only
+     selfAssessments: [           // optional: NBME self-assessments the student
+       {label, date, score,       //   bought through the school's order - CBSSA
+        incorrect, pacing} ],     //   (equated percent correct) and CCSSA (on the
+                                  //   Step 2 CK scale). label is NBME's
+                                  //   Description; the exam and form are read
+                                  //   from it, never from the Order ID suffix.
+                                  //   pacing "Standard" | "Self-Paced". Practice,
+                                  //   not assessment: shown and noted, never
+                                  //   counted toward standing.
      records: [ Record, ... ]     // one per module / clerkship / transition course
    }
 
@@ -1536,7 +1547,29 @@ function makeStudent(rng, idx, cohort){
     contentAreas[a] = {percentile: pctile(z), natlMean:50};
   });
 
-  return {id: code, cohort,
+  /* NBME self-assessments: the CBSSA in the run-up to Step 1 (spring of the
+     year the class sits it) and the CCSSA in the run-up to
+     Step 2 CK (spring of the clerkship year), one to three sittings each,
+     mostly standard-paced, each a little better than the last */
+  const selfAssessments = [];
+  const sitRun = (exam, year, month, base, slope, lo, hi, forms) => {
+    const n = 1 + Math.floor(r()*3);
+    for(let k = 0; k < n; k++){
+      const score = clamp(Math.round(base + kAbility*slope + k*slope*0.3 + rnorm(r)*slope*0.35), lo, hi);
+      const correct = exam === 'CCSSA' ? 0.78 - (254 - score)*0.004 : score/100;
+      selfAssessments.push({
+        label: exam === 'CCSSA'
+          ? 'Comprehensive Clinical Science Self-Assessment (CCSSA) Form ' + forms[Math.floor(r()*forms.length)] + ' - Retired'
+          : 'Comprehensive Basic Science Self-Assessment (CBSSA) Form ' + forms[Math.floor(r()*forms.length)] + ' - Retired',
+        date: year + '-' + String(month + k).padStart(2,'0') + '-' + String(3 + Math.floor(r()*24)).padStart(2,'0'),
+        score, incorrect: clamp(Math.round(200*(1 - correct)), 5, 150),
+        pacing: r() < 0.82 ? 'Standard' : 'Self-Paced'});
+    }
+  };
+  if(cohort <= 2028) sitRun('CBSSA', cohort - 2, 3, 72, 9, 35, 95, [28,29,30,31,32,33]);
+  if(cohort <= 2027) sitRun('CCSSA', cohort - 1, 3, 244, 15, 175, 285, [10,11,12,13,14,15,16]);
+
+  return {id: code, cohort, selfAssessments,
     careerAdvisor: SAMPLE_ADVISORS[Math.floor(r()*SAMPLE_ADVISORS.length)],
     ccm: SAMPLE_CCMS[Math.floor(r()*SAMPLE_CCMS.length)],
     advisingGroup: 'AG-' + String(1 + Math.floor(r()*12)).padStart(2,'0'),
@@ -1729,6 +1762,19 @@ function hydrate(data){
     rec.cas = list.length ? list : null;
   }));
 
+  /* --- NBME self-assessments: the exam and form come from NBME's
+     Description (the Order ID suffix does not say which exam it is), and
+     the pacing decides whether a sitting predicts the real exam --- */
+  students.forEach(s => {
+    if(!Array.isArray(s.selfAssessments)){ s.selfAssessments = []; return }
+    s.selfAssessments = s.selfAssessments.map(x => {
+      const label = x.label || '', form = /form\s*(\d+)/i.exec(label);
+      const score = x.score == null || x.score === '' ? null : +x.score;
+      return Object.assign({}, x, {exam: x.exam || ssaExam(label), form: x.form || (form ? +form[1] : null),
+        score: isNaN(score) ? null : score, selfPaced: /self/i.test(x.pacing || '')});
+    }).filter(x => x.exam);
+  });
+
   /* --- cohort-relative CAS percentiles, exam by exam --- */
   /* A registrar extract carries the NBME percentile already. A gradebook
      export does not - it has the scaled score and nothing else - and a CAS
@@ -1897,7 +1943,7 @@ function hydrate(data){
       return p;
     });
 
-    s.flags = buildFlags(s);
+    s.flags = buildFlags(s).concat(ssaNotes(s));   /* info only: never moves the standing */
     s.status = standingOf(s);
   });
 
@@ -2048,6 +2094,10 @@ function clerkshipConcerns(s){
    Incomplete or unrecognised grade, or an assessment owed (a finished
    clerkship with no shelf on record OWED_GRACE_DAYS after it ended). */
 const SHELF_NEAR = 5, OWED_GRACE_DAYS = 14;
+/* NBME self-assessment pass lines: the CCSSA against the Step 2 CK minimum
+   passing score (and within SSA_CCSSA_NEAR of it), the CBSSA's equated percent
+   correct against the 65 the Phase 1 NBME exams use. See ssaNotes. */
+const SSA_CCSSA_PASS = 218, SSA_CCSSA_NEAR = 10, SSA_CBSSA_PASS = 65;
 let HYDRATE_ASOF = null;
 const SHELF_CODES = ['MED','NRL','OBG','PED','PSY','SUR','EM'];
 function phase2Flags(s){
@@ -2551,9 +2601,11 @@ const FLAG_FILTERS = [
   ['owed', 'Assessment owed', /owed/],
   ['nbmelow', 'Phase 1: low NBME percentile or knowledge standing', /NBME assessments? below the|Medical knowledge standing/],
   ['clin', 'Phase 1: clinical skills standing', /Clinical skills standing/],
-  ['trend', 'Phase 1: downward trajectory', /Downward trajectory/]];
+  ['trend', 'Phase 1: downward trajectory', /Downward trajectory/],
+  /* a note, not a flag - the fourth entry lets the filter find notes */
+  ['ssa', 'NBME self-assessment at or below the pass line', /self-assessment (below|within)/, true]];
 const hasFlag = (s, key) => { const f = FLAG_FILTERS.find(f => f[0] === key);
-  return !f || (s.flags || []).some(x => x.level !== 'info' && f[2].test(x.what)) };
+  return !f || (s.flags || []).some(x => (f[3] || x.level !== 'info') && f[2].test(x.what)) };
 function filtered(){
   const q = state.q.trim().toLowerCase();
   return (DATA.students||[]).filter(s => {
@@ -3790,6 +3842,65 @@ function cbseOf(s){
     for(const c of casList(r)) if(/cbse/i.test(c.label || '') && c.scaled != null) return {rec: r, cas: c, prior}; return null };
   return find(false) || find(true);
 }
+
+/* NBME self-assessments (CBSSA before Step 1, CCSSA before Step 2 CK). The
+   CCSSA score is on the Step 2 CK scale, so it reads against the Step 2 CK
+   minimum passing score; the CBSSA score is an equated percent correct, read
+   against the same 65 the Phase 1 NBME exams use. Only standard-paced
+   sittings predict the real exam - a self-paced one is shown, marked, and
+   never raises a note. Practice exams: noted, never counted toward standing.
+   The thresholds (SSA_*) sit with the Phase 2 ones above: hydrate reads them. */
+function ssaExam(label){
+  const l = String(label || '');
+  return /\bccssa\b|clinical science self/i.test(l) ? 'CCSSA' : /\bcbssa\b|basic science self/i.test(l) ? 'CBSSA' : null;
+}
+/* scored sittings only; NBME lists a sitting with no score (and no report to
+   download) as Complete too - those are counted, not read */
+function ssaOf(s, exam){
+  return (s.selfAssessments || []).filter(x => x.exam === exam && x.score != null)
+    .sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')));
+}
+function ssaUnscored(s, exam){ return (s.selfAssessments || []).filter(x => x.exam === exam && x.score == null).length }
+function ssaPass(exam){ return exam === 'CCSSA' ? SSA_CCSSA_PASS : SSA_CBSSA_PASS }
+/* 'below' the pass line, 'near' it (CCSSA only, within SSA_CCSSA_NEAR), or 'ok' */
+function ssaLevel(x){
+  const pass = ssaPass(x.exam);
+  return x.score < pass ? 'below' : x.exam === 'CCSSA' && x.score < pass + SSA_CCSSA_NEAR ? 'near' : 'ok';
+}
+/* the sitting a note is read from: the latest standard-paced one */
+function ssaLatestStandard(s, exam){ return ssaOf(s, exam).filter(x => !x.selfPaced).pop() || null }
+function ssaNotes(s){
+  const out = [];
+  ['CBSSA', 'CCSSA'].forEach(exam => {
+    const x = ssaLatestStandard(s, exam);
+    if(!x) return;
+    const lv = ssaLevel(x), target = exam === 'CCSSA' ? 'Step 2 CK' : 'Step 1';
+    if(lv === 'ok') return;
+    out.push({level:'info', what: exam + ' self-assessment ' + (lv === 'below' ? 'below the pass line' : 'within ' + SSA_CCSSA_NEAR + ' points of the pass line'),
+      why: exam + (x.form ? ' Form ' + x.form : '') + ': ' + x.score + ' on ' + x.date +   /* ISO: hydrate runs before fmtDate's MONTHS exists */
+        ' (standard pacing), against a ' + target + ' pass line of ' + ssaPass(exam) +
+        (exam === 'CCSSA' ? '' : ' equated percent correct') +
+        '. A practice exam: worth a conversation about readiness and timing, not counted toward standing.'});
+  });
+  return out;
+}
+/* one tile per exam sat: the latest sitting, and the run of sittings before it */
+function ssaTile(s, exam, tile){
+  const all = ssaOf(s, exam), unscored = ssaUnscored(s, exam);
+  if(!all.length){
+    if(unscored) tile('NBME ' + exam, 'No score', unscored + ' sitting' + (unscored === 1 ? '' : 's') + ' listed with no score reported', false);
+    return;
+  }
+  const x = all[all.length - 1], lv = x.selfPaced ? 'ok' : ssaLevel(x);
+  tile('NBME ' + exam, String(x.score),
+    (exam === 'CCSSA' ? 'predicted Step 2 CK' : 'equated percent correct') + ' \u00b7 ' + fmtDate(x.date) +
+    (x.form ? ' \u00b7 Form ' + x.form : '') + (x.selfPaced ? ' \u00b7 self-paced, not predictive' : '') +
+    (all.length > 1 ? ' \u00b7 ' + all.length + ' sittings: ' + all.map(y => y.score + (y.selfPaced ? '\u2020' : '')).join(' \u2192 ') +
+      (all.some(y => y.selfPaced) ? ' (\u2020 self-paced)' : '') : '') +
+    (lv === 'below' ? ' \u00b7 below the ' + ssaPass(exam) + ' pass line' : lv === 'near' ? ' \u00b7 within ' + SSA_CCSSA_NEAR + ' of the ' + ssaPass(exam) + ' pass line' : '') +
+    (unscored ? ' \u00b7 ' + unscored + ' more with no score reported' : ''),
+    lv === 'below');
+}
 function cbsePct(s, v){
   const pool = (DATA.students || []).filter(o => o.cohort === s.cohort).map(o => cbseOf(o)).filter(x => x && !x.prior).map(x => x.cas.scaled);
   if(pool.length < 5) return null;
@@ -3797,7 +3908,7 @@ function cbsePct(s, v){
 }
 function usmleStrip(host, s){
   const u = usmleOf(s), cb = cbseOf(s);
-  if(!u.STEP1 && !u.STEP2CK && !cb && s.cohort > 2028) return;
+  if(!u.STEP1 && !u.STEP2CK && !cb && !(s.selfAssessments || []).length && s.cohort > 2028) return;
   const strip = elc('div','usmle');
   const tile = (name, big, sub, bad) => { const d = elc('div','ustile' + (bad ? ' bad' : '')); d.appendChild(elc('span','un', name));
     d.appendChild(elc('b', null, big)); if(sub) d.appendChild(elc('span','us', sub)); strip.appendChild(d) };
@@ -3812,10 +3923,12 @@ function usmleStrip(host, s){
   } else if(s.cohort >= 2028 && s.phase > 1){
     tile('NBME CBSE', 'Not on record', 'No CBSE score on file', false);
   }
+  ssaTile(s, 'CBSSA', tile);
   const s1 = u.STEP1;
   tile('USMLE Step 1', s1 ? resWord(s1) : 'Not on record',
        s1 ? fmtDate(s1.date) + (s1.tries > 1 ? ' \u00b7 ' + s1.tries + ' attempts' : '') + ' \u00b7 pass/fail' : 'No result in the score roster',
        s1 && s1.result !== 'Pass');
+  ssaTile(s, 'CCSSA', tile);
   const s2 = u.STEP2CK;
   if(s2 && s2.scores.length){
     const pc = step2Pct(s, s2.scores[0]);
@@ -5746,6 +5859,8 @@ function renderReview(list){
     const cbx = cbseOf(s), us = usmleOf(s);
     const line = (k, v, bad) => { const d = elc('div', bad ? 'bad' : null); d.appendChild(elc('span', null, k)); d.appendChild(elc('b', null, v)); ex.appendChild(d) };
     if(cbx) line('CBSE', Math.round(cbx.cas.scaled) + (cbx.prior ? '*' : ''), false);
+    ['CBSSA', 'CCSSA'].forEach(exam => { const all = ssaOf(s, exam), x = all[all.length - 1];
+      if(x) line(exam, x.score + (x.selfPaced ? '\u2020' : ''), !x.selfPaced && ssaLevel(x) === 'below') });
     if(us.STEP1) line('Step 1', us.STEP1.result === 'Pass with remediation' ? 'Pass (retake)' : us.STEP1.result, us.STEP1.result !== 'Pass');
     if(us.STEP2CK) line('Step 2', us.STEP2CK.scores.length ? String(us.STEP2CK.scores[us.STEP2CK.scores.length - 1]) : us.STEP2CK.result, us.STEP2CK.result !== 'Pass');
     if(ex.children.length) wide.appendChild(ex);
@@ -5863,7 +5978,7 @@ function renderReview(list){
         class_photo_url,
         seq, block_code, block_name, term, site, result,
         start_date, end_date, status,
-        assessment_type   quiz | cas | osce | eval | objective
+        assessment_type   quiz | cas | osce | eval | objective | self_assessment
         assessment_label, score, percentile, national_mean, cohort_mean,
         comment
         rating, evidence, rule, grade_need, grade_by_rules
@@ -5873,6 +5988,14 @@ function renderReview(list){
                           the letter the rules alone reach
         domain:<name>     any number of columns, e.g. domain:Clinical reasoning
         area:<name>       an NBME exam's content areas, e.g. area:Cardiovascular System
+        pacing, total_incorrect
+                          a self_assessment row: an NBME CBSSA or CCSSA sitting
+                          from the Self-Assessment Services results page.
+                          assessment_label is NBME's Description (the exam and
+                          form are read from it), score the Scaled Score,
+                          end_date the Exam Completion date, pacing "Standard"
+                          or "Self-Paced". It belongs to the student, not a
+                          block: leave the block columns blank.
 
       Rows for the same student_code and block_code are folded into one block.
       start_date / end_date are ISO dates and drive the rotation schedule; the
@@ -5922,10 +6045,16 @@ function csvToData(text){
       program: get('program') || '',
       enteredWith: num(get('entered_with')),
       classPhotoUrl: get('class_photo_url') || '',
-      records: [], contentAreas: {}
+      records: [], contentAreas: {}, selfAssessments: []
     });
     if((get('assessment_type') || '').toLowerCase() === 'summary'){
       s.summary = {text: get('comment'), note: get('result'), status: get('assessment_label')}; return;
+    }
+    if(/^(self_assessment|ssa|cbssa|ccssa)$/i.test(get('assessment_type'))){
+      s.selfAssessments.push({label: get('assessment_label') || get('assessment_type').toUpperCase(),
+        date: get('end_date') || get('start_date'), score: num(get('score')),
+        incorrect: num(get('total_incorrect')), pacing: get('pacing')});
+      return;
     }
     const code = get('block_code') || get('block_name') || 'BLOCK';
     let rec = s.records.find(x => x.code === code);
