@@ -505,6 +505,13 @@ table.opgrid{border-collapse:collapse;width:100%;min-width:680px;font-size:13px}
 .ustile b{font-size:28px;font-weight:800;line-height:1.15;color:var(--ink);font-variant-numeric:tabular-nums}
 .ustile .us{font-size:12px;color:var(--ink-2);max-width:42ch}
 .ustile.bad{border-left-color:var(--crit)}.ustile.bad b{color:var(--crit)}
+.ssatrend{display:block;width:100%;max-width:300px;margin-top:6px;overflow:visible}
+.ssatrend .ssapass{stroke:var(--muted);stroke-width:1;stroke-dasharray:3 3}
+.ssatrend .ssaline{fill:none;stroke:var(--s2);stroke-width:1.75}
+.ssatrend .ssapt{fill:var(--s2);stroke:var(--s2);stroke-width:1.5}
+.ssatrend .ssapt.sp{fill:var(--surface, #fff)}.ssatrend .ssapt.low{fill:var(--crit);stroke:var(--crit)}
+.ssatrend .ssaval{font-size:10px;font-weight:700;fill:var(--ink);font-variant-numeric:tabular-nums}
+.ssatrend .ssalbl{font-size:9.5px;fill:var(--muted)}
 .predh{font-size:13px;letter-spacing:.06em;text-transform:uppercase;margin:6px 0 8px;color:var(--ink)}
 table.predict{min-width:720px}table.predict tr.sub th{font-weight:500;color:var(--ink-2);padding-left:22px}table.predict tr.sub td{color:var(--ink-2)}
 
@@ -3892,7 +3899,7 @@ function ssaTile(s, exam, tile){
     return;
   }
   const x = all[all.length - 1], lv = x.selfPaced ? 'ok' : ssaLevel(x);
-  tile('NBME ' + exam, String(x.score),
+  const d = tile('NBME ' + exam, String(x.score),
     (exam === 'CCSSA' ? 'predicted Step 2 CK' : 'equated percent correct') + ' \u00b7 ' + fmtDate(x.date) +
     (x.form ? ' \u00b7 Form ' + x.form : '') + (x.selfPaced ? ' \u00b7 self-paced, not predictive' : '') +
     (all.length > 1 ? ' \u00b7 ' + all.length + ' sittings: ' + all.map(y => y.score + (y.selfPaced ? '\u2020' : '')).join(' \u2192 ') +
@@ -3900,6 +3907,35 @@ function ssaTile(s, exam, tile){
     (lv === 'below' ? ' \u00b7 below the ' + ssaPass(exam) + ' pass line' : lv === 'near' ? ' \u00b7 within ' + SSA_CCSSA_NEAR + ' of the ' + ssaPass(exam) + ' pass line' : '') +
     (unscored ? ' \u00b7 ' + unscored + ' more with no score reported' : ''),
     lv === 'below');
+  if(all.length > 1) d.appendChild(ssaTrend(all, exam));
+}
+/* Score over time for a student with repeated sittings. The x axis is the
+   calendar - sittings three days apart sit close, two months apart far - and
+   the pass line is drawn so the trend reads against it. Filled points are
+   standard-paced, hollow ones self-paced; each point's title repeats the
+   sittings line in the tile text, which is this chart's table twin. */
+function ssaTrend(all, exam){
+  const W = 260, H = 76, L = 8, R = 8, T = 14, B = 16, pass = ssaPass(exam);
+  const day = x => Date.parse(String(x.date).slice(0,10)) / 864e5;
+  const d0 = day(all[0]), d1 = day(all[all.length - 1]), span = d1 - d0;
+  const xs = all.map((x, i) => L + (W - L - R) * (span > 0 ? (day(x) - d0) / span : i / (all.length - 1)));
+  const vals = all.map(x => x.score).concat(pass), pad = exam === 'CCSSA' ? 6 : 3;
+  const lo = Math.min(...vals) - pad, hi = Math.max(...vals) + pad;
+  const y = v => T + (H - T - B) * (hi - v) / (hi - lo);
+  const svg = sv('svg', {viewBox: '0 0 ' + W + ' ' + H, class: 'ssatrend', role: 'img',
+    'aria-label': exam + ' over time: ' + all.map(x => x.score + ' on ' + fmtDate(x.date)).join(', ') + '; pass line ' + pass});
+  add(svg, 'line', {x1: L, x2: W - R, y1: y(pass), y2: y(pass), class: 'ssapass'});
+  add(svg, 'text', {x: W - R, y: y(pass) - 3, 'text-anchor': 'end', class: 'ssalbl'}, 'pass ' + pass);
+  add(svg, 'polyline', {points: all.map((x, i) => xs[i] + ',' + y(x.score)).join(' '), class: 'ssaline'});
+  all.forEach((x, i) => {
+    const c = add(svg, 'circle', {cx: xs[i], cy: y(x.score), r: 3.5,
+      class: 'ssapt' + (x.selfPaced ? ' sp' : '') + (!x.selfPaced && ssaLevel(x) === 'below' ? ' low' : '')});
+    add(c, 'title', null, x.score + ' \u00b7 ' + fmtDate(x.date) + (x.form ? ' \u00b7 Form ' + x.form : '') + (x.selfPaced ? ' \u00b7 self-paced' : ''));
+    add(svg, 'text', {x: xs[i], y: y(x.score) - 6, 'text-anchor': i === 0 ? 'start' : i === all.length - 1 ? 'end' : 'middle', class: 'ssaval'}, String(x.score));
+  });
+  add(svg, 'text', {x: L, y: H - 3, class: 'ssalbl'}, fmtDate(all[0].date));
+  add(svg, 'text', {x: W - R, y: H - 3, 'text-anchor': 'end', class: 'ssalbl'}, fmtDate(all[all.length - 1].date));
+  return svg;
 }
 function cbsePct(s, v){
   const pool = (DATA.students || []).filter(o => o.cohort === s.cohort).map(o => cbseOf(o)).filter(x => x && !x.prior).map(x => x.cas.scaled);
@@ -3911,7 +3947,7 @@ function usmleStrip(host, s){
   if(!u.STEP1 && !u.STEP2CK && !cb && !(s.selfAssessments || []).length && s.cohort > 2028) return;
   const strip = elc('div','usmle');
   const tile = (name, big, sub, bad) => { const d = elc('div','ustile' + (bad ? ' bad' : '')); d.appendChild(elc('span','un', name));
-    d.appendChild(elc('b', null, big)); if(sub) d.appendChild(elc('span','us', sub)); strip.appendChild(d) };
+    d.appendChild(elc('b', null, big)); if(sub) d.appendChild(elc('span','us', sub)); strip.appendChild(d); return d };
   const resWord = x => x.result === 'Pass with remediation' ? 'Pass on retake' : x.result;
   if(cb){
     const pc = cb.prior ? null : cbsePct(s, cb.cas.scaled);
