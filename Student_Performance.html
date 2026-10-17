@@ -318,6 +318,13 @@ main{padding-bottom:44px}
 .rv-chips .rem{background:var(--warn-wash);border-color:rgba(224,172,53,.75);color:#8a5a00}
 .rv-flag{font-size:11.5px;color:var(--ink-2);line-height:1.35}
 .rv-note{font-size:11px;color:var(--muted);margin-top:4px}
+.rv-tog{display:flex;align-items:center;gap:6px;cursor:pointer;border-radius:4px}
+.rv-tog:hover{color:var(--ink-2)}
+.rv-tog:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
+.rv-tog .car{display:inline-block;transition:transform .15s}
+.rv-tog[aria-expanded="true"] .car{transform:rotate(90deg)}
+.rv-fold{display:flex;flex-direction:column;gap:inherit}
+.rv-fold[hidden]{display:none}
 .rv-empty{padding:26px 12px;text-align:center;color:var(--muted);font-size:13.5px}
 .kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
   padding:14px 16px;box-shadow:0 1px 2px var(--ring)}
@@ -5816,18 +5823,40 @@ function renderReview(list){
         const list = casList(r).filter(c => c.percentile != null && !/cbse/i.test(c.label || ''));
         list.forEach(c => cas.push({r, c, label: r.code + (list.length > 1 && c.label ? ' · ' + casShort(c.label) : '')}));
       });
+    /* once in Phase 2, Phase 1 is finished business (it no longer counts toward
+       standing): the Phase 2 percentiles lead and the Phase 1 CAS list folds
+       away behind a one-line summary, opened on demand */
+    const p2 = s.phase >= 2;
+    if(p2 && types.length){
+      card.appendChild(elc('div','rv-sec','By assessment type · percentile in class'));
+      types.forEach(t => card.appendChild(bar(t.short || t.label, Math.round(median(buckets[t.key])))));
+    }
     if(cas.length){
-      card.appendChild(elc('div','rv-sec','NBME CAS · percentile in class'));
+      let box = card;
+      if(p2){
+        const nBelow = cas.filter(({c}) => c.passMark != null && c.scaled != null && c.scaled < c.passMark).length;
+        const tog = elc('span','rv-sec rv-tog');
+        tog.setAttribute('role','button'); tog.tabIndex = 0; tog.setAttribute('aria-expanded','false');
+        tog.append(elc('span','car','▸'), 'Phase 1 NBME CAS · ' + cas.length + ' exams' +
+          (nBelow ? ' · ' + nBelow + ' below pass' : ''));
+        box = elc('div','rv-fold'); box.hidden = true;
+        /* the card is one big button: keep the toggle from opening the record */
+        const flip = e => { e.preventDefault(); e.stopPropagation();
+          box.hidden = !box.hidden; tog.setAttribute('aria-expanded', String(!box.hidden)) };
+        tog.addEventListener('click', flip);
+        tog.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' ') flip(e) });
+        card.appendChild(tog); card.appendChild(box);
+      } else card.appendChild(elc('div','rv-sec','NBME CAS · percentile in class'));
       cas.forEach(({c, label}) => {
         const below = c.passMark != null && c.scaled != null && c.scaled < c.passMark;
         const row = bar(label, Math.round(c.percentile), below ? 'low' : null,
                         Math.round(c.percentile) + (below ? ' · ' + c.scaled + '%' : ''));
         if(below) row.title = label + ': ' + c.scaled + '% correct, below the ' + c.passMark + '% pass mark';
-        card.appendChild(row);
+        box.appendChild(row);
       });
-      const others = types.filter(t => t.key !== 'cas').map(t => t.short || t.label);
+      const others = p2 ? [] : types.filter(t => t.key !== 'cas').map(t => t.short || t.label);
       if(others.length) card.appendChild(elc('div','rv-note', others.join(', ') + ' percentiles: in the full record'));
-    } else if(types.length){
+    } else if(types.length && !p2){
       card.appendChild(elc('div','rv-sec','By assessment type · percentile in class'));
       types.forEach(t => card.appendChild(bar(t.short || t.label, Math.round(median(buckets[t.key])))));
     }
