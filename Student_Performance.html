@@ -1777,8 +1777,11 @@ function hydrate(data){
     s.selfAssessments = s.selfAssessments.map(x => {
       const label = x.label || '', form = /form\s*(\d+)/i.exec(label);
       const score = x.score == null || x.score === '' ? null : +x.score;
+      /* a sitting at the floor of the scale (score 1, every item wrong) was
+         opened and not taken: kept and counted, never read as a score */
+      const blank = !isNaN(score) && score != null && (score <= 1 || (x.incorrect != null && +x.incorrect >= 200));
       return Object.assign({}, x, {exam: x.exam || ssaExam(label), form: x.form || (form ? +form[1] : null),
-        score: isNaN(score) ? null : score, selfPaced: /self/i.test(x.pacing || '')});
+        score: isNaN(score) || blank ? null : score, blank, selfPaced: /self/i.test(x.pacing || '')});
     }).filter(x => x.exam);
   });
 
@@ -3862,12 +3865,18 @@ function ssaExam(label){
   return /\bccssa\b|clinical science self/i.test(l) ? 'CCSSA' : /\bcbssa\b|basic science self/i.test(l) ? 'CBSSA' : null;
 }
 /* scored sittings only; NBME lists a sitting with no score (and no report to
-   download) as Complete too - those are counted, not read */
+   download) as Complete too, and one left blank scores 1 - those are counted,
+   not read */
 function ssaOf(s, exam){
   return (s.selfAssessments || []).filter(x => x.exam === exam && x.score != null)
     .sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')));
 }
 function ssaUnscored(s, exam){ return (s.selfAssessments || []).filter(x => x.exam === exam && x.score == null).length }
+function ssaUnscoredText(s, exam){
+  const list = (s.selfAssessments || []).filter(x => x.exam === exam && x.score == null);
+  const blank = list.filter(x => x.blank).length, none = list.length - blank;
+  return [none && none + ' with no score reported', blank && blank + ' not attempted (scored 1, every item blank)'].filter(Boolean).join(', ');
+}
 function ssaPass(exam){ return exam === 'CCSSA' ? SSA_CCSSA_PASS : SSA_CBSSA_PASS }
 /* 'below' the pass line, 'near' it (CCSSA only, within SSA_CCSSA_NEAR), or 'ok' */
 function ssaLevel(x){
@@ -3895,7 +3904,7 @@ function ssaNotes(s){
 function ssaTile(s, exam, tile){
   const all = ssaOf(s, exam), unscored = ssaUnscored(s, exam);
   if(!all.length){
-    if(unscored) tile('NBME ' + exam, 'No score', unscored + ' sitting' + (unscored === 1 ? '' : 's') + ' listed with no score reported', false);
+    if(unscored) tile('NBME ' + exam, 'No score', unscored + ' sitting' + (unscored === 1 ? '' : 's') + ': ' + ssaUnscoredText(s, exam), false);
     return;
   }
   const x = all[all.length - 1], lv = x.selfPaced ? 'ok' : ssaLevel(x);
@@ -3905,7 +3914,7 @@ function ssaTile(s, exam, tile){
     (all.length > 1 ? ' \u00b7 ' + all.length + ' sittings: ' + all.map(y => y.score + (y.selfPaced ? '\u2020' : '')).join(' \u2192 ') +
       (all.some(y => y.selfPaced) ? ' (\u2020 self-paced)' : '') : '') +
     (lv === 'below' ? ' \u00b7 below the ' + ssaPass(exam) + ' pass line' : lv === 'near' ? ' \u00b7 within ' + SSA_CCSSA_NEAR + ' of the ' + ssaPass(exam) + ' pass line' : '') +
-    (unscored ? ' \u00b7 ' + unscored + ' more with no score reported' : ''),
+    (unscored ? ' \u00b7 also ' + ssaUnscoredText(s, exam) : ''),
     lv === 'below');
   if(all.length > 1) d.appendChild(ssaTrend(all, exam));
 }
