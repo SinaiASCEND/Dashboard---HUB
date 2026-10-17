@@ -3787,6 +3787,19 @@ function usmleOf(s){
   });
   return out;
 }
+/* NBME self-assessments (CBSSA, CCSSA): not graded, so outside standing; the
+   build puts every sitting in the subtitle, "NBME self-assessment · Jan 30,
+   2026 Form 26 · score 64 · ...". The last sitting on or before `by` (an ISO
+   date, e.g. the Step exam's), or the last of all when no date is given. */
+function saScore(s, exam, by){
+  const r = (s.records || []).find(x => x.kind === 'selfassess' && x.code === exam && !isPrior(x));
+  if(!r) return null;
+  const MON = 'JanFebMarAprMayJunJulAugSepOctNovDec';
+  const sits = [...String(r.term || '').matchAll(/([A-Z][a-z]{2}) (\d{1,2}), (\d{4}) Form \S+ · score (\d+)/g)]
+    .map(m => ({date: m[3] + '-' + String(MON.indexOf(m[1]) / 3 + 1).padStart(2, '0') + '-' + m[2].padStart(2, '0'), score: +m[4]}))
+    .filter(x => !by || x.date <= by);
+  return sits.length ? sits[sits.length - 1].score : null;
+}
 /* a first-attempt score's percentile within the student's class */
 function step2Pct(s, score){
   const pool = (DATA.students || []).filter(o => o.cohort === s.cohort)
@@ -5635,7 +5648,22 @@ function renderPredictors(){
   const body2 = byClass(rows.filter(x => x.timing && cbq(x) != null), QN.map((n, q) => [n, x => cbq(x) === q]));
   if(body2.length) table('CBSE quarter against Step 1 and shelves', ['CBSE (quarter of the class)'].concat(COLS), body2);
   else none('No class here has CBSE scores and a closed Step 1 window yet.');
-  none('Step 1 is reported pass/fail, so the CBSE predicts passing, not a score. The NBME self-assessments (CBSSA, CCSSA) are not on file.');
+  none('Step 1 is reported pass/fail, so the CBSE predicts passing, not a score.');
+  /* 2b. CBSSA -> Step 1: the last self-assessment sat before Step 1, by quarter
+     of the class's students who sat one */
+  host.appendChild(elc('h3','predh', 'CBSSA → Step 1'));
+  const before = (x, exam, step) => { const u = usmleOf(x.s)[step]; return saScore(x.s, exam, u && u.rec.start) };
+  const qOf = (list, val) => { const q = new Map();
+    PREDICT_CLASSES.forEach(c => { const C = list.filter(x => Number(x.s.cohort) === c).sort((a, b) => val(a) - val(b));
+      C.forEach((x, i) => q.set(x, Math.min(3, Math.floor(4 * i / C.length)))) });
+    return x => q.get(x) };
+  const sa1 = rows.filter(x => x.timing && before(x, 'CBSSA', 'STEP1') != null);
+  const q1 = qOf(sa1, x => before(x, 'CBSSA', 'STEP1'));
+  const SQ = n => ['bottom', 'second', 'third', 'top'].map(w => n + ' ' + w + ' quarter');
+  const body2b = byClass(sa1, SQ('CBSSA').map((n, q) => [n, x => q1(x) === q]));
+  if(body2b.length) table('CBSSA quarter against Step 1 and shelves', ['CBSSA (quarter of those who sat it)'].concat(COLS), body2b);
+  else none('No CBSSA on file for a class whose Step 1 window has closed.');
+  none('Quarters are of the students with a CBSSA on file, not the whole class; the last CBSSA before Step 1 counts.');
   /* 3. Step 1 timing -> shelves */
   host.appendChild(elc('h3','predh', 'Step 1 timing → clerkship shelves'));
   const body3 = byClass(rows.filter(x => x.timing && x.shelves.length),
@@ -5649,6 +5677,34 @@ function renderPredictors(){
     ? 'Class of 2027: CCSE against Step 2 CK r = ' + C.r + '; the CCSE explains ' + pct(Math.round(100 * C.r2Ccse), 100) +
       ' of the variation, preclinical grades ' + pct(Math.round(100 * C.r2Preclinical), 100) + ', both ' + pct(Math.round(100 * C.r2Both), 100) + ' (n ' + C.n + ').'
     : 'Shown when the confidential build is loaded (Class of 2027 CCSE against Step 2 CK, class-level figures only).');
+  /* 5. CCSSA -> Step 2 CK: the last self-assessment before the first Step 2 CK
+     sitting against that sitting's 3-digit score */
+  host.appendChild(elc('h3','predh', 'CCSSA → Step 2 CK'));
+  const ck = x => { const u = usmleOf(x.s).STEP2CK; return u && u.scores.length ? u : null };
+  const sa2 = rows.filter(x => ck(x) && before(x, 'CCSSA', 'STEP2CK') != null);
+  const q2 = qOf(sa2, x => before(x, 'CCSSA', 'STEP2CK'));
+  const body5 = [];
+  PREDICT_CLASSES.forEach(c => {
+    const C = sa2.filter(x => Number(x.s.cohort) === c); if(!C.length) return;
+    body5.push({cls: 'Class of ' + c + (c <= 2027 ? ' (legacy curriculum)' : '')});
+    SQ('CCSSA').forEach((n, q) => { const G = C.filter(x => q2(x) === q); if(!G.length) return;
+      body5.push({cells: [n, String(G.length), Math.round(mean(G.map(x => before(x, 'CCSSA', 'STEP2CK')))) + '',
+        Math.round(mean(G.map(x => ck(x).scores[0]))) + '', String(G.filter(x => ck(x).result !== 'Pass').length)]}) });
+  });
+  if(body5.length){
+    table('CCSSA quarter against Step 2 CK', ['CCSSA (quarter of those who sat it)', 'Students', 'Mean CCSSA', 'Mean Step 2 CK (1st attempt)', 'Failed Step 2 CK (any attempt)'], body5);
+    PREDICT_CLASSES.forEach(c => { const C = sa2.filter(x => Number(x.s.cohort) === c); if(C.length < 5) return;
+      const r = pearson(C.map(x => before(x, 'CCSSA', 'STEP2CK')), C.map(x => ck(x).scores[0]));
+      if(r != null) none('Class of ' + c + ': CCSSA against Step 2 CK r = ' + r.toFixed(2) + ' (n ' + C.length + ').') });
+  } else none('No student here has both a CCSSA and a Step 2 CK score on file yet.');
+  none('Unscored and abandoned self-assessment sittings are left out by the build.');
+}
+function pearson(a, b){
+  if(a.length < 3) return null;
+  const ma = mean(a), mb = mean(b);
+  let n = 0, da = 0, db = 0;
+  a.forEach((v, i) => { n += (v - ma) * (b[i] - mb); da += (v - ma) ** 2; db += (b[i] - mb) ** 2 });
+  return da && db ? n / Math.sqrt(da * db) : null;
 }
 
 /* ---------------- review cards ---------------- */
