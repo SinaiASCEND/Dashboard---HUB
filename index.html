@@ -481,31 +481,31 @@ const TIERS = {
   },
   "255af8d0734e8438d7fcef7cb457da08d130e24f574065175f2ab73ed2ffb360": {
     name: "Executive Education Committee",
-    sub: "All monitoring, mapping, governance, and accreditation views.",
-    dashboards: ["phase1", "clinicalskills", "phase2", "phase3", "nbme",  "objectives", "nutrition", "integration", "policies", "surveys", "lcme", "governance", "studentleaders",
+    sub: "Programmatic assessment across all three phases, clinical skills, the class calendar, policies, and governance.",
+    dashboards: ["calendar", "phase1", "clinicalskills", "phase2", "phase3", "integration", "policies", "governance", "studentleaders",
                  "people", "navigator", "electives"],
     pinned: ["phase1","phase2","phase3","governance"]
   },
   "31016cceeab858e9880093fcb959e82b5ac270f082b80c9ef9a63a731c9c7d86": {
     name: "Pre-Clerkship Curriculum Subcommittee",
-    sub: "Phase 1 assessment, clinical skills, exam performance, objectives, policies, and governance.",
-    dashboards: ["phase1", "clinicalskills", "nbme", "objectives", "nutrition", "integration", "policies", "governance", "studentleaders",
+    sub: "Phase 1 assessment, the class calendar, policies, and governance.",
+    dashboards: ["calendar", "phase1", "integration", "policies", "governance", "studentleaders",
                  "people", "navigator", "electives"],
     pinned: ["phase1","governance"]
   },
   "5156cc64ad912a74bb8bd6a96ec955fa6d4fc4c4f97815d53e6eef9439d398a0": {
     name: "Clinical Curriculum Subcommittee",
-    sub: "Phase 2 and 3 assessment, clerkship quality, exam performance, objectives, policies, and governance.",
-    dashboards: ["phase2", "phase3", "nbme",  "objectives", "nutrition", "integration", "policies", "governance", "studentleaders",
+    sub: "Phase 2 and 3 assessment, clerkship quality, the class calendar, policies, and governance.",
+    dashboards: ["calendar", "phase2", "phase3", "integration", "policies", "governance", "studentleaders",
                  "people", "navigator", "electives"],
     pinned: ["phase2","governance"]
   },
   "4ed5cb948f5f7c10d66e38ed679d0e5f0be24469df2de636c2da893d5b06ecb3": {
     name: "Curricular Integration Subcommittee",
-    sub: "Programmatic assessment across all three phases, clinical skills, objectives, policies, and governance.",
+    sub: "The class calendar, policies, governance, the Faculty Development Retreat, and student navigation tools.",
     // Integration Retreat card added 15 Oct 2026 at the owner's request (pinned until the retreat is over).
     // Curricular Integration Dashboard added 18 Oct 2026 at the owner's request: this subcommittee's home dashboard.
-    dashboards: ["phase1", "clinicalskills", "phase2", "phase3", "objectives", "nutrition", "integration", "policies", "governance", "studentleaders",
+    dashboards: ["calendar", "integration", "policies", "governance", "studentleaders",
                  "people", "navigator", "electives", "retreat"],
     pinned: ["retreat", "integration"]
   },
@@ -534,12 +534,13 @@ const TIERS = {
   },
   "7299453b621d99c8276fe0e83fa140072a0ab85e1a2be10331ff8f668db65b0c": {
     // Added 15 Oct 2026 at the owner's request. Each server-gated site in this list must also accept this code
-    // in its own unlock (the Support Dashboard, the Governance student roster).
+    // in its own unlock (Governance, the Clinical Skills Portal). 18 Oct 2026: Governance and Electives added,
+    // the Support Dashboard removed (owner's access review).
     name: "Assessment and Evaluation Subcommittee",
-    sub: "Programmatic assessment across all three phases, exam performance, student surveys, objectives and milestones, and the assessment and meeting tools.",
-    dashboards: ["support", "phase1", "phase2", "phase3", "nbme", "surveys", "objectives", "nutrition", "integration", "clinicalskills",
-                 "policies", "calendar", "people", "navigator", "studentleaders"],
-    pinned: ["support","phase1","phase2","phase3"]
+    sub: "Programmatic assessment across all three phases, exam performance, student surveys, objectives and milestones, clinical skills, and governance.",
+    dashboards: ["phase1", "phase2", "phase3", "nbme", "surveys", "objectives", "nutrition", "clinicalskills",
+                 "integration", "policies", "governance", "calendar", "people", "navigator", "electives", "studentleaders"],
+    pinned: ["phase1","phase2","phase3","nbme"]
   }
 };
 /* ============================================================ */

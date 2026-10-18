@@ -199,7 +199,7 @@
    "kicker": "Programmatic Assessment",
    "title": "ASCEND Phase 1 Directors Dashboard",
    "short": "Phase 1",
-   "audience": "Module directors, the Pre-Clerkship Curriculum Subcommittee, the Curricular Integration Subcommittee, the EEC, and OCA leadership.",
+   "audience": "Module directors, the Pre-Clerkship Curriculum Subcommittee, the Assessment and Evaluation Subcommittee, the EEC, and OCA leadership.",
    "intro": "Module-level outcomes for the pre-clerkship phase. Aggregate data by class cohort: how each module's assessments performed, what students said, and how the module maps to the program objectives.",
    "primary": "Dashboard-Phase-1-Program-Assessment/",
    "views": [
@@ -265,7 +265,7 @@
    "kicker": "Programmatic Assessment",
    "title": "ASCEND Phase 2 Directors Dashboard",
    "short": "Phase 2",
-   "audience": "Clerkship directors, the Clinical Curriculum Subcommittee, the Curricular Integration Subcommittee, the EEC, and OCA leadership.",
+   "audience": "Clerkship directors, the Clinical Curriculum Subcommittee, the Assessment and Evaluation Subcommittee, the EEC, and OCA leadership.",
    "intro": "Clerkship-level outcomes for the clinical phase, plus program-wide clerkship monitoring across teaching sites. Aggregate data by academic year with prior-year comparison; student-level files go to directors separately.",
    "primary": "Dashboard-Phase-2-Program-Assessment/",
    "views": [
@@ -310,7 +310,7 @@
    "kicker": "Programmatic Assessment",
    "title": "ASCEND Phase 3 Dashboard",
    "short": "Phase 3",
-   "audience": "Course and clerkship directors, the Clinical Curriculum Subcommittee, the Curricular Integration Subcommittee, the EEC, and OCA leadership.",
+   "audience": "Course and clerkship directors, the Clinical Curriculum Subcommittee, the Assessment and Evaluation Subcommittee, the EEC, and OCA leadership.",
    "intro": "Outcomes for the Integration and Transitions phase. This site is being built. It will cover the Chronic Care Clerkship, the acting internships, Transition to Phase 3, Transition to Residency, and PEAKS III, in the same format as the Phase 1 and Phase 2 sites.",
    "primary": "Dashboard-Phase-3-Program-Assessment/",
    "views": [
@@ -334,7 +334,7 @@
    "kicker": "Assessment Monitoring",
    "title": "NBME and USMLE Performance",
    "short": "the exam dashboard",
-   "audience": "The Pre-Clerkship and Clinical Curriculum Subcommittees, the EEC, and OCA leadership.",
+   "audience": "The Assessment and Evaluation Subcommittee and OCA leadership.",
    "intro": "Content-area strengths and gaps across national examinations, for curricular review across all phases.",
    "primary": "Dashboard---NBME-CAS-Performance/",
    "views": [
@@ -362,7 +362,7 @@
    "kicker": "Curriculum Mapping",
    "title": "ASCEND MEPOs, Learning Objectives and Outcomes Dashboard",
    "short": "Objectives and Outcomes",
-   "audience": "Curriculum leaders, all EEC subcommittees, the EEC, and OCA leadership.",
+   "audience": "Curriculum leaders, the Assessment and Evaluation Subcommittee, and OCA leadership.",
    "intro": "The program's learning objectives and how students are meeting them: every objective in Phases 1 to 3, the 23 program objectives, the milestones expected at each phase, and measured outcomes. The library and the Milestones Map share one framework file and one MEPO wording.",
    "primary": "PMB-MLOs/",
    "equal": true,
@@ -395,7 +395,7 @@
    "kicker": "Curriculum Mapping",
    "title": "Nutrition Milestones",
    "short": "Nutrition Milestones",
-   "audience": "The Nutrition Content Area Director, module and clerkship directors, all EEC subcommittees, the EEC, and OCA leadership. Draft content for review by the Nutrition Content Area Director, PCCS and CCS.",
+   "audience": "The Nutrition Content Area Director, module and clerkship directors, the Assessment and Evaluation Subcommittee, and OCA leadership. Draft content for review by the Nutrition Content Area Director, PCCS and CCS.",
    "intro": "End-of-phase milestones for nutrition, built on the Milestones Map framework. It takes one competency from the JAMA nutrition competencies for medical students (Eisenberg et al., 2024), #5: assessing a patient's nutritional status with a brief diet history, measurements and lab tests. It follows that competency from the end of Phase 1 to residency readiness, and marks what is already taught and what is proposed.",
    "primary": "PMB-MLOs/nutrition.html",
    "views": [
@@ -527,7 +527,7 @@
    "kicker": "Student Feedback",
    "title": "Student Surveys",
    "short": "the surveys",
-   "audience": "The EEC and OCA leadership. The Graduation Questionnaire view is restricted.",
+   "audience": "The Assessment and Evaluation Subcommittee and OCA leadership. The Graduation Questionnaire view is restricted.",
    "intro": "What students report about the program, mapped to LCME elements, alongside national curriculum benchmarks, in one site with three views.",
    "primary": "ASQ-ISA/",
    "views": [
@@ -554,7 +554,7 @@
    "kicker": "Accreditation",
    "title": "LCME Task Force",
    "short": "the task force site",
-   "audience": "LCME Task Force members, the EEC, and OCA leadership.",
+   "audience": "LCME Task Force members and OCA leadership.",
    "intro": "Working materials for the 2027–28 self-study and site visit.",
    "primary": "Dashboard---LCME/",
    "views": [
@@ -661,7 +661,7 @@
    "kicker": "Support Tools",
    "title": "ASCEND Support Dashboard",
    "short": "the Support Dashboard",
-   "audience": "Office of Curricular Affairs staff, governance support, dashboard maintainers, and the subcommittee that reviews module evaluations. Each tool keeps its own audience: the Program Evaluation Report Generator rates named educators, so fewer codes open it. Your Hub code opens what your role allows; the dashboard's home greys out the rest.",
+   "audience": "Office of Curricular Affairs staff, governance support, and dashboard maintainers.",
    "intro": "Four tools for the people who keep ASCEND running, behind one access code. Make a Word draft of meeting minutes from a transcript, build a module evaluation report from a one45 export, take student names out of a file before it goes in a dashboard inbox, or look up how a dashboard job is done. The Office of Curricular Affairs keeps a copy of each meeting transcript; nothing else you upload to these tools is stored.",
    "primaryAbs": "https://ascend-support-dashboard.vercel.app/",
    "unlock": "https://ascend-support-dashboard.vercel.app/api/unlock",
