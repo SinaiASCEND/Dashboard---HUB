@@ -518,6 +518,31 @@ table.opgrid{border-collapse:collapse;width:100%;min-width:680px;font-size:13px}
 .predh{font-size:13px;letter-spacing:.06em;text-transform:uppercase;margin:6px 0 8px;color:var(--ink)}
 table.predict{min-width:720px}table.predict tr.sub th{font-weight:500;color:var(--ink-2);padding-left:22px}table.predict tr.sub td{color:var(--ink-2)}
 table.predict tr.cls th{font-weight:800;color:var(--ink);background:var(--surface-2)}
+.pr-pick{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.pr-chip{font:inherit;font-size:13px;font-weight:700;padding:6px 14px;border-radius:999px;border:1px solid var(--line-2);
+  background:var(--surface);color:var(--ink-2);cursor:pointer}
+.pr-chip[aria-pressed="true"]{background:var(--s1);border-color:var(--s1);color:#fff}
+.pr-chip:disabled{opacity:.45;cursor:default}
+.pr-chip:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
+.pr-how{margin:0 0 14px;font-size:13px;color:var(--ink-2)}
+.pr-how summary,.pr-num summary{cursor:pointer;font-weight:700;color:var(--s1)}
+.pr-how p{margin:6px 0 0;line-height:1.45;max-width:90ch}
+.pr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:14px;margin-bottom:18px}
+.pr-card{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:var(--surface);display:flex;flex-direction:column;gap:8px;min-width:0}
+.pr-card h4{margin:0;font-size:15px;color:var(--ink)}
+.pr-card .pr-what{margin:0;font-size:12px;color:var(--muted);line-height:1.4}
+.pr-card .pr-head{margin:2px 0 0;font-size:14px;font-weight:600;color:var(--ink);line-height:1.4}
+.pr-card.pr-empty .pr-head{font-weight:500;color:var(--muted)}
+.pr-bars{display:flex;flex-direction:column;gap:6px;margin-top:2px}
+.pr-bar{display:grid;grid-template-columns:minmax(0,140px) 1fr 84px;align-items:center;gap:8px;font-size:12px}
+.pr-bar .lab{color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pr-bar.risk .lab{font-weight:700;color:var(--ink)}
+.pr-bar .val{text-align:right;font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink)}
+.pr-track{position:relative;height:10px;border-radius:5px;background:var(--surface-2);overflow:hidden}
+.pr-track i{position:absolute;left:0;top:0;bottom:0;border-radius:0 4px 4px 0;background:var(--s1)}
+.pr-card .pr-axis{margin:0;font-size:11px;color:var(--muted)}
+.pr-num{font-size:12.5px;margin-top:2px}
+.pr-num .tablewrap{margin-top:8px}
 
 /* Dark mode: every card carries a soft luminous edge so neighbouring cards
    read as separate panels on the dark plane. */
@@ -1151,15 +1176,10 @@ body.gated{overflow:hidden}
     <div class="card" id="predictCard">
       <div class="cardhd">
         <div>
-          <div class="kicker">Classes of 2027, 2028 and 2029 &middot; each class on its own</div>
-          <h2>What Phase 1 NBME results predict</h2>
-          <p class="why">Not tied to the class filter, and never pooled: each class is shown under its own heading.
-            A Phase 1 NBME failure is a first sitting below 65; Step 1 is
-            &ldquo;on schedule&rdquo; when sat by the end of the class&rsquo;s Dedicated Study Block (legacy Class of
-            2027: by 30 June 2025), and &ldquo;late&rdquo; otherwise &mdash; including no Step 1 on record, which
-            delays Phase 2 entry. A student with no Step 1 on record who is already in clerkships is left out of the
-            timing rows: their result is missing from the USMLE match, not late. A shelf failure is a first attempt below its Clerkship Information Sheet pass
-            mark. Small groups: read the direction, not the decimals.</p>
+          <div class="kicker">One class at a time &middot; patterns for advising</div>
+          <h2>What predicts Step 1, Step 2 CK and the shelves</h2>
+          <p class="why">Each card takes one thing known early and shows how each group of students did later.
+            Pick a class below; classes are never pooled.</p>
         </div>
       </div>
       <div class="cardbody" id="predictBody"></div>
@@ -5601,103 +5621,181 @@ function predictorRows(){
 /* the classes the card covers (user, 2026-10-17): each shown on its own, never
    pooled; the legacy Classes of 2023-2026 are left out */
 const PREDICT_CLASSES = [2027, 2028, 2029];
+/* What predicts Step 1, Step 2 CK and the shelves: ONE class at a time (picked
+   above the findings; never pooled), each predictor a finding card - a
+   headline sentence worked out from the data, one bar per group (the share of
+   the group with the outcome, or its mean score), and the full numbers behind
+   "Show the numbers". Patterns for advising, not predictions about a student. */
 function renderPredictors(){
   const host = $('predictBody'); if(!host) return; host.textContent = '';
-  const rows = predictorRows().filter(x => PREDICT_CLASSES.includes(Number(x.s.cohort)));
+  const all = predictorRows().filter(x => PREDICT_CLASSES.includes(Number(x.s.cohort)));
+  const has = c => all.some(x => Number(x.s.cohort) === c);
+  if(!PREDICT_CLASSES.includes(state.predClass) || !has(state.predClass))
+    state.predClass = [2028, 2027, 2029].find(has) || 2028;
+  const cls = state.predClass;
+  const rows = all.filter(x => Number(x.s.cohort) === cls);
   const pct = (a, b) => b ? Math.round(100 * a / b) + '%' : '—';
+  const kofn = (k, n) => k + ' of ' + n + ' (' + pct(k, n) + ')';
+
+  /* the class picker */
+  const pick = elc('div','pr-pick'); pick.setAttribute('role','group'); pick.setAttribute('aria-label','Class');
+  PREDICT_CLASSES.forEach(c => {
+    const b = elc('button','pr-chip', 'Class of ' + c + (c <= 2027 ? ' · legacy' : ''));
+    b.type = 'button'; b.setAttribute('aria-pressed', String(c === cls)); b.disabled = !has(c);
+    b.addEventListener('click', () => { state.predClass = c; renderPredictors() });
+    pick.appendChild(b);
+  });
+  host.appendChild(pick);
+
+  /* how to read it */
+  const how = elc('details','pr-how');
+  how.appendChild(elc('summary', null, 'How to read this'));
+  [
+    'Each card takes one thing known early (a Phase 1 NBME result, the CBSE, a self-assessment, Step 1 timing) and shows how the students in each group did later. The bars compare the groups; the sentence above them says what the bars show.',
+    'One class at a time, never pooled: classes sat different exams under different rules. The Class of 2027 is the last legacy-curriculum class (no Phase 1 NBME exams or CBSE).',
+    '“Failed or late on Step 1”: Step 1 not passed on the first attempt, or not sat by the end of the class’s Dedicated Study Block (Class of 2027: by 30 June 2025) — including no Step 1 on record. A student already in clerkships with no Step 1 on record is left out: the result is missing from the USMLE match, not late.',
+    'A Phase 1 NBME failure is a first sitting below 65. A shelf failure is a first attempt below its Clerkship Information Sheet pass mark. Quarters are of the students in that class who have the score; for the self-assessments, the last sitting before the Step exam counts.',
+    'Small groups swing a lot: read the direction, not the decimals. These are patterns for advising and anticipatory support, not predictions about any one student, and they never change a student’s standing.'
+  ].forEach(t => how.appendChild(elc('p', null, t)));
+  host.appendChild(how);
+
+  /* the numbers behind a card */
   const summary = G => {
     const timed = G.filter(x => x.timing), late = timed.filter(x => x.timing !== 'on').length;
     const sat = G.filter(x => x.shelves.length), sf = sat.filter(x => x.shelves.some(h => h.fail)).length;
     const zs = sat.flatMap(x => x.shelves.map(h => h.z)).filter(z => z != null);
-    return [String(G.length), timed.length ? pct(late, timed.length) + ' (' + late + ' of ' + timed.length + ')' : '—',
-      String(G.filter(x => x.s1fail).length), sat.length ? pct(sf, sat.length) + ' (' + sf + ' of ' + sat.length + ')' : '—',
+    return [String(G.length), timed.length ? kofn(late, timed.length) : '—',
+      String(G.filter(x => x.s1fail).length), sat.length ? kofn(sf, sat.length) : '—',
       zs.length ? (mean(zs) >= 0 ? '+' : '') + mean(zs).toFixed(2) : '—'];
   };
-  const table = (caption, head, body) => {
+  const COLS = ['Students', 'Step 1 late or not on record', 'Failed Step 1', 'Any shelf failed (1st attempt)', 'Mean shelf (class z)'];
+  const numbers = (card, caption, head, body) => {
+    const d = elc('details','pr-num'); d.appendChild(elc('summary', null, 'Show the numbers'));
     const w = elc('div','tablewrap'), t = elc('table','grid predict'); t.appendChild(elc('caption','sr', caption));
     const tr = elc('tr'); head.forEach(h => tr.appendChild(elc('th', null, h))); const th = elc('thead'); th.appendChild(tr); t.appendChild(th);
-    const tb = elc('tbody'); body.forEach(r => {
-      if(r.cls){ const x = elc('tr','cls'), c = elc('th', null, r.cls); c.colSpan = head.length; x.appendChild(c); tb.appendChild(x); return }
-      const x = elc('tr', r.sub ? 'sub' : null); r.cells.forEach((c, i) => x.appendChild(elc(i ? 'td' : 'th', i ? 'num' : null, c))); tb.appendChild(x) });
-    t.appendChild(tb); w.appendChild(t); host.appendChild(w);
+    const tb = elc('tbody');
+    body.forEach(r => { const x = elc('tr'); r.forEach((c, i) => x.appendChild(elc(i ? 'td' : 'th', i ? 'num' : null, c))); tb.appendChild(x) });
+    t.appendChild(tb); w.appendChild(t); d.appendChild(w); card.appendChild(d);
   };
-  /* one block of rows per class, each under its own class heading */
-  const byClass = (list, groups) => {
-    const body = [];
-    PREDICT_CLASSES.forEach(c => {
-      const C = list.filter(x => Number(x.s.cohort) === c), part = [];
-      groups.forEach(([n, test]) => { const G = C.filter(test); if(G.length) part.push({cells: [n].concat(summary(G))}) });
-      if(part.length) body.push({cls: 'Class of ' + c + (c <= 2027 ? ' (legacy curriculum)' : '')}, ...part);
+  /* a finding card: title, what it is, headline, bars */
+  const grid = elc('div','pr-grid');
+  const card = (title, what) => {
+    const c = elc('article','pr-card');
+    c.appendChild(elc('h4', null, title));
+    if(what) c.appendChild(elc('p','pr-what', what));
+    grid.appendChild(c); return c;
+  };
+  const empty = (c, msg) => { c.classList.add('pr-empty'); c.appendChild(elc('p','pr-head', msg)) };
+  /* one bar per group: the share with the outcome (k of n) or a mean on a fixed scale */
+  const bars = (c, items, outcome) => {
+    const box = elc('div','pr-bars');
+    items.forEach(it => {
+      const row = elc('div','pr-bar' + (it.risk ? ' risk' : ''));
+      row.appendChild(elc('span','lab', it.label));
+      const tr = elc('span','pr-track'), f = elc('i');
+      f.style.width = Math.max(it.w, it.w > 0 ? 2 : 0) + '%'; tr.appendChild(f); row.appendChild(tr);
+      row.appendChild(elc('span','val', it.text));
+      row.title = it.label + ': ' + it.tip + (outcome ? ' ' + outcome : '');
+      box.appendChild(row);
     });
-    return body;
+    c.appendChild(box);
   };
-  const COLS = ['Students', 'Step 1 late or not on record', 'Failed Step 1', 'Any shelf failed (1st attempt)', 'Mean shelf (class z)'];
-  const none = c => host.appendChild(elc('p','why', c));
+  /* a rate card: groups, the outcome test, which groups are the "risk" side */
+  const rateCard = (c, groups, list, bad, outcome, riskName) => {
+    const items = groups.map(([label, test, risk]) => { const G = list.filter(test);
+      return {label, risk, n: G.length, k: G.filter(bad).length, G} }).filter(g => g.n);
+    const R = items.filter(g => g.risk), O = items.filter(g => !g.risk);
+    const sum = (A, f) => A.reduce((t, g) => t + g[f], 0);
+    const rk = sum(R, 'k'), rn = sum(R, 'n'), ok = sum(O, 'k'), on = sum(O, 'n');
+    const head = !rk && !ok ? 'No student in these groups ' + outcome + ' — nothing to tell apart yet.'
+      : rn && on ? 'Among students ' + riskName + ', ' + kofn(rk, rn) + ' ' + outcome + '; among the rest, ' + kofn(ok, on) + '.'
+      : 'Overall, ' + kofn(rk + ok, rn + on) + ' ' + outcome + '.';
+    c.appendChild(elc('p','pr-head', head + (rn && rn < 8 ? ' Small group: read the direction.' : '')));
+    bars(c, items.map(g => ({label: g.label, risk: g.risk, w: 100 * g.k / g.n, text: pct(g.k, g.n) + ' · ' + g.k + '/' + g.n,
+      tip: kofn(g.k, g.n)})), outcome);
+    return items;
+  };
+  const s1bad = x => x.timing !== 'on' || x.s1fail;
+  const S1 = 'failed or were late on Step 1';
+  const qOf = (list, val) => { const q = new Map(), C = list.slice().sort((a, b) => val(a) - val(b));
+    C.forEach((x, i) => q.set(x, Math.min(3, Math.floor(4 * i / C.length)))); return x => q.get(x) };
+  const QW = ['Bottom quarter', 'Second quarter', 'Third quarter', 'Top quarter'];
+  const before = (x, exam, step) => { const u = usmleOf(x.s)[step]; return saScore(x.s, exam, u && u.rec.start) };
+
+  host.appendChild(elc('h3','predh', 'Before Step 1'));
+  host.appendChild(grid);
   /* 1. Phase 1 NBME failures */
-  const NAMES = ['No Phase 1 NBME failure', 'One failure', 'Two or more, in one semester', 'Two or more, across semesters'];
-  host.appendChild(elc('h3','predh', 'Phase 1 NBME failures → Step 1 timing and clerkship shelves'));
-  const body1 = byClass(rows.filter(x => x.group != null && x.timing), NAMES.map((n, g) => [n, x => x.group === g]));
-  if(body1.length) table('Phase 1 NBME failures against Step 1 timing and shelves', ['Phase 1 NBME (first sittings)'].concat(COLS), body1);
-  else none('No class here has both Phase 1 NBME exams and a closed Step 1 window yet.');
-  none('The Class of 2027 (legacy curriculum) had no Phase 1 NBME exams; the Class of 2029 joins once its Step 1 window closes.');
-  /* 2. CBSE -> Step 1: the CBSE, sat at the end of Phase 1, by quarter of the class */
-  host.appendChild(elc('h3','predh', 'CBSE → Step 1'));
+  let c = card('Phase 1 NBME exams', 'Module NBME exams failed on the first sitting (below 65).');
+  const p1 = rows.filter(x => x.group != null && x.timing);
+  if(cls <= 2027) empty(c, 'The legacy curriculum had no Phase 1 NBME exams.');
+  else if(!p1.length) empty(c, 'Step 1 results are not in yet for this class.');
+  else {
+    const NAMES = ['No failure', 'One failure', '2+ in one semester', '2+ across semesters'];
+    const it = rateCard(c, NAMES.map((n, g) => [n, x => x.group === g, g > 0]), p1, s1bad, S1, 'who failed at least one');
+    numbers(c, 'Phase 1 NBME failures against Step 1 and shelves', ['Phase 1 NBME (first sittings)'].concat(COLS), it.map(g => [g.label].concat(summary(g.G))));
+  }
+  /* 2. CBSE */
+  c = card('CBSE', 'The NBME Comprehensive Basic Science Exam at the end of Phase 1, by quarter of the class.');
   const cbq = x => { const cb = cbseOf(x.s); if(!cb || cb.prior) return null; const p = cbsePct(x.s, cb.cas.scaled);
     return p == null ? null : p < 25 ? 0 : p < 50 ? 1 : p < 75 ? 2 : 3 };
-  const QN = ['CBSE bottom quarter', 'CBSE second quarter', 'CBSE third quarter', 'CBSE top quarter'];
-  const body2 = byClass(rows.filter(x => x.timing && cbq(x) != null), QN.map((n, q) => [n, x => cbq(x) === q]));
-  if(body2.length) table('CBSE quarter against Step 1 and shelves', ['CBSE (quarter of the class)'].concat(COLS), body2);
-  else none('No class here has CBSE scores and a closed Step 1 window yet.');
-  none('Step 1 is reported pass/fail, so the CBSE predicts passing, not a score.');
-  /* 2b. CBSSA -> Step 1: the last self-assessment sat before Step 1, by quarter
-     of the class's students who sat one */
-  host.appendChild(elc('h3','predh', 'CBSSA → Step 1'));
-  const before = (x, exam, step) => { const u = usmleOf(x.s)[step]; return saScore(x.s, exam, u && u.rec.start) };
-  const qOf = (list, val) => { const q = new Map();
-    PREDICT_CLASSES.forEach(c => { const C = list.filter(x => Number(x.s.cohort) === c).sort((a, b) => val(a) - val(b));
-      C.forEach((x, i) => q.set(x, Math.min(3, Math.floor(4 * i / C.length)))) });
-    return x => q.get(x) };
+  const cb = rows.filter(x => x.timing && cbq(x) != null);
+  if(cls <= 2027) empty(c, 'The legacy curriculum had no CBSE.');
+  else if(!cb.length) empty(c, 'No CBSE with a Step 1 result for this class yet.');
+  else {
+    const it = rateCard(c, QW.map((n, q) => [n, x => cbq(x) === q, q === 0]), cb, s1bad, S1, 'in the bottom quarter');
+    numbers(c, 'CBSE quarter against Step 1 and shelves', ['CBSE quarter'].concat(COLS), it.map(g => [g.label].concat(summary(g.G))));
+  }
+  /* 3. CBSSA */
+  c = card('CBSSA self-assessment', 'The last Comprehensive Basic Science Self-Assessment before Step 1, by quarter of the students who sat one.');
   const sa1 = rows.filter(x => x.timing && before(x, 'CBSSA', 'STEP1') != null);
-  const q1 = qOf(sa1, x => before(x, 'CBSSA', 'STEP1'));
-  const SQ = n => ['bottom', 'second', 'third', 'top'].map(w => n + ' ' + w + ' quarter');
-  const body2b = byClass(sa1, SQ('CBSSA').map((n, q) => [n, x => q1(x) === q]));
-  if(body2b.length) table('CBSSA quarter against Step 1 and shelves', ['CBSSA (quarter of those who sat it)'].concat(COLS), body2b);
-  else none('No CBSSA on file for a class whose Step 1 window has closed.');
-  none('Quarters are of the students with a CBSSA on file, not the whole class; the last CBSSA before Step 1 counts.');
-  /* 3. Step 1 timing -> shelves */
-  host.appendChild(elc('h3','predh', 'Step 1 timing → clerkship shelves'));
-  const body3 = byClass(rows.filter(x => x.timing && x.shelves.length),
-    [['Step 1 on schedule', x => x.timing === 'on'], ['Step 1 late', x => x.timing === 'late'], ['No Step 1 on record', x => x.timing === 'none']]);
-  if(body3.length) table('Step 1 timing against shelves', ['Step 1'].concat(COLS), body3);
-  none('“No Step 1 on record” can also mean a roster name the USMLE match has not resolved yet.');
-  /* 4. CCSE -> Step 2 CK: the Class of 2027 aggregate the confidential build carries */
-  host.appendChild(elc('h3','predh', 'CCSE → Step 2 CK'));
-  const C = ((DATA.meta || {}).legacyCohorts || {}).ccse2027 || {};
-  none(C.r != null
-    ? 'Class of 2027: CCSE against Step 2 CK r = ' + C.r + '; the CCSE explains ' + pct(Math.round(100 * C.r2Ccse), 100) +
-      ' of the variation, preclinical grades ' + pct(Math.round(100 * C.r2Preclinical), 100) + ', both ' + pct(Math.round(100 * C.r2Both), 100) + ' (n ' + C.n + ').'
-    : 'Shown when the confidential build is loaded (Class of 2027 CCSE against Step 2 CK, class-level figures only).');
-  /* 5. CCSSA -> Step 2 CK: the last self-assessment before the first Step 2 CK
-     sitting against that sitting's 3-digit score */
-  host.appendChild(elc('h3','predh', 'CCSSA → Step 2 CK'));
+  if(!sa1.length) empty(c, 'No CBSSA on file for this class with a Step 1 result.');
+  else {
+    const q1 = qOf(sa1, x => before(x, 'CBSSA', 'STEP1'));
+    const it = rateCard(c, QW.map((n, q) => [n, x => q1(x) === q, q === 0]), sa1, s1bad, S1, 'in the bottom quarter');
+    numbers(c, 'CBSSA quarter against Step 1 and shelves', ['CBSSA quarter', 'Mean CBSSA'].concat(COLS),
+      it.map(g => [g.label, String(Math.round(mean(g.G.map(x => before(x, 'CBSSA', 'STEP1')))))].concat(summary(g.G))));
+  }
+
+  const grid2 = elc('div','pr-grid');
+  host.appendChild(elc('h3','predh', 'Before Step 2 CK and the shelves'));
+  host.appendChild(grid2);
+  const card2 = (t, w) => { const k = card(t, w); grid2.appendChild(k); return k };
+  /* 4. CCSSA -> Step 2 CK: mean score by quarter */
+  c = card2('CCSSA self-assessment', 'The last Comprehensive Clinical Science Self-Assessment before Step 2 CK, by quarter of the students who sat one, against their first Step 2 CK score.');
   const ck = x => { const u = usmleOf(x.s).STEP2CK; return u && u.scores.length ? u : null };
   const sa2 = rows.filter(x => ck(x) && before(x, 'CCSSA', 'STEP2CK') != null);
-  const q2 = qOf(sa2, x => before(x, 'CCSSA', 'STEP2CK'));
-  const body5 = [];
-  PREDICT_CLASSES.forEach(c => {
-    const C = sa2.filter(x => Number(x.s.cohort) === c); if(!C.length) return;
-    body5.push({cls: 'Class of ' + c + (c <= 2027 ? ' (legacy curriculum)' : '')});
-    SQ('CCSSA').forEach((n, q) => { const G = C.filter(x => q2(x) === q); if(!G.length) return;
-      body5.push({cells: [n, String(G.length), Math.round(mean(G.map(x => before(x, 'CCSSA', 'STEP2CK')))) + '',
-        Math.round(mean(G.map(x => ck(x).scores[0]))) + '', String(G.filter(x => ck(x).result !== 'Pass').length)]}) });
-  });
-  if(body5.length){
-    table('CCSSA quarter against Step 2 CK', ['CCSSA (quarter of those who sat it)', 'Students', 'Mean CCSSA', 'Mean Step 2 CK (1st attempt)', 'Failed Step 2 CK (any attempt)'], body5);
-    PREDICT_CLASSES.forEach(c => { const C = sa2.filter(x => Number(x.s.cohort) === c); if(C.length < 5) return;
-      const r = pearson(C.map(x => before(x, 'CCSSA', 'STEP2CK')), C.map(x => ck(x).scores[0]));
-      if(r != null) none('Class of ' + c + ': CCSSA against Step 2 CK r = ' + r.toFixed(2) + ' (n ' + C.length + ').') });
-  } else none('No student here has both a CCSSA and a Step 2 CK score on file yet.');
-  none('Unscored and abandoned self-assessment sittings are left out by the build.');
+  if(!sa2.length) empty(c, 'No student in this class has both a CCSSA and a Step 2 CK score yet.');
+  else {
+    const q2 = qOf(sa2, x => before(x, 'CCSSA', 'STEP2CK'));
+    const G = QW.map((n, q) => ({label: n, G: sa2.filter(x => q2(x) === q)})).filter(g => g.G.length);
+    G.forEach(g => { g.ck = mean(g.G.map(x => ck(x).scores[0])); g.sa = mean(g.G.map(x => before(x, 'CCSSA', 'STEP2CK'))) });
+    const r = sa2.length >= 5 ? pearson(sa2.map(x => before(x, 'CCSSA', 'STEP2CK')), sa2.map(x => ck(x).scores[0])) : null;
+    const lo = G[0], hi = G[G.length - 1];
+    c.appendChild(elc('p','pr-head', 'Students in the bottom quarter averaged ' + Math.round(lo.ck) + ' on Step 2 CK; the top quarter averaged ' +
+      Math.round(hi.ck) + '.' + (r != null ? ' The CCSSA tracks Step 2 CK ' + (r >= .7 ? 'closely' : r >= .4 ? 'somewhat' : 'only loosely') +
+      ' (r = ' + r.toFixed(2) + ', n ' + sa2.length + ').' : '')));
+    const LO = 200, HI = 280;      /* the Step 2 CK range the bars are drawn on */
+    bars(c, G.map(g => ({label: g.label, risk: g === lo, w: Math.max(0, Math.min(100, 100 * (g.ck - LO) / (HI - LO))),
+      text: String(Math.round(g.ck)), tip: 'mean Step 2 CK ' + Math.round(g.ck) + ' (n ' + g.G.length + ')'})), '');
+    c.appendChild(elc('p','pr-axis', 'Bars: mean first Step 2 CK score, drawn from ' + LO + ' to ' + HI + '.'));
+    numbers(c, 'CCSSA quarter against Step 2 CK', ['CCSSA quarter', 'Students', 'Mean CCSSA', 'Mean Step 2 CK (1st attempt)', 'Failed Step 2 CK (any attempt)'],
+      G.map(g => [g.label, String(g.G.length), String(Math.round(g.sa)), String(Math.round(g.ck)), String(g.G.filter(x => ck(x).result !== 'Pass').length)]));
+  }
+  if(cls <= 2027){
+    const L = ((DATA.meta || {}).legacyCohorts || {}).ccse2027 || {};
+    if(L.r != null) c.appendChild(elc('p','pr-what', 'The CCSE (the proctored clinical science exam) tracked Step 2 CK closely in this class: r = ' + L.r +
+      '; it explains ' + pct(Math.round(100 * L.r2Ccse), 100) + ' of the variation, against ' + pct(Math.round(100 * L.r2Preclinical), 100) + ' for preclinical grades (n ' + L.n + ').'));
+  }
+  /* 5. Step 1 timing -> shelves */
+  c = card2('Step 1 timing', 'Whether Step 1 was passed on schedule, against failing any clerkship shelf on the first attempt.');
+  const t3 = rows.filter(x => x.timing && x.shelves.length);
+  if(!t3.length) empty(c, 'No shelf results with a Step 1 result for this class yet.');
+  else {
+    const it = rateCard(c, [['On schedule', x => x.timing === 'on', false], ['Late', x => x.timing === 'late', true], ['No Step 1 on record', x => x.timing === 'none', true]],
+      t3, x => x.shelves.some(h => h.fail), 'failed a shelf on the first attempt', 'late on Step 1 or with none on record');
+    numbers(c, 'Step 1 timing against shelves', ['Step 1'].concat(COLS), it.map(g => [g.label].concat(summary(g.G))));
+  }
+  host.appendChild(elc('p','why', 'Unscored and abandoned self-assessment sittings are left out by the build. “No Step 1 on record” can also mean a roster name the USMLE match has not resolved yet.'));
 }
 function pearson(a, b){
   if(a.length < 3) return null;
