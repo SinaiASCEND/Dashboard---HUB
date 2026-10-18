@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ASCEND Curricular Integration Dashboard · ASCEND</title>
+<link rel="stylesheet" href="../ascend-mast.css">
+<style>
+:root{--navy:#0A1F44;--navy2:#0E2C5C;--ink:#1d2433;--bg:#eef1f6;--line:#d7dde8;--muted:#5b6678;--soft:#f6f8fc;--magenta:#D6177F;--cyan:#00A0C8;--radius:14px;
+  --sans:"Helvetica Neue",-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+.wrap{max-width:980px;margin:0 auto;padding:0 22px}
+.intro{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:26px 26px 22px;margin:26px auto 0;box-shadow:0 2px 12px rgba(10,31,68,.06)}
+.lead{font-size:16px;line-height:1.6;margin:0;color:var(--ink);max-width:760px}
+.btn{display:inline-block;margin-top:18px;background:var(--navy);color:#fff;text-decoration:none;font-weight:700;font-size:14px;padding:12px 20px;border-radius:999px}
+.btn:hover{background:var(--magenta)}
+h2{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:800;margin:30px 0 12px}
+.vgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.vcard{background:#fff;border:1px solid var(--line);border-top:3px solid var(--magenta);border-radius:var(--radius);padding:20px 20px 18px;position:relative}
+.vcard:nth-child(even){border-top-color:var(--cyan)}
+.vk{font-size:10.5px;letter-spacing:.16em;font-weight:800;color:var(--muted)}
+.vt{font-size:17px;font-weight:800;color:var(--navy);margin:6px 0 6px;line-height:1.25}
+.vb{font-size:13.5px;color:var(--muted);line-height:1.5}
+.vgo{display:inline-block;margin-top:12px;font-weight:700;font-size:13px;color:var(--magenta);text-decoration:none}
+.vcard:nth-child(even) .vgo{color:var(--cyan)}
+.aud{margin:28px 0 40px;font-size:13px;color:var(--muted);line-height:1.6;border-left:3px solid var(--line);padding-left:14px}
+.aud b{color:var(--navy)}
+@media (max-width:680px){.vgrid{grid-template-columns:1fr}.wrap{padding:0 16px}}
+/* Phones: 16px text and 44px targets. Desktop untouched. */
+@media (max-width:767px){
+  .btn{display:inline-flex;align-items:center;min-height:44px;font-size:15px;padding:10px 20px}
+  h2{font-size:13px}
+  .vk{font-size:11.5px}
+  .vb{font-size:16px}
+  .vgo{display:inline-flex;align-items:center;min-height:44px;font-size:15px;margin-top:4px}
+  .aud{font-size:14.5px}
+}
+</style><script src="https://sinaiascend.github.io/Dashboard---HUB/ascend-stats.js" async></script>
+</head><body>
+<header class="ascend-mast ascend-mast--compact">
+  <img class="am-logo" src="../oca-mountain.png" alt="">
+  <div class="am-wrap">
+    <div class="am-top"><span class="am-dot"></span>
+      <div class="am-eyebrow">ICAHN SCHOOL OF MEDICINE AT MOUNT SINAI<br><span class="am-dept">OFFICE OF CURRICULAR AFFAIRS &middot; ASCEND DASHBOARD HUB</span></div>
+      <a class="am-hub" href="../">&larr; Back to ASCEND Hub</a></div>
+    <h1>ASCEND Curricular Integration Dashboard</h1>
+    <div class="am-motto"><span class="a">Climb higher.</span><span class="b">Reach further.</span><span class="c">Care deeper.</span></div>
+  </div>
+  <div class="am-util"><div class="in">Curriculum Mapping <span>&middot; Access-code dashboard</span></div></div>
+  <div class="am-stripe"><i></i><i></i><i></i></div>
+</header>
+<main class="wrap">
+  <section class="intro">
+    <p class="lead">Where the four Areas of Concentration (Healthcare Delivery Science, Scientific &amp; Scholarly Discovery, Leadership &amp; Professional Identity, Patient-Centered Advocacy), the ten content areas (curricular threads) and THINQ live across the three phases of ASCEND. Breadth: which modules and clerkships carry each one. Depth: how many sessions and hours, and how Practice of Medicine skills progress. Alignment: which sessions carry objectives, MEPO links and summative assessment. Built from the AOC, thread and THINQ tabs of the master curriculum map; many tags still await director review.</p>
+    <a class="btn" href="https://sinaiascend.github.io/Dashboard---Integration/">Open Curricular Integration &rarr;</a>
+  </section>
+  <h2>What you will find</h2>
+  <div class="vgrid">
+      <div class="vcard">
+        <div class="vk">01</div>
+        <div class="vt">Overview and breadth map</div>
+        <div class="vb">A card for each AOC, content area and THINQ with its lead, sessions, hours and phases, and a map of sessions by module and clerkship in curriculum order.</div>
+        <a class="vgo" href="https://sinaiascend.github.io/Dashboard---Integration/#home">Open &rarr;</a>
+      </div>
+      <div class="vcard">
+        <div class="vk">02</div>
+        <div class="vt">Area profiles</div>
+        <div class="vb">One page per AOC or content area: sessions by module, subdomains, alignment to objectives, MEPOs and assessment, and (for Nutrition) coverage of the 36 JAMA competencies.</div>
+        
+      </div>
+      <div class="vcard">
+        <div class="vk">03</div>
+        <div class="vt">Explore sessions</div>
+        <div class="vb">Search and filter every mapped session, or every module and clerkship session to find ones that could carry a thread, by area, phase, module, MEPO or missing link. Download as CSV.</div>
+        <a class="vgo" href="https://sinaiascend.github.io/Dashboard---Integration/#explore">Open &rarr;</a>
+      </div>
+      <div class="vcard">
+        <div class="vk">04</div>
+        <div class="vt">THINQ</div>
+        <div class="vb">THINQ 1, 2 and 3 by semester, with each session's AOC and the sessions still awaiting objectives.</div>
+        <a class="vgo" href="https://sinaiascend.github.io/Dashboard---Integration/#thinq">Open &rarr;</a>
+      </div>
+      <div class="vcard">
+        <div class="vk">05</div>
+        <div class="vt">Skill threads</div>
+        <div class="vb">The Practice of Medicine skill threads (communication, ethics, clinical reasoning and more) marked Introduced, Developed or Applied across POM 1, 2 and 3.</div>
+        <a class="vgo" href="https://sinaiascend.github.io/Dashboard---Integration/#skills">Open &rarr;</a>
+      </div>
+      <div class="vcard">
+        <div class="vk">06</div>
+        <div class="vt">Gaps and alignment</div>
+        <div class="vb">For each area: sessions without objectives, MEPO links, summative assessment or hours, titles no longer on the current map, and areas still without a named lead.</div>
+        <a class="vgo" href="https://sinaiascend.github.io/Dashboard---Integration/#gaps">Open &rarr;</a>
+      </div>
+  </div>
+  <div class="aud"><b>Who this is for.</b> The Curricular Integration Subcommittee, AOC Directors, Content Area Directors, module and clerkship directors, the EEC and its subcommittees, and OCA leadership. Draft content for review by the Curricular Integration Subcommittee.</div>
+</main>
+</body></html>
