@@ -422,6 +422,56 @@
    ]
   },
   {
+   "slug": "curricular-integration",
+   "key": "integration",
+   "kicker": "Curriculum Mapping",
+   "title": "ASCEND Curricular Integration Dashboard",
+   "short": "Curricular Integration",
+   "audience": "The Curricular Integration Subcommittee, AOC Directors, Content Area Directors, module and clerkship directors, the EEC and its subcommittees, and OCA leadership. Draft content for review by the Curricular Integration Subcommittee.",
+   "intro": "Where the four Areas of Curricular Integration (AOCs: Healthcare Delivery Science, Scientific & Scholarly Discovery, Leadership & Professional Identity, Patient-Centered Advocacy), the ten content areas (curricular threads) and The Inquiry (THINQ) Curriculum live across the three phases of ASCEND. Breadth: which modules and clerkships carry each one. Depth: how many sessions and hours, and how Practice of Medicine skills progress. Alignment: which sessions carry objectives, MEPO links and summative assessment. Built from the AOC, thread and THINQ tabs of the master curriculum map; many tags still await director review.",
+   "primary": "Dashboard---Integration/",
+   "views": [
+    {
+     "title": "Overview and breadth map",
+     "blurb": "A card for each AOC, content area and THINQ with its lead, sessions, hours and phases (colour-coded Phase 1, 2, 3), and a map of sessions by module and clerkship. Select a card or cell for a side-panel summary, then open the full page.",
+     "url": "Dashboard---Integration/#home"
+    },
+    {
+     "title": "Area profiles",
+     "blurb": "One page per AOC or content area: sessions by module, subdomains, alignment to objectives, MEPOs and assessment, and (for Nutrition) coverage of the 36 JAMA competencies."
+    },
+    {
+     "title": "Floor and ceiling",
+     "blurb": "For each AOC and content area, the topics integrated into modules and clerkships (the floor) beside the THINQ sessions that extend them (the ceiling).",
+     "url": "Dashboard---Integration/#ladder"
+    },
+    {
+     "title": "Last CIS and EEC review",
+     "blurb": "For each AOC and thread, a summary of its most recent review by the Curricular Integration Subcommittee and the EEC: what was presented, the vote, and the action items."
+    },
+    {
+     "title": "Explore sessions",
+     "blurb": "Search and filter every mapped session, or every module and clerkship session to find ones that could carry a thread, by area, phase, module, MEPO or missing link. Download as CSV.",
+     "url": "Dashboard---Integration/#explore"
+    },
+    {
+     "title": "THINQ",
+     "blurb": "THINQ 1, 2 and 3 by semester, with each session's AOC and the sessions still awaiting objectives.",
+     "url": "Dashboard---Integration/#thinq"
+    },
+    {
+     "title": "Skill threads",
+     "blurb": "The Practice of Medicine skill threads (communication, ethics, clinical reasoning and more) marked Introduced, Developed or Applied across POM 1, 2 and 3.",
+     "url": "Dashboard---Integration/#skills"
+    },
+    {
+     "title": "Gaps and alignment",
+     "blurb": "For each area: sessions without objectives, MEPO links, summative assessment or hours, titles no longer on the current map, and areas still without a named lead.",
+     "url": "Dashboard---Integration/#gaps"
+    }
+   ]
+  },
+  {
    "slug": "integration-retreat",
    "key": "retreat",
    "kicker": "Faculty Development",
