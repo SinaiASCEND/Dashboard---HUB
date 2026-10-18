@@ -6360,8 +6360,8 @@ function init(){
     if(b && done.length) b.textContent = 'Loaded: ' + done.join(' · ');
     if(missing.length) alert((done.length ? 'Loaded ' + done.join(', ') + '.\n\n' : '') + 'Not found:\n• ' +
       missing.join('\n• ') + (opts.photosOptional
-        ? '\n\nOn a phone, pick the files themselves from # Confidential: phase1_all.json inside the newest ' +
-          '"Student Performance Dashboard <date>" folder, and the ASCEND_Names_Key_for_Dashboard_<date>.csv file.'
+        ? '\n\nOn a phone, open the newest "Student Performance Dashboard <date>" folder in # Confidential and ' +
+          'select both files in it at once - phase1_all.json and ASCEND_Names_Key_for_Dashboard_<date>.csv - then tap Open.'
         : '\n\nThe # Confidential folder should hold a "Student Performance Dashboard <date>" ' +
           'folder, an ASCEND_Names_Key_for_Dashboard_<date>.csv file and a "Student Photos <date>" folder.'));
   };
@@ -6427,7 +6427,8 @@ function init(){
   });
   confRemembered().then(k => { confKnown = k }).catch(() => {});
   if($('loadAllBtn')) $('loadAllBtn').title =
-    'Loads the newest data file, name key and photo folder from # Confidential. Shift-click to pick the folder yourself.';
+    onPhone() ? 'Pick phase1_all.json and the name key together from the newest "Student Performance Dashboard <date>" folder.'
+      : 'Loads the newest data file, name key and photo folder from # Confidential. Shift-click to pick the folder yourself.';
 
   /* charts are drawn at real pixel width, so a resize means a redraw */
   let rt = null;
