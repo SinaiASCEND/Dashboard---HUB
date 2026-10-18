@@ -656,6 +656,42 @@
    ]
   },
   {
+   "slug": "strategic-plan",
+   "key": "strategicplan",
+   "kicker": "MD Program Strategic Plan",
+   "title": "From Education to Impact",
+   "short": "the dashboard",
+   "audience": "The dashboard's owner. It is a private claude.ai page and opens only for accounts it is shared with.",
+   "intro": "A working dashboard for From Education to Impact, the ISMMS MD Program Strategic Plan for 2026–2031: its five priorities, goals, Year 1 initiatives and KPIs, with an action plan, a meeting log and the materials behind each meeting.",
+   "primaryAbs": "https://claude.ai/artifact/HhJHfLXNRfzvUsotXAr7iu",
+   "views": [
+    {
+     "title": "Plan and KPIs",
+     "blurb": "The five priorities, their goals and initiatives, and each Year 1 KPI with its due date and status."
+    },
+    {
+     "title": "Year 1 working groups",
+     "blurb": "The 12 Year 1 initiatives with their co-leads and project managers."
+    },
+    {
+     "title": "Action plan",
+     "blurb": "Requests, deadlines and milestones, with owner, due date and status."
+    },
+    {
+     "title": "Meetings",
+     "blurb": "Each planning and working group meeting: where it met, summary, decisions, follow-ups and materials."
+    },
+    {
+     "title": "Curriculum gap register",
+     "blurb": "Curriculum Content Gap Closure: each flagged gap and its governance decision."
+    },
+    {
+     "title": "Materials",
+     "blurb": "Pre-reads, synopses, workbooks and sites, and where each one lives."
+    }
+   ]
+  },
+  {
    "slug": "support-dashboard",
    "key": "support",
    "kicker": "Support Tools",

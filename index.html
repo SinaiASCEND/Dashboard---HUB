@@ -413,6 +413,14 @@ const DASHBOARDS = {
     title: "Student Performance Dashboard",
     blurb: "De-identified student-level performance across all three phases, by student code."
   },
+  /* Private claude.ai artifact (18 Oct 2026): the owner's working dashboard for the MD Program Strategic
+     Plan. Not listed on any committee tier, so it shows only on the owner's tier. */
+  strategicplan: {
+    url: "overview/strategic-plan.html",
+    kicker: "MD Program Strategic Plan",
+    title: "From Education to Impact",
+    blurb: "The 2026\u20132031 MD Program Strategic Plan: priorities, goals, Year 1 initiatives and KPIs, with an action plan, meeting log and materials."
+  },
   /* Open to everyone (reached from the Student and Faculty landing pages);
      carded here so the Office of Curricular Affairs tier lists every dashboard in one place. */
   navigator: {
@@ -522,7 +530,7 @@ const TIERS = {
     // Always every card in DASHBOARDS, so a new card shows here without being listed.
     // Student Performance shows only here.
     dashboards: Object.keys(DASHBOARDS),
-    pinned: ["retreat","studentperf","phase1","phase2","phase3","governance"]
+    pinned: ["retreat","studentperf","strategicplan","phase1","phase2","phase3","governance"]
   },
   "a42b8352b4c79f604f3ca0f8c703cbd08f648e86099ec682ce98bd4a11286741": {
     name: "Governance Support",
