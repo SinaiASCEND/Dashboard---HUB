@@ -1155,8 +1155,8 @@ body.gated{overflow:hidden}
             concern into a Monitor. In PEAKS only the CBSE counts. <strong>Once in Phase 2 (Class of 2027 and ASCEND Phase 2, graded
             Honors / Pass / Fail), only the Phase 2 red flags decide the standing</strong> &mdash; Phase 1 no longer counts, and
             relative standing is not used. An Academic concern is a USMLE Step failure; a clerkship failure; any shelf or CAS
-            below its pass mark (Surgery&rsquo;s CAS 65%), even if the retake passed; a clerkship direct observation (or the
-            Class of 2027&rsquo;s DO Week) below 70%; or any clinical evaluation domain below 3. A Monitor is a shelf within 5
+            below its pass mark (Surgery&rsquo;s CAS 65%), even if the retake passed; or any clinical evaluation domain below 3.
+            A Monitor is a clerkship direct observation (or the Class of 2027&rsquo;s DO Week) below 70%, a shelf within 5
             points above its pass mark, a clerkship grade of Pass, an Incomplete, or an assessment owed (a finished
             clerkship with no shelf on record two weeks after it ended).</p>
         </div>
@@ -2063,10 +2063,10 @@ function clerkshipConcerns(s){
   /* a clerkship's direct observations below the pass mark */
   const lowDo = finals.filter(r => r.osce && r.osce.pct != null && r.osce.passMark != null && r.osce.pct < r.osce.passMark);
   if(lowDo.length)
-    out.push({level:'crit', what: lowDo.length + ' clerkship direct observation' + (lowDo.length === 1 ? '' : 's') + ' below ' + lowDo[0].osce.passMark + '%',
+    out.push({level:'watch', what: lowDo.length + ' clerkship direct observation' + (lowDo.length === 1 ? '' : 's') + ' below ' + lowDo[0].osce.passMark + '%',
       why: lowDo.map(r => r.code + ' ' + r.osce.pct + '%').join(', ') + ' \u2014 below the ' + lowDo[0].osce.passMark + '% pass mark for the clerkship direct observations.'});
   recs.filter(r => r.code === 'DOWEEK' && r.osce && r.osce.pct != null && r.osce.passMark != null && r.osce.pct < r.osce.passMark)
-    .forEach(r => out.push({level:'crit', what: 'DO Week overall score below ' + r.osce.passMark + '%',
+    .forEach(r => out.push({level:'watch', what: 'DO Week overall score below ' + r.osce.passMark + '%',
       why: r.osce.pct + '% across the DO Week encounters, below the ' + r.osce.passMark + '% pass mark the clerkship direct observations use.'}));
   return out;
 }
@@ -2074,9 +2074,10 @@ function clerkshipConcerns(s){
 /* Phase 2 standing (2026-10-12). Once a student is in Phase 2 these alone
    decide their standing; Phase 1 flags no longer count (that record stays on
    the page). Academic concern: a USMLE Step failure, a clerkship failure, a
-   clerkship shelf below its pass mark (even when the retake passed), a direct
-   observation below its pass mark (the clerkships' and DO Week), or any
-   clinical evaluation domain below 3 (of 5). Monitor: a shelf within
+   clerkship shelf below its pass mark (even when the retake passed), or any
+   clinical evaluation domain below 3 (of 5). Monitor (a direct observation
+   below its pass mark moved here 2026-10-13): a direct observation below 70%
+   (the clerkships' and DO Week), a shelf within
    SHELF_NEAR points above its pass mark, a clerkship grade of Pass, an
    Incomplete or unrecognised grade, or an assessment owed (a finished
    clerkship with no shelf on record OWED_GRACE_DAYS after it ended). */
@@ -2107,7 +2108,7 @@ function phase2Flags(s){
   const lowDo = recs.filter(r => (r.kind === 'clerkship' || r.code === 'DOWEEK') && r.osce && r.osce.pct != null &&
                                  r.osce.passMark != null && r.osce.pct < r.osce.passMark);
   if(lowDo.length)
-    out.push({level:'crit', what: count(lowDo.length, 'direct observation', 'direct observations') + ' below ' + lowDo[0].osce.passMark + '%',
+    out.push({level:'watch', what: count(lowDo.length, 'direct observation', 'direct observations') + ' below ' + lowDo[0].osce.passMark + '%',
       why: lowDo.map(r => (r.code === 'DOWEEK' ? 'DO Week' : r.code) + ' ' + r.osce.pct + '%').join(', ') + ' — below the pass mark.'});
   const lowDom = [];
   ck.forEach(r => { const d = (r.eval && r.eval.domains) || {};
