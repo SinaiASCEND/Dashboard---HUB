@@ -612,7 +612,7 @@
    "title": "Meeting Minutes Generator",
    "short": "the Meeting Minutes Generator",
    "audience": "Office of Curricular Affairs staff and governance support. Not for EEC, subcommittee or Monday Curricular Affairs minutes: those stay in the Governance dashboard.",
-   "intro": "Drop in the transcript Zoom or Teams makes of a meeting, or paste its text, and get a Word draft of the minutes straight away for you to edit. Nothing else to fill in; nothing you upload is stored. Your Hub code opens it.",
+   "intro": "Drop in the transcript Zoom or Teams makes of a meeting, or paste its text, and get a Word draft of the minutes straight away for you to edit. Nothing else to fill in. The Office of Curricular Affairs keeps a copy of each transcript. Your Hub code opens it.",
    "primaryAbs": "https://ascend-meeting-summaries.vercel.app/",
    "unlock": "https://ascend-meeting-summaries.vercel.app/api/unlock",
    "views": [
