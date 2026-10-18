@@ -9,7 +9,7 @@
    "title": "Curriculum Navigator",
    "short": "the Navigator",
    "audience": "Students, faculty, and staff. Open to everyone.",
-   "intro": "Search the ASCEND curriculum from one place. Find any session, learning objective, or calendar date across all three phases, and see how sessions connect to program objectives, threads, and Areas of Concentration.",
+   "intro": "Search the ASCEND curriculum from one place. Find any session, learning objective, or calendar date across all three phases, and see how sessions connect to program objectives, threads, and Areas of Curricular Integration (AOCs).",
    "primary": "Dashboard---Students/",
    "views": [
     {
@@ -25,7 +25,7 @@
      "blurb": "The Phase 2 clerkships with their learning objectives."
     },
     {
-     "title": "Threads and Areas of Concentration",
+     "title": "Threads and Areas of Curricular Integration",
      "blurb": "Where each curricular thread and AOC is taught, by session, from the AOC and Threads workbook; rows not yet matched to a session are listed on each AOC page."
     },
     {
@@ -56,7 +56,7 @@
    "views": [
     {
      "title": "Electives catalog",
-     "blurb": "All medical student electives, filterable by field, Area of Concentration, phase, and schedule. Built from the master electives catalog.",
+     "blurb": "All medical student electives, filterable by field, Area of Curricular Integration, phase, and schedule. Built from the master electives catalog.",
      "url": "Dashboard---Electives/"
     },
     {
