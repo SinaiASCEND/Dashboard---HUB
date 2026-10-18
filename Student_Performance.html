@@ -2552,7 +2552,7 @@ function taPct(z){
 
 let DATA = hydrate(buildSampleData());
 const state = {
-  cohort:null, program:'all', advisor:'all', ccm:'all', phase:'all', standing:'all', flag:'all', emphasis:'knowledge', q:'',
+  cohort:'all', program:'all', advisor:'all', ccm:'all', phase:'all', standing:'all', flag:'all', emphasis:'knowledge', q:'',
   reviewWatch:false,
   sort:{key:'knowledge', dir:'desc'}, student:null
 };
@@ -2609,10 +2609,6 @@ function filtered(){
    adds a class. "All cohorts" stays in the list as a deliberate choice. */
 function cohortYears(){
   return [...new Set((DATA.students||[]).map(s => s.cohort))].sort();
-}
-function latestCohort(){
-  const yrs = cohortYears().map(Number).filter(Number.isFinite);
-  return yrs.length ? String(Math.max(...yrs)) : 'all';
 }
 /* With one class chosen, a section that class has nothing for says so in the
    same words everywhere, rather than reading as a quiet zero or borrowing
@@ -6187,7 +6183,8 @@ function fillCohortFilter(){
   all.value = 'all'; all.textContent = 'All cohorts'; sel.appendChild(all);
   years.forEach(y => { const o = document.createElement('option');
     o.value = String(y); o.textContent = 'Class of ' + y; sel.appendChild(o) });
-  sel.value = keep === 'all' || years.map(String).includes(keep) ? keep : latestCohort();
+  /* All cohorts unless a class was picked (user, 2026-10-18) */
+  sel.value = years.map(String).includes(keep) ? keep : 'all';
   state.cohort = sel.value;
   fillListFilter('fProgram', 'fProgramField', 'program', 'program', 'All programs', 'No program set');
   fillListFilter('fAdvisor', 'fAdvisorField', 'careerAdvisor', 'advisor', 'All career advisors', 'No career advisor set');
@@ -6249,7 +6246,7 @@ function init(){
       $('studentView').hidden = true; $('cohortView').hidden = false; renderAll() }, 160);
   });
   $('fClear').addEventListener('click', () => {
-    state.cohort = latestCohort(); state.program = 'all'; state.advisor = 'all'; state.ccm = 'all';
+    state.cohort = 'all'; state.program = 'all'; state.advisor = 'all'; state.ccm = 'all';
     state.phase = 'all'; state.standing = 'all'; state.flag = 'all';
     state.emphasis = 'knowledge'; state.q = ''; state.student = null;
     state.sort = {key:'knowledge', dir:'desc'};
