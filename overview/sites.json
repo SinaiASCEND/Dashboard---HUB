@@ -612,13 +612,13 @@
    "title": "ASCEND Support Dashboard",
    "short": "the Support Dashboard",
    "audience": "Office of Curricular Affairs staff, governance support, dashboard maintainers, and the subcommittee that reviews module evaluations. Each tool keeps its own audience: the Program Evaluation Report Generator rates named educators, so fewer codes open it. Your Hub code opens what your role allows; the dashboard's home greys out the rest.",
-   "intro": "Four tools for the people who keep ASCEND running, behind one access code. Make a Word draft of meeting minutes from a transcript, build a module evaluation report from a one45 export, take student names out of a file before it goes in a dashboard inbox, or look up how a dashboard job is done. Nothing you upload to these tools is stored.",
+   "intro": "Four tools for the people who keep ASCEND running, behind one access code. Make a Word draft of meeting minutes from a transcript, build a module evaluation report from a one45 export, take student names out of a file before it goes in a dashboard inbox, or look up how a dashboard job is done. The Office of Curricular Affairs keeps a copy of each meeting transcript; nothing else you upload to these tools is stored.",
    "primaryAbs": "https://ascend-support-dashboard.vercel.app/",
    "unlock": "https://ascend-support-dashboard.vercel.app/api/unlock",
    "views": [
     {
      "title": "Meeting Minutes Generator",
-     "blurb": "Drop in a Zoom or Teams transcript, or paste its text, and get a Word draft of the minutes: overview, decisions, action items with owners, and discussion by topic. Not for EEC, subcommittee or Monday Curricular Affairs minutes: those stay in the Governance dashboard."
+     "blurb": "Drop in a Zoom or Teams transcript, or paste its text, and get a Word draft of the minutes: overview, decisions, action items with owners, and discussion by topic. The Office of Curricular Affairs keeps a copy of each transcript. Not for EEC, subcommittee or Monday Curricular Affairs minutes: those stay in the Governance dashboard."
     },
     {
      "title": "Program Evaluation Report Generator",
