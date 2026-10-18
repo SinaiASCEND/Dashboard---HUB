@@ -1200,6 +1200,7 @@ body.gated{overflow:hidden}
 <!-- the fallback for a browser without folder access, or a shift-click: the
      viewer picks # Confidential (or one dated folder) with an ordinary picker -->
 <input type="file" id="allInput" webkitdirectory multiple hidden>
+<input type="file" id="filesInput" multiple accept=".json,.csv,application/json,text/csv,image/*" hidden>
 <script>
 /* ============================================================================
    ASCEND STUDENT PERFORMANCE DASHBOARD
@@ -3548,6 +3549,10 @@ const CONF = {
 };
 let confKnown = false;
 function confPickerOk(){ return typeof window.showDirectoryPicker === 'function' && !!window.indexedDB }
+/* a phone or tablet: no folder picking at all, so the load button opens an
+   ordinary multi-file picker and the files are chosen one by one */
+function onPhone(){ return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
+  (navigator.maxTouchPoints > 1 && /Macintosh/.test(navigator.userAgent)) }
 function confStore(write, fn){
   return new Promise((res, rej) => {
     const rq = indexedDB.open('ascendConfidential', 1);
@@ -6312,12 +6317,15 @@ function init(){
      browser without folder access, picks the folder with an ordinary picker. */
   const LOAD_ALL_WHY = 'Loading brings coded education records into this browser and pairs a name and a ' +
     'photo with each code, which re-identifies the students. Continue only with a legitimate educational interest.';
-  const loadAll = async find => {
+  const loadAll = async (find, opts = {}) => {
     const done = [], missing = [];
     const step = async (want, use) => {
       try {
         const got = await find(want);
-        if(!got || (Array.isArray(got) && !got.length)){ missing.push(want.what); return }
+        if(!got || (Array.isArray(got) && !got.length)){
+          if(!(opts.photosOptional && want === CONF.photos)) missing.push(want.what);
+          return;
+        }
         const said = await use(got);
         if(said) done.push(said); else missing.push(want.what + ' (nothing usable in it)');
       } catch(err){
@@ -6344,8 +6352,11 @@ function init(){
     const b = $('loadAllBtn');
     if(b && done.length) b.textContent = 'Loaded: ' + done.join(' · ');
     if(missing.length) alert((done.length ? 'Loaded ' + done.join(', ') + '.\n\n' : '') + 'Not found:\n• ' +
-      missing.join('\n• ') + '\n\nThe # Confidential folder should hold a "Student Performance Dashboard <date>" ' +
-      'folder, an ASCEND_Names_Key_for_Dashboard_<date>.csv file and a "Student Photos <date>" folder.');
+      missing.join('\n• ') + (opts.photosOptional
+        ? '\n\nOn a phone, pick the files themselves from # Confidential: phase1_all.json inside the newest ' +
+          '"Student Performance Dashboard <date>" folder, and the ASCEND_Names_Key_for_Dashboard_<date>.csv file.'
+        : '\n\nThe # Confidential folder should hold a "Student Performance Dashboard <date>" ' +
+          'folder, an ASCEND_Names_Key_for_Dashboard_<date>.csv file and a "Student Photos <date>" folder.'));
   };
   /* the folder-access route: one remembered folder for all three */
   const loadAllFromFolder = async () => {
@@ -6359,6 +6370,14 @@ function init(){
   const listFind = (files, want) => {
     const segs = f => (f.webkitRelativePath || f.name).split('/');
     const dirOf = f => segs(f).slice(0, -1);
+    /* files picked one by one (a phone's picker): no folder to read the date
+       from - the data file by its name (else any .json that is not the name
+       key), loose images as the photos */
+    if(want.dir && !files.some(f => dirOf(f).length)){
+      if(want.images){ const img = files.filter(f => /\.(jpe?g|png|gif|webp|heic)$/i.test(f.name)); return img.length ? img : null }
+      return files.filter(f => want.file.test(f.name))[0] ||
+        files.filter(f => want.alsoFile.test(f.name) && !CONF.names.file.test(f.name))[0] || null;
+    }
     if(want.dir){
       const byDir = {};
       files.forEach(f => { const d = dirOf(f); const i = d.findIndex(x => want.dir.test(x));
@@ -6382,7 +6401,7 @@ function init(){
   $('loadAllBtn').addEventListener('click', ev => {
     const plain = ev.shiftKey || !confPickerOk();
     ferpaGate(LOAD_ALL_WHY, () => {
-      if(plain){ $('allInput').click(); return }
+      if(plain){ $(onPhone() ? 'filesInput' : 'allInput').click(); return }
       confHint(async () => {
         try { await loadAllFromFolder() }
         catch(err){ if(!(err && err.name === 'AbortError')) alert(err.message || String(err)) }
@@ -6392,6 +6411,12 @@ function init(){
   $('allInput').addEventListener('change', e => {
     const files = [...(e.target.files || [])]; e.target.value = '';
     if(files.length) loadAll(async want => listFind(files, want)).catch(err => alert(err.message || String(err)));
+  });
+  /* phones: files picked one by one (Files -> OneDrive -> # Confidential);
+     photos are optional there - nobody picks 500 images on a phone */
+  $('filesInput').addEventListener('change', e => {
+    const files = [...(e.target.files || [])]; e.target.value = '';
+    if(files.length) loadAll(async want => listFind(files, want), {photosOptional: true}).catch(err => alert(err.message || String(err)));
   });
   confRemembered().then(k => { confKnown = k }).catch(() => {});
   if($('loadAllBtn')) $('loadAllBtn').title =
