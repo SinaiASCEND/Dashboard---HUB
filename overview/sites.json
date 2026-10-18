@@ -606,81 +606,31 @@
    ]
   },
   {
-   "slug": "meeting-summaries",
-   "key": "meetings",
-   "kicker": "Meeting Tools",
-   "title": "Meeting Minutes Generator",
-   "short": "the Meeting Minutes Generator",
-   "audience": "Office of Curricular Affairs staff and governance support. Not for EEC, subcommittee or Monday Curricular Affairs minutes: those stay in the Governance dashboard.",
-   "intro": "Drop in the transcript Zoom or Teams makes of a meeting, or paste its text, and get a Word draft of the minutes straight away for you to edit. Nothing else to fill in; nothing you upload is stored. Your Hub code opens it.",
-   "primaryAbs": "https://ascend-meeting-summaries.vercel.app/",
-   "unlock": "https://ascend-meeting-summaries.vercel.app/api/unlock",
+   "slug": "support-dashboard",
+   "key": "support",
+   "kicker": "Support Tools",
+   "title": "ASCEND Support Dashboard",
+   "short": "the Support Dashboard",
+   "audience": "Office of Curricular Affairs staff, governance support, dashboard maintainers, and the subcommittee that reviews module evaluations. Each tool keeps its own audience: the Program Evaluation Report Generator rates named educators, so fewer codes open it. Your Hub code opens what your role allows; the dashboard's home greys out the rest.",
+   "intro": "Four tools for the people who keep ASCEND running, behind one access code. Make a Word draft of meeting minutes from a transcript, build a module evaluation report from a one45 export, take student names out of a file before it goes in a dashboard inbox, or look up how a dashboard job is done. Nothing you upload to these tools is stored.",
+   "primaryAbs": "https://ascend-support-dashboard.vercel.app/",
+   "unlock": "https://ascend-support-dashboard.vercel.app/api/unlock",
    "views": [
     {
-     "title": "Add the transcript",
-     "blurb": "Drop a Zoom “Audio transcript” (.vtt) or a Teams transcript (.docx or .vtt), or paste the transcript text into the box."
+     "title": "Meeting Minutes Generator",
+     "blurb": "Drop in a Zoom or Teams transcript, or paste its text, and get a Word draft of the minutes: overview, decisions, action items with owners, and discussion by topic. Not for EEC, subcommittee or Monday Curricular Affairs minutes: those stay in the Governance dashboard."
     },
     {
-     "title": "Claude drafts the minutes",
-     "blurb": "Overview, decisions, action items with owners and due dates, discussion by topic, and open questions. Student names are left out."
+     "title": "Program Evaluation Report Generator",
+     "blurb": "Upload a module's one45 evaluation export and get the Module Evaluation Report in Word, with rating charts, last year's ratings and Claude-coded comment themes, or download the latest finished report as a PDF."
     },
     {
-     "title": "Edit the Word draft",
-     "blurb": "The draft downloads as Word, marked DRAFT. Check names, who said what and the action-item owners, then send it."
-    }
-   ]
-  },
-  {
-   "slug": "remove-student-names",
-   "key": "deid",
-   "kicker": "Maintainer Tools",
-   "title": "Remove Student Names",
-   "short": "Remove Student Names",
-   "audience": "Office of Curricular Affairs staff, dashboard maintainers and governance support, before a file with student names is shared or dropped in a dashboard inbox. Not for Student Performance: its owner keeps that data.",
-   "intro": "Most dashboard files start with student names, like Blackboard gradebooks. This site takes the names, usernames, IDs and emails out before the file goes in an inbox, so Claude only ever sees codes. It reads the file inside your browser: nothing is uploaded or stored. Your Hub code opens it.",
-   "primaryAbs": "https://ascend-remove-names.vercel.app/",
-   "unlock": "https://ascend-remove-names.vercel.app/api/unlock",
-   "views": [
-    {
-     "title": "Choose the file",
-     "blurb": "A Blackboard gradebook, NBME score download, one45 or CPEvals export, or a Registrar workbook (.xlsx, .xls, .csv, .txt). A practice file with made-up students is built in."
+     "title": "Remove Student Names",
+     "blurb": "Take names, usernames, IDs and emails out of a gradebook or export inside your browser (nothing is uploaded), with or without a key, and save the DEID copy."
     },
     {
-     "title": "Check what it found",
-     "blurb": "Columns that show who a student is are ticked, by heading or by what they hold. Look across every column, then tick or untick."
-    },
-    {
-     "title": "No key or with a key",
-     "blurb": "No key for Phase 1 and Electives (S001, S002…). With a key for Phase 2, NBME, Clinical Skills and MEPO, so the same student gets the same code in every file."
-    },
-    {
-     "title": "Save the DEID file",
-     "blurb": "The cleaned file saves to your Downloads, named … DEID. Put it in the dashboard's inbox and delete the original."
-    }
-   ]
-  },
-  {
-   "slug": "assessment-reports",
-   "key": "assessmentreports",
-   "kicker": "Assessment Tools",
-   "title": "ASCEND Program Evaluation Report Generator",
-   "short": "the Program Evaluation Report Generator",
-   "audience": "Office of Curricular Affairs staff and the subcommittee that reviews module evaluations. The exports rate named educators, so only some Hub codes open it.",
-   "intro": "Upload a module's one45 evaluation export and get the Module Evaluation Report as a Word file: a one-page summary, rating charts, last year's ratings for comparison, themes from student comments, educator ratings and the verbatim module comments. Nothing you upload is stored. Your Hub code opens it.",
-   "primaryAbs": "https://ascend-assessment-reports.vercel.app/",
-   "unlock": "https://ascend-assessment-reports.vercel.app/api/unlock",
-   "views": [
-    {
-     "title": "Upload the one45 export",
-     "blurb": "The module's evaluation export (.xlsx). The site recognizes the module and fills in the cohort, dates and response counts."
-    },
-    {
-     "title": "Review the comment themes",
-     "blurb": "Claude groups every student comment into themes; each needs three or more students. Read the quotes behind a theme, rename it or remove it."
-    },
-    {
-     "title": "Download the Word report",
-     "blurb": "In the Office of Curricular Affairs layout, with 2024-25 and 2025-26 ratings for comparison where the one45 summaries have them."
+     "title": "How-To Library",
+     "blurb": "Plain-language guides for committee coordinators and dashboard maintainers: the Governance dashboard buttons, meeting files, checklists, and how each dashboard is kept up to date."
     }
    ]
   }

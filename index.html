@@ -435,32 +435,15 @@ const DASHBOARDS = {
     title: "Baby Bates",
     blurb: "A pocket clinical reference for history-taking and physical examination, drawn from Bates' Guide, for clinical skills coaching and direct observation."
   },
-  /* Vercel site (13 Oct 2026): a Zoom/Teams transcript in, a written summary out, drafted by
-     Claude, as a Word draft. For operational meetings only: it turns away governance transcripts, whose minutes
-     stay in Governance. Its server gate checks the visitor's code (plus a site-only code). */
-  meetings: {
-    url: "overview/meeting-summaries.html",
-    kicker: "Meeting Tools",
-    title: "Meeting Minutes Generator",
-    blurb: "Upload a Zoom or Teams transcript and get a Word draft of the minutes straight away: overview, decisions, action items with owners, and discussion by topic, ready for you to edit."
-  },
-  /* Vercel site (13 Oct 2026): the How-To Library's Remove Student Names tool as its own site.
-     Files are read in the visitor's browser and never uploaded; the server only checks the code.
-     Its server gate checks the visitor's code. */
-  deid: {
-    url: "overview/remove-student-names.html",
-    kicker: "Maintainer Tools",
-    title: "Remove Student Names",
-    blurb: "Take student names, usernames, IDs and emails out of a gradebook or export before it goes in a dashboard inbox. Works in your browser; nothing is uploaded."
-  },
-  /* Vercel site (12 Oct 2026): one45 module evaluation export -> Module Evaluation Report (Word), with
-     Claude-coded comment themes and prior-year comparison. Its server gate admits only some tiers:
-     the exports rate named educators. */
-  assessmentreports: {
-    url: "overview/assessment-reports.html",
-    kicker: "Assessment Tools",
-    title: "ASCEND Program Evaluation Report Generator",
-    blurb: "Upload a module's one45 evaluation export and get the Module Evaluation Report in Word, or download the latest finished report for a module as a PDF."
+  /* Vercel site (18 Oct 2026): the ASCEND Support Dashboard, one server gate in front of four tools that
+     used to be separate cards: the Meeting Minutes Generator, the Program Evaluation Report Generator,
+     Remove Student Names and the How-To Library. Each tool keeps the audience it had, so the site's
+     home greys out any tool a code does not open. */
+  support: {
+    url: "overview/support-dashboard.html",
+    kicker: "Support Tools",
+    title: "ASCEND Support Dashboard",
+    blurb: "The Meeting Minutes Generator, the Program Evaluation Report Generator, Remove Student Names and the How-To Library, in one place."
   },
   /* Vercel site (15 Oct 2026): the 22 Oct 2026 Faculty Development Retreat: AOC Directors and Thread Leaders (renamed 16 Oct 2026 from Curriculum Integration Retreat). Session materials open
      at set times (held on the server). Its server gate checks the visitor's code (plus a retreat-only code). */
@@ -469,13 +452,6 @@ const DASHBOARDS = {
     kicker: "Faculty Development",
     title: "Faculty Development Retreat: AOC Directors and Thread Leaders",
     blurb: "Thursday, October 22, 2026: the schedule, and each session's materials as the session starts. For AOC Directors and Curriculum Thread Leads."
-  },
-  /* A Claude artifact (shared by link), not a GitHub Pages site. */
-  howto: {
-    url: "https://claude.ai/artifact/2RA7WChp13CueGLpEhBaH3",
-    kicker: "How-To Guides",
-    title: "ASCEND How-To Library",
-    blurb: "Plain-language guides for committee coordinators and dashboard maintainers: the Governance dashboard buttons, meeting files, and step-by-step checklists."
   },
   people: {
     url: "overview/people.html",
@@ -493,8 +469,8 @@ const TIERS = {
     sub: "Full access \u2014 all monitoring, mapping, governance, and accreditation views.",
     // Every dashboard the Hub knows, except Student Performance: that one stays
     // on the owner's tier only, or by its direct URL. Add a new card's key here too.
-    dashboards: ["calendar", "phase1", "clinicalskills", "phase2", "phase3", "nbme",  "objectives", "nutrition", "policies", "surveys", "lcme", "governance", "meetings", "studentleaders",
-                 "navigator", "electives", "babybates", "facultyguides", "people", "deid", "howto", "retreat", "assessmentreports"],
+    dashboards: ["calendar", "phase1", "clinicalskills", "phase2", "phase3", "nbme",  "objectives", "nutrition", "policies", "surveys", "lcme", "governance", "support", "studentleaders",
+                 "navigator", "electives", "babybates", "facultyguides", "people", "retreat"],
     pinned: ["retreat","phase1","phase2","phase3","governance"]
   },
   "255af8d0734e8438d7fcef7cb457da08d130e24f574065175f2ab73ed2ffb360": {
@@ -543,20 +519,20 @@ const TIERS = {
   },
   "a42b8352b4c79f604f3ca0f8c703cbd08f648e86099ec682ce98bd4a11286741": {
     name: "Governance Support",
-    sub: "The ASCEND Curriculum Governance Dashboard, the Curricular Student Leadership roster, the Meeting Minutes Generator and Remove Student Names.",
-    // Governance, Student Leadership (added 14 Oct 2026 at the owner's request), the Meeting Minutes Generator,
-    // Remove Student Names and the How-To Library.
-    dashboards: ["governance", "studentleaders", "meetings", "deid", "howto"],
+    sub: "The ASCEND Curriculum Governance Dashboard, the Curricular Student Leadership roster and the ASCEND Support Dashboard.",
+    // Governance, Student Leadership (added 14 Oct 2026 at the owner's request) and the Support Dashboard
+    // (18 Oct 2026: Meeting Minutes, Remove Student Names and the How-To Library, which this tier had as cards).
+    dashboards: ["governance", "studentleaders", "support"],
     pinned: ["governance"]
   },
   "7299453b621d99c8276fe0e83fa140072a0ab85e1a2be10331ff8f668db65b0c": {
     // Added 15 Oct 2026 at the owner's request. Each server-gated site in this list must also accept this code
-    // in its own unlock (Program Evaluation Report Generator, Governance student roster, Meeting Minutes, Remove Student Names).
+    // in its own unlock (the Support Dashboard, the Governance student roster).
     name: "Assessment and Evaluation Subcommittee",
     sub: "Programmatic assessment across all three phases, exam performance, student surveys, objectives and milestones, and the assessment and meeting tools.",
-    dashboards: ["assessmentreports", "phase1", "phase2", "phase3", "nbme", "surveys", "objectives", "nutrition", "clinicalskills",
-                 "policies", "calendar", "people", "navigator", "studentleaders", "meetings", "deid"],
-    pinned: ["assessmentreports","phase1","phase2","phase3"]
+    dashboards: ["support", "phase1", "phase2", "phase3", "nbme", "surveys", "objectives", "nutrition", "clinicalskills",
+                 "policies", "calendar", "people", "navigator", "studentleaders"],
+    pinned: ["support","phase1","phase2","phase3"]
   }
 };
 /* ============================================================ */
