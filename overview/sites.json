@@ -433,12 +433,21 @@
    "views": [
     {
      "title": "Overview and breadth map",
-     "blurb": "A card for each AOC, content area and THINQ with its lead, sessions, hours and phases, and a map of sessions by module and clerkship in curriculum order.",
+     "blurb": "A card for each AOC, content area and THINQ with its lead, sessions, hours and phases (colour-coded Phase 1, 2, 3), and a map of sessions by module and clerkship. Select a card or cell for a side-panel summary, then open the full page.",
      "url": "Dashboard---Integration/#home"
     },
     {
      "title": "Area profiles",
      "blurb": "One page per AOC or content area: sessions by module, subdomains, alignment to objectives, MEPOs and assessment, and (for Nutrition) coverage of the 36 JAMA competencies."
+    },
+    {
+     "title": "Floor and ceiling",
+     "blurb": "For each AOC and content area, the topics integrated into modules and clerkships (the floor) beside the THINQ sessions that extend them (the ceiling).",
+     "url": "Dashboard---Integration/#ladder"
+    },
+    {
+     "title": "Last CIS and EEC review",
+     "blurb": "For each AOC and thread, a summary of its most recent review by the Curricular Integration Subcommittee and the EEC: what was presented, the vote, and the action items."
     },
     {
      "title": "Explore sessions",
