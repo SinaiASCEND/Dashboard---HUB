@@ -181,7 +181,7 @@ button,select,input{font:inherit;color:inherit}
   font-weight:700;display:flex;align-items:center;gap:10px;margin-bottom:8px}
 .eyebrow::before{content:"";width:26px;height:3px;background:var(--magenta);flex:none}
 .mast h1{font-size:clamp(21px,3.4vw,29px);font-weight:800;letter-spacing:-.01em}
-.mastsub{color:#c3d6ee;font-size:13.5px;margin-top:6px;max-width:74ch}
+.mastsub{color:#c3d6ee;font-size:13.5px;margin-top:6px}
 .mastlogo{height:52px;width:auto;flex:none;margin-bottom:2px;-webkit-user-drag:none;user-select:none}
 .mastactions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 /* Once the shared ASCEND masthead is in place (ascend-mast.js hides header.mast),
@@ -238,7 +238,8 @@ main{padding-bottom:44px}
   flex-wrap:wrap;padding:16px 18px 0}
 .cardhd h2{font-size:16.5px;font-weight:800;color:var(--ink)}
 .cardhd h3{font-size:14.5px;font-weight:800;color:var(--ink)}
-.cardhd .why{font-size:12.5px;color:var(--muted);margin-top:4px;max-width:78ch}
+.cardhd .why{font-size:12.5px;color:var(--muted);margin-top:4px}
+.cardhd > div:first-child{flex:1;min-width:0}          /* the heading text runs the card's full width */
 .cardbody{padding:14px 18px 18px}
 .kicker{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
   font-weight:800;color:var(--magenta);margin-bottom:6px}
@@ -433,7 +434,7 @@ details.fold[open] > summary{margin-bottom:12px}
 .nbhead{display:flex;flex-wrap:wrap;gap:12px 28px;margin:0 0 14px}
 .nbbig{display:flex;align-items:baseline;gap:10px}
 .nbbig b{font-size:30px;font-weight:800;line-height:1;color:var(--ink);font-variant-numeric:tabular-nums}
-.nbbig span{font-size:13px;color:var(--ink-2);max-width:30ch}
+.nbbig span{font-size:13px;color:var(--ink-2)}
 .nbbig.warn b{color:var(--crit)}
 .nbrow{display:grid;grid-template-columns:minmax(150px,230px) minmax(0,1fr) 54px 64px;gap:12px;align-items:center;padding:6px 8px;border-top:1px solid var(--line)}
 .nbcolhd{border-top:0;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700}
@@ -510,7 +511,7 @@ table.opgrid{border-collapse:collapse;width:100%;min-width:680px;font-size:13px}
 .ustile{border:1px solid var(--line);border-left:4px solid var(--ink);border-radius:6px;padding:8px 14px;min-width:200px;display:flex;flex-direction:column}
 .ustile .un{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:700}
 .ustile b{font-size:28px;font-weight:800;line-height:1.15;color:var(--ink);font-variant-numeric:tabular-nums}
-.ustile .us{font-size:12px;color:var(--ink-2);max-width:42ch}
+.ustile .us{font-size:12px;color:var(--ink-2)}
 .ustile.bad{border-left-color:var(--crit)}.ustile.bad b{color:var(--crit)}
 .jumplink{display:inline-block;margin:0 0 12px;font-size:13px;font-weight:700;color:var(--s1);text-decoration:none}
 .jumplink:hover{text-decoration:underline}
@@ -526,7 +527,7 @@ table.predict tr.cls th{font-weight:800;color:var(--ink);background:var(--surfac
 .pr-chip:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
 .pr-how{margin:0 0 14px;font-size:13px;color:var(--ink-2)}
 .pr-how summary,.pr-num summary{cursor:pointer;font-weight:700;color:var(--s1)}
-.pr-how p{margin:6px 0 0;line-height:1.45;max-width:90ch}
+.pr-how p{margin:6px 0 0;line-height:1.45}
 .pr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:14px;margin-bottom:18px}
 .pr-card{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:var(--surface);display:flex;flex-direction:column;gap:8px;min-width:0}
 .pr-card h4{margin:0;font-size:15px;color:var(--ink)}
@@ -605,7 +606,7 @@ table.standards{min-width:0;font-size:13px}table.standards td,table.standards th
 @media (max-width:640px){ .gpath > summary{grid-template-columns:1fr} }
 .hero .fig{font-size:56px;font-weight:700;letter-spacing:-.03em;line-height:1;color:var(--ink)}
 .hero .fig .u{font-size:17px;font-weight:600;color:var(--muted);margin-left:6px;letter-spacing:0}
-.hero .cap{font-size:13px;color:var(--ink-2);max-width:62ch}
+.hero .cap{font-size:13px;color:var(--ink-2)}
 
 /* ================= status chips ================= */
 /* Status never travels on colour alone - each chip is icon + word. */
@@ -1102,7 +1103,8 @@ body.gated{overflow:hidden}
           <div class="kicker">Review</div>
           <h2 id="reviewTitle">Students needing attention, side by side</h2>
           <p class="why">One card per student in the current filter whose standing is Academic concern &mdash;
-            the same layout on every card, so a domain can be compared across students at a glance.
+            or, once a CCM or career advisor is picked or a student is searched for, every student in that group,
+            the most serious first. The same layout on every card, so a domain can be compared across students at a glance.
             Percentiles are within the student&rsquo;s class; domain bars show points above or below the
             class mean. Open a card for the full record.</p>
         </div>
@@ -5822,23 +5824,30 @@ function renderReview(list){
   /* Phones show the first five cards and a Show-all button (see .rv-more). */
   grid.classList.toggle('rv-all', !!state.reviewAll);
   const more = $('rvMore'); if(more) more.hidden = true;
+  /* a CCM's or career advisor's group, or a search: every student in it gets
+     a card, whatever their standing (user, 2026-10-18); otherwise only
+     Academic concern, and Monitor on request */
+  const everyone = state.ccm !== 'all' || state.advisor !== 'all' || !!state.q.trim();
   const want = new Set(['concern'].concat(state.reviewWatch ? ['watch'] : []));
-  const picked = list.filter(s => want.has(s.status));
+  const picked = everyone ? list.slice() : list.filter(s => want.has(s.status));
+  const rw = $('rvWatch'); if(rw) rw.disabled = everyone;
   const worst = s => Math.min(...[kOf(s), skOf(s)].filter(v => v != null).concat([101]));
   /* the most serious first: a USMLE Step failure, a clerkship failure, a
-     shelf failure; then the other Academic concerns; then Monitor */
+     shelf failure; then the other Academic concerns; then Monitor; then the rest */
   const rank = s => { const w = (s.flags || []).filter(f => f.level === 'crit').map(f => f.what).join(' | ');
     return /USMLE Step/.test(w) ? 0 : /clerkship failure/.test(w) ? 1 : /shelf exams? below the pass mark/.test(w) ? 2
-         : s.status === 'concern' ? 3 : 4 };
+         : s.status === 'concern' ? 3 : s.status === 'watch' ? 4 : 5 };
   picked.sort((a, b) => rank(a) - rank(b) || worst(a) - worst(b));
-  $('reviewTitle').textContent = picked.length
-    ? picked.length + (picked.length === 1 ? ' student' : ' students') + ' needing attention, side by side'
-    : 'Students needing attention, side by side';
+  const nWord = n => n + (n === 1 ? ' student' : ' students');
+  $('reviewTitle').textContent = everyone
+    ? (picked.length ? nWord(picked.length) : 'Students') + ' in this group, side by side'
+    : picked.length ? nWord(picked.length) + ' needing attention, side by side' : 'Students needing attention, side by side';
   const na = unavailableMsg();
   if(na){ grid.appendChild(elc('div','rv-empty', na)); return }
   if(!picked.length){
-    grid.appendChild(elc('div','rv-empty', 'No student in this filter is in academic concern' +
-      (state.reviewWatch ? ' or to monitor.' : '. Tick “Include students to monitor” to widen it.')));
+    grid.appendChild(elc('div','rv-empty', everyone ? 'No student matches these filters.'
+      : 'No student in this filter is in academic concern' +
+        (state.reviewWatch ? ' or to monitor.' : '. Tick “Include students to monitor” to widen it.')));
     return;
   }
   if(more && !state.reviewAll && picked.length > 5){ more.hidden = false; more.textContent = 'Show all ' + picked.length + ' students'; }
