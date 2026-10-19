@@ -49,7 +49,7 @@ h2{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute
 <main class="wrap">
   <section class="intro">
     <p class="lead">The schedule and session materials for the Faculty Development Retreat: AOC Directors and Thread Leaders. Each session's materials open on the page when the session starts, so check back during the day. Your Hub code opens it.</p>
-    <a class="btn" href="https://ascend-integration-retreat.vercel.app/">Open Faculty Development Retreat &rarr;</a>
+    <a class="btn" href="https://ascend-faculty-retreat.vercel.app/">Open Faculty Development Retreat &rarr;</a>
   </section>
   <h2>What you will find</h2>
   <div class="vgrid">
@@ -92,7 +92,7 @@ document.querySelector('.btn').addEventListener('click', function(e){
   if(!code) return;
   e.preventDefault();
   var f = document.createElement('form');
-  f.method = 'post'; f.action = "https://ascend-integration-retreat.vercel.app/api/unlock";
+  f.method = 'post'; f.action = "https://ascend-faculty-retreat.vercel.app/api/unlock";
   var add = function(n, v){ var i = document.createElement('input'); i.type = 'hidden'; i.name = n; i.value = v; f.appendChild(i); };
   add('code', code); add('to', "/");
   document.body.appendChild(f); f.submit();
