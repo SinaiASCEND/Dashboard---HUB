@@ -152,6 +152,9 @@ a.card[data-key="retreat"] .favstar:hover{background:rgba(255,255,255,.12)}
 a.card[data-key="babybates"]{background:linear-gradient(180deg,#efe7f6 0%,#f8f4fb 100%);border-color:#d6c3e6;border-top:4px solid #68357C}
 a.card[data-key="babybates"] .cardkicker{color:#68357C}
 a.card[data-key="babybates"] .cardgo,a.card[data-key="babybates"]:nth-child(even) .cardgo{color:#68357C}
+a.card[data-key="facultyguides"]{background:linear-gradient(180deg,#e3e9f7 0%,#f2f5fc 100%);border-color:#c3cfeb;border-top:4px solid #0E3692}
+a.card[data-key="facultyguides"] .cardkicker{color:#0E3692}
+a.card[data-key="facultyguides"] .cardgo,a.card[data-key="facultyguides"]:nth-child(even) .cardgo{color:#0E3692}
 a.card:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
 .cardkicker{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:800;color:var(--muted);margin-bottom:8px}
 .cardtitle{font-size:18px;font-weight:800;line-height:1.25;margin-bottom:8px;color:var(--navy)}
@@ -519,8 +522,9 @@ const TIERS = {
   },
   "9f8b17ea00b6b3fd1efa6d10aa21cfedc91ba71a26b03557e09576370c157a81": {
     name: "Clinical Competency Mentors",
-    sub: "Clinical skills, the Baby Bates reference, the Bates faculty session guides, and student navigation tools to guide mentoring conversations.",
-    dashboards: ["clinicalskills", "babybates", "facultyguides", "people", "navigator", "electives", "studentleaders"]
+    sub: "Clinical skills, the Baby Bates reference and POM Student Learning Guides, the POM Faculty Guides, and student navigation tools to guide mentoring conversations.",
+    dashboards: ["clinicalskills", "babybates", "facultyguides", "people", "navigator", "electives", "studentleaders"],
+    pinned: ["babybates", "facultyguides"]
   },
   "b9b2b6f01aa767c022763ca563e0882c08635da21f2519dc7b02564aaf0aa9ba": {
     // The owner's own tier. Named for the tier, not its first card
