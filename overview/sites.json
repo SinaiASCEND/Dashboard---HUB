@@ -145,7 +145,7 @@
    "slug": "bates-faculty-guides",
    "key": "facultyguides",
    "kicker": "Physical Examination",
-   "title": "POM Faculty Guides",
+   "title": "ASCEND Practice of Medicine (POM) Faculty Guides",
    "short": "POM Faculty Guides",
    "audience": "Clinical Competency Mentors and the Office of Curricular Affairs. The guides are faculty material (scripts, expected answers, case findings), so the site sits behind its own server-side gate; your Hub code opens it if your role allows. Students use the matching POM Student Learning Guides on Baby Bates.",
    "intro": "The Practice of Medicine faculty session guides for the POM 1 core physical exam, rebuilt as pages that read well on a laptop or phone. Each guide is the whole session: outline and timeline, the facilitator script with what to say and ask, the expected responses, and the exam checklist. The guide's faculty cues sit beside the script, with the Bates' Visual Guide video (and the time to skip to) and the Bates' Guide, 14th edition passage for each part of the exam.",
