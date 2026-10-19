@@ -661,35 +661,36 @@
    "kicker": "MD Program Strategic Plan",
    "title": "From Education to Impact",
    "short": "the dashboard",
-   "audience": "The dashboard's owner. It is a private claude.ai page and opens only for accounts it is shared with.",
-   "intro": "A working dashboard for From Education to Impact, the ISMMS MD Program Strategic Plan for 2026–2031: its five priorities, goals, Year 1 initiatives and KPIs, with an action plan, a meeting log and the materials behind each meeting.",
-   "primaryAbs": "https://claude.ai/artifact/HhJHfLXNRfzvUsotXAr7iu",
+   "audience": "Strategic plan working group members and the Office of Curricular Affairs. The dashboard holds working-group planning material, so it sits behind its own server-side gate; your Hub code opens it if your role allows.",
+   "intro": "The working dashboard for From Education to Impact, the ISMMS MD Program Strategic Plan for 2026–2031: its five priorities, goals, Year 1 initiatives and KPIs, with the two initiatives Curriculum Content Gap Closure (G2.2) and the Emerging Healthcare Competency Framework (G3.1), their members, milestones, meetings and materials. It is read-only; the working groups' project managers send updates.",
+   "primaryAbs": "https://ascend-strategic-plan.vercel.app/",
    "views": [
+    {
+     "title": "Overview and roadmap",
+     "blurb": "The strategic identity, open items, what is coming up, and a timeline of next steps for G2.2 and G3.1."
+    },
     {
      "title": "Plan and KPIs",
      "blurb": "The five priorities, their goals and initiatives, and each Year 1 KPI with its due date and status."
     },
     {
-     "title": "Year 1 working groups",
-     "blurb": "The 12 Year 1 initiatives with their co-leads and project managers."
+     "title": "KPI milestones",
+     "blurb": "Each G2.2 and G3.1 indicator broken into dated stages, with what counts as done."
     },
     {
-     "title": "Action plan",
-     "blurb": "Requests, deadlines and milestones, with owner, due date and status."
+     "title": "Members and Year 1 teams",
+     "blurb": "The G2.2 and G3.1 working groups with photos, and the co-leads and project managers of all 12 initiatives."
     },
     {
-     "title": "Meetings",
-     "blurb": "Each planning and working group meeting: where it met, summary, decisions, follow-ups and materials."
+     "title": "Action plan, meetings and minutes",
+     "blurb": "Requests and deadlines with owner and status, each meeting with its decisions, and minutes and synopses."
     },
     {
-     "title": "Curriculum gap register",
-     "blurb": "Curriculum Content Gap Closure: each flagged gap and its governance decision."
-    },
-    {
-     "title": "Materials",
-     "blurb": "Pre-reads, synopses, workbooks and sites, and where each one lives."
+     "title": "Gap register and materials",
+     "blurb": "Each flagged curriculum gap with its October 2026 evidence and decision, the draft charters, the Curriculum Gap Report and the meeting pre-reads."
     }
-   ]
+   ],
+   "unlock": "https://ascend-strategic-plan.vercel.app/api/unlock"
   },
   {
    "slug": "support-dashboard",
