@@ -407,12 +407,6 @@ const DASHBOARDS = {
     title: "Curricular Student Leadership",
     blurb: "The students who represent their classes on the EEC, its subcommittees, and each module and clerkship."
   },
-  studentperf: {
-    url: "overview/student-performance.html",
-    kicker: "De-identified Student Data",
-    title: "Student Performance Dashboard",
-    blurb: "De-identified student-level performance across all three phases, by student code."
-  },
   /* Gated Vercel site (19 Oct 2026; was a claude.ai artifact): the working dashboard for the MD Program Strategic Plan.
      19 Oct 2026: on its own strategic plan tier, the Office of Curricular Affairs tier and the owner's tier. */
   strategicplan: {
@@ -481,8 +475,7 @@ const TIERS = {
   "5942bd952f12e02478b5a6aba902340a58c9c769a961f128dbb57f0b79358537": {
     name: "Office of Curricular Affairs",
     sub: "Full access \u2014 all monitoring, mapping, governance, and accreditation views.",
-    // Every dashboard the Hub knows, except Student Performance: that one stays
-    // on the owner's tier only, or by its direct URL. Add a new card's key here too.
+    // Every dashboard the Hub knows. Add a new card's key here too.
     dashboards: ["calendar", "phase1", "clinicalskills", "phase2", "phase3", "nbme",  "objectives", "nutrition", "integration", "policies", "surveys", "lcme", "governance", "support", "studentleaders",
                  "navigator", "electives", "babybates", "facultyguides", "people", "retreat", "strategicplan"],
     pinned: ["retreat","phase1","phase2","phase3","governance"]
@@ -523,14 +516,12 @@ const TIERS = {
     dashboards: ["clinicalskills", "babybates", "facultyguides", "people", "navigator", "electives", "studentleaders"]
   },
   "b9b2b6f01aa767c022763ca563e0882c08635da21f2519dc7b02564aaf0aa9ba": {
-    // The owner's own tier. Named for the tier, not its first card
-    // (whose kicker is "De-identified Student Data").
-    name: "Rainier Soriano \u2014 Full Access with Student Data",
-    sub: "Every dashboard, including the de-identified Student Performance dashboard: student-level results across all three phases by student code. Names are held in a separate key.",
+    // The owner's own tier.
+    name: "Rainier Soriano \u2014 Full Access",
+    sub: "Every dashboard.",
     // Always every card in DASHBOARDS, so a new card shows here without being listed.
-    // Student Performance shows only here.
     dashboards: Object.keys(DASHBOARDS),
-    pinned: ["retreat","studentperf","strategicplan","phase1","phase2","phase3","governance"]
+    pinned: ["retreat","strategicplan","phase1","phase2","phase3","governance"]
   },
   "a42b8352b4c79f604f3ca0f8c703cbd08f648e86099ec682ce98bd4a11286741": {
     name: "Governance Support",
