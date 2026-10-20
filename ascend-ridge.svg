@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="100 0 560 220" preserveAspectRatio="xMaxYMax meet">
+  <!-- The ASCEND peaks, traced as plain wedges: used only as a faint background -->
+  <g fill="#ffffff">
+    <polygon points="108,215 272,38 296,58"/>
+    <polygon points="180,215 305,77 332,102"/>
+    <polygon points="250,215 445,4 472,28"/>
+    <polygon points="320,215 478,42 505,66"/>
+    <polygon points="390,215 515,80 542,104"/>
+    <polygon points="460,215 553,118 580,142"/>
+    <polygon points="530,215 590,156 613,180"/>
+  </g>
+  <polygon fill="#d6007e" points="607,215 626,194 645,215"/>
+</svg>
