@@ -9,7 +9,7 @@
    "title": "Curriculum Navigator",
    "short": "the Navigator",
    "audience": "Students, faculty, and staff. Open to everyone.",
-   "intro": "Search the ASCEND curriculum from one place. Find any session, learning objective, or calendar date across all three phases, and see how sessions connect to program objectives, threads, and Areas of Curricular Integration (AOCs).",
+   "intro": "Search the ASCEND curriculum from one place. Find any session, learning objective, or calendar date across all three phases, and see how sessions connect to program objectives, threads, and Areas of Curricular Concentration (AOCs).",
    "primary": "Dashboard---Students/",
    "views": [
     {
@@ -25,7 +25,7 @@
      "blurb": "The Phase 2 clerkships with their learning objectives."
     },
     {
-     "title": "Threads and Areas of Curricular Integration",
+     "title": "Threads and Areas of Curricular Concentration",
      "blurb": "Where each curricular thread and AOC is taught, by session, from the AOC and Threads workbook; rows not yet matched to a session are listed on each AOC page."
     },
     {
@@ -56,7 +56,7 @@
    "views": [
     {
      "title": "Electives catalog",
-     "blurb": "All medical student electives, filterable by field, Area of Curricular Integration, phase, and schedule. Built from the master electives catalog.",
+     "blurb": "All medical student electives, filterable by field, Area of Curricular Concentration, phase, and schedule. Built from the master electives catalog.",
      "url": "Dashboard---Electives/"
     },
     {
@@ -428,7 +428,7 @@
    "title": "ASCEND Curricular Integration Dashboard",
    "short": "Curricular Integration",
    "audience": "The Curricular Integration Subcommittee, AOC Directors, Content Area Directors, module and clerkship directors, the EEC and its subcommittees, and OCA leadership. Draft content for review by the Curricular Integration Subcommittee.",
-   "intro": "Where the four Areas of Curricular Integration (AOCs: Healthcare Delivery Science, Scientific & Scholarly Discovery, Leadership & Professional Identity, Patient-Centered Advocacy), the ten content areas (curricular threads) and The Inquiry (THINQ) Curriculum live across the three phases of ASCEND. Breadth: which modules and clerkships carry each one. Depth: how many sessions and hours, and how Practice of Medicine skills progress. Alignment: which sessions carry objectives, MEPO links and summative assessment. Built from the AOC, thread and THINQ tabs of the master curriculum map; many tags still await director review.",
+   "intro": "Where the four Areas of Curricular Concentration (AOCs: Healthcare Delivery Science, Scientific & Scholarly Discovery, Leadership & Professional Identity, Patient-Centered Advocacy), the ten content areas (curricular threads) and The Inquiry (THINQ) Curriculum live across the three phases of ASCEND. Breadth: which modules and clerkships carry each one. Depth: how many sessions and hours, and how Practice of Medicine skills progress. Alignment: which sessions carry objectives, MEPO links and summative assessment. Built from the AOC, thread and THINQ tabs of the master curriculum map; many tags still await director review.",
    "primary": "Dashboard---Integration/",
    "views": [
     {
