@@ -43,10 +43,14 @@ body{font-family:var(--sans);color:var(--ink);font-size:15px;line-height:1.5;-we
   display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:22px}
 .tile .eyebrow::before,.tile .eyebrow::after{content:"";width:26px;height:3px;background:var(--magenta)}
 .tile .eyebrow::after{background:var(--cyan)}
-.logo{width:min(330px,88%);height:auto;display:block;margin:0 auto 22px;user-select:none;-webkit-user-drag:none}
+/* text-only name: no logo image */
+.wordmark{margin:0 auto 18px;line-height:1;user-select:none}
+.wordmark .wm-name{display:block;font-size:44px;font-weight:800;letter-spacing:.02em;color:var(--navy)}
+.wordmark .wm-sub{display:inline-block;margin-top:9px;padding-top:8px;border-top:2px solid var(--cyan);
+  font-size:12px;font-weight:700;letter-spacing:.42em;text-indent:.42em;text-transform:uppercase;color:var(--navy2)}
 .tile h1{font-size:17px;font-weight:800;letter-spacing:-.01em;color:var(--navy);margin:10px 0 4px}
 .tile .sub{color:var(--muted);font-size:13.5px;margin:0 0 14px}
-.tile .inst{font-size:11.5px;font-weight:700;color:var(--navy);letter-spacing:.01em;line-height:1.3;margin:0 0 12px}
+.tile .inst{font-size:11.5px;font-weight:600;color:var(--muted);letter-spacing:.01em;line-height:1.3;margin:-12px 0 18px}
 .tile .tagline{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:7px;background:transparent;margin:2px 0 22px}
 .tile .tagline span{font-size:11px;font-weight:800;letter-spacing:-.01em;line-height:1}
 .tile .tl-a{color:var(--cyan)}
@@ -119,8 +123,10 @@ body{font-family:var(--sans);color:var(--ink);font-size:15px;line-height:1.5;-we
 .mast h2{font-size:28px;line-height:1.1;margin:12px 0 6px;font-weight:800;letter-spacing:-.01em}
 .mast .sub2{color:#cfe0f5;font-size:14px;max-width:640px}
 .mastright{display:flex;flex-direction:column;align-items:flex-end;gap:14px;flex-shrink:0}
-.mastlogo{height:58px;width:auto;background:#fff;border-radius:10px;padding:7px 12px;box-sizing:content-box;-webkit-user-drag:none;user-select:none}
-@media (max-width:560px){.mastlogo{height:40px;padding:5px 9px}}
+.mastmark{text-align:right;line-height:1;user-select:none}
+.mastmark .wm-name{display:block;font-size:24px;font-weight:800;letter-spacing:.02em;color:#fff}
+.mastmark .wm-sub{display:inline-block;margin-top:6px;padding-top:5px;border-top:2px solid var(--cyan);
+  font-size:9.5px;font-weight:700;letter-spacing:.38em;margin-right:-.38em;text-transform:uppercase;color:#9fc2e8}
 .lockBtn{appearance:none;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.08);color:#dfeafc;
   font-family:var(--sans);font-weight:600;font-size:12.5px;padding:9px 16px;border-radius:999px;cursor:pointer;white-space:nowrap;
   transition:background .15s ease}
@@ -220,8 +226,9 @@ a.card.locked .cardgo{color:var(--muted)}
 <div class="gate" id="gate">
   <div class="ridge" aria-hidden="true"></div>
   <div class="tile" id="tile">
-    <img class="logo" id="ascendLogo" alt="ASCEND Curriculum | Icahn School of Medicine at Mount Sinai" src="ascend-icahn-lockup.png">
+    <div class="wordmark"><span class="wm-name">ASCEND</span><span class="wm-sub">Curriculum</span></div>
     <div class="eyebrow">Office of Curricular Affairs</div>
+    <div class="inst">Icahn School of Medicine at Mount Sinai</div>
     <h1>Dashboard Hub</h1>
     <p class="sub">Your guide to the ASCEND curriculum.</p>
     <div class="tagline">
@@ -265,7 +272,7 @@ a.card.locked .cardgo{color:var(--muted)}
           <div class="sub2" id="hubSub"></div>
         </div>
         <div class="mastright">
-          <img class="mastlogo" id="mastLogo" alt="ASCEND Curriculum | Icahn School of Medicine at Mount Sinai" src="ascend-icahn-lockup.png">
+          <div class="mastmark"><span class="wm-name">ASCEND</span><span class="wm-sub">Curriculum</span></div>
           <button class="lockBtn" id="lockBtn">Lock &amp; exit</button>
         </div>
       </div>
