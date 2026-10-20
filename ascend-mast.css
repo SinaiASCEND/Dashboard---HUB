@@ -5,7 +5,7 @@
 
    Markup:
      <header class="ascend-mast ascend-mast--compact">
-       <img class="am-logo" src=".../oca-mountain.png" alt="">
+       <img class="am-logo" src=".../oca-mountain.png" alt="">   (faint peaks only)
        <div class="am-wrap">
          <div class="am-top">
            <span class="am-dot"></span>
@@ -66,6 +66,10 @@
 .ascend-mast .am-stripe i:nth-child(1){flex:2;background:#1fb6e8}
 .ascend-mast .am-stripe i:nth-child(2){flex:1;background:#fff}
 .ascend-mast .am-stripe i:nth-child(3){flex:1;background:#d6117f}
+/* Official ASCEND Curriculum wordmark (white), lower right of the masthead. The
+   mountain behind it (am-logo) is only a faint echo, never a logo of its own. */
+.ascend-mast .am-wrap::after{content:"";position:absolute;right:28px;bottom:24px;width:150px;height:54px;
+  background:url("ascend-wordmark-white.png") no-repeat right bottom/contain;pointer-events:none}
 
 /* Compact variant — for dense tools that carry their own toolbars below. */
 .ascend-mast--compact .am-wrap{padding:16px 24px 15px}
@@ -74,6 +78,7 @@
 .ascend-mast--compact h1{font-size:27px;letter-spacing:-.6px;margin:9px 0 0}
 .ascend-mast--compact .am-motto{margin:9px 0 0;gap:14px;font-size:11.5px;line-height:1.2}
 .ascend-mast--compact .am-util .in{padding:9px 24px;font-size:13px}
+.ascend-mast--compact .am-wrap::after{right:24px;bottom:14px;width:104px;height:38px}
 
 @media(max-width:900px){
   .ascend-mast h1{font-size:30px}
@@ -119,4 +124,5 @@
   .ascend-mast .am-util .in>span:not(.am-nav){display:none}
   .ascend-mast .am-util .in .am-nav a{min-height:44px;display:inline-flex;align-items:center}
   .ascend-mast .am-logo{opacity:.3}
+  .ascend-mast .am-wrap::after{display:none}
 }
