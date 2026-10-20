@@ -5,13 +5,11 @@
 
    Paths are recorded without query strings or hashes, so nothing typed into
    a dashboard (a search, a student code) reaches the stats. Pages off
-   sinaiascend.github.io (Governance on Vercel) are prefixed with their host.
-   Student Performance is never counted. */
+   sinaiascend.github.io (Governance on Vercel) are prefixed with their host. */
 (function () {
   if (window.__ascendStats) return; window.__ascendStats = 1;
   var host = location.hostname, path = location.pathname;
   if (location.protocol !== "https:") return;                 // local copies and previews
-  if (/student[_-]?performance/i.test(path)) return;
   var strip = function (u) { return String(u || "").split(/[?#]/)[0]; };
   window.goatcounter = {
     path: (host === "sinaiascend.github.io" ? "" : host) + path,

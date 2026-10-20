@@ -632,30 +632,6 @@
    ]
   },
   {
-   "slug": "student-performance",
-   "key": "studentperf",
-   "kicker": "De-identified Student Data",
-   "title": "Student Performance Dashboard",
-   "short": "the dashboard",
-   "audience": "Holders of the student-data code only. Names are held in a separate key.",
-   "intro": "De-identified student-level performance across all three phases, by student code: module quizzes, NBME customized assessments, OSCE and clinical skills evaluations, and shelf exams, with a class roster and a rotation view.",
-   "primaryAbs": "../Student_Performance.html",
-   "views": [
-    {
-     "title": "Class roster",
-     "blurb": "Every student by code, with phase and rotation."
-    },
-    {
-     "title": "Assessments",
-     "blurb": "Quizzes, NBME customized assessments, OSCE and clinical skills evaluations, and shelf exams by student."
-    },
-    {
-     "title": "Rotation view",
-     "blurb": "Performance by rotation and site."
-    }
-   ]
-  },
-  {
    "slug": "strategic-plan",
    "key": "strategicplan",
    "kicker": "MD Program Strategic Plan",
