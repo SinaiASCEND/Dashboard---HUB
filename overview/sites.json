@@ -310,7 +310,7 @@
    "kicker": "Programmatic Assessment",
    "title": "Site Comparability",
    "short": "Site Comparability",
-   "audience": "Clerkship directors and site directors, the Clinical Curriculum Subcommittee, the Assessment and Evaluation Subcommittee, the EEC, and OCA leadership.",
+   "audience": "Clerkship and site directors, the Clinical Curriculum Subcommittee, and OCA leadership.",
    "intro": "How the teaching sites of each Phase 2 clerkship compare, one clerkship at a time and across all clerkships, for the Class of 2028 (year to date) and the Class of 2027 where the data has a site split. Every figure is an aggregate; cells with fewer than five students are not shaded, and shading describes position only.",
    "primary": "Dashboard-Site-Comparability/",
    "views": [

@@ -349,6 +349,8 @@ const DASHBOARDS = {
     title: "ASCEND Phase 2 Directors Dashboard",
     blurb: "Clerkship Director dashboards for the clinical phase: cohort outcomes, assessment quality, and clerkship and site evaluations by academic year."
   },
+  // Site Comparability: shown only to the tiers the owner chose on 21 Oct 2026 (the office, the Clinical
+  // Curriculum Subcommittee and the owner's full-access tier).
   sitecomp: {
     url: "overview/site-comparability.html",
     kicker: "Programmatic Assessment",
@@ -493,7 +495,7 @@ const TIERS = {
   "255af8d0734e8438d7fcef7cb457da08d130e24f574065175f2ab73ed2ffb360": {
     name: "Executive Education Committee",
     sub: "Programmatic assessment across all three phases, clinical skills, the class calendar, policies, and governance.",
-    dashboards: ["calendar", "phase1", "clinicalskills", "phase2", "sitecomp", "phase3", "integration", "policies", "governance", "studentleaders",
+    dashboards: ["calendar", "phase1", "clinicalskills", "phase2", "phase3", "integration", "policies", "governance", "studentleaders",
                  "people", "navigator", "electives"],
     pinned: ["phase1","phase2","phase3","governance"]
   },
@@ -548,7 +550,7 @@ const TIERS = {
     // the Support Dashboard removed (owner's access review).
     name: "Assessment and Evaluation Subcommittee",
     sub: "Programmatic assessment across all three phases, exam performance, student surveys, objectives and milestones, clinical skills, and governance.",
-    dashboards: ["phase1", "phase2", "sitecomp", "phase3", "nbme", "surveys", "objectives", "nutrition", "clinicalskills",
+    dashboards: ["phase1", "phase2", "phase3", "nbme", "surveys", "objectives", "nutrition", "clinicalskills",
                  "integration", "policies", "governance", "calendar", "people", "navigator", "electives", "studentleaders"],
     pinned: ["phase1","phase2","phase3","nbme"]
   },
