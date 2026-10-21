@@ -326,7 +326,7 @@
     },
     {
      "title": "1. Mid-clerkship feedback",
-     "blurb": "The site evaluation's feedback items by site, and the rate of students receiving mid-clerkship feedback in each clerkship.",
+     "blurb": "The site evaluation's feedback items by site, and the rate of students receiving mid-clerkship feedback in each clerkship (the clerkship evaluation is anonymous, so that rate has no site split).",
      "url": "Dashboard-Site-Comparability/#feedback"
     },
     {
@@ -361,7 +361,7 @@
     },
     {
      "title": "8. Mistreatment",
-     "blurb": "Students reporting mistreatment, by site (being added from the one45 site evaluation).",
+     "blurb": "Mistreatment by site: explains why no site-level figures are available for 2025–26 and 2026–27.",
      "url": "Dashboard-Site-Comparability/#mistreatment"
     },
     {
