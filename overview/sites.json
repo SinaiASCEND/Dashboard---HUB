@@ -279,9 +279,9 @@
      "url": "Dashboard-Phase-2-Program-Assessment/monitoring.html"
     },
     {
-     "title": "Site reports",
-     "blurb": "One teaching site at a time: every clerkship that rotates there against the other sites of the same clerkship and the prior year, with the site’s history.",
-     "url": "Dashboard-Phase-2-Program-Assessment/sites.html"
+     "title": "Site comparability",
+     "blurb": "Opens the Site Comparability dashboard: teaching sites compared on nine measures, plus the clinical site reports (one teaching site at a time).",
+     "url": "Dashboard-Site-Comparability/"
     },
     {
      "title": "Direct observations",
@@ -301,6 +301,73 @@
     {
      "title": "Objective mapping",
      "blurb": "Clerkship learning objectives mapped to program objectives."
+    }
+   ]
+  },
+  {
+   "slug": "site-comparability",
+   "key": "sitecomp",
+   "kicker": "Programmatic Assessment",
+   "title": "Site Comparability",
+   "short": "Site Comparability",
+   "audience": "Clerkship directors and site directors, the Clinical Curriculum Subcommittee, the Assessment and Evaluation Subcommittee, the EEC, and OCA leadership.",
+   "intro": "How the teaching sites of each Phase 2 clerkship compare, one clerkship at a time and across all clerkships, for the Class of 2028 (year to date) and the Class of 2027 where the data has a site split. Every figure is an aggregate; cells with fewer than five students are not shaded, and shading describes position only.",
+   "primary": "Dashboard-Site-Comparability/",
+   "views": [
+    {
+     "title": "Overview",
+     "blurb": "What each area holds, its coverage by class, and a sites-at-a-glance table of each site's difference from each clerkship's all-site figure.",
+     "url": "Dashboard-Site-Comparability/#overview"
+    },
+    {
+     "title": "Clinical site reports",
+     "blurb": "One teaching site at a time: supervision and learning-environment items (LCME 9.3 and 3.5) against the other sites of the same clerkship, the prior year and the site's history.",
+     "url": "Dashboard-Site-Comparability/#site-reports"
+    },
+    {
+     "title": "1. Mid-clerkship feedback",
+     "blurb": "The site evaluation's feedback items by site, and the rate of students receiving mid-clerkship feedback in each clerkship (the clerkship evaluation is anonymous, so that rate has no site split).",
+     "url": "Dashboard-Site-Comparability/#feedback"
+    },
+    {
+     "title": "2. Overall quality of the clerkship",
+     "blurb": "Overall quality of training at each site.",
+     "url": "Dashboard-Site-Comparability/#quality"
+    },
+    {
+     "title": "3. Clinical Performance Evaluations",
+     "blurb": "Mean composite CPE score by the student's assigned site.",
+     "url": "Dashboard-Site-Comparability/#cpe"
+    },
+    {
+     "title": "4. NBME shelf exams",
+     "blurb": "Subject-exam scores by the student's assigned site.",
+     "url": "Dashboard-Site-Comparability/#shelf"
+    },
+    {
+     "title": "5. Direct observation",
+     "blurb": "Morchand Center checklist scores by the student's assigned site.",
+     "url": "Dashboard-Site-Comparability/#do"
+    },
+    {
+     "title": "6. Work hours",
+     "blurb": "Students reporting a work-hour policy violation, by site.",
+     "url": "Dashboard-Site-Comparability/#workhours"
+    },
+    {
+     "title": "7. Professionalism",
+     "blurb": "Every professionalism item on the site evaluation, by site.",
+     "url": "Dashboard-Site-Comparability/#professionalism"
+    },
+    {
+     "title": "8. Mistreatment",
+     "blurb": "Mistreatment by site: explains why no site-level figures are available for 2025–26 and 2026–27.",
+     "url": "Dashboard-Site-Comparability/#mistreatment"
+    },
+    {
+     "title": "9. RCE log completion",
+     "blurb": "Students who logged every required clinical experience, by the student's assigned site.",
+     "url": "Dashboard-Site-Comparability/#rce"
     }
    ]
   },

@@ -349,6 +349,12 @@ const DASHBOARDS = {
     title: "ASCEND Phase 2 Directors Dashboard",
     blurb: "Clerkship Director dashboards for the clinical phase: cohort outcomes, assessment quality, and clerkship and site evaluations by academic year."
   },
+  sitecomp: {
+    url: "overview/site-comparability.html",
+    kicker: "Programmatic Assessment",
+    title: "Site Comparability",
+    blurb: "Phase 2 teaching sites compared, per clerkship and across all clerkships: mid-clerkship feedback, quality, CPE, shelf, direct observation, work hours, professionalism, and RCE logging, plus the clinical site reports."
+  },
   phase3: {
     url: "overview/phase-3-assessment.html",
     kicker: "Programmatic Assessment",
@@ -480,14 +486,14 @@ const TIERS = {
     name: "Office of Curricular Affairs",
     sub: "Full access \u2014 all monitoring, mapping, governance, and accreditation views.",
     // Every dashboard the Hub knows. Add a new card's key here too.
-    dashboards: ["calendar", "phase1", "clinicalskills", "phase2", "phase3", "nbme",  "objectives", "nutrition", "integration", "policies", "surveys", "lcme", "governance", "support", "studentleaders",
+    dashboards: ["calendar", "phase1", "clinicalskills", "phase2", "sitecomp", "phase3", "nbme",  "objectives", "nutrition", "integration", "policies", "surveys", "lcme", "governance", "support", "studentleaders",
                  "navigator", "electives", "babybates", "facultyguides", "people", "retreat", "strategicplan"],
     pinned: ["retreat","phase1","phase2","phase3","governance"]
   },
   "255af8d0734e8438d7fcef7cb457da08d130e24f574065175f2ab73ed2ffb360": {
     name: "Executive Education Committee",
     sub: "Programmatic assessment across all three phases, clinical skills, the class calendar, policies, and governance.",
-    dashboards: ["calendar", "phase1", "clinicalskills", "phase2", "phase3", "integration", "policies", "governance", "studentleaders",
+    dashboards: ["calendar", "phase1", "clinicalskills", "phase2", "sitecomp", "phase3", "integration", "policies", "governance", "studentleaders",
                  "people", "navigator", "electives"],
     pinned: ["phase1","phase2","phase3","governance"]
   },
@@ -501,7 +507,7 @@ const TIERS = {
   "5156cc64ad912a74bb8bd6a96ec955fa6d4fc4c4f97815d53e6eef9439d398a0": {
     name: "Clinical Curriculum Subcommittee",
     sub: "Phase 2 and 3 assessment, clerkship quality, the class calendar, policies, and governance.",
-    dashboards: ["calendar", "phase2", "phase3", "integration", "policies", "governance", "studentleaders",
+    dashboards: ["calendar", "phase2", "sitecomp", "phase3", "integration", "policies", "governance", "studentleaders",
                  "people", "navigator", "electives"],
     pinned: ["phase2","governance"]
   },
@@ -542,7 +548,7 @@ const TIERS = {
     // the Support Dashboard removed (owner's access review).
     name: "Assessment and Evaluation Subcommittee",
     sub: "Programmatic assessment across all three phases, exam performance, student surveys, objectives and milestones, clinical skills, and governance.",
-    dashboards: ["phase1", "phase2", "phase3", "nbme", "surveys", "objectives", "nutrition", "clinicalskills",
+    dashboards: ["phase1", "phase2", "sitecomp", "phase3", "nbme", "surveys", "objectives", "nutrition", "clinicalskills",
                  "integration", "policies", "governance", "calendar", "people", "navigator", "electives", "studentleaders"],
     pinned: ["phase1","phase2","phase3","nbme"]
   },
