@@ -479,6 +479,20 @@ const DASHBOARDS = {
     kicker: "Office Resources",
     title: "People",
     blurb: "The Office of Curricular Affairs and the faculty roles that are open."
+  },
+  /* The two halves of People as their own cards (22 Oct 2026), for the Technology Review tier.
+     Open to everyone, so they link straight to the Curricular Affairs site. */
+  curricularaffairs: {
+    url: "https://sinaiascend.github.io/Curricular-Affairs/",
+    kicker: "Office Resources",
+    title: "Office of Curricular Affairs",
+    blurb: "Org chart and directory of directors, co-directors, coordinators, and managers by phase and area."
+  },
+  opportunities: {
+    url: "https://sinaiascend.github.io/Curricular-Affairs/opportunities/",
+    kicker: "Office Resources",
+    title: "Faculty Opportunities",
+    blurb: "Open roles, leadership positions, and ways to get involved in medical education."
   }
 };
 
@@ -565,11 +579,11 @@ const TIERS = {
   },
   "32f6e996f503c5646c0da2bcb7728d1db78085e46cbcd9075d502e9efae9960c": {
     // Added 22 Oct 2026 at the owner's request (code TECH); same day, narrowed to the Navigator and Electives,
-    // then People added (the Curricular Affairs directory and faculty opportunities).
+    // then the Office of Curricular Affairs and Faculty Opportunities added as separate cards.
     name: "Technology Review",
-    sub: "The Curriculum Navigator, the Electives and NEXUS Catalog, and People: the Office of Curricular Affairs and faculty opportunities.",
-    dashboards: ["navigator", "electives", "people"],
-    pinned: ["navigator", "electives", "people"]
+    sub: "The Curriculum Navigator, the Electives and NEXUS Catalog, the Office of Curricular Affairs, and Faculty Opportunities.",
+    dashboards: ["navigator", "electives", "curricularaffairs", "opportunities"],
+    pinned: ["navigator", "electives", "curricularaffairs", "opportunities"]
   }
 };
 /* ============================================================ */
