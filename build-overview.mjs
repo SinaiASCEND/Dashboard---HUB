@@ -8,6 +8,32 @@ const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>
 const abs = u => !u ? "" : /^(https?:|\.\.\/)/.test(u) ? u : cfg.base + u;
 for (const s of cfg.sites) {
   const primary = s.primaryAbs || abs(s.primary);
+  /* "forward": the site's own home page already explains each tool, so a second
+     explainer here would repeat it. The page shows nothing: it hands the stored hub
+     code to the site's unlock (or, without one, goes to the site, whose gate asks). */
+  if (s.forward) {
+    writeFileSync(`overview/${s.slug}.html`, `<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>${esc(s.title)}</title>
+<meta name="robots" content="noindex, nofollow">
+<noscript><meta http-equiv="refresh" content="0; url=${esc(primary)}"></noscript></head>
+<body><p>Opening the <a href="${esc(primary)}">${esc(s.title)}</a>&hellip;</p>
+<script>
+var code = null;
+try { code = sessionStorage.getItem('ascendCode'); } catch(_){}
+if (code && ${JSON.stringify(s.unlock || "")}) {
+  var f = document.createElement('form');
+  f.method = 'post'; f.action = ${JSON.stringify(s.unlock || "")};
+  var add = function(n, v){ var i = document.createElement('input'); i.type = 'hidden'; i.name = n; i.value = v; f.appendChild(i); };
+  add('code', code); add('to', ${JSON.stringify(s.unlockTo || "/")});
+  document.body.appendChild(f); f.submit();
+} else {
+  location.replace(${JSON.stringify(primary)});
+}
+</script></body></html>
+`);
+    console.log("wrote overview/" + s.slug + ".html (forward)");
+    continue;
+  }
   const views = s.views.map((v, i) => `
       <div class="vcard">
         <div class="vk">${String(i+1).padStart(2,"0")}</div>
