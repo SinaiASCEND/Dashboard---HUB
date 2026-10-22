@@ -738,11 +738,12 @@
   {
    "slug": "support-dashboard",
    "key": "support",
+   "forward": true,
    "kicker": "Support Tools",
    "title": "ASCEND Support Dashboard",
    "short": "the Support Dashboard",
    "audience": "Office of Curricular Affairs staff, governance support, and dashboard maintainers.",
-   "intro": "Four tools for the people who keep ASCEND running, behind one access code. Make a Word draft of meeting minutes from a transcript, build a module evaluation report from a one45 export, take student names out of a file before it goes in a dashboard inbox, or look up how a dashboard job is done. The Office of Curricular Affairs keeps a copy of each meeting transcript; nothing else you upload to these tools is stored.",
+   "intro": "Five tools for the people who keep ASCEND running, behind one access code. Make a Word draft of meeting minutes from a transcript, build a module evaluation report from a one45 export, track mid-clerkship feedback, take student names out of a file before it goes in a dashboard inbox, or look up how a dashboard job is done. The Office of Curricular Affairs keeps a copy of each meeting transcript; the MCF Tracker keeps its rosters and logs as the record of mid-clerkship feedback; nothing else you upload to these tools is stored.",
    "primaryAbs": "https://ascend-support-dashboard.vercel.app/",
    "unlock": "https://ascend-support-dashboard.vercel.app/api/unlock",
    "views": [
@@ -753,6 +754,10 @@
     {
      "title": "Program Evaluation Report Generator",
      "blurb": "Upload a module's one45 evaluation export and get the Module Evaluation Report in Word, with rating charts, last year's ratings and Claude-coded comment themes, or download the latest finished report as a PDF."
+    },
+    {
+     "title": "Mid-Clerkship Feedback Tracker",
+     "blurb": "Faculty log each mid-clerkship feedback meeting from a personal email link and students confirm it in a short survey aligned to LCME Element 9.7; see who is still missing, send reminders from Outlook, and download the inventory by rotation, faculty and student."
     },
     {
      "title": "Remove Student Names",
