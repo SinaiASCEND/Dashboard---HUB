@@ -736,6 +736,28 @@
    "unlock": "https://ascend-strategic-plan.vercel.app/api/unlock"
   },
   {
+   "slug": "one45-evaluations",
+   "key": "one45forms",
+   "kicker": "Evaluation",
+   "title": "one45 Evaluations Library",
+   "short": "the one45 Evaluations Library",
+   "audience": "Module and clerkship directors and coordinators, the Assessment and Evaluation Subcommittee, and Office of Curricular Affairs staff who write or review evaluation forms.",
+   "intro": "Every evaluation and assessment form that one45 has sent, or has scheduled, for academic year 2026-27 (1 July 2026 to 30 June 2027), in all four years: Phase 1 modules and electives, the Phase 2 clerkships and the Year 4 acting internships. Each form shows every question, instruction and answer choice as one45 displays it. The library holds form wording only: no responses, and no evaluator or student names. Pulled directly from one45 and refreshed on request.",
+   "primary": "Dashboard---one45-Evaluations/",
+   "views": [
+    {
+     "title": "Forms",
+     "blurb": "All forms grouped by year and module or clerkship, with who completes each form, how many times one45 has sent it so far, and its full questions. Filter by year, form type or status, print one form, or copy a link to it.",
+     "url": "Dashboard---one45-Evaluations/"
+    },
+    {
+     "title": "Questions",
+     "blurb": "Search a word or phrase (for example supervision, work hours or professionalism) and see every question that asks it, side by side across forms, with the form it comes from. Download the matching questions as a CSV.",
+     "url": "Dashboard---one45-Evaluations/"
+    }
+   ]
+  },
+  {
    "slug": "support-dashboard",
    "key": "support",
    "forward": true,

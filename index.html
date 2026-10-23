@@ -494,6 +494,13 @@ const DASHBOARDS = {
     title: "Faculty Opportunities",
     blurb: "Open roles, leadership positions, and ways to get involved in medical education."
   },
+  /* one45 Evaluations Library (23 Oct 2026, owner's request): every AY 2026-27 one45 form and its questions. */
+  one45forms: {
+    url: "overview/one45-evaluations.html",
+    kicker: "Evaluation",
+    title: "one45 Evaluations Library",
+    blurb: "Every evaluation form one45 sends in 2026-27, Years 1 to 4, with each question and answer choice. Search a word to see where it is asked."
+  },
   /* Private Vercel site with its own server gate (22 Oct 2026, owner's request). */
   privateworkspace: {
     url: "https://ascend-rps-desk.vercel.app/",
@@ -510,7 +517,7 @@ const TIERS = {
     name: "Office of Curricular Affairs",
     sub: "Full access \u2014 all monitoring, mapping, governance, and accreditation views.",
     // Every dashboard the Hub knows. Add a new card's key here too.
-    dashboards: ["calendar", "phase1", "clinicalskills", "phase2", "sitecomp", "phase3", "nbme",  "objectives", "nutrition", "integration", "policies", "surveys", "lcme", "governance", "support", "studentleaders",
+    dashboards: ["calendar", "phase1", "clinicalskills", "phase2", "sitecomp", "phase3", "nbme",  "objectives", "nutrition", "integration", "policies", "surveys", "lcme", "governance", "support", "one45forms", "studentleaders",
                  "navigator", "electives", "babybates", "facultyguides", "people", "retreat", "strategicplan"],
     pinned: ["retreat","phase1","phase2","phase3","governance","studentleaders"]
   },
@@ -574,7 +581,7 @@ const TIERS = {
     name: "Assessment and Evaluation Subcommittee",
     sub: "Programmatic assessment across all three phases, exam performance, student surveys, objectives and milestones, clinical skills, and governance.",
     dashboards: ["phase1", "phase2", "phase3", "nbme", "surveys", "objectives", "nutrition", "clinicalskills",
-                 "integration", "policies", "governance", "calendar", "people", "navigator", "electives", "studentleaders"],
+                 "integration", "policies", "governance", "one45forms", "calendar", "people", "navigator", "electives", "studentleaders"],
     pinned: ["phase1","phase2","phase3","nbme", "studentleaders"]
   },
   "c7d6fd25503f927c695ef3448d2f37c3a86cae5fbac39774cd21ca1a856a1bfe": {
