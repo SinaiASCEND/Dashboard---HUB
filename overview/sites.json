@@ -704,13 +704,13 @@
    "kicker": "MD Program Strategic Plan",
    "title": "From Education to Impact",
    "short": "the dashboard",
-   "audience": "Strategic plan working group members and the Office of Curricular Affairs. The dashboard holds working-group planning material, so it sits behind its own server-side gate; your Hub code opens it if your role allows.",
-   "intro": "The working dashboard for From Education to Impact, the ISMMS MD Program Strategic Plan for 2026–2031: its five priorities, goals, Year 1 initiatives and KPIs, with the two initiatives Curriculum Content Gap Closure (G2.2) and the Emerging Healthcare Competency Framework (G3.1), their members, milestones, meetings and materials. It is read-only; the working groups' project managers send updates.",
-   "primaryAbs": "https://ascend-strategic-plan.vercel.app/",
+   "audience": "Strategic plan working group members and the Office of Curricular Affairs. The plan pages are open to anyone with the link; the working files open in SharePoint with a Mount Sinai sign-in.",
+   "intro": "The dashboard for From Education to Impact, the ISMMS MD Program Strategic Plan for 2026–2031: its five priorities, goals, Year 1 initiatives and KPIs, with the two initiatives Curriculum Content Gap Closure (G2.2) and the Emerging Healthcare Competency Framework (G3.1), their milestones and gap register. Members, meetings, minutes, charters and pre-reads are working files in SharePoint, linked from the dashboard.",
+   "primaryAbs": "https://sinaiascend.github.io/Dashboard---Education-to-Impact/",
    "views": [
     {
      "title": "Overview and roadmap",
-     "blurb": "The strategic identity, open items, what is coming up, and a timeline of next steps for G2.2 and G3.1."
+     "blurb": "The strategic identity, the plan at a glance, and a timeline of the G2.2 and G3.1 KPI milestones."
     },
     {
      "title": "Plan and KPIs",
@@ -721,19 +721,18 @@
      "blurb": "Each G2.2 and G3.1 indicator broken into dated stages, with what counts as done."
     },
     {
-     "title": "Members and Year 1 teams",
-     "blurb": "The G2.2 and G3.1 working groups with photos, and the co-leads and project managers of all 12 initiatives."
+     "title": "Year 1 teams",
+     "blurb": "The co-leads and project managers of all 12 Year 1 initiatives, and who does what in the plan."
     },
     {
-     "title": "Action plan, meetings and minutes",
-     "blurb": "Requests and deadlines with owner and status, each meeting with its decisions, and minutes and synopses."
+     "title": "Gap register",
+     "blurb": "Each flagged curriculum gap with its October 2026 evidence and its EEC decision."
     },
     {
-     "title": "Gap register and materials",
-     "blurb": "Each flagged curriculum gap with its October 2026 evidence and decision, the draft charters, the Curriculum Gap Report and the meeting pre-reads."
+     "title": "Working files",
+     "blurb": "SharePoint links, opened with a Mount Sinai sign-in: the draft charters, the Curriculum Gap Report, a workbook of members, actions, meetings and minutes, and the Steering Committee pre-reads."
     }
-   ],
-   "unlock": "https://ascend-strategic-plan.vercel.app/api/unlock"
+   ]
   },
   {
    "slug": "support-dashboard",
