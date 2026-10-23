@@ -493,6 +493,13 @@ const DASHBOARDS = {
     kicker: "Office Resources",
     title: "Faculty Opportunities",
     blurb: "Open roles, leadership positions, and ways to get involved in medical education."
+  },
+  /* Private Vercel site with its own server gate (22 Oct 2026, owner's request). */
+  privateworkspace: {
+    url: "https://ascend-rps-desk.vercel.app/",
+    kicker: "Private",
+    title: "Private Workspace",
+    blurb: "A private workspace for the Office of Curricular Affairs."
   }
 };
 
@@ -584,6 +591,13 @@ const TIERS = {
     sub: "The Curriculum Navigator, the Electives and NEXUS Catalog, the Office of Curricular Affairs, and Faculty Opportunities.",
     dashboards: ["navigator", "electives", "curricularaffairs", "opportunities"],
     pinned: ["navigator", "electives", "curricularaffairs", "opportunities"]
+  },
+  "cd144ab2ff42f8bd12b54a5603a23efeda5976d757219d800d0ed6d9dd7118dc": {
+    // Added 22 Oct 2026 at the owner's request: this one card only. Its site's own unlock must accept this code too.
+    name: "Private Workspace",
+    sub: "A private workspace for the Office of Curricular Affairs.",
+    dashboards: ["privateworkspace"],
+    pinned: ["privateworkspace"]
   }
 };
 /* ============================================================ */
