@@ -48,15 +48,15 @@ h2{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute
 </header>
 <main class="wrap">
   <section class="intro">
-    <p class="lead">The working dashboard for From Education to Impact, the ISMMS MD Program Strategic Plan for 2026–2031: its five priorities, goals, Year 1 initiatives and KPIs, with the two initiatives Curriculum Content Gap Closure (G2.2) and the Emerging Healthcare Competency Framework (G3.1), their members, milestones, meetings and materials. It is read-only; the working groups' project managers send updates.</p>
-    <a class="btn" href="https://ascend-strategic-plan.vercel.app/">Open the dashboard &rarr;</a>
+    <p class="lead">The dashboard for From Education to Impact, the ISMMS MD Program Strategic Plan for 2026–2031: its five priorities, goals, Year 1 initiatives and KPIs, with the two initiatives Curriculum Content Gap Closure (G2.2) and the Emerging Healthcare Competency Framework (G3.1), their milestones and gap register. Members, meetings, minutes, charters and pre-reads are working files in SharePoint, linked from the dashboard.</p>
+    <a class="btn" href="https://sinaiascend.github.io/Dashboard---Education-to-Impact/">Open the dashboard &rarr;</a>
   </section>
   <h2>What you will find</h2>
   <div class="vgrid">
       <div class="vcard">
         <div class="vk">01</div>
         <div class="vt">Overview and roadmap</div>
-        <div class="vb">The strategic identity, open items, what is coming up, and a timeline of next steps for G2.2 and G3.1.</div>
+        <div class="vb">The strategic identity, the plan at a glance, and a timeline of the G2.2 and G3.1 KPI milestones.</div>
         
       </div>
       <div class="vcard">
@@ -73,41 +73,23 @@ h2{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute
       </div>
       <div class="vcard">
         <div class="vk">04</div>
-        <div class="vt">Members and Year 1 teams</div>
-        <div class="vb">The G2.2 and G3.1 working groups with photos, and the co-leads and project managers of all 12 initiatives.</div>
+        <div class="vt">Year 1 teams</div>
+        <div class="vb">The co-leads and project managers of all 12 Year 1 initiatives, and who does what in the plan.</div>
         
       </div>
       <div class="vcard">
         <div class="vk">05</div>
-        <div class="vt">Action plan, meetings and minutes</div>
-        <div class="vb">Requests and deadlines with owner and status, each meeting with its decisions, and minutes and synopses.</div>
+        <div class="vt">Gap register</div>
+        <div class="vb">Each flagged curriculum gap with its October 2026 evidence and its EEC decision.</div>
         
       </div>
       <div class="vcard">
         <div class="vk">06</div>
-        <div class="vt">Gap register and materials</div>
-        <div class="vb">Each flagged curriculum gap with its October 2026 evidence and decision, the draft charters, the Curriculum Gap Report and the meeting pre-reads.</div>
+        <div class="vt">Working files</div>
+        <div class="vb">SharePoint links, opened with a Mount Sinai sign-in: the draft charters, the Curriculum Gap Report, a workbook of members, actions, meetings and minutes, and the Steering Committee pre-reads.</div>
         
       </div>
   </div>
-  <div class="aud"><b>Who this is for.</b> Strategic plan working group members and the Office of Curricular Affairs. The dashboard holds working-group planning material, so it sits behind its own server-side gate; your Hub code opens it if your role allows.</div>
+  <div class="aud"><b>Who this is for.</b> Strategic plan working group members and the Office of Curricular Affairs. The plan pages are open to anyone with the link; the working files open in SharePoint with a Mount Sinai sign-in.</div>
 </main>
-<script>
-/* This site keeps its own server-side gate on another origin, so the hub's
-   unlock cannot reach it. The hub kept the code this tab was opened with; the
-   button posts it to the site's unlock endpoint, which sets the cookie and
-   sends the person on. Without a stored code the button is a plain link and
-   the site's own gate asks. */
-document.querySelector('.btn').addEventListener('click', function(e){
-  var code = null;
-  try { code = sessionStorage.getItem('ascendCode'); } catch(_){}
-  if(!code) return;
-  e.preventDefault();
-  var f = document.createElement('form');
-  f.method = 'post'; f.action = "https://ascend-strategic-plan.vercel.app/api/unlock";
-  var add = function(n, v){ var i = document.createElement('input'); i.type = 'hidden'; i.name = n; i.value = v; f.appendChild(i); };
-  add('code', code); add('to', "/");
-  document.body.appendChild(f); f.submit();
-});
-</script>
 </body></html>
