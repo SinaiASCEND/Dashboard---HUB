@@ -289,8 +289,8 @@
      "url": "Dashboard-Phase-2-Program-Assessment/monitoring.html"
     },
     {
-     "title": "Site comparability",
-     "blurb": "Opens the Site Comparability dashboard: teaching sites compared on nine measures, plus the clinical site reports (one teaching site at a time).",
+     "title": "OAEA Clerkship Quality Monitor",
+     "blurb": "Opens the OAEA Clerkship Quality Monitor: nine measures per clerkship compared across teaching sites and rotations, RCE completion and ALE use (LCME 6.2, 6.4, 8.6), plus the clinical site reports (one teaching site at a time).",
      "url": "Dashboard-Site-Comparability/"
     },
     {
@@ -318,10 +318,10 @@
    "slug": "site-comparability",
    "key": "sitecomp",
    "kicker": "Programmatic Assessment",
-   "title": "Site Comparability",
-   "short": "Site Comparability",
+   "title": "OAEA Clerkship Quality Monitor",
+   "short": "OAEA Clerkship Quality Monitor",
    "audience": "Clerkship and site directors, the Clinical Curriculum Subcommittee, and OCA leadership.",
-   "intro": "How the teaching sites of each Phase 2 clerkship compare, one clerkship at a time and across all clerkships, for the Class of 2028 (year to date) and the Class of 2027 where the data has a site split. Every figure is an aggregate; cells with fewer than five students are not shaded, and shading describes position only.",
+   "intro": "Formerly Site Comparability. The quality of each Phase 2 clerkship on nine measures, compared across teaching sites and rotations, with RCE completion and ALE use, one clerkship at a time and across all clerkships, for the Class of 2028 (year to date) and the Class of 2027 where the data has a site split. Every figure is an aggregate; cells with fewer than five students are not shaded, and shading describes position only.",
    "primary": "Dashboard-Site-Comparability/",
    "views": [
     {
