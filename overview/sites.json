@@ -715,32 +715,32 @@
    "title": "From Education to Impact",
    "short": "the dashboard",
    "audience": "Strategic plan working group members and the Office of Curricular Affairs. The plan pages are open to anyone with the link; the working files open in SharePoint with a Mount Sinai sign-in.",
-   "intro": "The dashboard for From Education to Impact, the ISMMS MD Program Strategic Plan for 2026–2031: its five priorities, goals, Year 1 initiatives and KPIs, with the two initiatives Curriculum Content Gap Closure (G2.2) and the Emerging Healthcare Competency Framework (G3.1), their milestones and gap register. Members, meetings, minutes, charters and pre-reads are working files in SharePoint, linked from the dashboard.",
+   "intro": "The dashboard for From Education to Impact, the ISMMS MD Program Strategic Plan for 2026–2031: its five priorities, goals, Year 1 initiatives and KPIs, with the two initiatives Curriculum Content Gap Closure (G2.2) and the Emerging Healthcare Competency Framework (G3.1), their milestones and gap register; each working group has its own page, and the overview, plan, teams and shared files are common to both. Members, meetings, minutes, charters and pre-reads are working files in SharePoint, linked from the dashboard.",
    "primaryAbs": "https://sinaiascend.github.io/Dashboard---Education-to-Impact/",
    "views": [
     {
-     "title": "Overview and roadmap",
-     "blurb": "The strategic identity, the plan at a glance, and a timeline of the G2.2 and G3.1 KPI milestones."
+     "title": "Overview",
+     "blurb": "Common to both working groups: the strategic identity, the plan at a glance, the timeline, and a card for each group that opens its own page."
     },
     {
      "title": "Plan and KPIs",
      "blurb": "The five priorities, their goals and initiatives, and each Year 1 KPI with its due date and status."
     },
     {
-     "title": "KPI milestones",
-     "blurb": "Each G2.2 and G3.1 indicator broken into dated stages, with what counts as done."
-    },
-    {
      "title": "Year 1 teams",
      "blurb": "The co-leads and project managers of all 12 Year 1 initiatives, and who does what in the plan."
     },
     {
-     "title": "Gap register",
-     "blurb": "Each flagged curriculum gap with its October 2026 evidence and its EEC decision."
+     "title": "Shared files",
+     "blurb": "SharePoint links, opened with a Mount Sinai sign-in: the working details workbook (members, actions, meetings and minutes for both groups) and the Steering Committee pre-reads."
     },
     {
-     "title": "Working files",
-     "blurb": "SharePoint links, opened with a Mount Sinai sign-in: the draft charters, the Curriculum Gap Report, a workbook of members, actions, meetings and minutes, and the Steering Committee pre-reads."
+     "title": "G2.2 Curriculum Content Gap Closure",
+     "blurb": "The group's own page: its Year 1 outcome, KPIs, roadmap timeline and KPI milestones, the gap register with each flagged gap's October 2026 evidence and EEC decision, and its charter and the Curriculum Gap Report."
+    },
+    {
+     "title": "G3.1 Emerging Healthcare Competency Framework",
+     "blurb": "The group's own page: its Year 1 outcome, KPIs, roadmap timeline and KPI milestones, and its charter."
     }
    ]
   },
