@@ -208,7 +208,7 @@
      "blurb": "One page per module with grading structure, final and component results, NBME customized assessment and end-of-module exam statistics, quizzes, and cohort comparison."
     },
     {
-     "title": "All Modules",
+     "title": "All Phase 1 ASCEND Modules",
      "blurb": "Every module side by side, by class: final grades, the end-of-module exam (with NBME national means and reliability), the student evaluation's core questions, instructional time and learning objectives.",
      "url": "Dashboard-Phase-1-Program-Assessment/all-modules.html"
     },
@@ -279,7 +279,7 @@
      "blurb": "One page per clerkship with grade distribution, NBME subject exam results by site, preceptor evaluation reliability, and direct-observation trends."
     },
     {
-     "title": "All Clerkships",
+     "title": "All Phase 2 ASCEND Clerkships",
      "blurb": "Every clerkship side by side on twelve shared measures — overall quality, mid-clerkship feedback and observation, clerkship and site evaluations, professionalism, CPE, shelf, direct observation, work hours, RCE logging, GQ and mistreatment — by class and by rotation.",
      "url": "Dashboard-Phase-2-Program-Assessment/all-clerkships.html"
     },
