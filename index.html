@@ -518,8 +518,8 @@ const TIERS = {
     sub: "Full access \u2014 all monitoring, mapping, governance, and accreditation views.",
     // Every dashboard the Hub knows. Add a new card's key here too.
     dashboards: ["calendar", "phase1", "clinicalskills", "phase2", "sitecomp", "phase3", "nbme",  "objectives", "nutrition", "integration", "policies", "surveys", "lcme", "governance", "support", "one45forms", "studentleaders",
-                 "navigator", "electives", "babybates", "facultyguides", "people", "retreat", "strategicplan"],
-    pinned: ["retreat","phase1","phase2","phase3","governance","studentleaders"]
+                 "navigator", "electives", "babybates", "facultyguides", "people", "strategicplan"],
+    pinned: ["phase1","phase2","phase3","governance","studentleaders"]
   },
   "255af8d0734e8438d7fcef7cb457da08d130e24f574065175f2ab73ed2ffb360": {
     name: "Executive Education Committee",
@@ -545,12 +545,12 @@ const TIERS = {
   "4ed5cb948f5f7c10d66e38ed679d0e5f0be24469df2de636c2da893d5b06ecb3": {
     name: "Curricular Integration Subcommittee",
     sub: "The Phase 1, 2 and 3 directors dashboards, the class calendar, policies, governance, the Faculty Development Retreat, and student navigation tools.",
-    // Integration Retreat card added 15 Oct 2026 at the owner's request (pinned until the retreat is over).
+    // Retreat card (added 15 Oct 2026) taken off every tier 24 Oct 2026 at the owner's request; its entry in DASHBOARDS stays so it can be restored.
     // Curricular Integration Dashboard added 18 Oct 2026 at the owner's request: this subcommittee's home dashboard.
     // Phase 1, 2 and 3 Directors Dashboards added 22 Oct 2026 at the owner's request.
     dashboards: ["calendar", "phase1", "phase2", "phase3", "integration", "policies", "governance", "studentleaders",
-                 "people", "navigator", "electives", "retreat"],
-    pinned: ["retreat", "integration", "studentleaders"]
+                 "people", "navigator", "electives"],
+    pinned: ["integration", "studentleaders"]
   },
   "9f8b17ea00b6b3fd1efa6d10aa21cfedc91ba71a26b03557e09576370c157a81": {
     name: "Clinical Competency Mentors",
@@ -562,9 +562,9 @@ const TIERS = {
     // The owner's own tier.
     name: "Rainier Soriano \u2014 Full Access",
     sub: "Every dashboard.",
-    // Always every card in DASHBOARDS, so a new card shows here without being listed.
-    dashboards: Object.keys(DASHBOARDS),
-    pinned: ["retreat","strategicplan","phase1","phase2","phase3","governance","studentleaders"]
+    // Every card in DASHBOARDS (a new card shows here without being listed) except the retreat card, hidden 24 Oct 2026.
+    dashboards: Object.keys(DASHBOARDS).filter(function (k) { return k !== "retreat"; }),
+    pinned: ["strategicplan","phase1","phase2","phase3","governance","studentleaders"]
   },
   "a42b8352b4c79f604f3ca0f8c703cbd08f648e86099ec682ce98bd4a11286741": {
     name: "Governance Support",
